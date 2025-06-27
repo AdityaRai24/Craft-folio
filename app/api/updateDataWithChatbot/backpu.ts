@@ -18,11 +18,12 @@ const generateDummyResponse = (changes: any[], inputValue: string): string => {
 
   const responseTemplates = {
     add: {
-      projects: "Added a new project to your portfolio with the details you provided.",
+      projects:
+        "Added a new project to your portfolio with the details you provided.",
       experience: "Added new work experience to your professional background.",
       skills: "Added new skills to your technical expertise.",
       education: "Added educational background to your profile.",
-      default: "Added the requested information to your portfolio."
+      default: "Added the requested information to your portfolio.",
     },
     update: {
       summary: "Updated your professional summary with fresh content.",
@@ -39,27 +40,28 @@ const generateDummyResponse = (changes: any[], inputValue: string): string => {
       experience: "Modified your work experience information.",
       skills: "Updated your skills and technical expertise.",
       education: "Updated your educational background.",
-      default: "Updated the requested section in your portfolio."
+      default: "Updated the requested section in your portfolio.",
     },
     change: {
-      summary: "Modified your professional summary to better reflect your experience.",
+      summary:
+        "Modified your professional summary to better reflect your experience.",
       projects: "Changed the project details as requested.",
       experience: "Modified your work experience information.",
       skills: "Updated your technical skills list.",
-      default: "Made the requested changes to your portfolio."
+      default: "Made the requested changes to your portfolio.",
     },
     remove: {
       projects: "Removed the specified project from your portfolio.",
       experience: "Removed the work experience entry.",
       skills: "Removed the specified skills from your list.",
-      default: "Removed the requested item from your portfolio."
+      default: "Removed the requested item from your portfolio.",
     },
     delete: {
       projects: "Deleted the specified project from your portfolio.",
       experience: "Deleted the work experience entry.",
       skills: "Deleted the specified skills.",
-      default: "Deleted the requested content from your portfolio."
-    }
+      default: "Deleted the requested content from your portfolio.",
+    },
   };
 
   // Generate response based on the first change (most common case)
@@ -68,10 +70,13 @@ const generateDummyResponse = (changes: any[], inputValue: string): string => {
   const section = primaryChange.sectionName.toLowerCase();
 
   let response = "";
-  
+
   if (responseTemplates[intent as keyof typeof responseTemplates]) {
-    const intentTemplates = responseTemplates[intent as keyof typeof responseTemplates];
-    response = intentTemplates[section as keyof typeof intentTemplates] || intentTemplates.default;
+    const intentTemplates =
+      responseTemplates[intent as keyof typeof responseTemplates];
+    response =
+      intentTemplates[section as keyof typeof intentTemplates] ||
+      intentTemplates.default;
   } else {
     response = "Made the requested changes to your portfolio.";
   }
@@ -79,17 +84,32 @@ const generateDummyResponse = (changes: any[], inputValue: string): string => {
   // Handle multiple changes
   if (changes.length > 1) {
     const additionalChanges = changes.length - 1;
-    response += ` I also made ${additionalChanges} other ${additionalChanges === 1 ? 'change' : 'changes'} as requested.`;
+    response += ` I also made ${additionalChanges} other ${
+      additionalChanges === 1 ? "change" : "changes"
+    } as requested.`;
   }
 
   // Add contextual responses for common patterns
-  if (inputValue.toLowerCase().includes('shorter') || inputValue.toLowerCase().includes('brief')) {
-    response = "Made your content more concise while keeping the key information.";
-  } else if (inputValue.toLowerCase().includes('longer') || inputValue.toLowerCase().includes('detailed')) {
+  if (
+    inputValue.toLowerCase().includes("shorter") ||
+    inputValue.toLowerCase().includes("brief")
+  ) {
+    response =
+      "Made your content more concise while keeping the key information.";
+  } else if (
+    inputValue.toLowerCase().includes("longer") ||
+    inputValue.toLowerCase().includes("detailed")
+  ) {
     response = "Expanded your content with more detailed information.";
-  } else if (inputValue.toLowerCase().includes('professional') || inputValue.toLowerCase().includes('formal')) {
+  } else if (
+    inputValue.toLowerCase().includes("professional") ||
+    inputValue.toLowerCase().includes("formal")
+  ) {
     response = "Updated your content with a more professional tone.";
-  } else if (inputValue.toLowerCase().includes('casual') || inputValue.toLowerCase().includes('friendly')) {
+  } else if (
+    inputValue.toLowerCase().includes("casual") ||
+    inputValue.toLowerCase().includes("friendly")
+  ) {
     response = "Adjusted your content to have a more approachable tone.";
   }
 
@@ -105,6 +125,8 @@ export async function POST(req: NextRequest) {
       model: "gemini-1.5-flash",
     });
 
+    const sections = portfolioData.map((item : any) => item.type);
+    console.log(sections)
     // Schema for the complete response
     const outputSchema = z.object({
       changes: z
@@ -222,7 +244,10 @@ export async function POST(req: NextRequest) {
     });
 
     // Single API call to handle everything
+    const start = Date.now();
     const response = await model.generateContent(finalPrompt);
+    const endLLM = Date.now();
+    console.log("LLM call duration:", endLLM - start, "ms");
     const responseText = response.response.text();
 
     // Parse the response with robust error handling
@@ -230,14 +255,14 @@ export async function POST(req: NextRequest) {
     try {
       // First, try to extract JSON from the response
       let jsonContent = responseText.trim();
-      
+
       // Remove markdown code blocks if present
       const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)```/;
       const codeBlockMatch = jsonContent.match(codeBlockRegex);
       if (codeBlockMatch) {
         jsonContent = codeBlockMatch[1].trim();
       }
-      
+
       // Try to find JSON object in the response
       const jsonObjectRegex = /\{[\s\S]*\}/;
       const jsonMatch = jsonContent.match(jsonObjectRegex);
@@ -251,15 +276,15 @@ export async function POST(req: NextRequest) {
         rawParsed = JSON.parse(jsonContent);
       } catch (jsonError) {
         console.error("Direct JSON parsing failed:", jsonError);
-        
+
         // Fallback: try to clean common JSON issues
         let cleanedJson = jsonContent
-          .replace(/,\s*}/g, '}')  // Remove trailing commas
-          .replace(/,\s*]/g, ']')  // Remove trailing commas in arrays
-          .replace(/[\r\n\t]/g, ' ')  // Replace newlines and tabs with spaces
-          .replace(/\s+/g, ' ')  // Collapse multiple spaces
+          .replace(/,\s*}/g, "}") // Remove trailing commas
+          .replace(/,\s*]/g, "]") // Remove trailing commas in arrays
+          .replace(/[\r\n\t]/g, " ") // Replace newlines and tabs with spaces
+          .replace(/\s+/g, " ") // Collapse multiple spaces
           .trim();
-        
+
         rawParsed = JSON.parse(cleanedJson);
       }
 
@@ -267,7 +292,7 @@ export async function POST(req: NextRequest) {
       if (!rawParsed.changes) {
         rawParsed.changes = [];
       }
-      
+
       if (!rawParsed.updatedPortfolio) {
         // If updatedPortfolio is missing, use the original data
         rawParsed.updatedPortfolio = portfolioData;
@@ -279,42 +304,46 @@ export async function POST(req: NextRequest) {
       }
 
       // Validate each change object
-      rawParsed.changes = rawParsed.changes.filter((change : any) => 
-        change && 
-        typeof change === 'object' && 
-        change.intent && 
-        change.sectionName &&
-        typeof change.isNewRequest === 'boolean'
+      rawParsed.changes = rawParsed.changes.filter(
+        (change: any) =>
+          change &&
+          typeof change === "object" &&
+          change.intent &&
+          change.sectionName &&
+          typeof change.isNewRequest === "boolean"
       );
 
       parsedOutput = rawParsed;
-
     } catch (error) {
       console.error("Parsing error:", error);
       console.error("Response text:", responseText);
-      
+
       // Return a fallback response with no changes
       return NextResponse.json({
         originalData: portfolioData,
         updatedData: portfolioData,
         changes: [],
-        userReply: "I encountered an issue processing your request. Could you please try rephrasing your request more specifically?",
+        userReply:
+          "I encountered an issue processing your request. Could you please try rephrasing your request more specifically?",
         error: "Parsing failed",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
       });
     }
+    const endParsing = Date.now();
+    console.log("Parsing duration:", endParsing - endLLM, "ms");
+    console.log("Total duration (LLM + parsing):", endParsing - start, "ms");
 
     // Filter out invalid changes
     const validChanges = parsedOutput.changes.filter(
-      (change : any) =>
-        change.intent && 
-        change.sectionName && 
+      (change: any) =>
+        change.intent &&
+        change.sectionName &&
         (change.isNewRequest || (change.value && change.value.trim() !== ""))
     );
 
     // Generate dummy response based on applied changes
     const userResponse = generateDummyResponse(validChanges, inputValue);
-
+    
     return NextResponse.json({
       originalData: portfolioData,
       updatedData: parsedOutput.updatedPortfolio,
@@ -322,7 +351,6 @@ export async function POST(req: NextRequest) {
       userReply: userResponse,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error: "An error occurred during portfolio customization",

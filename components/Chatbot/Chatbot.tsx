@@ -145,6 +145,17 @@ const CHATBOT_THEMES = {
   },
 };
 
+// Add this near the top of your component (after other constants)
+const FUN_LOADING_MESSAGES = [
+  "CraftBot is brewing up some magic... ✨",
+  "Summoning creative ideas...",
+  "Sharpening pencils and pixels...",
+  "Consulting the portfolio wizards...",
+  "Mixing colors and code...",
+  "Adding a pinch of awesomeness...",
+  "Almost there! Crafting your update...",
+];
+
 const PortfolioChatbot = ({
   portfolioData,
   setCurrentPortTheme,
@@ -195,6 +206,7 @@ const PortfolioChatbot = ({
   const [isGeneratingSEO, setIsGeneratingSEO] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [hasUpdatedUserId, setHasUpdatedUserId] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(FUN_LOADING_MESSAGES[0]);
 
   const themeColors = CHATBOT_THEMES[chatbotTheme];
 
@@ -350,6 +362,7 @@ const PortfolioChatbot = ({
     );
 
     setInputValue("");
+    setLoadingMessage(FUN_LOADING_MESSAGES[Math.floor(Math.random() * FUN_LOADING_MESSAGES.length)]);
     setIsProcessing(true);
 
     setShowHelpPanel(false);
@@ -1920,7 +1933,10 @@ const PortfolioChatbot = ({
                                 color: themeColors.textPrimary,
                               }}
                             >
-                              <p className="text-sm whitespace-pre-line">
+                              <p
+                                className="text-sm whitespace-pre-line break-all"
+                                style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                              >
                                 {message.text}
                               </p>
                               <span
@@ -1944,31 +1960,17 @@ const PortfolioChatbot = ({
                           className="flex justify-start"
                         >
                           <div
-                            className="rounded-lg rounded-bl-none p-3 max-w-[80%]"
+                            className="rounded-lg rounded-bl-none p-3 max-w-[80%] flex items-center gap-3"
                             style={{ backgroundColor: themeColors.bgCard }}
                           >
-                            <div className="flex space-x-2">
-                              <div
-                                className="w-2 h-2 rounded-full animate-bounce"
-                                style={{
-                                  backgroundColor: themeColors.primary,
-                                  animationDelay: "0ms",
-                                }}
-                              ></div>
-                              <div
-                                className="w-2 h-2 rounded-full animate-bounce"
-                                style={{
-                                  backgroundColor: themeColors.primary,
-                                  animationDelay: "150ms",
-                                }}
-                              ></div>
-                              <div
-                                className="w-2 h-2 rounded-full animate-bounce"
-                                style={{
-                                  backgroundColor: themeColors.primary,
-                                  animationDelay: "300ms",
-                                }}
-                              ></div>
+                            <span className="text-2xl animate-bounce">🪄</span>
+                            <div>
+                              <div className="text-sm font-medium">{loadingMessage}</div>
+                              <div className="flex space-x-1 mt-1">
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: themeColors.primary, animationDelay: "0ms" }}></div>
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: themeColors.primary, animationDelay: "150ms" }}></div>
+                                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: themeColors.primary, animationDelay: "300ms" }}></div>
+                              </div>
                             </div>
                           </div>
                         </motion.div>

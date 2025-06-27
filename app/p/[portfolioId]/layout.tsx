@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
         str
       );
 
-    let portfolioId = params.portfolioId;
+    let portfolioId = await params.portfolioId;
 
     // If not UUID, try to get ID through slug
     if (!isUUID(portfolioId)) {
