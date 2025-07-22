@@ -13,13 +13,13 @@ export async function POST(req: NextRequest) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
     });
 
     const sections = portfolioData.map((item : any) => item.type);
     const sectionDetectionPrompt = `
       You are an assistant for a portfolio editing tool.\n\nAvailable sections: ${JSON.stringify(sections)}\nUser request: "${inputValue}"\nPrevious messages: ${messageMemory && messageMemory.length > 0 ? messageMemory.map((msg: MessageMemory, idx: number) => `Message ${idx + 1}: ${msg.text}`).join(' ') : ''}\n\nWhich single section should be updated? Return ONLY the most relevant section name as a plain string, e.g. "projects". Do not explain, do not return an array.`;
-    const sectionDetectionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const sectionDetectionModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const sectionDetectionResponse = await sectionDetectionModel.generateContent(sectionDetectionPrompt);
     const sectionDetectionText = sectionDetectionResponse.response.text().trim();
     let detectedSection = "";
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       - Do NOT include any explanations, markdown, or extra text.\n
       - If the request is unclear, make a reasonable professional update.\n    `;
 
-    const sectionEditModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const sectionEditModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const sectionEditResponse = await sectionEditModel.generateContent(sectionEditPrompt);
     const sectionEditText = sectionEditResponse.response.text().trim();
     let updatedSectionData = null;
