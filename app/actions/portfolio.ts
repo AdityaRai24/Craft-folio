@@ -545,7 +545,7 @@ export async function checkUserSubdomain(userId: string) {
       },
     });
 
-    // Get current subdomain count
+    // Get current subdomain counts
     const subdomainCount = await prisma.portfolioLink.count({
       where: {
         userId: userId,
