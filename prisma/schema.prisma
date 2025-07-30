@@ -22,6 +22,7 @@ model Portfolio {
   fontName      String         @default("Raleway")
   themeName     String         @default("default")
   PortfolioLink PortfolioLink?
+  customizations ComponentCustomization[]
 }
 
 model Template {
@@ -50,4 +51,16 @@ model PremiumUser {
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ComponentCustomization {
+  id          String   @id @default(uuid())
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  portfolioId String
+  component   String   
+  settings    Json     
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([portfolioId, component])
 }
