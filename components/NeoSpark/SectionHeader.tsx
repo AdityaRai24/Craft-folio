@@ -1,7 +1,21 @@
 import React from "react";
 import EditButton from "../EditButton";
+import { Settings } from "lucide-react";
+import { ColorTheme } from "@/lib/colorThemes";
 
-const SectionHeader = ({ sectionName, sectionTitle, sectionDescription, titleColor }: { sectionName: string, sectionTitle: string, sectionDescription: string, titleColor: string }) => {
+const SectionHeader = ({ 
+  sectionName, 
+  sectionTitle, 
+  sectionDescription, 
+  titleColor,
+  onVisualEditorOpen 
+}: { 
+  sectionName: string, 
+  sectionTitle: string, 
+  sectionDescription: string, 
+  titleColor: string,
+  onVisualEditorOpen?: () => void
+}) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="max-w-xl block mx-auto">
@@ -14,7 +28,25 @@ const SectionHeader = ({ sectionName, sectionTitle, sectionDescription, titleCol
         <p className="text-xl section-description text-gray-300 text-center mb-16">
           {sectionDescription}
         </p>
-        <EditButton sectionName={sectionName} styles="ml-auto mr-20" />
+        
+        {/* Consistent Button Layout */}
+      <div className="absolute top-4 right-4 z-20">
+      <div className="flex items-center justify-center gap-2">
+          <EditButton sectionName={sectionName} />
+          {onVisualEditorOpen && (
+            <button
+              onClick={onVisualEditorOpen}
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+              style={{
+                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+              }}
+            >
+              <Settings className="h-4 w-4" />
+              Visual Editor
+            </button>
+          )}
+        </div>
+      </div>
       </div>
     </div>
   );

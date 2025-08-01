@@ -2,27 +2,26 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  ArrowRight,
-  MessageSquareIcon,
-  Settings,
-  Palette,
-  Move,
-  Grid3X3,
+  ArrowRight, Settings, Grid3X3,
   RotateCcw,
   Type,
   Zap,
   Eye,
-  X,
+  X
 } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useAnimate } from "framer-motion";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import EditButton from "@/components/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
 import Navbar from "./Navbar";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import toast from "react-hot-toast";
+import { defaultHeroStyles } from "./defaultStyles/hero";
+import { CustomizationState } from "./defaultStyles/types";
 
 // Visual Alignment Selector Component
 const AlignmentSelector: React.FC<{
@@ -229,44 +228,7 @@ const BackgroundThemeSelector: React.FC<{
   );
 };
 
-interface CustomizationState {
-  // Layout & Structure
-  contentAlignment: "center" | "left" | "right";
-  verticalAlignment: "center" | "top" | "bottom";
-  maxWidth: "sm" | "md" | "lg" | "xl" | "full";
-  containerPadding: number;
 
-  // Background Theme
-  backgroundTheme:
-    | "pearl-mist"
-    | "aurora-midnight"
-    | "crimson-shadow"
-    | "ocean-abyss";
-
-  // Badge Customization
-  badgeVisible: boolean;
-
-  // Typography
-  titleSize: "sm" | "md" | "lg" | "xl";
-  titleWeight: "normal" | "medium" | "semibold" | "bold" | "extrabold";
-  titleLineHeight: "tight" | "snug" | "normal" | "relaxed";
-  titleLetterSpacing: "tighter" | "tight" | "normal" | "wide";
-  subtitleSize: "sm" | "md" | "lg" | "xl";
-  subtitleWeight: "normal" | "medium" | "semibold";
-  descriptionSize: "sm" | "md" | "lg";
-  descriptionMaxWidth: "sm" | "md" | "lg" | "xl" | "full";
-
-  // Button Customization
-  buttonLayout: "horizontal" | "vertical" | "stacked";
-  buttonSize: "sm" | "md" | "lg";
-  buttonStyle: "default" | "rounded" | "square" | "pill";
-
-  // Effects
-  scrollIndicator: boolean;
-  scrollIndicatorStyle: "line" | "arrow" | "dot" | "animated";
-  glowEffect: boolean;
-  textShadow: boolean;
-}
 
 const Hero = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
@@ -294,41 +256,78 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<CustomizationState>({
-    // Layout & Structure
-    contentAlignment: "center",
-    verticalAlignment: "center",
-    maxWidth: "full",
-    containerPadding: 16,
+  // Main customization state (from DB or default)
+  const [customization, setCustomization] = useState<CustomizationState>(defaultHeroStyles);
+  // Local draft state for visual editor
+  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
 
-    // Background Theme
-    backgroundTheme: "pearl-mist",
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
-    // Badge Customization
-    badgeVisible: true,
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "hero",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as unknown as CustomizationState);
+        } else {
+          setCustomization(defaultHeroStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultHeroStyles);
+      }
+    };
+    if (portfolioId) loadCustomizations();
+  }, [portfolioId]);
 
-    // Typography
-    titleSize: "lg",
-    titleWeight: "bold",
-    titleLineHeight: "snug",
-    titleLetterSpacing: "tight",
-    subtitleSize: "lg",
-    subtitleWeight: "medium",
-    descriptionSize: "md",
-    descriptionMaxWidth: "lg",
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
 
-    // Button Customization
-    buttonLayout: "horizontal",
-    buttonSize: "md",
-    buttonStyle: "default",
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
 
-    // Effects
-    scrollIndicator: true,
-    scrollIndicatorStyle: "line",
-    glowEffect: false,
-    textShadow: false,
-  });
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "hero",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "hero",
+      });
+      setCustomization(defaultHeroStyles);
+      setDraftCustomization(defaultHeroStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
+  };
 
   const getThemeButtonStyle = (isActive: boolean) => {
     if (isActive) {
@@ -377,44 +376,6 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
   }, [isDragging, dragOffset]);
 
-  // Reset customization
-  const resetCustomization = () => {
-    setCustomization({
-      // Layout & Structure
-      contentAlignment: "center",
-      verticalAlignment: "center",
-      maxWidth: "full",
-      containerPadding: 16,
-
-      // Background Theme
-      backgroundTheme: "pearl-mist",
-
-      // Badge Customization
-      badgeVisible: true,
-
-      // Typography
-      titleSize: "lg",
-      titleWeight: "bold",
-      titleLineHeight: "snug",
-      titleLetterSpacing: "tight",
-      subtitleSize: "lg",
-      subtitleWeight: "medium",
-      descriptionSize: "md",
-      descriptionMaxWidth: "lg",
-
-      // Button Customization
-      buttonLayout: "horizontal",
-      buttonSize: "md",
-      buttonStyle: "default",
-
-      // Effects
-      scrollIndicator: true,
-      scrollIndicatorStyle: "line",
-      glowEffect: false,
-      textShadow: false,
-    });
-  };
-
   // Helper functions for styling
   const getContainerClasses = () => {
     const alignmentMap = {
@@ -438,9 +399,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
 
     let classes = `relative flex-1 flex pt-8 flex-col ${
-      alignmentMap[customization.contentAlignment]
-    } ${verticalMap[customization.verticalAlignment]} ${
-      maxWidthMap[customization.maxWidth]
+      alignmentMap[effectiveCustomization.contentAlignment]
+    } ${verticalMap[effectiveCustomization.verticalAlignment]} ${
+      maxWidthMap[effectiveCustomization.maxWidth]
     } mx-auto space-y-6`;
 
     return classes;
@@ -476,10 +437,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       wide: "tracking-wide",
     };
 
-    return `section-title ${sizeMap[customization.titleSize]} ${
-      weightMap[customization.titleWeight]
-    } ${lineHeightMap[customization.titleLineHeight]} ${
-      letterSpacingMap[customization.titleLetterSpacing]
+    return `section-title ${sizeMap[effectiveCustomization.titleSize]} ${
+      weightMap[effectiveCustomization.titleWeight]
+    } ${lineHeightMap[effectiveCustomization.titleLineHeight]} ${
+      letterSpacingMap[effectiveCustomization.titleLetterSpacing]
     }`;
   };
 
@@ -499,9 +460,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
 
     return `section-description ${
-      sizeMap[customization.descriptionSize]
-    } font-medium ${maxWidthMap[customization.descriptionMaxWidth]} ${
-      customization.contentAlignment === "center" ? "mx-auto" : ""
+      sizeMap[effectiveCustomization.descriptionSize]
+    } font-medium ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${
+      effectiveCustomization.contentAlignment === "center" ? "mx-auto" : ""
     }`;
   };
 
@@ -530,11 +491,11 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
 
     return {
-      container: `${layoutMap[customization.buttonLayout]} mt-8`,
+      container: `${layoutMap[effectiveCustomization.buttonLayout]} mt-8`,
       button: `flex btn-primary items-center gap-2 ${
-        sizeMap[customization.buttonSize]
+        sizeMap[effectiveCustomization.buttonSize]
       } ${
-        styleMap[customization.buttonStyle]
+        styleMap[effectiveCustomization.buttonStyle]
       } cursor-pointer transition-all duration-300`,
     };
   };
@@ -549,11 +510,11 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const getTitleStyle = () => {
     let style: any = {};
 
-    if (customization.glowEffect) {
+    if (effectiveCustomization.glowEffect) {
       style.textShadow = `0 0 20px ${theme.colors.primary}50`;
     }
 
-    if (customization.textShadow) {
+    if (effectiveCustomization.textShadow) {
       style.textShadow = "2px 2px 4px rgba(0,0,0,0.5)";
     }
 
@@ -561,8 +522,25 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   };
 
   // Update customization helper
-  const updateCustomization = (key: keyof CustomizationState, value: any) => {
-    setCustomization((prev) => ({ ...prev, [key]: value }));
+  const updateCustomization = async (key: keyof CustomizationState, value: any) => {
+    const newCustomization = { ...customization, [key]: value };
+    setCustomization(newCustomization);
+    
+    // Save to database
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "hero",
+        settings: newCustomization,
+      });
+      
+      if (!result.success) {
+        toast.error("Failed to save customization");
+      }
+    } catch (error) {
+      console.error("Error saving customization:", error);
+      toast.error("Failed to save customization");
+    }
   };
 
   const renderToggle = (
@@ -705,7 +683,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const buttonClasses = getButtonClasses();
 
   const getBackgroundStyle = () => {
-    switch (customization.backgroundTheme) {
+    switch (effectiveCustomization.backgroundTheme) {
       case "pearl-mist":
         return {
           background:
@@ -739,17 +717,17 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0" style={getBackgroundStyle()} />
       <Navbar currentPortTheme={currentPortTheme} customCSS={customCSS} />
-      <div
-        className={getContainerClasses()}
-        style={{
-          paddingLeft: `${customization.containerPadding}px`,
-          paddingRight: `${customization.containerPadding}px`,
-        }}
-      >
+              <div
+          className={getContainerClasses()}
+          style={{
+            paddingLeft: `${effectiveCustomization.containerPadding}px`,
+            paddingRight: `${effectiveCustomization.containerPadding}px`,
+          }}
+        >
         <style>{customCSS}</style>
 
         {/* Badge */}
-        {customization.badgeVisible && heroData?.badge?.isVisible && (
+        {effectiveCustomization.badgeVisible && heroData?.badge?.isVisible && (
           <motion.div
             initial={animationVariants.hidden}
             animate={animationVariants.visible}
@@ -774,9 +752,12 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             </span>
           </motion.div>
         )}
-        <div className="absolute top-4 right-4 z-20">
+        
+        {/* Consistent Button Layout */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <EditButton sectionName="hero" />
           <button
-            onClick={() => setVisualEditorOpen(true)}
+            onClick={openVisualEditor}
             className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
             style={getThemeButtonStyle(true)}
           >
@@ -784,6 +765,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             Visual Editor
           </button>
         </div>
+        
         {/* Title */}
         <motion.h1
           initial={animationVariants.hidden}
@@ -800,9 +782,6 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             {heroData.titlePrefix}
             <span ref={titleScope}> {titleTexts[titleIndex]}</span>.
           </span>
-          <div className="absolute right-24 top-8">
-            <EditButton sectionName="hero" styles="mr-14" />
-          </div>
         </motion.h1>
 
         {/* Description */}
@@ -882,7 +861,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
         </motion.div>
 
         {/* Scroll Indicator */}
-        {customization.scrollIndicator && (
+        {effectiveCustomization.scrollIndicator && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.7 }}
@@ -891,7 +870,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             className="mt-16 text-center"
           >
             <p>Scroll to explore</p>
-            {customization.scrollIndicatorStyle === "line" && (
+            {effectiveCustomization.scrollIndicatorStyle === "line" && (
               <motion.div
                 initial={{ height: 32 }}
                 animate={{ height: 32 }}
@@ -902,7 +881,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 }}
               ></motion.div>
             )}
-            {customization.scrollIndicatorStyle === "arrow" && (
+            {effectiveCustomization.scrollIndicatorStyle === "arrow" && (
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -911,14 +890,14 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 ↓
               </motion.div>
             )}
-            {customization.scrollIndicatorStyle === "dot" && (
+            {effectiveCustomization.scrollIndicatorStyle === "dot" && (
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-2 h-2 bg-current rounded-full mx-auto mt-2"
               ></motion.div>
             )}
-            {customization.scrollIndicatorStyle === "animated" && (
+            {effectiveCustomization.scrollIndicatorStyle === "animated" && (
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
@@ -992,17 +971,13 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
               {activeTab === "layout" && (
                 <div className="space-y-4">
                   <BackgroundThemeSelector
-                    value={customization.backgroundTheme}
-                    onChange={(value) =>
-                      updateCustomization("backgroundTheme", value)
-                    }
+                    value={draftCustomization?.backgroundTheme ?? customization.backgroundTheme}
+                    onChange={value => updateDraftCustomization("backgroundTheme", value)}
                   />
 
                   <AlignmentSelector
-                    value={customization.contentAlignment}
-                    onChange={(value) =>
-                      updateCustomization("contentAlignment", value)
-                    }
+                    value={draftCustomization?.contentAlignment ?? customization.contentAlignment}
+                    onChange={value => updateDraftCustomization("contentAlignment", value)}
                     label="Content Alignment"
                   />
 
@@ -1018,11 +993,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                       ].map(({ value, label, icon }) => (
                         <div
                           key={value}
-                          onClick={() =>
-                            updateCustomization("verticalAlignment", value)
-                          }
+                          onClick={() => updateDraftCustomization("verticalAlignment", value)}
                           className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                            customization.verticalAlignment === value
+                            (draftCustomization?.verticalAlignment ?? customization.verticalAlignment) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
@@ -1051,9 +1024,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                       ].map(({ value, label, width }) => (
                         <div
                           key={value}
-                          onClick={() => updateCustomization("maxWidth", value)}
+                          onClick={() => updateDraftCustomization("maxWidth", value)}
                           className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            customization.maxWidth === value
+                            (draftCustomization?.maxWidth ?? customization.maxWidth) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
@@ -1086,22 +1059,11 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                       min={0}
                       max={64}
                       step={4}
-                      value={customization.containerPadding}
-                      onChange={(e) =>
-                        updateCustomization(
-                          "containerPadding",
-                          Number(e.target.value)
-                        )
-                      }
+                      value={draftCustomization?.containerPadding ?? customization.containerPadding}
+                      onChange={e => updateDraftCustomization("containerPadding", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${
-                          ColorTheme.primary
-                        } 0%, ${ColorTheme.primary} ${
-                          (customization.containerPadding / 64) * 100
-                        }%, #3f3f46 ${
-                          (customization.containerPadding / 64) * 100
-                        }%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100}%, #3f3f46 ${((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
@@ -1113,8 +1075,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
                     {renderToggle(
                       "Show Badge",
-                      customization.badgeVisible,
-                      (value) => updateCustomization("badgeVisible", value)
+                      draftCustomization?.badgeVisible ?? customization.badgeVisible,
+                      value => updateDraftCustomization("badgeVisible", value)
                     )}
                   </div>
                 </div>
@@ -1124,10 +1086,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 <div>
                   <div className="mb-6 space-y-4">
                     <SizeSelector
-                      value={customization.titleSize}
-                      onChange={(value) =>
-                        updateCustomization("titleSize", value)
-                      }
+                      value={draftCustomization?.titleSize ?? customization.titleSize}
+                      onChange={value => updateDraftCustomization("titleSize", value)}
                       label="Title Size"
                       options={[
                         { value: "sm", label: "Small", size: "24px" },
@@ -1168,10 +1128,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                           <div
                             key={value}
                             onClick={() =>
-                              updateCustomization("titleWeight", value)
+                              updateDraftCustomization("titleWeight", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.titleWeight === value
+                              (draftCustomization?.titleWeight ?? customization.titleWeight) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1210,10 +1170,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                           <div
                             key={value}
                             onClick={() =>
-                              updateCustomization("titleLineHeight", value)
+                              updateDraftCustomization("titleLineHeight", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.titleLineHeight === value
+                              (draftCustomization?.titleLineHeight ?? customization.titleLineHeight) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1258,10 +1218,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                           <div
                             key={value}
                             onClick={() =>
-                              updateCustomization("titleLetterSpacing", value)
+                              updateDraftCustomization("titleLetterSpacing", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.titleLetterSpacing === value
+                              (draftCustomization?.titleLetterSpacing ?? customization.titleLetterSpacing) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1288,10 +1248,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
                   <div className="border-t text-left space-y-4 border-zinc-700 ">
                     <SizeSelector
-                      value={customization.descriptionSize}
-                      onChange={(value) =>
-                        updateCustomization("descriptionSize", value)
-                      }
+                      value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
+                      onChange={value => updateDraftCustomization("descriptionSize", value)}
                       label="Description Size"
                       options={[
                         { value: "sm", label: "Small", size: "18px" },
@@ -1319,10 +1277,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                           <div
                             key={value}
                             onClick={() =>
-                              updateCustomization("descriptionMaxWidth", value)
+                              updateDraftCustomization("descriptionMaxWidth", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.descriptionMaxWidth === value
+                              (draftCustomization?.descriptionMaxWidth ?? customization.descriptionMaxWidth) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1358,10 +1316,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                         <div
                           key={value}
                           onClick={() =>
-                            updateCustomization("buttonLayout", value)
+                            updateDraftCustomization("buttonLayout", value)
                           }
                           className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            customization.buttonLayout === value
+                            (draftCustomization?.buttonLayout ?? customization.buttonLayout) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
@@ -1378,10 +1336,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                   </div>
 
                   <SizeSelector
-                    value={customization.buttonSize}
-                    onChange={(value) =>
-                      updateCustomization("buttonSize", value)
-                    }
+                    value={draftCustomization?.buttonSize ?? customization.buttonSize}
+                    onChange={value => updateDraftCustomization("buttonSize", value)}
                     label="Button Size"
                     options={[
                       { value: "sm", label: "Small", size: "12px" },
@@ -1391,10 +1347,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                   />
 
                   <ButtonStyleSelector
-                    value={customization.buttonStyle}
-                    onChange={(value) =>
-                      updateCustomization("buttonStyle", value)
-                    }
+                    value={draftCustomization?.buttonStyle ?? customization.buttonStyle}
+                    onChange={value => updateDraftCustomization("buttonStyle", value)}
                     label="Button Style"
                     options={[
                       { value: "default", label: "Default", style: "rounded" },
@@ -1429,13 +1383,13 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                         <div
                           key={key}
                           onClick={() =>
-                            updateCustomization(
+                            updateDraftCustomization(
                               key as any,
-                              !customization[key as keyof CustomizationState]
+                              !(draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
                             )
                           }
                           className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                            customization[key as keyof CustomizationState]
+                            (draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
@@ -1454,11 +1408,11 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                   <div className="border-t text-left border-zinc-700 pt-4">
                     {renderToggle(
                       "Show Scroll Indicator",
-                      customization.scrollIndicator,
-                      (value) => updateCustomization("scrollIndicator", value)
+                      draftCustomization?.scrollIndicator ?? customization.scrollIndicator,
+                      (value) => updateDraftCustomization("scrollIndicator", value)
                     )}
 
-                    {customization.scrollIndicator && (
+                    {(draftCustomization?.scrollIndicator ?? customization.scrollIndicator) && (
                       <div>
                         <label className="block text-white font-medium mb-3">
                           Indicator Style
@@ -1473,13 +1427,13 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                             <div
                               key={value}
                               onClick={() =>
-                                updateCustomization(
+                                updateDraftCustomization(
                                   "scrollIndicatorStyle",
                                   value
                                 )
                               }
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                customization.scrollIndicatorStyle === value
+                                (draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
@@ -1511,7 +1465,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                   Reset
                 </button>
                 <button
-                  onClick={() => setVisualEditorOpen(false)}
+                  onClick={saveDraftCustomization}
                   className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
                   style={getThemeButtonStyle(true)}
                 >

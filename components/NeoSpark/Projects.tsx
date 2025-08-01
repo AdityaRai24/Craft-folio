@@ -31,6 +31,10 @@ import { motion } from "framer-motion";
 import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
+import toast from "react-hot-toast";
+import { defaultProjectsStyles } from "./defaultStyles/projects";
+import { ProjectsCustomizationState } from "./defaultStyles/types";
+import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 
 interface Technology {
   name: string;
@@ -48,72 +52,6 @@ interface Project {
   year?: string;
 }
 
-interface CustomizationState {
-  layout: "single" | "grid";
-  gridColumns: number;
-  cardSpacing: number;
-  cardBorderRadius: number;
-  imageBorderRadius: number;
-  cardBackground: string;
-  cardBorder: string;
-  imageAspectRatio: "auto" | "square" | "wide" | "tall";
-  imageHeight: number;
-  githubButtonStyle: "default" | "filled" | "ghost" | "minimal";
-  liveButtonStyle: "default" | "filled" | "ghost" | "minimal";
-  buttonBorderRadius: number;
-  techStackStyle: "pills" | "badges" | "minimal" | "colorful";
-  animationSpeed: number;
-  titleAlignment: "left" | "center" | "right";
-  cardPadding: number;
-  imageOverlay: boolean;
-  imagePosition: "left" | "right";
-}
-
-// Visual Border Radius Selector Component
-const BorderRadiusSelector: React.FC<{
-  value: number;
-  onChange: (value: number) => void;
-  label: string;
-}> = ({ value, onChange, label }) => {
-  const borderOptions = [0, 4, 8, 12, 16, 20, 24];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">{label}</label>
-      <div className="grid grid-cols-4 gap-2">
-        {borderOptions.map((radius) => (
-          <div
-            key={radius}
-            onClick={() => onChange(radius)}
-            className={`relative cursor-pointer p-3 border-2 transition-all duration-200 ${
-              value === radius
-                ? "border-white"
-                : "border-gray-600 hover:border-gray-400"
-            }`}
-            style={{ borderRadius: `${radius}px` }}
-          >
-            <div
-              className="w-full h-8 rounded"
-              style={{ 
-                borderRadius: `${Math.max(0, radius - 4)}px`,
-                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`
-              }}
-            />
-            <div className="text-center text-xs text-gray-300 mt-1">
-              {radius}px
-            </div>
-            {value === radius && (
-              <div
-                className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
-                style={{ backgroundColor: ColorTheme.primary }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 // Visual Layout Selector Component
 const LayoutSelector: React.FC<{
@@ -459,34 +397,6 @@ const TechStackStyleSelector: React.FC<{
 
 
 
-// Visual Spacing Selector Component
-const SpacingSelector: React.FC<{
-  value: number;
-  onChange: (value: number) => void;
-  label: string;
-  type: "gap" | "padding";
-}> = ({ value, onChange, label, type }) => {
-  return (
-    <div>
-      <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-        {label}: {value}px
-      </label>
-      <input
-        type="range"
-        min={type === "gap" ? 2 : 1}
-        max={type === "gap" ? 16 : 12}
-        step={type === "gap" ? 2 : 1}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-        style={{
-          background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(value / (type === "gap" ? 16 : 12)) * 100}%, #3f3f46 ${(value / (type === "gap" ? 16 : 12)) * 100}%, #3f3f46 100%)`
-        }}
-      />
-    </div>
-  );
-};
-
 const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const [isInView, setIsInView] = useState<boolean>(false);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -494,16 +404,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const portfolioId = params.portfolioId as string;
   const dispatch = useDispatch();
 
-  // Helper function to get theme-based button style
-  const getThemeButtonStyle = (isActive: boolean) => {
-    if (isActive) {
-      return {
-        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-        color: "white",
-      };
-    }
-    return {};
-  };
+
 
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -518,28 +419,15 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<CustomizationState>({
-    layout: "single",
-    gridColumns: 3,
-    cardSpacing: 8,
-    cardBorderRadius: 8,
-    imageBorderRadius: 8,
-    cardBackground: "bg-stone-800/30",
-    cardBorder: "border-gray-700",
-    imageAspectRatio: "auto",
-    imageHeight: 208,
-    githubButtonStyle: "default",
-    liveButtonStyle: "default",
-    buttonBorderRadius: 6,
-    techStackStyle: "pills",
-    animationSpeed: 0.3,
-    titleAlignment: "left",
-    cardPadding: 4,
-    imageOverlay: true,
-    imagePosition: "left",
-  });
+  // Use defaultProjectsStyles for initial state
+  const [customization, setCustomization] = useState<ProjectsCustomizationState>(defaultProjectsStyles);
+  const [draftCustomization, setDraftCustomization] = useState<ProjectsCustomizationState | null>(null);
 
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
+
+  
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
@@ -559,28 +447,80 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     projectsSection?.sectionDescription ||
     "A showcase of my full-stack projects, built using modern web technologies and frameworks.";
 
-  // Reset customization
-  const resetCustomization = () => {
-    setCustomization({
-      layout: "single",
-      gridColumns: 3,
-      cardSpacing: 8,
-      cardBorderRadius: 8,
-      imageBorderRadius: 8,
-      cardBackground: "bg-stone-800/30",
-      cardBorder: "border-gray-700",
-      imageAspectRatio: "auto",
-      imageHeight: 208,
-      githubButtonStyle: "default",
-      liveButtonStyle: "default",
-      buttonBorderRadius: 6,
-      techStackStyle: "pills",
-      animationSpeed: 0.3,
-      titleAlignment: "left",
-      cardPadding: 4,
-      imageOverlay: true,
-      imagePosition: "left",
-    });
+  
+
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "project",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as any);
+        } else {
+          setCustomization(defaultProjectsStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultProjectsStyles);
+      }
+    };
+    if (portfolioId) loadCustomizations();
+  }, [portfolioId]);
+
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof ProjectsCustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "project",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "project",
+      });
+      setCustomization(defaultProjectsStyles);
+      setDraftCustomization(defaultProjectsStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
+  };
+
+  const getThemeButtonStyle = (isActive: boolean) => {
+    if (isActive) {
+      return {
+        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+        color: "white",
+      };
+    }
+    return {};
   };
 
   // Dragging functionality
@@ -620,44 +560,44 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     };
   }, [isDragging, dragOffset]);
 
-  // Helper functions for styling
+  // Helper functions for styling - update all to use effectiveCustomization
   const getLayoutClasses = () => {
-    switch (customization.layout) {
+    switch (effectiveCustomization.layout) {
       case "grid":
-        return `grid grid-cols-1 md:grid-cols-${customization.gridColumns}`;
+        return `grid grid-cols-1 md:grid-cols-${effectiveCustomization.gridColumns}`;
       default:
         return `flex flex-col`;
     }
   };
 
   const getLayoutStyle = () => {
-    switch (customization.layout) {
+    switch (effectiveCustomization.layout) {
       case "grid":
-        return { gap: `${customization.cardSpacing}px` };
+        return { gap: `${effectiveCustomization.cardSpacing}px` };
       default:
-        return { gap: `${customization.cardSpacing}px` };
+        return { gap: `${effectiveCustomization.cardSpacing}px` };
     }
   };
 
   const getCardClasses = () => {
-    let classes = `${customization.cardBackground} section-card border ${
-      customization.cardBorder
+    let classes = `${effectiveCustomization.cardBackground} section-card border ${
+      effectiveCustomization.cardBorder
     } overflow-hidden transition-all duration-${Math.round(
-      customization.animationSpeed * 1000
+      effectiveCustomization.animationSpeed * 1000
     )} cursor-pointer hover:bg-zinc-900/80`;
 
     return classes;
   };
 
   const getCardStyle = () => ({
-    borderRadius: `${customization.cardBorderRadius}px`,
-    padding: `${customization.cardPadding * 4}px`,
+    borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+    padding: `${effectiveCustomization.cardPadding * 4}px`,
   });
 
   const getImageStyle = () => {
     let aspectRatio = "auto";
 
-    switch (customization.imageAspectRatio) {
+    switch (effectiveCustomization.imageAspectRatio) {
       case "square":
         aspectRatio = "1 / 1";
         break;
@@ -670,21 +610,21 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     }
 
     return {
-      borderRadius: `${customization.imageBorderRadius}px`,
+      borderRadius: `${effectiveCustomization.imageBorderRadius}px`,
       height:
-        customization.imageAspectRatio === "auto"
-          ? `${customization.imageHeight}px`
+        effectiveCustomization.imageAspectRatio === "auto"
+          ? `${effectiveCustomization.imageHeight}px`
           : "auto",
       aspectRatio:
-        customization.imageAspectRatio !== "auto" ? aspectRatio : undefined,
+        effectiveCustomization.imageAspectRatio !== "auto" ? aspectRatio : undefined,
     };
   };
 
   const getButtonClasses = (buttonType: "github" | "live") => {
     const style =
       buttonType === "github"
-        ? customization.githubButtonStyle
-        : customization.liveButtonStyle;
+        ? effectiveCustomization.githubButtonStyle
+        : effectiveCustomization.liveButtonStyle;
     let classes =
       "flex items-center gap-2 px-3 py-1.5 transition-all duration-300 text-sm";
 
@@ -708,11 +648,11 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const getButtonStyle = (buttonType: "github" | "live") => {
     const style =
       buttonType === "github"
-        ? customization.githubButtonStyle
-        : customization.liveButtonStyle;
+        ? effectiveCustomization.githubButtonStyle
+        : effectiveCustomization.liveButtonStyle;
 
     return {
-      borderRadius: `${customization.buttonBorderRadius}px`,
+      borderRadius: `${effectiveCustomization.buttonBorderRadius}px`,
       borderColor: style !== "minimal" ? `${titleColor}30` : "transparent",
       color: style === "filled" ? "white" : titleColor,
       backgroundColor: style === "filled" ? titleColor : "transparent",
@@ -723,7 +663,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     let classes =
       "px-3 py-1 text-sm font-medium cursor-pointer transition-all duration-300";
 
-    switch (customization.techStackStyle) {
+    switch (effectiveCustomization.techStackStyle) {
       case "badges":
         classes += " bg-gray-800 text-white rounded";
         break;
@@ -741,7 +681,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   };
 
   const getTitleAlignment = () => {
-    switch (customization.titleAlignment) {
+    switch (effectiveCustomization.titleAlignment) {
       case "center":
         return "text-center";
       case "right":
@@ -816,7 +756,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: customization.animationSpeed,
+        staggerChildren: effectiveCustomization.animationSpeed,
       },
     },
   };
@@ -833,7 +773,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
         type: "spring",
         stiffness: 80,
         damping: 12,
-        duration: customization.animationSpeed,
+        duration: effectiveCustomization.animationSpeed,
       },
     },
   };
@@ -843,7 +783,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     hover: {
       scale: 1.05,
       transition: {
-        duration: customization.animationSpeed,
+        duration: effectiveCustomization.animationSpeed,
       },
     },
   };
@@ -892,21 +832,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
           sectionTitle={sectionTitle}
           sectionDescription={sectionDescription}
           titleColor={titleColor}
+          onVisualEditorOpen={openVisualEditor}
         />
-
-        {/* Visual Editor Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => setVisualEditorOpen(true)}
-            style={{
-              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-            }}
-            className={`flex items-center gap-2 px-4 py-2  text-white rounded-lg transition-colors`}
-          >
-            <Settings className="h-4 w-4" />
-            Visual Editor
-          </button>
-        </div>
 
         {/* Projects Grid */}
         {Array.isArray(projectsData) && projectsData.length > 0 ? (
@@ -926,9 +853,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
               >
                 <div
                   className={
-                    customization.layout === "grid"
+                    effectiveCustomization.layout === "grid"
                       ? "flex flex-col items-center"
-                      : customization.imagePosition === "right"
+                      : effectiveCustomization.imagePosition === "right"
                       ? "flex flex-col md:flex-row-reverse items-center"
                       : "flex flex-col md:flex-row items-center"
                   }
@@ -936,7 +863,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                   {/* Project Image */}
                   <div
                     className={
-                      customization.layout === "grid"
+                      effectiveCustomization.layout === "grid"
                         ? "w-full"
                         : "w-full md:w-2/5 relative"
                     }
@@ -951,14 +878,14 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                         whileHover="hover"
                         variants={imageVariants}
                       />
-                      {customization.imageOverlay && (
+                      {effectiveCustomization.imageOverlay && (
                         <motion.div
                           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-lg z-0"
                           style={{ backgroundColor: `${titleColor}35` }}
                           initial={{ opacity: 0.5, scale: 1 }}
                           whileHover={{ opacity: 0.8, scale: 1.3 }}
                           transition={{
-                            duration: customization.animationSpeed,
+                            duration: effectiveCustomization.animationSpeed,
                           }}
                         />
                       )}
@@ -996,16 +923,16 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                   {/* Project Details */}
                   <div
                     className={
-                      customization.layout === "grid"
+                      effectiveCustomization.layout === "grid"
                         ? "w-full"
                         : "w-full md:w-3/5 p-5 md:p-6"
                     }
                   >
                     <div
                       className={`flex flex-wrap items-center ${
-                        customization.titleAlignment === "center"
+                        effectiveCustomization.titleAlignment === "center"
                           ? "justify-center"
-                          : customization.titleAlignment === "right"
+                          : effectiveCustomization.titleAlignment === "right"
                           ? "justify-end"
                           : "justify-between"
                       } mb-3`}
@@ -1035,9 +962,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                       </h4>
                       <div
                         className={`flex flex-wrap gap-2 ${
-                          customization.titleAlignment === "center"
+                          effectiveCustomization.titleAlignment === "center"
                             ? "justify-center"
-                            : customization.titleAlignment === "right"
+                            : effectiveCustomization.titleAlignment === "right"
                             ? "justify-end"
                             : ""
                         }`}
@@ -1050,11 +977,11 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                               className={getTechStackClasses()}
                               style={{
                                 borderColor:
-                                  customization.techStackStyle === "colorful"
+                                  effectiveCustomization.techStackStyle === "colorful"
                                     ? titleColor
                                     : `${titleColor}30`,
                                 backgroundColor:
-                                  customization.techStackStyle === "colorful"
+                                  effectiveCustomization.techStackStyle === "colorful"
                                     ? `${titleColor}20`
                                     : undefined,
                               }}
@@ -1128,15 +1055,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                       : {}
                   }
                 >
-                  {tab === "layout" && (
-                    <Layout className="h-4 w-4 mx-auto mb-1" />
-                  )}
-                  {tab === "styling" && (
-                    <Palette className="h-4 w-4 mx-auto mb-1" />
-                  )}
-                  {tab === "timing" && (
-                    <Move className="h-4 w-4 mx-auto mb-1" />
-                  )}
+                  {tab === "layout" && <Layout className="h-4 w-4 mx-auto mb-1" />}
+                  {tab === "styling" && <Palette className="h-4 w-4 mx-auto mb-1" />}
+                  {tab === "timing" && <Move className="h-4 w-4 mx-auto mb-1" />}
                   {tab}
                 </button>
               ))}
@@ -1147,56 +1068,33 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
               {activeTab === "layout" && (
                 <>
                   <LayoutSelector
-                    value={customization.layout}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({ ...prev, layout: value }))
-                    }
-                    gridColumns={customization.gridColumns}
-                    onGridColumnsChange={(cols) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        gridColumns: cols,
-                      }))
-                    }
+                    value={draftCustomization?.layout ?? customization.layout}
+                    onChange={value => updateDraftCustomization("layout", value)}
+                    gridColumns={draftCustomization?.gridColumns ?? customization.gridColumns}
+                    onGridColumnsChange={cols => updateDraftCustomization("gridColumns", cols)}
                   />
 
                   <div className="mb-4">
                     <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Card Spacing: {customization.cardSpacing}px
+                      Card Spacing: {draftCustomization?.cardSpacing ?? customization.cardSpacing}px
                     </label>
                     <input
                       type="range"
                       min={0}
                       max={64}
                       step={4}
-                      value={customization.cardSpacing}
-                      onChange={(e) =>
-                        setCustomization((prev) => ({
-                          ...prev,
-                          cardSpacing: Number(e.target.value),
-                        }))
-                      }
+                      value={draftCustomization?.cardSpacing ?? customization.cardSpacing}
+                      onChange={e => updateDraftCustomization("cardSpacing", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${
-                          ColorTheme.primary
-                        } 0%, ${ColorTheme.primary} ${
-                          (customization.cardSpacing / 64) * 100
-                        }%, #3f3f46 ${
-                          (customization.cardSpacing / 64) * 100
-                        }%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.cardSpacing ?? customization.cardSpacing) / 64) * 100}%, #3f3f46 ${((draftCustomization?.cardSpacing ?? customization.cardSpacing) / 64) * 100}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
 
                   <AlignmentSelector
-                    value={customization.titleAlignment}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        titleAlignment: value,
-                      }))
-                    }
+                    value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
+                    onChange={value => updateDraftCustomization("titleAlignment", value)}
                   />
 
                   <div>
@@ -1204,38 +1102,24 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                       Image Position
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "left", label: "Left Side" },
-                        { value: "right", label: "Right Side" },
-                      ].map(({ value, label }) => (
+                      {[{ value: "left", label: "Left Side" }, { value: "right", label: "Right Side" }].map(({ value, label }) => (
                         <div
                           key={value}
-                          onClick={() =>
-                            setCustomization((prev) => ({
-                              ...prev,
-                              imagePosition: value as any,
-                            }))
-                          }
+                          onClick={() => updateDraftCustomization("imagePosition", value)}
                           className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                            customization.imagePosition === value
+                            (draftCustomization?.imagePosition ?? customization.imagePosition) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                         >
-                          <div
-                            className={`flex items-center gap-2 ${
-                              value === "right" ? "flex-row-reverse" : ""
-                            }`}
-                          >
+                          <div className={`flex items-center gap-2 ${value === "right" ? "flex-row-reverse" : ""}`}>
                             <div className="w-6 h-4 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
                             <div className="flex-1 space-y-1">
                               <div className="h-1 bg-gray-400 rounded"></div>
                               <div className="h-1 bg-gray-500 rounded w-3/4"></div>
                             </div>
                           </div>
-                          <div className="text-center text-xs text-white mt-2">
-                            {label}
-                          </div>
+                          <div className="text-center text-xs text-white mt-2">{label}</div>
                         </div>
                       ))}
                     </div>
@@ -1247,178 +1131,106 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                 <>
                   <div className="mb-4">
                     <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Card Border Radius: {customization.cardBorderRadius}px
+                      Card Border Radius: {draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}px
                     </label>
                     <input
                       type="range"
                       min={0}
                       max={24}
                       step={2}
-                      value={customization.cardBorderRadius}
-                      onChange={(e) =>
-                        setCustomization((prev) => ({
-                          ...prev,
-                          cardBorderRadius: Number(e.target.value),
-                        }))
-                      }
+                      value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
+                      onChange={e => updateDraftCustomization("cardBorderRadius", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${
-                          ColorTheme.primary
-                        } 0%, ${ColorTheme.primary} ${
-                          (customization.cardBorderRadius / 24) * 100
-                        }%, #3f3f46 ${
-                          (customization.cardBorderRadius / 24) * 100
-                        }%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 24) * 100}%, #3f3f46 ${((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 24) * 100}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
 
                   <div className="mb-4">
                     <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Image Border Radius: {customization.imageBorderRadius}px
+                      Image Border Radius: {draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius}px
                     </label>
                     <input
                       type="range"
                       min={0}
                       max={24}
                       step={2}
-                      value={customization.imageBorderRadius}
-                      onChange={(e) =>
-                        setCustomization((prev) => ({
-                          ...prev,
-                          imageBorderRadius: Number(e.target.value),
-                        }))
-                      }
+                      value={draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius}
+                      onChange={e => updateDraftCustomization("imageBorderRadius", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${
-                          ColorTheme.primary
-                        } 0%, ${ColorTheme.primary} ${
-                          (customization.imageBorderRadius / 24) * 100
-                        }%, #3f3f46 ${
-                          (customization.imageBorderRadius / 24) * 100
-                        }%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius) / 24) * 100}%, #3f3f46 ${((draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius) / 24) * 100}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
 
                   <div className="mb-4">
                     <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Card Padding: {customization.cardPadding}px
+                      Card Padding: {draftCustomization?.cardPadding ?? customization.cardPadding}px
                     </label>
                     <input
                       type="range"
                       min={0}
                       max={12}
                       step={2}
-                      value={customization.cardPadding}
-                      onChange={(e) =>
-                        setCustomization((prev) => ({
-                          ...prev,
-                          cardPadding: Number(e.target.value),
-                        }))
-                      }
+                      value={draftCustomization?.cardPadding ?? customization.cardPadding}
+                      onChange={e => updateDraftCustomization("cardPadding", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${
-                          ColorTheme.primary
-                        } 0%, ${ColorTheme.primary} ${
-                          (customization.cardPadding / 12) * 100
-                        }%, #3f3f46 ${
-                          (customization.cardPadding / 12) * 100
-                        }%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.cardPadding ?? customization.cardPadding) / 12) * 100}%, #3f3f46 ${((draftCustomization?.cardPadding ?? customization.cardPadding) / 12) * 100}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
 
                   <ButtonStyleSelector
-                    value={customization.githubButtonStyle}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        githubButtonStyle: value,
-                      }))
-                    }
+                    value={draftCustomization?.githubButtonStyle ?? customization.githubButtonStyle}
+                    onChange={value => updateDraftCustomization("githubButtonStyle", value)}
                     label="GitHub Button Style"
                   />
 
                   <ButtonStyleSelector
-                    value={customization.liveButtonStyle}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        liveButtonStyle: value,
-                      }))
-                    }
+                    value={draftCustomization?.liveButtonStyle ?? customization.liveButtonStyle}
+                    onChange={value => updateDraftCustomization("liveButtonStyle", value)}
                     label="Live Demo Button Style"
                   />
 
-                  {(customization.githubButtonStyle === "default" || customization.githubButtonStyle === "filled" || 
-                    customization.liveButtonStyle === "default" || customization.liveButtonStyle === "filled") && (
+                  {(draftCustomization?.githubButtonStyle === "default" || draftCustomization?.githubButtonStyle === "filled" || 
+                    draftCustomization?.liveButtonStyle === "default" || draftCustomization?.liveButtonStyle === "filled") && (
                     <div className="mb-4">
                       <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                        Button Border Radius: {customization.buttonBorderRadius}px
+                        Button Border Radius: {draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius}px
                       </label>
                       <input
                         type="range"
                         min={0}
                         max={24}
                         step={2}
-                        value={customization.buttonBorderRadius}
-                        onChange={(e) =>
-                          setCustomization((prev) => ({
-                            ...prev,
-                            buttonBorderRadius: Number(e.target.value),
-                          }))
-                        }
+                        value={draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius}
+                        onChange={e => updateDraftCustomization("buttonBorderRadius", Number(e.target.value))}
                         className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                         style={{
-                          background: `linear-gradient(to right, ${
-                            ColorTheme.primary
-                          } 0%, ${ColorTheme.primary} ${
-                            (customization.buttonBorderRadius / 24) * 100
-                          }%, #3f3f46 ${
-                            (customization.buttonBorderRadius / 24) * 100
-                          }%, #3f3f46 100%)`,
+                          background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius) / 24) * 100}%, #3f3f46 ${((draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius) / 24) * 100}%, #3f3f46 100%)`,
                         }}
                       />
                     </div>
                   )}
 
                   <TechStackStyleSelector
-                    value={customization.techStackStyle}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        techStackStyle: value,
-                      }))
-                    }
+                    value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
+                    onChange={value => updateDraftCustomization("techStackStyle", value)}
                   />
                 </>
               )}
 
               {activeTab === "timing" && (
                 <>
-
                   <AspectRatioSelector
-                    value={customization.imageAspectRatio}
-                    onChange={(value) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        imageAspectRatio: value,
-                      }))
-                    }
-                    imageHeight={customization.imageHeight}
-                    onImageHeightChange={(height) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        imageHeight: height,
-                      }))
-                    }
+                    value={draftCustomization?.imageAspectRatio ?? customization.imageAspectRatio}
+                    onChange={value => updateDraftCustomization("imageAspectRatio", value)}
+                    imageHeight={draftCustomization?.imageHeight ?? customization.imageHeight}
+                    onImageHeightChange={height => updateDraftCustomization("imageHeight", height)}
                   />
-
-
                 </>
               )}
             </div>
@@ -1434,7 +1246,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                   Reset
                 </button>
                 <button
-                  onClick={() => setVisualEditorOpen(false)}
+                  onClick={saveDraftCustomization}
                   className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
                   style={{
                     background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,

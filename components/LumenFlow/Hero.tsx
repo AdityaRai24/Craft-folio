@@ -10,13 +10,24 @@ import {
   ExternalLink,
   Heart,
   Link,
+  Settings,
+  Palette,
+  Move,
+  Grid3X3,
+  RotateCcw,
+  X,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Eye,
+  Type,
 } from "lucide-react";
 import Projects from "./Projects";
 import Navbar from "./Navbar";
 import Technologies from "./Technologies";
 import Experience from "./Experience";
 import Education from "./Education";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   LumenFlowThemeProvider,
   useLumenFlowTheme,
@@ -30,6 +41,9 @@ import EditButton from "@/components/EditButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { HeaderComponent } from "./Components";
 import { toast } from "react-hot-toast";
+import { Switch } from "@/components/ui/switch";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { ColorTheme } from "@/lib/colorThemes";
 
 // Helper function to convert hex to rgba
 function hexToRgba(hex: string, alpha: number): string {
@@ -44,6 +58,142 @@ function hexToRgba(hex: string, alpha: number): string {
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+// Customization interface for Hero component
+interface CustomizationState {
+  // Profile Settings
+  profileImageSize: number;
+  profileImageBorder: boolean;
+  profileImageBorderWidth: number;
+  profileImageShadow: boolean;
+  
+  // Content Settings
+  nameSize: "sm" | "md" | "lg" | "xl";
+  titleSize: "sm" | "md" | "lg";
+  contentAlignment: "left" | "center" | "right";
+  
+  // Card Settings
+  cardBorderRadius: number;
+  cardPadding: number;
+  cardSpacing: number;
+  cardShadow: boolean;
+  shadowIntensity: number;
+  cardBackdrop: boolean;
+  
+  // Animation Settings
+  animationSpeed: number;
+  hoverEffects: boolean;
+  
+  // Social Links
+  socialLinksVisible: boolean;
+  socialIconSize: number;
+  
+  // Layout
+  sidebarPosition: "left" | "right";
+  sidebarWidth: number;
+  
+  // Effects
+  backgroundBlur: boolean;
+  blurIntensity: number;
+  gradientOverlay: boolean;
+}
+
+// Default styles for Hero (current LumenFlow style)
+const defaultHeroStyles: CustomizationState = {
+  profileImageSize: 160,
+  profileImageBorder: true,
+  profileImageBorderWidth: 4,
+  profileImageShadow: true,
+  nameSize: "lg",
+  titleSize: "sm",
+  contentAlignment: "center",
+  cardBorderRadius: 16,
+  cardPadding: 24,
+  cardSpacing: 8,
+  cardShadow: true,
+  shadowIntensity: 3,
+  cardBackdrop: true,
+  animationSpeed: 300,
+  hoverEffects: true,
+  socialLinksVisible: true,
+  socialIconSize: 16,
+  sidebarPosition: "left",
+  sidebarWidth: 320,
+  backgroundBlur: true,
+  blurIntensity: 12,
+  gradientOverlay: true,
+};
+
+// Custom Slider Component with proper styling
+const CustomSlider: React.FC<{
+  value: number;
+  onChange: (value: number) => void;
+  label: string;
+  min: number;
+  max: number;
+  step?: number;
+  unit?: string;
+}> = ({ value, onChange, label, min, max, step = 1, unit = "px" }) => {
+  const percentage = ((value - min) / (max - min)) * 100;
+  
+  return (
+    <div>
+      <label className="block text-white font-medium mb-2">
+        {label}: {value}{unit}
+      </label>
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
+            WebkitAppearance: "none",
+            outline: "none",
+          }}
+        />
+      </div>
+      <style jsx>{`
+        input[type="range"]::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: 3px solid #ffffff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          transition: all 0.15s ease-in-out;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: 3px solid #ffffff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          transition: all 0.15s ease-in-out;
+        }
+        
+        input[type="range"]::-moz-range-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+      `}</style>
+    </div>
+  );
+};
 
 const MobileProfileCard = ({
   heroData,
@@ -205,7 +355,126 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
 
+  // Visual Editor States
+  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
+  const [activeEditorTab, setActiveEditorTab] = useState<"layout" | "design" | "effects">("layout");
+  
+  // Dragging state for floating window
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
+  const dragRef = useRef<HTMLDivElement>(null);
+
+  // Comprehensive customization state
+  const [customization, setCustomization] = useState<CustomizationState>(defaultHeroStyles);
+  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
+
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
   const themeClasses = getThemeClasses(currentTheme);
+
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "hero",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as any);
+        } else {
+          setCustomization(defaultHeroStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultHeroStyles);
+      }
+    };
+
+    if (portfolioId) {
+      loadCustomizations();
+    }
+  }, [portfolioId]);
+
+  // Visual Editor Functions
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "hero",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "hero",
+      });
+      setCustomization(defaultHeroStyles);
+      setDraftCustomization(defaultHeroStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
+  };
+
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (dragRef.current) {
+      const rect = dragRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setWindowPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
 
   useEffect(() => {
     if (portfolioData) {
@@ -283,6 +552,20 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 themeClasses={themeClasses}
               />
             </div>
+            {/* Visual Editor Button */}
+            <div className="absolute top-4 right-4 z-20">
+              <button
+                onClick={openVisualEditor}
+                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                <Settings className="h-4 w-4" />
+                Visual Editor
+              </button>
+            </div>
+
             <HeaderComponent
               currentTheme={currentTheme}
               sectionTitle="About Me"
@@ -1062,6 +1345,261 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
           </div>
         </div>
       </div>
+
+      {/* Floating Visual Editor Window */}
+      {visualEditorOpen && (
+        <div
+          ref={dragRef}
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            onMouseDown={handleMouseDown}
+          >
+            <h3 className="text-lg font-bold text-white">Hero Settings</h3>
+            <button
+              onClick={() => setVisualEditorOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex border-b border-zinc-700">
+            {["layout", "design", "effects"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveEditorTab(tab as any)}
+                className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
+                  activeEditorTab === tab
+                    ? "text-white"
+                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                }`}
+                style={
+                  activeEditorTab === tab
+                    ? {
+                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                      }
+                    : {}
+                }
+              >
+                {tab === "layout" && <Grid3X3 className="h-3 w-3 mx-auto mb-1" />}
+                {tab === "design" && <Palette className="h-3 w-3 mx-auto mb-1" />}
+                {tab === "effects" && <Eye className="h-3 w-3 mx-auto mb-1" />}
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+            {activeEditorTab === "layout" && (
+              <>
+                <CustomSlider
+                  value={draftCustomization?.profileImageSize ?? customization.profileImageSize}
+                  onChange={(value) => updateDraftCustomization("profileImageSize", value)}
+                  label="Profile Image Size"
+                  min={120}
+                  max={200}
+                  step={10}
+                  unit="px"
+                />
+
+                <CustomSlider
+                  value={draftCustomization?.sidebarWidth ?? customization.sidebarWidth}
+                  onChange={(value) => updateDraftCustomization("sidebarWidth", value)}
+                  label="Sidebar Width"
+                  min={280}
+                  max={400}
+                  step={20}
+                  unit="px"
+                />
+
+                <CustomSlider
+                  value={draftCustomization?.cardSpacing ?? customization.cardSpacing}
+                  onChange={(value) => updateDraftCustomization("cardSpacing", value)}
+                  label="Card Spacing"
+                  min={4}
+                  max={16}
+                  step={2}
+                  unit="px"
+                />
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Social Links Visible</span>
+                  <Switch
+                    checked={draftCustomization?.socialLinksVisible ?? customization.socialLinksVisible}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("socialLinksVisible", checked)
+                    }
+                  />
+                </div>
+              </>
+            )}
+
+            {activeEditorTab === "design" && (
+              <>
+                <div>
+                  <label className="block text-white font-medium mb-3">Name Size</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "sm", label: "Small" },
+                      { value: "md", label: "Medium" },
+                      { value: "lg", label: "Large" },
+                      { value: "xl", label: "X-Large" },
+                    ].map(({ value, label }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("nameSize", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.nameSize ?? customization.nameSize) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-sm text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <CustomSlider
+                  value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
+                  onChange={(value) => updateDraftCustomization("cardBorderRadius", value)}
+                  label="Card Border Radius"
+                  min={8}
+                  max={32}
+                  step={2}
+                  unit="px"
+                />
+
+                <CustomSlider
+                  value={draftCustomization?.cardPadding ?? customization.cardPadding}
+                  onChange={(value) => updateDraftCustomization("cardPadding", value)}
+                  label="Card Padding"
+                  min={16}
+                  max={32}
+                  step={2}
+                  unit="px"
+                />
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Profile Border</span>
+                  <Switch
+                    checked={draftCustomization?.profileImageBorder ?? customization.profileImageBorder}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("profileImageBorder", checked)
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Card Shadow</span>
+                  <Switch
+                    checked={draftCustomization?.cardShadow ?? customization.cardShadow}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("cardShadow", checked)
+                    }
+                  />
+                </div>
+              </>
+            )}
+
+            {activeEditorTab === "effects" && (
+              <>
+                <CustomSlider
+                  value={draftCustomization?.animationSpeed ?? customization.animationSpeed}
+                  onChange={(value) => updateDraftCustomization("animationSpeed", value)}
+                  label="Animation Speed"
+                  min={100}
+                  max={500}
+                  step={50}
+                  unit="ms"
+                />
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Hover Effects</span>
+                  <Switch
+                    checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("hoverEffects", checked)
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Background Blur</span>
+                  <Switch
+                    checked={draftCustomization?.backgroundBlur ?? customization.backgroundBlur}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("backgroundBlur", checked)
+                    }
+                  />
+                </div>
+
+                {(draftCustomization?.backgroundBlur ?? customization.backgroundBlur) && (
+                  <CustomSlider
+                    value={draftCustomization?.blurIntensity ?? customization.blurIntensity}
+                    onChange={(value) => updateDraftCustomization("blurIntensity", value)}
+                    label="Blur Intensity"
+                    min={5}
+                    max={20}
+                    step={1}
+                    unit="px"
+                  />
+                )}
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Gradient Overlay</span>
+                  <Switch
+                    checked={draftCustomization?.gradientOverlay ?? customization.gradientOverlay}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("gradientOverlay", checked)
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+            <div className="flex gap-2">
+              <button
+                onClick={resetCustomization}
+                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </button>
+              <button
+                onClick={saveDraftCustomization}
+                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay for floating window */}
+      {visualEditorOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
+          onClick={() => setVisualEditorOpen(false)}
+        />
+      )}
     </motion.div>
   );
 };

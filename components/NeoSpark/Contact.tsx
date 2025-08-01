@@ -35,6 +35,8 @@ import { Switch } from "@/components/ui/switch";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import toast from "react-hot-toast";
 
 interface CustomizationState {
   layout: "grid";
@@ -326,8 +328,8 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
     );
   };
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<CustomizationState>({
+  // Default styles for Contact
+  const defaultContactStyles: CustomizationState = {
     layout: "grid",
     gridColumns: 2,
     cardLayout: "stacked",
@@ -350,34 +352,81 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
     borderWidth: 1,
     copyToClipboard: false,
     openInNewTab: true,
-  });
+  };
 
-  // Reset customization
-  const resetCustomization = () => {
-    setCustomization({
-      layout: "grid",
-      gridColumns: 2,
-      cardLayout: "stacked",
-      cardSize: "default",
-      cardStyle: "default",
-      cardBorderRadius: 8,
-      cardPadding: 8,
-      cardSpacing: 36,
-      containerWidth: "wide",
-      iconSize: 32,
-      iconStyle: "outline",
-      showLabels: true,
-      showDescriptions: true,
-      textAlignment: "left",
-      animationStyle: "scale",
-      animationSpeed: 300,
-      staggerDelay: 200,
-      hoverEffects: true,
-      backgroundOpacity: 60,
-      borderWidth: 1,
-      copyToClipboard: false,
-      openInNewTab: true,
-    });
+  // Comprehensive customization state
+  const [customization, setCustomization] = useState<CustomizationState>(defaultContactStyles);
+  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
+
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "contact",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as any);
+        } else {
+          setCustomization(defaultContactStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultContactStyles);
+      }
+    };
+
+    if (portfolioId) {
+      loadCustomizations();
+    }
+  }, [portfolioId]);
+
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "contact",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "contact",
+      });
+      setCustomization(defaultContactStyles);
+      setDraftCustomization(defaultContactStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
   };
 
   // Dragging functionality
@@ -430,15 +479,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
   // Helper functions for styling
   const getLayoutClasses = () => {
-    return `grid grid-cols-1 md:grid-cols-${customization.gridColumns}`;
+    return `grid grid-cols-1 md:grid-cols-${effectiveCustomization.gridColumns}`;
   };
 
   const getLayoutStyle = () => {
-    return { gap: `${customization.cardSpacing}px` };
+    return { gap: `${effectiveCustomization.cardSpacing}px` };
   };
 
   const getContainerStyle = () => {
-    switch (customization.containerWidth) {
+    switch (effectiveCustomization.containerWidth) {
       case "narrow":
         return { maxWidth: "60%", margin: "0 auto" };
       case "wide":
@@ -455,7 +504,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
     let classes = `cursor-pointer flex transition-all shadow-lg`;
 
     // Card layout-specific classes
-    if (customization.cardLayout === "flex") {
+    if (effectiveCustomization.cardLayout === "flex") {
       classes += " items-center";
     } else {
       classes += " flex-col items-center justify-center";
@@ -463,14 +512,14 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
     // Size variations
     const sizeClasses = {
-      compact: customization.cardLayout === "flex" ? "p-3 sm:p-4" : "p-4 sm:p-5",
-      default: customization.cardLayout === "flex" ? "p-4 sm:p-5" : "p-6 sm:p-8",
-      large: customization.cardLayout === "flex" ? "p-5 sm:p-6" : "p-8 sm:p-10",
+      compact: effectiveCustomization.cardLayout === "flex" ? "p-3 sm:p-4" : "p-4 sm:p-5",
+      default: effectiveCustomization.cardLayout === "flex" ? "p-4 sm:p-5" : "p-6 sm:p-8",
+      large: effectiveCustomization.cardLayout === "flex" ? "p-5 sm:p-6" : "p-8 sm:p-10",
     };
-    classes += ` ${sizeClasses[customization.cardSize]}`;
+    classes += ` ${sizeClasses[effectiveCustomization.cardSize]}`;
 
     // Style variations
-    switch (customization.cardStyle) {
+    switch (effectiveCustomization.cardStyle) {
       case "minimal":
         classes += " bg-transparent border-gray-600 hover:border-gray-400";
         break;
@@ -486,11 +535,11 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
     }
 
     // Animation duration
-    classes += ` duration-${customization.animationSpeed}`;
+    classes += ` duration-${effectiveCustomization.animationSpeed}`;
 
     // Hover effects
-    if (customization.hoverEffects && customization.animationStyle !== "none") {
-      switch (customization.animationStyle) {
+    if (effectiveCustomization.hoverEffects && effectiveCustomization.animationStyle !== "none") {
+      switch (effectiveCustomization.animationStyle) {
         case "rotate":
           classes += " hover:rotate-1";
           break;
@@ -516,22 +565,22 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
   const getCardStyle = (platform: string) => {
     let style: any = {
-      borderRadius: `${customization.cardBorderRadius}px`,
+      borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
     };
 
     // Border styling
-    if (customization.cardStyle === "neon") {
+    if (effectiveCustomization.cardStyle === "neon") {
       style.borderColor = titleColor;
-      style.borderWidth = `${customization.borderWidth}px`;
+      style.borderWidth = `${effectiveCustomization.borderWidth}px`;
     } else {
       style.borderColor = `${titleColor}30`;
-      style.borderWidth = `${customization.borderWidth}px`;
+      style.borderWidth = `${effectiveCustomization.borderWidth}px`;
     }
 
     // Background opacity for default style
-    if (customization.cardStyle === "default") {
+    if (effectiveCustomization.cardStyle === "default") {
       style.backgroundColor = `rgba(28, 25, 23, ${
-        customization.backgroundOpacity / 100
+        effectiveCustomization.backgroundOpacity / 100
       })`;
     }
 
@@ -539,12 +588,12 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
   };
 
   const getIconSize = () => ({
-    width: `${customization.iconSize}px`,
-    height: `${customization.iconSize}px`,
+    width: `${effectiveCustomization.iconSize}px`,
+    height: `${effectiveCustomization.iconSize}px`,
   });
 
   const getTextAlignment = () => {
-    switch (customization.textAlignment) {
+    switch (effectiveCustomization.textAlignment) {
       case "left":
         return "text-left items-start";
       case "right":
@@ -560,7 +609,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
       visible: { opacity: 1 },
     };
 
-    switch (customization.animationStyle) {
+    switch (effectiveCustomization.animationStyle) {
       case "slide":
         return {
           hidden: { opacity: 0, x: -30 },
@@ -713,28 +762,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         titleColor={titleColor}
+        onVisualEditorOpen={openVisualEditor}
       />
-
-      {/* Visual Editor Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
-          onClick={() => setVisualEditorOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
 
       <div className="mx-auto">
         <motion.div
           initial="hidden"
           animate="visible"
           transition={{
-            staggerChildren: customization.staggerDelay / 1000,
+            staggerChildren: effectiveCustomization.staggerDelay / 1000,
             delayChildren: 0.2,
           }}
           className={getLayoutClasses()}
@@ -747,8 +783,8 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                 customization.animationStyle !== "none" ? animationVariants : {}
               }
               transition={{
-                duration: customization.animationSpeed / 1000,
-                delay: index * (customization.staggerDelay / 1000),
+                duration: effectiveCustomization.animationSpeed / 1000,
+                delay: index * (effectiveCustomization.staggerDelay / 1000),
               }}
               onMouseEnter={() =>
                 visualEditorOpen && setHoveredCard(platform.key)
@@ -761,13 +797,13 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                 style={getCardStyle(platform.key)}
                 onClick={(e) => {
                   if (
-                    customization.copyToClipboard &&
+                    effectiveCustomization.copyToClipboard &&
                     platform.key === "email"
                   ) {
                     e.preventDefault();
                     copyToClipboard(platform.value, platform.key);
                   } else if (
-                    !customization.openInNewTab &&
+                    !effectiveCustomization.openInNewTab &&
                     platform.href.startsWith("http")
                   ) {
                     e.preventDefault();
@@ -775,13 +811,13 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                   }
                 }}
               >
-                {customization.copyToClipboard && platform.key === "email" ? (
-                  <div className={`flex ${customization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()}`}>
-                    <div className={`flex items-center ${customization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"} relative`}>
+                {effectiveCustomization.copyToClipboard && platform.key === "email" ? (
+                  <div className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()}`}>
+                    <div className={`flex items-center ${effectiveCustomization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"} relative`}>
                       <platform.icon
                         style={{ ...getIconSize(), color: titleColor }}
-                        className={`${customization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${
-                          customization.iconStyle === "filled"
+                        className={`${effectiveCustomization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${
+                          effectiveCustomization.iconStyle === "filled"
                             ? "fill-current"
                             : ""
                         }`}
@@ -790,13 +826,13 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                         <Check className="absolute -top-2 -right-2 w-4 h-4 text-green-500 bg-white rounded-full p-0.5" />
                       )}
                     </div>
-                    <div className={`${customization.cardLayout === "flex" ? "flex-1" : ""}`}>
-                      {customization.showLabels && (
+                    <div className={`${effectiveCustomization.cardLayout === "flex" ? "flex-1" : ""}`}>
+                      {effectiveCustomization.showLabels && (
                         <div className="text-white text-base sm:text-xl font-bold mb-1 sm:mb-2">
                           {platform.label}
                         </div>
                       )}
-                      {customization.showDescriptions && (
+                      {effectiveCustomization.showDescriptions && (
                         <p className="text-gray-300 break-all text-xs sm:text-base">
                           {platform.description}
                         </p>
@@ -808,44 +844,44 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                   <motion.a
                     href={platform.href}
                     target={
-                      customization.openInNewTab &&
+                      effectiveCustomization.openInNewTab &&
                       platform.href.startsWith("http")
                         ? "_blank"
                         : undefined
                     }
                     rel={
-                      customization.openInNewTab &&
+                      effectiveCustomization.openInNewTab &&
                       platform.href.startsWith("http")
                         ? "noopener noreferrer"
                         : undefined
                     }
-                    className={`flex ${customization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
+                    className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
                     whileHover={
-                      customization.hoverEffects ? { scale: 1.02 } : {}
+                      effectiveCustomization.hoverEffects ? { scale: 1.02 } : {}
                     }
-                    whileTap={customization.hoverEffects ? { scale: 0.98 } : {}}
+                    whileTap={effectiveCustomization.hoverEffects ? { scale: 0.98 } : {}}
                   >
-                    <div className={`flex items-center ${customization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"}`}>
+                    <div className={`flex items-center ${effectiveCustomization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"}`}>
                       <platform.icon
                         style={{ ...getIconSize(), color: titleColor }}
-                        className={`${customization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${
-                          customization.iconStyle === "filled"
+                        className={`${effectiveCustomization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${
+                          effectiveCustomization.iconStyle === "filled"
                             ? "fill-current"
                             : ""
                         }`}
                       />
                     </div>
-                    <div className={`${customization.cardLayout === "flex" ? "flex-1" : ""}`}>
-                      {customization.showLabels && (
+                    <div className={`${effectiveCustomization.cardLayout === "flex" ? "flex-1" : ""}`}>
+                      {effectiveCustomization.showLabels && (
                         <div className="text-white text-base sm:text-xl font-bold mb-1 sm:mb-2">
                           {platform.label}
-                          {customization.openInNewTab &&
+                          {effectiveCustomization.openInNewTab &&
                             platform.href.startsWith("http") && (
                               <ExternalLink className="w-3 h-3 ml-1 inline opacity-50" />
                             )}
                         </div>
                       )}
-                      {customization.showDescriptions && (
+                      {effectiveCustomization.showDescriptions && (
                         <p className="text-gray-300 break-all text-xs sm:text-base">
                           {platform.description}
                         </p>
@@ -915,48 +951,39 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
             {activeTab === "layout" && (
               <>
                 <GridColumnsSelector
-                  value={customization.gridColumns}
+                  value={draftCustomization?.gridColumns ?? customization.gridColumns}
                   onChange={(value) =>
-                    setCustomization((prev) => ({
-                      ...prev,
-                      gridColumns: value,
-                    }))
+                    updateDraftCustomization("gridColumns", value)
                   }
                 />
 
                 <CardLayoutSelector
-                  value={customization.cardLayout}
+                  value={draftCustomization?.cardLayout ?? customization.cardLayout}
                   onChange={(value) =>
-                    setCustomization((prev) => ({ ...prev, cardLayout: value }))
+                    updateDraftCustomization("cardLayout", value)
                   }
                 />
 
                 <WidthSelector
-                  value={customization.containerWidth}
+                  value={draftCustomization?.containerWidth ?? customization.containerWidth}
                   onChange={(value) =>
-                    setCustomization((prev) => ({ ...prev, containerWidth: value }))
+                    updateDraftCustomization("containerWidth", value)
                   }
                 />
 
                 <SpacingSelector
-                  value={customization.cardSpacing}
+                  value={draftCustomization?.cardSpacing ?? customization.cardSpacing}
                   onChange={(value) =>
-                    setCustomization((prev) => ({
-                      ...prev,
-                      cardSpacing: value,
-                    }))
+                    updateDraftCustomization("cardSpacing", value)
                   }
                   label="Card Spacing"
                   type="gap"
                 />
 
                 <AlignmentSelector
-                  value={customization.textAlignment}
+                  value={draftCustomization?.textAlignment ?? customization.textAlignment}
                   onChange={(value) =>
-                    setCustomization((prev) => ({
-                      ...prev,
-                      textAlignment: value,
-                    }))
+                    updateDraftCustomization("textAlignment", value)
                   }
                 />
               </>
@@ -978,17 +1005,14 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                       <button
                         key={style.value}
                         onClick={() =>
-                          setCustomization((prev) => ({
-                            ...prev,
-                            cardStyle: style.value as any,
-                          }))
+                          updateDraftCustomization("cardStyle", style.value as any)
                         }
                         className={`py-2 px-3 text-sm rounded transition-colors ${
-                          customization.cardStyle === style.value
+                          (draftCustomization?.cardStyle ?? customization.cardStyle) === style.value
                             ? "text-white"
                             : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
                         }`}
-                        style={getThemeButtonStyle(customization.cardStyle === style.value)}
+                        style={getThemeButtonStyle((draftCustomization?.cardStyle ?? customization.cardStyle) === style.value)}
                       >
                         {style.label}
                       </button>
@@ -998,18 +1022,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Border Radius: {customization.cardBorderRadius}px
+                    Border Radius: {draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}px
                   </label>
                   <input
                     type="range"
                     min={0}
                     max={24}
-                    value={customization.cardBorderRadius}
+                    value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
                     onChange={(e) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        cardBorderRadius: Number(e.target.value),
-                      }))
+                      updateDraftCustomization("cardBorderRadius", Number(e.target.value))
                     }
                     style={{ accentColor: ColorTheme.primary }}
                     className="w-full"
@@ -1018,18 +1039,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Icon Size: {customization.iconSize}px
+                    Icon Size: {draftCustomization?.iconSize ?? customization.iconSize}px
                   </label>
                   <input
                     type="range"
                     min={24}
                     max={64}
-                    value={customization.iconSize}
+                    value={draftCustomization?.iconSize ?? customization.iconSize}
                     onChange={(e) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        iconSize: Number(e.target.value),
-                      }))
+                      updateDraftCustomization("iconSize", Number(e.target.value))
                     }
                     style={{ accentColor: ColorTheme.primary }}
                     className="w-full"
@@ -1045,17 +1063,14 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                       <button
                         key={style}
                         onClick={() =>
-                          setCustomization((prev) => ({
-                            ...prev,
-                            iconStyle: style as any,
-                          }))
+                          updateDraftCustomization("iconStyle", style as any)
                         }
                         className={`flex-1 py-2 px-3 text-sm capitalize rounded transition-colors ${
-                          customization.iconStyle === style
+                          (draftCustomization?.iconStyle ?? customization.iconStyle) === style
                             ? "text-white"
                             : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
                         }`}
-                        style={getThemeButtonStyle(customization.iconStyle === style)}
+                        style={getThemeButtonStyle((draftCustomization?.iconStyle ?? customization.iconStyle) === style)}
                       >
                         {style}
                       </button>
@@ -1067,18 +1082,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Background Opacity: {customization.backgroundOpacity}%
+                    Background Opacity: {draftCustomization?.backgroundOpacity ?? customization.backgroundOpacity}%
                   </label>
                   <input
                     type="range"
                     min={10}
                     max={100}
-                    value={customization.backgroundOpacity}
+                    value={draftCustomization?.backgroundOpacity ?? customization.backgroundOpacity}
                     onChange={(e) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        backgroundOpacity: Number(e.target.value),
-                      }))
+                      updateDraftCustomization("backgroundOpacity", Number(e.target.value))
                     }
                     style={{ accentColor: ColorTheme.primary }}
                     className="w-full"
@@ -1087,18 +1099,15 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
                 <div>
                   <label className="block text-white font-medium mb-2">
-                    Border Width: {customization.borderWidth}px
+                    Border Width: {draftCustomization?.borderWidth ?? customization.borderWidth}px
                   </label>
                   <input
                     type="range"
                     min={0}
                     max={4}
-                    value={customization.borderWidth}
+                    value={draftCustomization?.borderWidth ?? customization.borderWidth}
                     onChange={(e) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        borderWidth: Number(e.target.value),
-                      }))
+                      updateDraftCustomization("borderWidth", Number(e.target.value))
                     }
                     style={{ accentColor: ColorTheme.primary }}
                     className="w-full"
@@ -1108,12 +1117,9 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">Show Labels</span>
                   <Switch
-                    checked={customization.showLabels}
+                    checked={draftCustomization?.showLabels ?? customization.showLabels}
                     onCheckedChange={(checked) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        showLabels: checked,
-                      }))
+                      updateDraftCustomization("showLabels", checked)
                     }
                   />
                 </div>
@@ -1123,12 +1129,9 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                     Show Descriptions
                   </span>
                   <Switch
-                    checked={customization.showDescriptions}
+                    checked={draftCustomization?.showDescriptions ?? customization.showDescriptions}
                     onCheckedChange={(checked) =>
-                      setCustomization((prev) => ({
-                        ...prev,
-                        showDescriptions: checked,
-                      }))
+                      updateDraftCustomization("showDescriptions", checked)
                     }
                   />
                 </div>
@@ -1149,7 +1152,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
                 Reset
               </button>
               <button
-                onClick={() => setVisualEditorOpen(false)}
+                onClick={saveDraftCustomization}
                 className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,

@@ -9,6 +9,8 @@ import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
 import { Switch } from "@/components/ui/switch";
 import { ColorTheme } from "@/lib/colorThemes";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import toast from "react-hot-toast";
 import {
   Settings,
   RotateCcw,
@@ -321,11 +323,31 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     };
   }, [isDragging, dragOffset]);
 
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "professional-journey",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as any);
+        } else {
+          setCustomization(defaultProfessionalJourneyStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultProfessionalJourneyStyles);
+      }
+    };
+    if (portfolioId) loadCustomizations();
+  }, [portfolioId]);
+
   const [isHeadingVisible, setIsHeadingVisible] = useState(false);
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<CustomizationState>({
+  // Default styles for Professional Journey
+  const defaultProfessionalJourneyStyles: CustomizationState = {
     // Layout & Structure
     maxWidth: "lg",
 
@@ -371,42 +393,58 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     glowEffect: false,
     borderGlow: false,
     backgroundPattern: "none",
-  });
+  };
 
-  // Reset customization
-  const resetCustomization = () => {
-    setCustomization({
-      maxWidth: "lg",
-      timelineStyle: "line",
-      timelinePosition: "left",
-      timelineWidth: 2,
-      timelineColor: titleColor || "#3b82f6",
-      dotSize: "md",
-      dotStyle: "circle",
-      cardStyle: "default",
-      cardRadius: 8,
-      cardPadding: 6,
-      titleSize: "lg",
-      titleWeight: "bold",
-      companySize: "md",
-      descriptionSize: "sm",
-      entranceAnimation: "stagger",
-      animationDuration: 700,
-      staggerDelay: 200,
-      hoverEffects: true,
-          techStackVisible: true,
-    techStackStyle: "pills",
-    techStackSize: "sm",
-      badgeStyle: "default",
-      badgeRadius: 20,
-      locationBadge: true,
-      dateBadge: true,
-      statusBadge: false,
-      gradientOverlay: false,
-      glowEffect: false,
-      borderGlow: false,
-      backgroundPattern: "none",
-    });
+  // Comprehensive customization state
+  const [customization, setCustomization] = useState<CustomizationState>(defaultProfessionalJourneyStyles);
+  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
+
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "professional-journey",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "professional-journey",
+      });
+      setCustomization(defaultProfessionalJourneyStyles);
+      setDraftCustomization(defaultProfessionalJourneyStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
   };
 
   // Update customization helper
@@ -424,7 +462,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       full: "w-full",
     };
 
-    return `${maxWidthMap[customization.maxWidth]} mx-auto space-y-10`;
+    return `${maxWidthMap[effectiveCustomization.maxWidth]} mx-auto space-y-10`;
   };
 
 
@@ -438,14 +476,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       glass: "bg-white/5 backdrop-blur-sm border border-white/10",
     };
 
-    // const paddingClass = `p-${customization.cardPadding}`;
-
-    return `${styleMap[customization.cardStyle]}`;
+    return `${styleMap[effectiveCustomization.cardStyle]}`;
   };
 
   const getCardStyle = () => ({
-    borderRadius: `${customization.cardRadius}px`,
-    padding : `${customization.cardPadding * 4}px`,
+    borderRadius: `${effectiveCustomization.cardRadius}px`,
+    padding : `${effectiveCustomization.cardPadding * 4}px`,
   });
 
   const getTitleClasses = () => {
@@ -463,8 +499,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       bold: "font-bold",
     };
 
-    return `${sizeMap[customization.titleSize]} ${
-      weightMap[customization.titleWeight]
+    return `${sizeMap[effectiveCustomization.titleSize]} ${
+      weightMap[effectiveCustomization.titleWeight]
     } section-sub-title mb-2`;
   };
 
@@ -477,7 +513,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     };
 
     return `${
-      sizeMap[customization.descriptionSize]
+      sizeMap[effectiveCustomization.descriptionSize]
     } text-gray-300 section-sub-description mb-4`;
   };
 
@@ -488,9 +524,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       lg: "text-base px-4 py-2",
     };
 
-    let classes = `${sizeMap[customization.techStackSize]} inline-flex items-center gap-1`;
+    let classes = `${sizeMap[effectiveCustomization.techStackSize]} inline-flex items-center gap-1`;
 
-    switch (customization.techStackStyle) {
+    switch (effectiveCustomization.techStackStyle) {
       case "badges":
         classes += " bg-gray-800 text-white rounded";
         break;
@@ -522,19 +558,19 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     };
 
     return {
-      dot: `${dotSizeMap[customization.dotSize]} ${
-        dotStyleMap[customization.dotStyle]
+      dot: `${dotSizeMap[effectiveCustomization.dotSize]} ${
+        dotStyleMap[effectiveCustomization.dotStyle]
       }`,
       line: `bg-opacity-30`,
       lineStyle: {
         backgroundColor: ColorTheme.primary,
-        width: `${customization.timelineWidth}px`,
+        width: `${effectiveCustomization.timelineWidth}px`,
         opacity: 0.3,
       },
       dotStyle: {
         backgroundColor: ColorTheme.primary,
         zIndex: 10,
-        ...(customization.dotStyle === "hexagon" && {
+        ...(effectiveCustomization.dotStyle === "hexagon" && {
           clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
         }),
       },
@@ -573,7 +609,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       },
     };
 
-    return variants[customization.entranceAnimation];
+    return variants[effectiveCustomization.entranceAnimation];
   };
 
   // Render control components
@@ -693,10 +729,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
             newState[index] = true;
             return newState;
           });
-        }, 500 + index * customization.staggerDelay);
+        }, 500 + index * effectiveCustomization.staggerDelay);
       });
     }
-  }, [experienceData, customization.staggerDelay]);
+  }, [experienceData, effectiveCustomization.staggerDelay]);
 
   useEffect(() => {
     const subscription = supabase
@@ -745,25 +781,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     <div className="text-white bg-black p-2 sm:p-4 md:p-8 relative">
       <style>{customCSS}</style>
 
-      {/* Visual Editor Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
-          onClick={() => setVisualEditorOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
-
       <SectionHeader
         sectionName="experience"
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         titleColor={titleColor}
+        onVisualEditorOpen={openVisualEditor}
       />
 
       <div className={getContainerClasses()}>
@@ -783,17 +806,17 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     : animationVariants.hidden
                 }
                 transition={{
-                  duration: customization.animationDuration / 1000,
+                  duration: effectiveCustomization.animationDuration / 1000,
                   delay:
-                    customization.entranceAnimation === "stagger"
-                      ? index * (customization.staggerDelay / 1000)
+                    effectiveCustomization.entranceAnimation === "stagger"
+                      ? index * (effectiveCustomization.staggerDelay / 1000)
                       : 0,
                 }}
                 className={`relative section-card max-w-[95%] mx-auto md:max-w-[90%] ${
                   index !== experienceData.length - 1 ? "mb-10 sm:mb-16" : ""
                 }`}
                 style={{
-                  filter: customization.glowEffect
+                  filter: effectiveCustomization.glowEffect
                     ? `drop-shadow(0 0 20px ${titleColor}30)`
                     : "none",
                 }}
@@ -803,7 +826,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                   className={`absolute left-2 sm:left-6 transform -translate-x-1/2 ${timelineStyles.dot}`}
                   style={{
                     ...timelineStyles.dotStyle,
-                    boxShadow: customization.borderGlow
+                    boxShadow: effectiveCustomization.borderGlow
                       ? `0 0 10px ${ColorTheme.primary}50`
                       : "none",
                     top: "1.5rem",
@@ -826,10 +849,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                   style={{
                     ...getCardStyle(),
                     borderColor:
-                      customization.cardStyle === "minimal"
+                      effectiveCustomization.cardStyle === "minimal"
                         ? titleColor
                         : `${titleColor}30`,
-                    background: customization.gradientOverlay
+                    background: effectiveCustomization.gradientOverlay
                       ? `linear-gradient(135deg, ${titleColor}10, transparent)`
                       : undefined,
                   }}
@@ -839,9 +862,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                   <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400">
                     <span
                       className={`truncate max-w-[60vw] sm:max-w-none ${
-                        customization.companySize === "lg"
+                        effectiveCustomization.companySize === "lg"
                           ? "text-lg"
-                          : customization.companySize === "md"
+                          : effectiveCustomization.companySize === "md"
                           ? "text-base"
                           : "text-sm"
                       }`}
@@ -850,26 +873,26 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                       {experience.companyName}
                     </span>
 
-                    {customization.locationBadge && experience.location && (
+                    {(draftCustomization?.locationBadge ?? customization.locationBadge) && experience.location && (
                       <span
                         className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${
-                          customization.badgeStyle === "outlined"
+                          (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                             ? "border"
                             : ""
                         }`}
                         style={{
                           backgroundColor:
-                            customization.badgeStyle === "outlined"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                               ? "transparent"
                               : `${titleColor}20`,
                           color: titleColor,
-                          borderRadius: `${customization.badgeRadius}px`,
+                          borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
                           border:
-                            customization.badgeStyle === "outlined"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                               ? `1px solid ${titleColor}`
                               : "none",
                           boxShadow:
-                            customization.badgeStyle === "glow"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
                               ? `0 0 10px ${titleColor}30`
                               : "none",
                         }}
@@ -879,26 +902,26 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                       </span>
                     )}
 
-                    {customization.dateBadge && (
+                    {(draftCustomization?.dateBadge ?? customization.dateBadge) && (
                       <span
                         className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${
-                          customization.badgeStyle === "outlined"
+                          (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                             ? "border"
                             : ""
                         }`}
                         style={{
                           backgroundColor:
-                            customization.badgeStyle === "outlined"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                               ? "transparent"
                               : `${titleColor}20`,
                           color: titleColor,
-                          borderRadius: `${customization.badgeRadius}px`,
+                          borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
                           border:
-                            customization.badgeStyle === "outlined"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
                               ? `1px solid ${titleColor}`
                               : "none",
                           boxShadow:
-                            customization.badgeStyle === "glow"
+                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
                               ? `0 0 10px ${titleColor}30`
                               : "none",
                         }}
@@ -925,12 +948,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                               backgroundColor: `${titleColor}20`,
                               color: titleColor,
                               border:
-                                customization.techStackStyle === "badges"
+                                (draftCustomization?.techStackStyle ?? customization.techStackStyle) === "badges"
                                   ? `1px solid ${titleColor}30`
                                   : "none",
                             }}
                           >
-                            {customization.techStackStyle !== "minimal" && (
+                            {(draftCustomization?.techStackStyle ?? customization.techStackStyle) !== "minimal" && (
                               <img
                                 src={
                                   tech.logo ||
@@ -938,7 +961,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                                 }
                                 alt={tech.name}
                                 className={`${
-                                  customization.techStackSize === "lg"
+                                  (draftCustomization?.techStackSize ?? customization.techStackSize) === "lg"
                                     ? "h-5 w-5"
                                     : "h-4 w-4"
                                 } inline-block mr-1`}
@@ -1036,9 +1059,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     ].map(({ value, label, width }) => (
                       <div
                         key={value}
-                        onClick={() => updateCustomization("maxWidth", value)}
+                        onClick={() => updateDraftCustomization("maxWidth", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          customization.maxWidth === value
+                          (draftCustomization?.maxWidth ?? customization.maxWidth) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
@@ -1079,11 +1102,11 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     min={1}
                     max={8}
                     step={1}
-                    value={customization.timelineWidth}
-                    onChange={(e) => updateCustomization("timelineWidth", Number(e.target.value))}
+                    value={draftCustomization?.timelineWidth ?? customization.timelineWidth}
+                    onChange={(e) => updateDraftCustomization("timelineWidth", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(100 * (customization.timelineWidth - 1) / 7)}%, #3f3f46 ${(100 * (customization.timelineWidth - 1) / 7)}%, #3f3f46 100%)`
+                                              background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 100%)`
                     }}
                     
                   />
@@ -1105,9 +1128,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                         ].map(({ value, label, icon }) => (
                           <div
                             key={value}
-                            onClick={() => updateCustomization("dotSize", value)}
+                            onClick={() => updateDraftCustomization("dotSize", value)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.dotSize === value
+                              (draftCustomization?.dotSize ?? customization.dotSize) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1130,9 +1153,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                         ].map(({ value, label, icon }) => (
                           <div
                             key={value}
-                            onClick={() => updateCustomization("dotStyle", value)}
+                            onClick={() => updateDraftCustomization("dotStyle", value)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              customization.dotStyle === value
+                              (draftCustomization?.dotStyle ?? customization.dotStyle) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
@@ -1166,18 +1189,13 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     ].map(({ value, label }) => (
                       <button
                       key={value}
-                      onClick={() =>
-                        setCustomization((prev) => ({
-                          ...prev,
-                          cardStyle: value as any,
-                        }))
-                      }
+                      onClick={() => updateDraftCustomization("cardStyle", value)}
                       className={`py-2 px-3 text-sm rounded transition-colors ${
-                        customization.cardStyle === value
+                        (draftCustomization?.cardStyle ?? customization.cardStyle) === value
                           ? "text-white"
                           : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
                       }`}
-                      style={customization.cardStyle === value ? {
+                      style={(draftCustomization?.cardStyle ?? customization.cardStyle) === value ? {
                         background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                       } : {}}
                     >
@@ -1196,11 +1214,11 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     min={0}
                     max={24}
                     step={2}
-                    value={customization.cardRadius}
-                    onChange={(e) => updateCustomization("cardRadius", Number(e.target.value))}
+                    value={draftCustomization?.cardRadius ?? customization.cardRadius}
+                    onChange={(e) => updateDraftCustomization("cardRadius", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(customization.cardRadius / 24) * 100}%, #3f3f46 ${(customization.cardRadius / 24) * 100}%, #3f3f46 100%)`
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.cardRadius ?? customization.cardRadius) / 24) * 100}%, #3f3f46 ${((draftCustomization?.cardRadius ?? customization.cardRadius) / 24) * 100}%, #3f3f46 100%)`
                     }}
                   />
                 </div>
@@ -1214,11 +1232,11 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     min={0}
                     max={16}
                     step={2}
-                    value={customization.cardPadding}
-                    onChange={(e) => updateCustomization("cardPadding", Number(e.target.value))}
+                    value={draftCustomization?.cardPadding ?? customization.cardPadding}
+                    onChange={(e) => updateDraftCustomization("cardPadding", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(customization.cardPadding / 16) * 100}%, #3f3f46 ${(customization.cardPadding / 16) * 100}%, #3f3f46 100%)`
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.cardPadding ?? customization.cardPadding) / 16) * 100}%, #3f3f46 ${((draftCustomization?.cardPadding ?? customization.cardPadding) / 16) * 100}%, #3f3f46 100%)`
                     }}
                   />
                 </div>
@@ -1242,9 +1260,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                           ].map(({ value, label, size }) => (
                             <div
                               key={value}
-                              onClick={() => updateCustomization("titleSize", value)}
+                              onClick={() => updateDraftCustomization("titleSize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                customization.titleSize === value
+                                (draftCustomization?.titleSize ?? customization.titleSize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
@@ -1277,9 +1295,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                           ].map(({ value, label, icon }) => (
                             <div
                               key={value}
-                              onClick={() => updateCustomization("titleWeight", value)}
+                              onClick={() => updateDraftCustomization("titleWeight", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                customization.titleWeight === value
+                                (draftCustomization?.titleWeight ?? customization.titleWeight) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
@@ -1313,9 +1331,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                           ].map(({ value, label, size }) => (
                             <div
                               key={value}
-                              onClick={() => updateCustomization("companySize", value)}
+                              onClick={() => updateDraftCustomization("companySize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                customization.companySize === value
+                                (draftCustomization?.companySize ?? customization.companySize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
@@ -1348,9 +1366,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                           ].map(({ value, label, size }) => (
                             <div
                               key={value}
-                              onClick={() => updateCustomization("descriptionSize", value)}
+                              onClick={() => updateDraftCustomization("descriptionSize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                customization.descriptionSize === value
+                                (draftCustomization?.descriptionSize ?? customization.descriptionSize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
@@ -1383,19 +1401,19 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
                         <input
                           type="checkbox"
-                          checked={customization.techStackVisible}
-                          onChange={(e) => updateCustomization("techStackVisible", e.target.checked)}
+                                                  checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
+                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
                           className="rounded border-gray-600 bg-zinc-700 text-primary focus:ring-primary"
                         />
                         Show Tech Stack
                       </label>
                     </div>
 
-                    {customization.techStackVisible && (
+                    {(draftCustomization?.techStackVisible ?? customization.techStackVisible) && (
                       <div className="space-y-4">
                         <TechStackStyleSelector
-                          value={customization.techStackStyle}
-                          onChange={(value) => updateCustomization("techStackStyle", value)}
+                          value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
+                          onChange={(value) => updateDraftCustomization("techStackStyle", value)}
                         />
 
                         <div>
@@ -1408,9 +1426,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                             ].map(({ value, label, size }) => (
                               <div
                                 key={value}
-                                onClick={() => updateCustomization("techStackSize", value)}
+                                onClick={() => updateDraftCustomization("techStackSize", value)}
                                 className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                  customization.techStackSize === value
+                                  (draftCustomization?.techStackSize ?? customization.techStackSize) === value
                                     ? "border-white bg-zinc-700"
                                     : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
@@ -1452,7 +1470,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                 Reset
               </button>
               <button
-                onClick={() => setVisualEditorOpen(false)}
+                onClick={saveDraftCustomization}
                 className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,

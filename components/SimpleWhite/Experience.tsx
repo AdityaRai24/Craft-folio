@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { Settings, Grid3X3, RotateCcw, Type, Zap, Eye, X, Clock, Building, MapPin } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setCurrentEdit } from '@/slices/editModeSlice';
 import { supabase } from '@/lib/supabase-client';
 import { useParams } from 'next/navigation';
 import EditButton from '@/components/EditButton';
+import toast from "react-hot-toast";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { defaultSimpleWhiteExperienceStyles } from "./defaultStyles/experience";
+import { SimpleWhiteExperienceCustomizationState } from "./defaultStyles/types";
+import { ColorTheme } from "@/lib/colorThemes";
 
 interface Technology {
   name: string;
@@ -22,6 +28,108 @@ interface Experience {
   location ?: string
 }
 
+// Visual Alignment Selector Component
+const AlignmentSelector: React.FC<{
+  value: "center" | "left" | "right";
+  onChange: (value: "center" | "left" | "right") => void;
+  label: string;
+}> = ({ value, onChange, label }) => {
+  const alignments = [
+    { value: "left", icon: "←", label: "Left" },
+    { value: "center", icon: "↔", label: "Center" },
+    { value: "right", icon: "→", label: "Right" },
+  ];
+
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        {label}
+      </label>
+      <div className="grid grid-cols-3 gap-2">
+        {alignments.map(({ value: align, icon, label: alignLabel }) => (
+          <div
+            key={align}
+            onClick={() => onChange(align as any)}
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+              value === align
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+            }`}
+          >
+            <div className="text-2xl text-white">{icon}</div>
+            <div className="space-y-1 w-full">
+              <div
+                className={`h-1 bg-gradient-to-r rounded ${
+                  align === "left"
+                    ? "mr-auto w-3/4"
+                    : align === "center"
+                    ? "mx-auto w-1/2"
+                    : "ml-auto w-3/4"
+                }`}
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              ></div>
+              <div
+                className={`h-1 bg-gray-400 rounded ${
+                  align === "left"
+                    ? "mr-auto w-full"
+                    : align === "center"
+                    ? "mx-auto w-3/4"
+                    : "ml-auto w-full"
+                }`}
+              ></div>
+            </div>
+            <div className="text-xs text-white">{alignLabel}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Visual Size Selector Component
+const SizeSelector: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  options: { value: string; label: string; size: string }[];
+}> = ({ value, onChange, label, options }) => {
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        {label}
+      </label>
+      <div className="grid grid-cols-2 gap-2">
+        {options.map(({ value: optionValue, label: optionLabel, size }) => (
+          <div
+            key={optionValue}
+            onClick={() => onChange(optionValue)}
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              value === optionValue
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+            }`}
+          >
+            <div className="flex justify-center mb-2">
+              <div
+                className="rounded text-white text-center font-bold"
+                style={{ 
+                  fontSize: size,
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Aa
+              </div>
+            </div>
+            <div className="text-center text-xs text-white">{optionLabel}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Experience: React.FC = ({ customCSS }: any) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const { portfolioData } = useSelector((state: RootState) => state.data);
@@ -34,6 +142,270 @@ const Experience: React.FC = ({ customCSS }: any) => {
 
   const [isHeadingVisible, setIsHeadingVisible] = useState(false);
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
+  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "layout" | "typography" | "timeline" | "effects"
+  >("layout");
+
+  // Dragging state for floating window
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
+  const dragRef = useRef<HTMLDivElement>(null);
+
+  // Main customization state (from DB or default)
+  const [customization, setCustomization] = useState<SimpleWhiteExperienceCustomizationState>(defaultSimpleWhiteExperienceStyles);
+  // Local draft state for visual editor
+  const [draftCustomization, setDraftCustomization] = useState<SimpleWhiteExperienceCustomizationState | null>(null);
+
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "experience",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as unknown as SimpleWhiteExperienceCustomizationState);
+        } else {
+          setCustomization(defaultSimpleWhiteExperienceStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultSimpleWhiteExperienceStyles);
+      }
+    };
+    if (portfolioId) loadCustomizations();
+  }, [portfolioId]);
+
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof SimpleWhiteExperienceCustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "experience",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "experience",
+      });
+      setCustomization(defaultSimpleWhiteExperienceStyles);
+      setDraftCustomization(defaultSimpleWhiteExperienceStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
+  };
+
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (dragRef.current) {
+      const rect = dragRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setWindowPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  // Helper functions for styling based on customization
+  const getSectionClasses = () => {
+    const bgMap = {
+      white: "bg-white",
+      "gray-50": "bg-gray-50",
+      "gray-100": "bg-gray-100",
+    };
+    
+    return `min-h-screen flex items-center justify-center ${bgMap[effectiveCustomization.backgroundColor]} text-black relative overflow-hidden py-20`;
+  };
+
+  const getHeaderClasses = () => {
+    const alignmentMap = {
+      left: "text-left",
+      center: "text-center",
+      right: "text-right",
+    };
+
+    const titleSizeMap = {
+      sm: "text-2xl md:text-3xl",
+      md: "text-3xl md:text-4xl",
+      lg: "text-4xl md:text-5xl",
+      xl: "text-4xl md:text-5xl",
+      "2xl": "text-5xl md:text-6xl",
+      "3xl": "text-6xl md:text-7xl",
+    };
+
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+      extrabold: "font-extrabold",
+    };
+
+    return {
+      container: `${alignmentMap[effectiveCustomization.titleAlignment]} mb-20`,
+      title: `font-display section-title ${titleSizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]} tracking-tight text-${effectiveCustomization.titleColor} mb-4 transition-all duration-700`,
+      description: `font-sans text-lg section-description md:text-xl font-normal text-${effectiveCustomization.descriptionColor} tracking-normal leading-relaxed max-w-2xl ${effectiveCustomization.titleAlignment === "center" ? "mx-auto" : ""} transition-all duration-700`,
+    };
+  };
+
+  const getTimelineClasses = () => {
+    if (!effectiveCustomization.timelineVisible) return { line: "hidden", dot: "hidden" };
+
+    const colorMap = {
+      "gray-300": "bg-gray-300",
+      "gray-400": "bg-gray-400",
+      primary: `bg-[${ColorTheme.primary}]`,
+    };
+
+    const widthMap = {
+      thin: "w-px",
+      normal: "w-0.5",
+      thick: "w-1",
+    };
+
+    const dotColorMap = {
+      "gray-500": "bg-gray-500",
+      primary: `bg-[${ColorTheme.primary}]`,
+      white: "bg-white",
+    };
+
+    const dotSizeMap = {
+      sm: "w-4 h-4",
+      md: "w-6 h-6",
+      lg: "w-8 h-8",
+    };
+
+    const positionMap = {
+      left: "left-8",
+      center: "left-8 md:left-1/2",
+      right: "right-8",
+    };
+
+    return {
+      line: `absolute ${positionMap[effectiveCustomization.timelinePosition]} top-0 bottom-0 ${widthMap[effectiveCustomization.timelineWidth]} ${colorMap[effectiveCustomization.timelineColor]} transform md:-translate-x-px`,
+      dot: effectiveCustomization.timelineDots ? `absolute top-1/2 ${dotSizeMap[effectiveCustomization.timelineDotSize]} rounded-full ${dotColorMap[effectiveCustomization.timelineDotColor]} border-4 border-white hidden md:block transform -translate-y-1/2` : "hidden",
+    };
+  };
+
+  const getCardClasses = () => {
+    const spacingMap = {
+      compact: "mb-8",
+      normal: "mb-12",
+      spacious: "mb-16",
+    };
+
+    const backgroundMap = {
+      solid: "bg-white",
+      gradient: "bg-gradient-to-br from-white to-gray-50",
+      glass: "bg-white/50 backdrop-blur-sm",
+    };
+
+    const borderMap = {
+      none: "border-transparent",
+      subtle: "border border-gray-300",
+      bold: "border-2 border-gray-400",
+    };
+
+    const shadowMap = {
+      none: "",
+      light: "shadow-sm",
+      medium: "shadow-lg",
+      heavy: "shadow-2xl",
+    };
+
+    const radiusMap = {
+      none: "rounded-none",
+      sm: "rounded-sm",
+      md: "rounded-md",
+      lg: "rounded-2xl",
+      xl: "rounded-3xl",
+    };
+
+    const hoverMap = {
+      lift: "hover:shadow-md hover:-translate-y-1",
+      glow: `hover:shadow-lg hover:shadow-[${ColorTheme.primary}]/20`,
+      border: "hover:border-gray-400",
+      none: "",
+    };
+
+    return `relative ${backgroundMap[effectiveCustomization.cardBackground]} ${radiusMap[effectiveCustomization.cardBorderRadius]} p-6 md:p-8 ${spacingMap[effectiveCustomization.cardSpacing]} ${borderMap[effectiveCustomization.cardBorderStyle]} ${shadowMap[effectiveCustomization.cardShadow]} ${effectiveCustomization.hoverEffects ? hoverMap[effectiveCustomization.cardHoverEffect] : ""} transition-all duration-300 md:w-[calc(50%-2rem)]`;
+  };
+
+  const getTechStackClasses = () => {
+    if (!effectiveCustomization.techStackVisible) return "hidden";
+
+    const colorMap = {
+      gray: "bg-gray-100 text-gray-600 border-gray-200",
+      blue: "bg-blue-100 text-blue-700 border-blue-200",
+      green: "bg-green-100 text-green-700 border-green-200",
+      purple: "bg-purple-100 text-purple-700 border-purple-200",
+    };
+
+    const styleMap = {
+      badges: "rounded-full",
+      pills: "rounded-lg",
+      minimal: "rounded-none border-0 bg-transparent",
+    };
+
+    return `${colorMap[effectiveCustomization.techStackColor]} px-3 py-1 text-sm border ${styleMap[effectiveCustomization.techStackStyle]}`;
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -150,30 +522,50 @@ const Experience: React.FC = ({ customCSS }: any) => {
   }
 
 
+  const headerClasses = getHeaderClasses();
+  const timelineClasses = getTimelineClasses();
+
   return (
     <section
       id="experience"
-      className="min-h-screen flex items-center justify-center bg-white text-black relative overflow-hidden py-20"
+      className={getSectionClasses()}
     >
       <style>{customCSS}</style>
-      <div className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
+      
+      {/* Visual Editor Toggle Button */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <EditButton sectionName="experience" />
+        <button
+          onClick={openVisualEditor}
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+          style={{
+            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+          }}
         >
-          <h2 className={`font-display section-title text-4xl md:text-5xl font-medium tracking-tight text-gray-900 mb-4 transition-all duration-700 ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
-            {portfolioData?.find((section: any) => section.type === "experience")?.sectionTitle || "Professional Experience"}
-          </h2>
-          <p className={`font-sans text-lg section-description md:text-xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-2xl mx-auto transition-all duration-700 ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
-            {portfolioData?.find((section: any) => section.type === "experience")?.sectionDescription || "My journey in the industry"}
-          </p>
-          <div className="mt-6">
-          <EditButton styles="right-64 -top-18" sectionName="experience" />
-          </div>
-        </motion.div>
+          <Settings className="h-4 w-4" />
+          Visual Editor
+        </button>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+        {effectiveCustomization.headerVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className={headerClasses.container}
+          >
+            <h2 className={`${headerClasses.title} ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
+              {portfolioData?.find((section: any) => section.type === "experience")?.sectionTitle || "Professional Experience"}
+            </h2>
+            {effectiveCustomization.descriptionVisible && (
+              <p className={`${headerClasses.description} ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
+                {portfolioData?.find((section: any) => section.type === "experience")?.sectionDescription || "My journey in the industry"}
+              </p>
+            )}
+          </motion.div>
+        )}
 
         {experienceData.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
@@ -181,71 +573,99 @@ const Experience: React.FC = ({ customCSS }: any) => {
           </div>
         ) : (
           <motion.div
-            variants={containerVariants}
+            variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             className="relative"
           >
-            <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gray-300 transform md:-translate-x-px" />
+            <div className={timelineClasses.line} />
 
             {experienceData.map((exp, index) => (
               <motion.div
                 key={index}
-                // variants={itemVariants}
-                className={`relative  bg-white/50 backdrop-blur-sm rounded-2xl p-6 md:p-8 mb-12 border border-gray-300
-                        shadow-sm hover:shadow-md transition-all duration-300 hover:border-gray-400
-                        md:w-[calc(50%-2rem)] ${
-                          visibleItems[index] ? 'opacity-100' : 'opacity-0'
-                        } ${
-                          index % 2 === 0
-                            ? "md:mr-[calc(50%+2rem)]"
-                            : "md:ml-[calc(50%+2rem)]"
-                        }`}
+                variants={effectiveCustomization.staggerAnimation ? itemVariants : undefined}
+                className={`${getCardClasses()} ${
+                  visibleItems[index] ? 'opacity-100' : 'opacity-0'
+                } ${
+                  effectiveCustomization.alternatingLayout && effectiveCustomization.layout === "timeline"
+                    ? index % 2 === 0
+                      ? "md:mr-[calc(50%+2rem)]"
+                      : "md:ml-[calc(50%+2rem)]"
+                    : ""
+                }`}
               >
                 <div
-                  className={`absolute top-1/2 w-6 h-6 rounded-full bg-gray-500
-                            border-4 border-white hidden md:block transform -translate-y-1/2
-                            ${
-                              index % 2 === 0
-                                ? "right-0 translate-x-[calc(100%+1rem+5px)]"
-                                : "left-0 -translate-x-[calc(100%+1rem+6px)]"
-                            }`}
+                  className={`${timelineClasses.dot} ${
+                    effectiveCustomization.alternatingLayout && effectiveCustomization.layout === "timeline"
+                      ? index % 2 === 0
+                        ? "right-0 translate-x-[calc(100%+1rem+5px)]"
+                        : "left-0 -translate-x-[calc(100%+1rem+6px)]"
+                      : "right-0 translate-x-[calc(100%+1rem+5px)]"
+                  }`}
                 />
 
                 <motion.div className="mb-6">
-                  <h3 className="font-title section-sub-title text-xl md:text-2xl font-semibold text-gray-900 mb-2">
+                  <h3 className={`font-title section-sub-title mb-2 ${
+                    effectiveCustomization.roleSize === "sm" ? "text-lg md:text-xl" :
+                    effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
+                    effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
+                  } ${
+                    effectiveCustomization.roleWeight === "normal" ? "font-normal" :
+                    effectiveCustomization.roleWeight === "medium" ? "font-medium" :
+                    effectiveCustomization.roleWeight === "semibold" ? "font-semibold" : "font-bold"
+                  } ${
+                    effectiveCustomization.roleColor === "primary" ? "text-primary-900" :
+                    `text-${effectiveCustomization.roleColor}`
+                  }`}>
                     {exp.role}
                   </h3>
-                  <p className="font-title section-sub-title text-lg font-medium text-gray-600 mb-3">
+                  <p className={`font-title section-sub-title mb-3 ${
+                    effectiveCustomization.companyNameSize === "sm" ? "text-base" :
+                    effectiveCustomization.companyNameSize === "md" ? "text-lg" :
+                    effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
+                  } ${
+                    effectiveCustomization.companyNameWeight === "normal" ? "font-normal" :
+                    effectiveCustomization.companyNameWeight === "medium" ? "font-medium" :
+                    effectiveCustomization.companyNameWeight === "semibold" ? "font-semibold" : "font-bold"
+                  } text-${effectiveCustomization.companyNameColor}`}>
                     {exp.company}
                   </p>
-                  <p className="font-sans text-sm uppercase tracking-wider font-medium text-gray-500">
-                    {exp.startDate} - {exp.endDate}  
+                  <p className={`font-sans text-sm uppercase tracking-wider font-medium text-${effectiveCustomization.dateColor}`}>
+                    {effectiveCustomization.dateFormat === "year-only" 
+                      ? `${exp.startDate.split(' ')[1]} - ${exp.endDate.split(' ')[1]}` 
+                      : `${exp.startDate} - ${exp.endDate}`}
                   </p>
-                  <span className="text-black capitalize">{exp.location}</span>
+                  {effectiveCustomization.locationVisible && exp.location && (
+                    <span className={`text-${effectiveCustomization.locationColor} capitalize`}>{exp.location}</span>
+                  )}
                 </motion.div>
 
                 <ul className="space-y-4">
                     <motion.li
-                      // variants={itemVariants}
                       className="flex items-start group"
                     >
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-gray-500 mt-2.5 mr-3 flex-shrink-0" />
-                      <p className="font-sans section-sub-description text-base text-gray-700 leading-relaxed font-normal">
+                      <p className={`font-sans section-sub-description leading-relaxed font-normal ${
+                        effectiveCustomization.descriptionTextSize === "sm" ? "text-sm" :
+                        effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
+                      } text-${effectiveCustomization.descriptionTextColor}`}>
                         {exp.description}
                       </p>
                     </motion.li>
                 </ul>
 
-                {exp.techStack && exp.techStack.length > 0 && (
+                {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-6">
-                    {exp.techStack.slice(0,5).map((tech, techIndex) => (
+                    {exp.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech, techIndex) => (
                       <span 
                         key={techIndex}
-                        className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm border border-gray-200"
+                        className={getTechStackClasses()}
                       >
-                        {tech.logo && <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>} {tech.name}
+                        {effectiveCustomization.techStackShowIcons && tech.logo && (
+                          <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>
+                        )}
+                        {tech.name}
                       </span>
                     ))}
                   </div>
@@ -255,6 +675,709 @@ const Experience: React.FC = ({ customCSS }: any) => {
           </motion.div>
         )}
       </div>
+
+      {/* Floating Visual Editor Window */}
+      {visualEditorOpen && (
+        <div
+          ref={dragRef}
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            onMouseDown={handleMouseDown}
+          >
+            <h3 className="text-lg font-bold text-white">Experience Visual Editor</h3>
+            <button
+              onClick={() => setVisualEditorOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex border-b border-zinc-700">
+            {["layout", "typography", "timeline", "effects"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors`}
+                style={{
+                  background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
+                  color: activeTab === tab ? "white" : "#9CA3AF",
+                }}
+              >
+                {tab === "layout" && <Grid3X3 className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "timeline" && <Clock className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "effects" && <Eye className="h-4 w-4 mx-auto mb-1" />}
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="max-h-96 overflow-y-auto p-4 space-y-4">
+            {activeTab === "layout" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Layout Style
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "timeline", label: "Timeline", icon: "⏰" },
+                      { value: "cards", label: "Cards", icon: "🎴" },
+                      { value: "list", label: "List", icon: "📋" },
+                    ].map(({ value, label, icon }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("layout", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.layout ?? customization.layout) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-lg text-white mb-1">
+                          {icon}
+                        </div>
+                        <div className="text-center text-xs text-white">
+                          {label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Card Spacing
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "compact", label: "Compact" },
+                      { value: "normal", label: "Normal" },
+                      { value: "spacious", label: "Spacious" },
+                    ].map(({ value, label }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("cardSpacing", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.cardSpacing ?? customization.cardSpacing) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Background Color
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "white", label: "White", color: "bg-white" },
+                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
+                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
+                    ].map(({ value, label, color }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("backgroundColor", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Card Background
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "solid", label: "Solid", style: "bg-white" },
+                      { value: "gradient", label: "Gradient", style: "bg-gradient-to-br from-white to-gray-50" },
+                      { value: "glass", label: "Glass", style: "bg-white/50 backdrop-blur-sm" },
+                    ].map(({ value, label, style }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("cardBackground", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.cardBackground ?? customization.cardBackground) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className={`w-full h-8 rounded mb-2 ${style}`}></div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Header Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Header</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.headerVisible ?? customization.headerVisible}
+                        onChange={(e) => updateDraftCustomization("headerVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.headerVisible ?? customization.headerVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Show Description</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.descriptionVisible ?? customization.descriptionVisible}
+                        onChange={(e) => updateDraftCustomization("descriptionVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.descriptionVisible ?? customization.descriptionVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "typography" && (
+              <div className="space-y-4">
+                <AlignmentSelector
+                  value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
+                  onChange={(value) => updateDraftCustomization("titleAlignment", value)}
+                  label="Title Alignment"
+                />
+
+                <SizeSelector
+                  value={draftCustomization?.titleSize ?? customization.titleSize}
+                  onChange={(value) => updateDraftCustomization("titleSize", value)}
+                  label="Title Size"
+                  options={[
+                    { value: "sm", label: "Small", size: "24px" },
+                    { value: "md", label: "Medium", size: "32px" },
+                    { value: "lg", label: "Large", size: "40px" },
+                    { value: "xl", label: "Extra Large", size: "52px" },
+                    { value: "2xl", label: "2XL", size: "64px" },
+                    { value: "3xl", label: "3XL", size: "76px" },
+                  ]}
+                />
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Experience Card Typography
+                  </h5>
+
+                  <SizeSelector
+                    value={draftCustomization?.roleSize ?? customization.roleSize}
+                    onChange={(value) => updateDraftCustomization("roleSize", value)}
+                    label="Role Title Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "18px" },
+                      { value: "md", label: "Medium", size: "20px" },
+                      { value: "lg", label: "Large", size: "24px" },
+                      { value: "xl", label: "Extra Large", size: "28px" },
+                    ]}
+                  />
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Role Title Color
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "gray-900", label: "Dark Gray", color: "bg-gray-900" },
+                        { value: "gray-800", label: "Medium Gray", color: "bg-gray-800" },
+                        { value: "primary", label: "Primary", color: ColorTheme.primary },
+                      ].map(({ value, label, color }) => (
+                        <div
+                          key={value}
+                          onClick={() => updateDraftCustomization("roleColor", value)}
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                            (draftCustomization?.roleColor ?? customization.roleColor) === value
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
+                        >
+                          <div
+                            className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
+                            style={{ backgroundColor: value === "primary" ? color : "" }}
+                          ></div>
+                          <div className="text-center text-xs text-white">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <SizeSelector
+                    value={draftCustomization?.companyNameSize ?? customization.companyNameSize}
+                    onChange={(value) => updateDraftCustomization("companyNameSize", value)}
+                    label="Company Name Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "16px" },
+                      { value: "md", label: "Medium", size: "18px" },
+                      { value: "lg", label: "Large", size: "20px" },
+                      { value: "xl", label: "Extra Large", size: "24px" },
+                    ]}
+                  />
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Date Format
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "month-year", label: "Month Year", example: "Jan 2024" },
+                        { value: "full-date", label: "Full Date", example: "January 2024" },
+                        { value: "year-only", label: "Year Only", example: "2024" },
+                      ].map(({ value, label, example }) => (
+                        <div
+                          key={value}
+                          onClick={() => updateDraftCustomization("dateFormat", value)}
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                            (draftCustomization?.dateFormat ?? customization.dateFormat) === value
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
+                        >
+                          <div className="text-center text-xs text-white mb-1">{label}</div>
+                          <div className="text-center text-xs text-gray-400">{example}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Show Location</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.locationVisible ?? customization.locationVisible}
+                        onChange={(e) => updateDraftCustomization("locationVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.locationVisible ?? customization.locationVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "timeline" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-300">Show Timeline</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={draftCustomization?.timelineVisible ?? customization.timelineVisible}
+                      onChange={(e) => updateDraftCustomization("timelineVisible", e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                      style={{
+                        backgroundColor: (draftCustomization?.timelineVisible ?? customization.timelineVisible) ? ColorTheme.primary : "",
+                      }}
+                    ></div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Timeline Position
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "left", label: "Left", icon: "←" },
+                      { value: "center", label: "Center", icon: "↕" },
+                      { value: "right", label: "Right", icon: "→" },
+                    ].map(({ value, label, icon }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("timelinePosition", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.timelinePosition ?? customization.timelinePosition) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-lg text-white mb-1">
+                          {icon}
+                        </div>
+                        <div className="text-center text-xs text-white">
+                          {label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Timeline Color
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "gray-300", label: "Light Gray", color: "bg-gray-300" },
+                      { value: "gray-400", label: "Gray", color: "bg-gray-400" },
+                      { value: "primary", label: "Primary", color: ColorTheme.primary },
+                    ].map(({ value, label, color }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("timelineColor", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.timelineColor ?? customization.timelineColor) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div
+                          className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
+                          style={{ backgroundColor: value === "primary" ? color : "" }}
+                        ></div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Timeline Width
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "thin", label: "Thin", width: "1px" },
+                      { value: "normal", label: "Normal", width: "2px" },
+                      { value: "thick", label: "Thick", width: "4px" },
+                    ].map(({ value, label, width }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("timelineWidth", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.timelineWidth ?? customization.timelineWidth) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="flex justify-center mb-2">
+                          <div
+                            className="bg-gradient-to-r rounded"
+                            style={{
+                              width: width,
+                              height: "24px",
+                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Timeline Dots
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Dots</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.timelineDots ?? customization.timelineDots}
+                        onChange={(e) => updateDraftCustomization("timelineDots", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.timelineDots ?? customization.timelineDots) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Dot Size
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "sm", label: "Small", size: "16px" },
+                        { value: "md", label: "Medium", size: "24px" },
+                        { value: "lg", label: "Large", size: "32px" },
+                      ].map(({ value, label, size }) => (
+                        <div
+                          key={value}
+                          onClick={() => updateDraftCustomization("timelineDotSize", value)}
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                            (draftCustomization?.timelineDotSize ?? customization.timelineDotSize) === value
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
+                        >
+                          <div className="flex justify-center mb-2">
+                            <div
+                              className="rounded-full"
+                              style={{
+                                width: size,
+                                height: size,
+                                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                              }}
+                            ></div>
+                          </div>
+                          <div className="text-center text-xs text-white">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Tech Stack Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Tech Stack</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
+                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.techStackVisible ?? customization.techStackVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Tech Stack Limit: {draftCustomization?.techStackLimit ?? customization.techStackLimit}
+                    </label>
+                    <input
+                      type="range"
+                      min={3}
+                      max={7}
+                      step={1}
+                      value={draftCustomization?.techStackLimit ?? customization.techStackLimit}
+                      onChange={(e) => updateDraftCustomization("techStackLimit", Number(e.target.value))}
+                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 4) * 100}%, #3f3f46 ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 4) * 100}%, #3f3f46 100%)`,
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Show Tech Icons</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.techStackShowIcons ?? customization.techStackShowIcons}
+                        onChange={(e) => updateDraftCustomization("techStackShowIcons", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.techStackShowIcons ?? customization.techStackShowIcons) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "effects" && (
+              <div className="space-y-4">
+                <div className="mb-6">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Animation Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Hover Effects</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
+                        onChange={(e) => updateDraftCustomization("hoverEffects", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.hoverEffects ?? customization.hoverEffects) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Stagger Animation</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.staggerAnimation ?? customization.staggerAnimation}
+                        onChange={(e) => updateDraftCustomization("staggerAnimation", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Alternating Layout</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.alternatingLayout ?? customization.alternatingLayout}
+                        onChange={(e) => updateDraftCustomization("alternatingLayout", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.alternatingLayout ?? customization.alternatingLayout) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Card Hover Effect
+                  </h5>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "lift", label: "Lift", icon: "⬆️" },
+                      { value: "glow", label: "Glow", icon: "✨" },
+                      { value: "border", label: "Border", icon: "🔲" },
+                      { value: "none", label: "None", icon: "❌" },
+                    ].map(({ value, label, icon }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("cardHoverEffect", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.cardHoverEffect ?? customization.cardHoverEffect) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-lg text-white mb-1">
+                          {icon}
+                        </div>
+                        <div className="text-center text-xs text-white">
+                          {label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+            <div className="flex gap-2">
+              <button
+                onClick={resetCustomization}
+                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </button>
+              <button
+                onClick={saveDraftCustomization}
+                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay for floating window */}
+      {visualEditorOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
+          onClick={() => setVisualEditorOpen(false)}
+        />
+      )}
+
+      {/* Custom CSS for sliders */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: none;
+        }
+      `}</style>
     </section>
   );
 };

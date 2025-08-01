@@ -6,6 +6,7 @@ import {
   fetchContent,
   getIdThroughSlug,
   getThemeNameApi,
+  getAllComponentCustomizations,
 } from "@/app/actions/portfolio";
 import { redirect, useParams } from "next/navigation";
 import {
@@ -170,6 +171,15 @@ const Page = () => {
           dispatch(setPortfolioData(contentResult?.data?.sections));
         }
 
+        // Fetch component customizations
+        const customizationsResult = await getAllComponentCustomizations({
+          portfolioId: currentPortfolioId,
+        });
+        if (customizationsResult.success) {
+          // Store customizations in Redux or pass to components
+          console.log("Loaded component customizations:", customizationsResult.data);
+        }
+
         // Mark data as loaded only after both fetches complete
         setDataLoaded(true);
       } catch (error) {
@@ -196,6 +206,21 @@ const Page = () => {
           templateName as keyof typeof templatesConfig
         ] as TemplateType)
       : null;
+
+  // Log all per-section data once fully loaded (for setting defaults)
+  useEffect(() => {
+    if (dataLoaded && templateName && portfolioData) {
+      const sectionData = portfolioData.reduce((acc: Record<string, any>, item: any) => {
+        // Ignore global items
+        if (item.type !== "themes" && item.type !== "userInfo") {
+          acc[item.type] = item.data;
+        }
+        return acc;
+      }, {} as Record<string, any>);
+
+      console.log(`Customisation snapshot for template: ${templateName}`, sectionData);
+    }
+  }, [dataLoaded, templateName, portfolioData]);
 
   const getComponentForSection = (sectionType: string) => {
     if (!Template || !Template.sections || !Template.sections[sectionType]) {

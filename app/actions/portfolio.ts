@@ -592,3 +592,124 @@ export async function checkUserSubdomain(userId: string) {
     };
   }
 }
+
+export async function saveComponentCustomization({
+  portfolioId,
+  componentType,
+  settings,
+}: {
+  portfolioId: string;
+  componentType: string;
+  settings: any;
+}) {
+  try {
+    // Check if customization already exists
+    const existingCustomization = await prisma.componentCustomization.findFirst({
+      where: {
+        portfolioId,
+        component: componentType,
+      },
+    });
+
+    if (existingCustomization) {
+      // Update existing customization
+      const updatedCustomization = await prisma.componentCustomization.update({
+        where: { id: existingCustomization.id },
+        data: {
+          settings: settings,
+        },
+      });
+      return { success: true, data: updatedCustomization };
+    } else {
+      // Create new customization
+      const newCustomization = await prisma.componentCustomization.create({
+        data: {
+          portfolioId,
+          component: componentType,
+          settings: settings,
+        },
+      });
+      return { success: true, data: newCustomization };
+    }
+  } catch (error) {
+    console.error("Error saving component customization:", error);
+    return { success: false, error: "Failed to save customization" };
+  }
+}
+
+export async function getComponentCustomization({
+  portfolioId,
+  componentType,
+}: {
+  portfolioId: string;
+  componentType: string;
+}) {
+  try {
+    const customization = await prisma.componentCustomization.findFirst({
+      where: {
+        portfolioId,
+        component: componentType,
+      },
+    });
+
+    if (customization) {
+      return { success: true, data: customization.settings };
+    } else {
+      return { success: false, data: null };
+    }
+  } catch (error) {
+    console.error("Error fetching component customization:", error);
+    return { success: false, error: "Failed to fetch customization" };
+  }
+}
+
+export async function getAllComponentCustomizations({
+  portfolioId,
+}: {
+  portfolioId: string;
+}) {
+  try {
+    const customizations = await prisma.componentCustomization.findMany({
+      where: { portfolioId },
+    });
+
+    const customizationsMap = customizations.reduce((acc, customization) => {
+      acc[customization.component] = customization.settings;
+      return acc;
+    }, {} as Record<string, any>);
+
+    return { success: true, data: customizationsMap };
+  } catch (error) {
+    console.error("Error fetching all component customizations:", error);
+    return { success: false, error: "Failed to fetch customizations" };
+  }
+}
+
+export async function deleteComponentCustomization({
+  portfolioId,
+  componentType,
+}: {
+  portfolioId: string;
+  componentType: string;
+}) {
+  try {
+    const customization = await prisma.componentCustomization.findFirst({
+      where: {
+        portfolioId,
+        component: componentType,
+      },
+    });
+
+    if (customization) {
+      await prisma.componentCustomization.delete({
+        where: { id: customization.id },
+      });
+      return { success: true };
+    } else {
+      return { success: false, error: "Customization not found" };
+    }
+  } catch (error) {
+    console.error("Error deleting component customization:", error);
+    return { success: false, error: "Failed to delete customization" };
+  }
+}

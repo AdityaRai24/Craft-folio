@@ -1,12 +1,18 @@
 import { motion } from "framer-motion";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
+import { Settings, Grid3X3, RotateCcw, Type, Zap, Eye, X, Layout, Image, Tag, Link } from "lucide-react";
 import type { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
 import EditButton from '@/components/EditButton';
+import toast from "react-hot-toast";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { defaultSimpleWhiteProjectsStyles } from "./defaultStyles/projects";
+import { SimpleWhiteProjectsCustomizationState } from "./defaultStyles/types";
+import { ColorTheme } from "@/lib/colorThemes";
 
 interface ProjectType {
   id: string;
@@ -21,6 +27,108 @@ interface ProjectType {
   liveLink: string;
 }
 
+// Visual Alignment Selector Component
+const AlignmentSelector: React.FC<{
+  value: "center" | "left" | "right";
+  onChange: (value: "center" | "left" | "right") => void;
+  label: string;
+}> = ({ value, onChange, label }) => {
+  const alignments = [
+    { value: "left", icon: "←", label: "Left" },
+    { value: "center", icon: "↔", label: "Center" },
+    { value: "right", icon: "→", label: "Right" },
+  ];
+
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        {label}
+      </label>
+      <div className="grid grid-cols-3 gap-2">
+        {alignments.map(({ value: align, icon, label: alignLabel }) => (
+          <div
+            key={align}
+            onClick={() => onChange(align as any)}
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+              value === align
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+            }`}
+          >
+            <div className="text-2xl text-white">{icon}</div>
+            <div className="space-y-1 w-full">
+              <div
+                className={`h-1 bg-gradient-to-r rounded ${
+                  align === "left"
+                    ? "mr-auto w-3/4"
+                    : align === "center"
+                    ? "mx-auto w-1/2"
+                    : "ml-auto w-3/4"
+                }`}
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              ></div>
+              <div
+                className={`h-1 bg-gray-400 rounded ${
+                  align === "left"
+                    ? "mr-auto w-full"
+                    : align === "center"
+                    ? "mx-auto w-3/4"
+                    : "ml-auto w-full"
+                }`}
+              ></div>
+            </div>
+            <div className="text-xs text-white">{alignLabel}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Visual Size Selector Component
+const SizeSelector: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  options: { value: string; label: string; size: string }[];
+}> = ({ value, onChange, label, options }) => {
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        {label}
+      </label>
+      <div className="grid grid-cols-2 gap-2">
+        {options.map(({ value: optionValue, label: optionLabel, size }) => (
+          <div
+            key={optionValue}
+            onClick={() => onChange(optionValue)}
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              value === optionValue
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+            }`}
+          >
+            <div className="flex justify-center mb-2">
+              <div
+                className="rounded text-white text-center font-bold"
+                style={{ 
+                  fontSize: size,
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Aa
+              </div>
+            </div>
+            <div className="text-center text-xs text-white">{optionLabel}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Projects: NextPage = ({ customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
@@ -29,7 +137,224 @@ const Projects: NextPage = ({ customCSS }: any) => {
   
   const [isLoading, setIsLoading] = useState(true);
   const [projectsData, setProjectsData] = useState<ProjectType[]>([]);
-  
+  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "layout" | "typography" | "cards" | "effects"
+  >("layout");
+
+  // Dragging state for floating window
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
+  const dragRef = useRef<HTMLDivElement>(null);
+
+  // Main customization state (from DB or default)
+  const [customization, setCustomization] = useState<SimpleWhiteProjectsCustomizationState>(defaultSimpleWhiteProjectsStyles);
+  // Local draft state for visual editor
+  const [draftCustomization, setDraftCustomization] = useState<SimpleWhiteProjectsCustomizationState | null>(null);
+
+  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
+  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+
+  // Load customizations from database on component mount
+  useEffect(() => {
+    const loadCustomizations = async () => {
+      try {
+        const result = await getComponentCustomization({
+          portfolioId,
+          componentType: "projects",
+        });
+        if (result.success && result.data) {
+          setCustomization(result.data as unknown as SimpleWhiteProjectsCustomizationState);
+        } else {
+          setCustomization(defaultSimpleWhiteProjectsStyles);
+        }
+      } catch (error) {
+        setCustomization(defaultSimpleWhiteProjectsStyles);
+      }
+    };
+    if (portfolioId) loadCustomizations();
+  }, [portfolioId]);
+
+  // When opening the editor, copy customization to draft
+  const openVisualEditor = () => {
+    setDraftCustomization({ ...customization });
+    setVisualEditorOpen(true);
+  };
+
+  // All visual editor controls update draftCustomization
+  const updateDraftCustomization = (key: keyof SimpleWhiteProjectsCustomizationState, value: any) => {
+    if (!draftCustomization) return;
+    setDraftCustomization({ ...draftCustomization, [key]: value });
+  };
+
+  // When 'Done' is clicked, save draft to DB and update main state
+  const saveDraftCustomization = async () => {
+    if (!draftCustomization) return;
+    setCustomization(draftCustomization);
+    setVisualEditorOpen(false);
+    try {
+      const result = await saveComponentCustomization({
+        portfolioId,
+        componentType: "projects",
+        settings: draftCustomization,
+      });
+      if (!result.success) toast.error("Failed to save customization");
+    } catch (error) {
+      toast.error("Failed to save customization");
+    }
+  };
+
+  // On reset, delete from DB, set both states to default, and close editor
+  const resetCustomization = async () => {
+    try {
+      await deleteComponentCustomization({
+        portfolioId,
+        componentType: "projects",
+      });
+      setCustomization(defaultSimpleWhiteProjectsStyles);
+      setDraftCustomization(defaultSimpleWhiteProjectsStyles);
+      setVisualEditorOpen(false);
+      toast.success("Customization reset successfully");
+    } catch (error) {
+      toast.error("Failed to reset customization");
+    }
+  };
+
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (dragRef.current) {
+      const rect = dragRef.current.getBoundingClientRect();
+      setDragOffset({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+      setIsDragging(true);
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setWindowPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y,
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  // Helper functions for styling based on customization
+  const getSectionClasses = () => {
+    const bgMap = {
+      white: "bg-white",
+      "gray-50": "bg-gray-50",
+      "gray-100": "bg-gray-100",
+    };
+    
+    const maxWidthMap = {
+      sm: "max-w-4xl",
+      md: "max-w-5xl",
+      lg: "max-w-6xl",
+      xl: "max-w-7xl",
+      "2xl": "max-w-8xl",
+      full: "w-full",
+    };
+
+    return `min-h-screen pb-24 bg-gradient-to-b text-gray-900 from-white to-white relative ${bgMap[effectiveCustomization.backgroundColor]} ${maxWidthMap[effectiveCustomization.maxWidth]}`;
+  };
+
+  const getHeaderClasses = () => {
+    const alignmentMap = {
+      left: "text-left",
+      center: "text-center",
+      right: "text-right",
+    };
+
+    const titleSizeMap = {
+      sm: "text-2xl md:text-3xl",
+      md: "text-3xl md:text-4xl",
+      lg: "text-4xl md:text-5xl",
+      xl: "text-4xl md:text-5xl",
+      "2xl": "text-5xl md:text-6xl",
+      "3xl": "text-6xl md:text-7xl",
+    };
+
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+      extrabold: "font-extrabold",
+    };
+
+    return {
+      container: `${alignmentMap[effectiveCustomization.titleAlignment]} mb-20`,
+      title: `font-display section-title ${titleSizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]} tracking-tight text-${effectiveCustomization.titleColor} mb-4 transition-all duration-700`,
+      description: `font-sans text-lg section-description md:text-xl font-normal text-${effectiveCustomization.descriptionColor} tracking-normal leading-relaxed max-w-2xl ${effectiveCustomization.titleAlignment === "center" ? "mx-auto" : ""} transition-all duration-700`,
+    };
+  };
+
+  const getProjectCardClasses = () => {
+    const layoutMap = {
+      grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+      list: "space-y-20",
+      masonry: "columns-1 md:columns-2 lg:columns-3 gap-8",
+    };
+
+    const spacingMap = {
+      compact: "space-y-12",
+      normal: "space-y-20",
+      spacious: "space-y-32",
+    };
+
+    const shadowMap = {
+      none: "",
+      light: "shadow-sm",
+      medium: "shadow-lg",
+      heavy: "shadow-2xl",
+    };
+
+    const borderRadiusMap = {
+      none: "rounded-none",
+      sm: "rounded-sm",
+      md: "rounded-md",
+      lg: "rounded-lg",
+      xl: "rounded-xl",
+    };
+
+    return {
+      container: effectiveCustomization.layout === "list" ? spacingMap[effectiveCustomization.spacing] : layoutMap[effectiveCustomization.layout],
+      card: `group relative border-b-2 border-primary-200 pb-12 last:border-none ${shadowMap[effectiveCustomization.cardShadow]} ${borderRadiusMap[effectiveCustomization.cardBorderRadius]}`,
+      image: `w-full lg:w-[40%] aspect-${effectiveCustomization.imageAspectRatio} relative ${borderRadiusMap[effectiveCustomization.cardBorderRadius]} overflow-hidden shadow-xl ${effectiveCustomization.hoverScale ? "group-hover:scale-105" : ""} transition-transform duration-500 ease-in-out`,
+    };
+  };
+
+  const getTechStackClasses = () => {
+    const colorMap = {
+      blue: "bg-blue-100 text-blue-700",
+      green: "bg-green-100 text-green-700",
+      purple: "bg-purple-100 text-purple-700",
+      gray: "bg-gray-100 text-gray-700",
+    };
+
+    return `px-4 py-2 text-sm font-medium ${colorMap[effectiveCustomization.techStackColor]} rounded-lg`;
+  };
+
   useEffect(() => {
     if (portfolioData) {
       const projectsSectionData = portfolioData?.find((section: any) => section.type === "projects")?.data;
@@ -98,12 +423,31 @@ const Projects: NextPage = ({ customCSS }: any) => {
 
 
 
+  const headerClasses = getHeaderClasses();
+  const projectCardClasses = getProjectCardClasses();
+
   return (
     <section
       id="projects"
-      className="min-h-screen pb-24 bg-gradient-to-b text-gray-900 from-white to-white relative"
+      className={getSectionClasses()}
     >
       <style>{customCSS}</style>
+      
+      {/* Visual Editor Toggle Button */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <EditButton sectionName="projects" />
+        <button
+          onClick={openVisualEditor}
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+          style={{
+            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+          }}
+        >
+          <Settings className="h-4 w-4" />
+          Visual Editor
+        </button>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -111,93 +455,122 @@ const Projects: NextPage = ({ customCSS }: any) => {
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-           <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <h2 className={`font-display section-title text-4xl md:text-5xl font-medium tracking-tight text-gray-900 mb-4 transition-all duration-700 `}>
-            {portfolioData?.find((section: any) => section.type === "projects")?.sectionTitle || "My Projects"}
-          </h2>
-          <p className={`font-sans text-lg section-description md:text-xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-2xl mx-auto transition-all duration-700 `}>
-            {portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that i have worked on."}
-          </p>
-          <div className="mt-6">
-          <EditButton styles="right-64 -top-18" sectionName="projects" />
-          </div>
-        </motion.div>
+          {effectiveCustomization.headerVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className={headerClasses.container}
+            >
+              <h2 className={headerClasses.title}>
+                {portfolioData?.find((section: any) => section.type === "projects")?.sectionTitle || "My Projects"}
+              </h2>
+              {effectiveCustomization.descriptionVisible && (
+                <p className={headerClasses.description}>
+                  {portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that i have worked on."}
+                </p>
+              )}
+            </motion.div>
+          )}
 
-          <div className="space-y-20">
+          <div className={projectCardClasses.container}>
             {projectsData.map((project, index) => (
               <motion.div
                 key={project.id || index}
-                // variants={projectVariants}
-                className="group relative border-b-2 border-primary-200 pb-12 last:border-none"
+                variants={effectiveCustomization.staggerAnimation ? projectVariants : undefined}
+                className={projectCardClasses.card}
               >
-                <div className="flex flex-col lg:flex-row gap-8 items-center">
+                <div className={`flex flex-col ${effectiveCustomization.layout === "list" ? "lg:flex-row" : ""} gap-8 items-center`}>
                   {/* Project Image */}
-                  <div className="w-full lg:w-[40%] aspect-video relative rounded-xl overflow-hidden shadow-xl group-hover:scale-105 transition-transform duration-500 ease-in-out">
-                    <div className="absolute inset-0 bg-primary-900/20 group-hover:bg-primary-900/0 transition-all duration-500" />
-                    <img
-                      src={project.projectImage}
-                      alt={project.projectName}
-                      className="w-full h-full section-image object-cover transform transition-all duration-700"
-                    />
-                  </div>
+                  {effectiveCustomization.showImages && (
+                    <div className={projectCardClasses.image}>
+                      {effectiveCustomization.imageOverlay && (
+                        <div className="absolute inset-0 bg-primary-900/20 group-hover:bg-primary-900/0 transition-all duration-500" />
+                      )}
+                      <img
+                        src={project.projectImage}
+                        alt={project.projectName}
+                        className={`w-full h-full section-image object-cover transform transition-all duration-700 ${
+                          effectiveCustomization.imageHoverEffect === "zoom" ? "group-hover:scale-110" : 
+                          effectiveCustomization.imageHoverEffect === "fade" ? "group-hover:opacity-80" : ""
+                        }`}
+                      />
+                    </div>
+                  )}
 
                   {/* Project Info */}
-                  <div className="w-full lg:w-1/2 space-y-6">
-                    <h3 className="text-3xl section-sub-title font-bold text-primary-900 hover:text-primary-700 transition-all duration-300 cursor-pointer">
+                  <div className={`w-full ${effectiveCustomization.layout === "list" && effectiveCustomization.showImages ? "lg:w-1/2" : ""} space-y-6`}>
+                    <h3 className={`section-sub-title transition-all duration-300 cursor-pointer ${
+                      effectiveCustomization.projectTitleSize === "sm" ? "text-xl" :
+                      effectiveCustomization.projectTitleSize === "md" ? "text-2xl" :
+                      effectiveCustomization.projectTitleSize === "lg" ? "text-3xl" : "text-4xl"
+                    } ${
+                      effectiveCustomization.projectTitleWeight === "normal" ? "font-normal" :
+                      effectiveCustomization.projectTitleWeight === "medium" ? "font-medium" :
+                      effectiveCustomization.projectTitleWeight === "semibold" ? "font-semibold" : "font-bold"
+                    } ${
+                      effectiveCustomization.projectTitleColor === "primary" ? "text-primary-900 hover:text-primary-700" :
+                      `text-${effectiveCustomization.projectTitleColor}`
+                    }`}>
                       {project.projectName}
                     </h3>
 
-                    <p className="text-lg section-sub-description leading-relaxed">
+                    <p className={`section-sub-description leading-relaxed ${
+                      effectiveCustomization.projectDescriptionSize === "sm" ? "text-base" :
+                      effectiveCustomization.projectDescriptionSize === "md" ? "text-lg" : "text-xl"
+                    } text-${effectiveCustomization.projectDescriptionColor}`}>
                       {project.projectDescription}
                     </p>
 
-                    <div className="flex flex-wrap gap-3">
-                      {project.techStack.slice(0,5).map((tech, tagIndex) => (
-                        <span
-                          key={tagIndex}
-                          className="px-4 py-2 text-sm font-medium bg-teal-300/50 text-primary-700 rounded-lg"
-                        >
-                          <img  src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>  {tech.name}
+                    {effectiveCustomization.techStackVisible && (
+                      <div className="flex flex-wrap gap-3">
+                        {project.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech, tagIndex) => (
+                          <span
+                            key={tagIndex}
+                            className={getTechStackClasses()}
+                          >
+                            {effectiveCustomization.techStackStyle === "icons" && (
+                              <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>
+                            )}
+                            {tech.name}
                           </span>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
 
-                    <div className="flex gap-6 pt-4">
-                      {project.githubLink && (
-                        <motion.a
-                          href={project.githubLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="View project code"
-                          className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-all duration-300"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaGithub size={22} />
-                          <span className="font-medium">View Code</span>
-                        </motion.a>
-                      )}
-                      {project.liveLink && (
-                        <motion.a
-                          href={project.liveLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="View live demo"
-                          className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-all duration-300"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaExternalLinkAlt size={20} />
-                          <span className="font-medium">Live Demo</span>
-                        </motion.a>
-                      )}
-                    </div>
+                    {effectiveCustomization.linksVisible && (
+                      <div className="flex gap-6 pt-4">
+                        {effectiveCustomization.githubLinkVisible && project.githubLink && (
+                          <motion.a
+                            href={project.githubLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="View project code"
+                            className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-all duration-300"
+                            whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
+                            whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
+                          >
+                            <FaGithub size={22} />
+                            <span className="font-medium">View Code</span>
+                          </motion.a>
+                        )}
+                        {effectiveCustomization.liveLinkVisible && project.liveLink && (
+                          <motion.a
+                            href={project.liveLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="View live demo"
+                            className="flex items-center gap-2 text-primary-600 hover:text-primary-800 transition-all duration-300"
+                            whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
+                            whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
+                          >
+                            <FaExternalLinkAlt size={20} />
+                            <span className="font-medium">Live Demo</span>
+                          </motion.a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -205,6 +578,611 @@ const Projects: NextPage = ({ customCSS }: any) => {
           </div>
         </motion.div>
       </div>
+
+      {/* Floating Visual Editor Window */}
+      {visualEditorOpen && (
+        <div
+          ref={dragRef}
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            onMouseDown={handleMouseDown}
+          >
+            <h3 className="text-lg font-bold text-white">Projects Visual Editor</h3>
+            <button
+              onClick={() => setVisualEditorOpen(false)}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex border-b border-zinc-700">
+            {["layout", "typography", "cards", "effects"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors`}
+                style={{
+                  background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
+                  color: activeTab === tab ? "white" : "#9CA3AF",
+                }}
+              >
+                {tab === "layout" && <Layout className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "cards" && <Image className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "effects" && <Eye className="h-4 w-4 mx-auto mb-1" />}
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="max-h-96 overflow-y-auto p-4 space-y-4">
+            {activeTab === "layout" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Layout Style
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "list", label: "List", icon: "☰" },
+                      { value: "grid", label: "Grid", icon: "⊞" },
+                      { value: "masonry", label: "Masonry", icon: "⊡" },
+                    ].map(({ value, label, icon }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("layout", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.layout ?? customization.layout) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-lg text-white mb-1">
+                          {icon}
+                        </div>
+                        <div className="text-center text-xs text-white">
+                          {label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Spacing
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "compact", label: "Compact" },
+                      { value: "normal", label: "Normal" },
+                      { value: "spacious", label: "Spacious" },
+                    ].map(({ value, label }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("spacing", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.spacing ?? customization.spacing) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Background Color
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "white", label: "White", color: "bg-white" },
+                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
+                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
+                    ].map(({ value, label, color }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("backgroundColor", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Header Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Header</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.headerVisible ?? customization.headerVisible}
+                        onChange={(e) => updateDraftCustomization("headerVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.headerVisible ?? customization.headerVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Show Description</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.descriptionVisible ?? customization.descriptionVisible}
+                        onChange={(e) => updateDraftCustomization("descriptionVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.descriptionVisible ?? customization.descriptionVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "typography" && (
+              <div className="space-y-4">
+                <AlignmentSelector
+                  value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
+                  onChange={(value) => updateDraftCustomization("titleAlignment", value)}
+                  label="Title Alignment"
+                />
+
+                <SizeSelector
+                  value={draftCustomization?.titleSize ?? customization.titleSize}
+                  onChange={(value) => updateDraftCustomization("titleSize", value)}
+                  label="Title Size"
+                  options={[
+                    { value: "sm", label: "Small", size: "24px" },
+                    { value: "md", label: "Medium", size: "32px" },
+                    { value: "lg", label: "Large", size: "40px" },
+                    { value: "xl", label: "Extra Large", size: "52px" },
+                    { value: "2xl", label: "2XL", size: "64px" },
+                    { value: "3xl", label: "3XL", size: "76px" },
+                  ]}
+                />
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Title Weight
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "normal", label: "Normal", weight: "font-normal" },
+                      { value: "medium", label: "Medium", weight: "font-medium" },
+                      { value: "semibold", label: "Semibold", weight: "font-semibold" },
+                      { value: "bold", label: "Bold", weight: "font-bold" },
+                      { value: "extrabold", label: "Extrabold", weight: "font-extrabold" },
+                    ].map(({ value, label, weight }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("titleWeight", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.titleWeight ?? customization.titleWeight) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="flex justify-center mb-2">
+                          <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "14px" }}>
+                            Aa
+                          </div>
+                        </div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Project Typography
+                  </h5>
+
+                  <SizeSelector
+                    value={draftCustomization?.projectTitleSize ?? customization.projectTitleSize}
+                    onChange={(value) => updateDraftCustomization("projectTitleSize", value)}
+                    label="Project Title Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "18px" },
+                      { value: "md", label: "Medium", size: "20px" },
+                      { value: "lg", label: "Large", size: "24px" },
+                      { value: "xl", label: "Extra Large", size: "28px" },
+                    ]}
+                  />
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Project Title Color
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "gray-900", label: "Dark Gray", color: "bg-gray-900" },
+                        { value: "gray-800", label: "Medium Gray", color: "bg-gray-800" },
+                        { value: "primary", label: "Primary", color: ColorTheme.primary },
+                      ].map(({ value, label, color }) => (
+                        <div
+                          key={value}
+                          onClick={() => updateDraftCustomization("projectTitleColor", value)}
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                            (draftCustomization?.projectTitleColor ?? customization.projectTitleColor) === value
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
+                        >
+                          <div
+                            className="w-full h-8 rounded mb-2"
+                            style={{ backgroundColor: value === "primary" ? color : "" }}
+                            className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
+                          ></div>
+                          <div className="text-center text-xs text-white">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "cards" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-300">Show Images</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={draftCustomization?.showImages ?? customization.showImages}
+                      onChange={(e) => updateDraftCustomization("showImages", e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                      style={{
+                        backgroundColor: (draftCustomization?.showImages ?? customization.showImages) ? ColorTheme.primary : "",
+                      }}
+                    ></div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Image Aspect Ratio
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "square", label: "Square", ratio: "1:1" },
+                      { value: "video", label: "Video", ratio: "16:9" },
+                      { value: "portrait", label: "Portrait", ratio: "3:4" },
+                    ].map(({ value, label, ratio }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("imageAspectRatio", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.imageAspectRatio ?? customization.imageAspectRatio) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="flex justify-center mb-2">
+                          <div
+                            className="bg-gradient-to-r rounded"
+                            style={{
+                              width: value === "square" ? "24px" : value === "video" ? "32px" : "20px",
+                              height: value === "square" ? "24px" : value === "video" ? "18px" : "26px",
+                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Tech Stack Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Tech Stack</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
+                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.techStackVisible ?? customization.techStackVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Tech Stack Color
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { value: "blue", label: "Blue", color: "bg-blue-100" },
+                        { value: "green", label: "Green", color: "bg-green-100" },
+                        { value: "purple", label: "Purple", color: "bg-purple-100" },
+                        { value: "gray", label: "Gray", color: "bg-gray-100" },
+                      ].map(({ value, label, color }) => (
+                        <div
+                          key={value}
+                          onClick={() => updateDraftCustomization("techStackColor", value)}
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                            (draftCustomization?.techStackColor ?? customization.techStackColor) === value
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
+                        >
+                          <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
+                          <div className="text-center text-xs text-white">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-left font-medium mb-3">
+                      Tech Stack Limit: {draftCustomization?.techStackLimit ?? customization.techStackLimit}
+                    </label>
+                    <input
+                      type="range"
+                      min={3}
+                      max={6}
+                      step={1}
+                      value={draftCustomization?.techStackLimit ?? customization.techStackLimit}
+                      onChange={(e) => updateDraftCustomization("techStackLimit", Number(e.target.value))}
+                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 3) * 100}%, #3f3f46 ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 3) * 100}%, #3f3f46 100%)`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4 mt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Project Links
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show Links</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.linksVisible ?? customization.linksVisible}
+                        onChange={(e) => updateDraftCustomization("linksVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.linksVisible ?? customization.linksVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Show GitHub Link</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.githubLinkVisible ?? customization.githubLinkVisible}
+                        onChange={(e) => updateDraftCustomization("githubLinkVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.githubLinkVisible ?? customization.githubLinkVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Show Live Link</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.liveLinkVisible ?? customization.liveLinkVisible}
+                        onChange={(e) => updateDraftCustomization("liveLinkVisible", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.liveLinkVisible ?? customization.liveLinkVisible) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "effects" && (
+              <div className="space-y-4">
+                <div className="mb-6">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Animation Settings
+                  </h5>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Hover Effects</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
+                        onChange={(e) => updateDraftCustomization("hoverEffects", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.hoverEffects ?? customization.hoverEffects) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-gray-300">Hover Scale</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.hoverScale ?? customization.hoverScale}
+                        onChange={(e) => updateDraftCustomization("hoverScale", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.hoverScale ?? customization.hoverScale) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-300">Stagger Animation</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={draftCustomization?.staggerAnimation ?? customization.staggerAnimation}
+                        onChange={(e) => updateDraftCustomization("staggerAnimation", e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="border-t border-zinc-700 pt-4">
+                  <h5 className="text-sm text-left font-medium text-white mb-3">
+                    Image Hover Effect
+                  </h5>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "zoom", label: "Zoom", icon: "🔍" },
+                      { value: "fade", label: "Fade", icon: "💫" },
+                      { value: "overlay", label: "Overlay", icon: "🎭" },
+                      { value: "none", label: "None", icon: "❌" },
+                    ].map(({ value, label, icon }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("imageHoverEffect", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.imageHoverEffect ?? customization.imageHoverEffect) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-lg text-white mb-1">
+                          {icon}
+                        </div>
+                        <div className="text-center text-xs text-white">
+                          {label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+            <div className="flex gap-2">
+              <button
+                onClick={resetCustomization}
+                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset
+              </button>
+              <button
+                onClick={saveDraftCustomization}
+                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overlay for floating window */}
+      {visualEditorOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
+          onClick={() => setVisualEditorOpen(false)}
+        />
+      )}
+
+      {/* Custom CSS for sliders */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: none;
+        }
+      `}</style>
     </section>
   );
 };

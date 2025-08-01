@@ -32,7 +32,7 @@ const EditButton = ({
   const shouldShowButton = isLoaded && (portfolioUserId === "guest" || (user && user.id === portfolioUserId));
 
   return (
-    <div className={divStyles ? divStyles : "hidden md:block absolute right-24 -top-12"}>
+    <div className={divStyles ? divStyles : "hidden md:block "}>
       {shouldShowButton && (
         <Button
           onClick={handleSectionEdit}
