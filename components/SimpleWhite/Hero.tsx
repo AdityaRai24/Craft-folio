@@ -7,6 +7,7 @@ import type { NextPage } from "next";
 import Navbar from "./Navbar";
 import AnimatedButton from "./AnimatedButton";
 import EditButton from "@/components/EditButton";
+import SectionHeader from "./SectionHeader";
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -151,6 +152,66 @@ const StyleSelector: React.FC<{
   );
 };
 
+// Visual Background Theme Selector Component
+const BackgroundThemeSelector: React.FC<{
+  value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
+  onChange: (value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning") => void;
+}> = ({ value, onChange }) => {
+  const themes: Array<{
+    value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
+    label: string;
+    background: string;
+  }> = [
+    {
+      value: "diagonal-grid",
+      label: "Diagonal Grid",
+      background: "#fafafa",
+    },
+    {
+      value: "crosshatch",
+      label: "Crosshatch",
+      background: "#ffffff",
+    },
+    {
+      value: "circuit-board",
+      label: "Circuit Board",
+      background: "#ffffff",
+    },
+    {
+      value: "zigzag-lightning",
+      label: "Zigzag Lightning",
+      background: "#ffffff",
+    },
+  ];
+
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        Background Theme
+      </label>
+      <div className="grid grid-cols-2 gap-2">
+        {themes.map(({ value: themeValue, label, background }) => (
+          <div
+            key={themeValue}
+            onClick={() => onChange(themeValue)}
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              value === themeValue
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+            }`}
+          >
+            <div
+              className="w-full h-16 rounded mb-2"
+              style={{ background }}
+            ></div>
+            <div className="text-center text-xs text-white">{label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Hero: NextPage = ({ customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
@@ -219,7 +280,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
       extrabold: "font-extrabold",
     };
 
-    return `section-title ${sizeMap[effectiveCustomization.titleSize]} ${
+    return `section-title text-left ${sizeMap[effectiveCustomization.titleSize]} ${
       weightMap[effectiveCustomization.titleWeight]
     } text-${effectiveCustomization.titleColor} mb-2 sm:mb-3 leading-tight`;
   };
@@ -239,7 +300,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
       bold: "font-bold",
     };
 
-    return `section-sub-title ${sizeMap[effectiveCustomization.subtitleSize]} ${
+    return `section-sub-title text-left ${sizeMap[effectiveCustomization.subtitleSize]} ${
       weightMap[effectiveCustomization.subtitleWeight]
     } text-${effectiveCustomization.subtitleColor} mb-3 sm:mb-4`;
   };
@@ -251,7 +312,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
       lg: "text-lg sm:text-xl lg:text-xl",
     };
 
-    return `section-description ${sizeMap[effectiveCustomization.descriptionSize]} font-medium text-${effectiveCustomization.descriptionColor} mb-6 sm:mb-8 lg:mb-10`;
+    return `section-description text-left ${sizeMap[effectiveCustomization.descriptionSize]} font-medium text-${effectiveCustomization.descriptionColor} mb-6 sm:mb-8 lg:mb-10`;
   };
 
   const getBackgroundStyle = () => {
@@ -261,6 +322,60 @@ const Hero: NextPage = ({ customCSS }: any) => {
       "gray-100": "bg-gray-100",
     };
     return bgMap[effectiveCustomization.backgroundColor] || "bg-white";
+  };
+
+  const getBackgroundThemeStyle = () => {
+    switch (effectiveCustomization.backgroundTheme) {
+      case "diagonal-grid":
+        return {
+          backgroundColor: "#fafafa",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px),
+            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px)
+          `,
+          backgroundSize: "40px 40px",
+        };
+      case "crosshatch":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
+            repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
+          `,
+        };
+      case "circuit-board":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
+            repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
+            radial-gradient(circle at 20px 20px, rgba(55, 65, 81, 0.12) 2px, transparent 2px),
+            radial-gradient(circle at 40px 40px, rgba(55, 65, 81, 0.12) 2px, transparent 2px)
+          `,
+          backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
+        };
+      case "zigzag-lightning":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(75, 85, 99, 0.08) 20px, rgba(75, 85, 99, 0.08) 21px),
+            repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(107, 114, 128, 0.06) 30px, rgba(107, 114, 128, 0.06) 31px),
+            repeating-linear-gradient(60deg, transparent, transparent 40px, rgba(55, 65, 81, 0.05) 40px, rgba(55, 65, 81, 0.05) 41px),
+            repeating-linear-gradient(150deg, transparent, transparent 35px, rgba(31, 41, 55, 0.04) 35px, rgba(31, 41, 55, 0.04) 36px)
+          `,
+        };
+      default:
+        return {
+          backgroundColor: "#fafafa",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px),
+            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px)
+          `,
+          backgroundSize: "40px 40px",
+        };
+    }
   };
 
   const getCardStyle = () => {
@@ -321,10 +436,10 @@ const Hero: NextPage = ({ customCSS }: any) => {
     };
 
     const styleMap = {
-      default: "bg-blue-500 hover:bg-blue-600 text-white",
-      animated: "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white",
+      default: "bg-gray-900 hover:bg-gray-800 text-white",
+      animated: "bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white",
       minimal: "border border-gray-300 text-gray-700 hover:bg-gray-50",
-      outline: "border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white",
+      outline: "border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white",
     };
 
     return `${sizeMap[effectiveCustomization.resumeButtonSize]} ${styleMap[effectiveCustomization.resumeButtonStyle]} rounded transition-all duration-300`;
@@ -504,29 +619,34 @@ const Hero: NextPage = ({ customCSS }: any) => {
   }
 
   return (
-    <div id="about" className={`relative simple-white pt-12 sm:pt-16 md:pt-20 ${getBackgroundStyle()}`}>
+    <div id="about" className={`relative simple-white pt-12 sm:pt-16 md:pt-20`} style={getBackgroundThemeStyle()}>
       <style>{customCSS}</style>
       
-      {/* Visual Editor Toggle Button */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <EditButton sectionName="hero" />
-        <button
-          onClick={openVisualEditor}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
+
 
       <div className="flex h-full pt-24 justify-center items-end mb-24">
         <div className={getContainerClasses()}>
+        <div className="flex absolute right-0 ">
+          <EditButton 
+            sectionName={"hero"}
+            styles="text-xs px-3 py-1"
+          />
+          <button
+            onClick={openVisualEditor}
+            className="flex cursor-pointer items-center gap-2 px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+            }}
+          >
+            <Settings className="h-3 w-3" />
+            Visual Editor
+          </button>
+        </div>
+
+          
           <main className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-4 xl:gap-8">
             {/* Left Column - Main Info */}
-            <div className={`lg:col-span-2 relative ${effectiveCustomization.layoutStyle === "split" ? "order-1 lg:order-1" : "order-2 lg:order-2"}`}>
+            <div className="lg:col-span-2 relative">
               <motion.h1
                 className={getTitleClasses()}
                 initial={{ y: 50, opacity: 0 }}
@@ -603,13 +723,13 @@ const Hero: NextPage = ({ customCSS }: any) => {
             </div>
 
             {/* Right Column - About */}
-            <div className={`lg:col-span-2 relative ${effectiveCustomization.layoutStyle === "split" ? "order-2 lg:order-2" : "order-1 lg:order-1"}`}>
+            <div className="lg:col-span-2 relative">
               {effectiveCustomization.aboutCardVisible && (
                 <motion.div
                   className={getCardStyle()}
                   initial={{ x: 0, opacity: 0 }}
                   animate={{
-                    x: 0,
+                    x: 0, 
                     opacity: 1,
                     transition: {
                       type: "spring",
@@ -687,7 +807,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
               )}
 
               <motion.div
-                className="mt-4 sm:mt-6 lg:mt-0 lg:ml-32 flex justify-center lg:justify-start"
+                className="mt-4 sm:mt-6 lg:mt-8 cursor-pointer lg:ml-32 flex justify-center lg:justify-start"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9, duration: 0.5 }}
@@ -712,7 +832,8 @@ const Hero: NextPage = ({ customCSS }: any) => {
               </motion.div>
             </div>
           </main>
-
+          
+        
           {/* Scroll Down Indicator */}
           {effectiveCustomization.scrollIndicatorVisible && (
             <motion.div
@@ -777,8 +898,11 @@ const Hero: NextPage = ({ customCSS }: any) => {
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
                 className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${
-                  activeTab === tab ? "bg-zinc-700 text-white" : "text-gray-400 hover:text-white"
+                  activeTab === tab ? "text-white" : "text-gray-400 hover:text-white"
                 }`}
+                style={{
+                  background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
+                }}
               >
                 {tab === "layout" && (
                   <Grid3X3 className="h-4 w-4 mx-auto mb-1" />
@@ -801,125 +925,10 @@ const Hero: NextPage = ({ customCSS }: any) => {
           <div className="max-h-96 overflow-y-auto p-4 space-y-4">
             {activeTab === "layout" && (
               <div className="space-y-4">
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Layout Style
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "split", label: "Split", icon: "⊞" },
-                      { value: "stacked", label: "Stacked", icon: "⊟" },
-                      { value: "centered", label: "Centered", icon: "○" },
-                    ].map(({ value, label, icon }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("layoutStyle", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.layoutStyle ?? customization.layoutStyle) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="text-center text-lg text-white mb-1">
-                          {icon}
-                        </div>
-                        <div className="text-center text-xs text-white">
-                          {label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <AlignmentSelector
-                  value={draftCustomization?.contentAlignment ?? customization.contentAlignment}
-                  onChange={value => updateDraftCustomization("contentAlignment", value)}
-                  label="Content Alignment"
+                <BackgroundThemeSelector
+                  value={draftCustomization?.backgroundTheme ?? customization.backgroundTheme}
+                  onChange={value => updateDraftCustomization("backgroundTheme", value)}
                 />
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Background Color
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "white", label: "White", color: "bg-white" },
-                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
-                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
-                    ].map(({ value, label, color }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("backgroundColor", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Card Style
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "solid", label: "Solid", style: "bg-white" },
-                      { value: "gradient", label: "Gradient", style: "bg-gradient-to-br from-white to-blue-100" },
-                      { value: "transparent", label: "Transparent", style: "bg-transparent" },
-                    ].map(({ value, label, style }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("cardBackground", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.cardBackground ?? customization.cardBackground) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className={`w-full h-8 rounded mb-2 ${style}`}></div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Visibility Settings
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show About Card</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.aboutCardVisible ?? customization.aboutCardVisible}
-                        onChange={(e) => updateDraftCustomization("aboutCardVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Social Links</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.socialLinksVisible ?? customization.socialLinksVisible}
-                        onChange={(e) => updateDraftCustomization("socialLinksVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -934,8 +943,6 @@ const Hero: NextPage = ({ customCSS }: any) => {
                     { value: "md", label: "Medium", size: "32px" },
                     { value: "lg", label: "Large", size: "40px" },
                     { value: "xl", label: "Extra Large", size: "52px" },
-                    { value: "2xl", label: "2XL", size: "64px" },
-                    { value: "3xl", label: "3XL", size: "76px" },
                   ]}
                 />
 
@@ -971,37 +978,10 @@ const Hero: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Title Color
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "gray-900", label: "Dark", color: "bg-gray-900" },
-                      { value: "gray-800", label: "Medium", color: "bg-gray-800" },
-                      { value: "black", label: "Black", color: "bg-black" },
-                    ].map(({ value, label, color }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("titleColor", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.titleColor ?? customization.titleColor) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Subtitle Settings
-                  </h5>
-
+                
                   <SizeSelector
                     value={draftCustomization?.subtitleSize ?? customization.subtitleSize}
                     onChange={value => updateDraftCustomization("subtitleSize", value)}
@@ -1014,38 +994,11 @@ const Hero: NextPage = ({ customCSS }: any) => {
                     ]}
                   />
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Subtitle Color
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "gray-600", label: "Light", color: "bg-gray-600" },
-                        { value: "gray-700", label: "Medium", color: "bg-gray-700" },
-                        { value: "gray-800", label: "Dark", color: "bg-gray-800" },
-                      ].map(({ value, label, color }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("subtitleColor", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.subtitleColor ?? customization.subtitleColor) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                          <div className="text-center text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                 </div>
 
                 <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Description Settings
-                  </h5>
-
+                 
                   <SizeSelector
                     value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
                     onChange={value => updateDraftCustomization("descriptionSize", value)}
@@ -1057,59 +1010,23 @@ const Hero: NextPage = ({ customCSS }: any) => {
                     ]}
                   />
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Description Color
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "gray-600", label: "Light", color: "bg-gray-600" },
-                        { value: "gray-700", label: "Medium", color: "bg-gray-700" },
-                        { value: "gray-800", label: "Dark", color: "bg-gray-800" },
-                      ].map(({ value, label, color }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("descriptionColor", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.descriptionColor ?? customization.descriptionColor) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                          <div className="text-center text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                 </div>
               </div>
             )}
 
             {activeTab === "buttons" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-300">Show Resume Button</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={draftCustomization?.resumeButtonVisible ?? customization.resumeButtonVisible}
-                      onChange={(e) => updateDraftCustomization("resumeButtonVisible", e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
-                  </label>
-                </div>
 
                 <StyleSelector
                   value={draftCustomization?.resumeButtonStyle ?? customization.resumeButtonStyle}
                   onChange={value => updateDraftCustomization("resumeButtonStyle", value)}
                   label="Button Style"
                   options={[
-                    { value: "default", label: "Default", style: "bg-blue-500 text-white rounded" },
-                    { value: "animated", label: "Animated", style: "bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded" },
+                    { value: "default", label: "Default", style: "bg-gray-900 text-white rounded" },
+                    { value: "animated", label: "Animated", style: "bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded" },
                     { value: "minimal", label: "Minimal", style: "border border-gray-300 text-gray-700 rounded" },
-                    { value: "outline", label: "Outline", style: "border-2 border-blue-500 text-blue-500 rounded" },
+                    { value: "outline", label: "Outline", style: "border-2 border-gray-900 text-gray-900 rounded" },
                   ]}
                 />
 
@@ -1133,7 +1050,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
                         }`}
                       >
                         <div className="flex justify-center mb-2">
-                          <div className={`px-3 py-1 text-xs rounded bg-blue-500 text-white ${size}`}>
+                          <div className={`px-3 py-1 text-xs rounded bg-gray-900 text-white ${size}`}>
                             Button
                           </div>
                         </div>
@@ -1148,9 +1065,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
             {activeTab === "effects" && (
               <div className="space-y-4">
                 <div className="mb-6">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Animation Settings
-                  </h5>
+                
 
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-sm font-medium text-gray-300">Hover Effects</label>
@@ -1161,7 +1076,11 @@ const Hero: NextPage = ({ customCSS }: any) => {
                         onChange={(e) => updateDraftCustomization("hoverEffects", e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.hoverEffects ?? customization.hoverEffects) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
                     </label>
                   </div>
 
@@ -1174,57 +1093,16 @@ const Hero: NextPage = ({ customCSS }: any) => {
                         onChange={(e) => updateDraftCustomization("staggerAnimation", e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                        style={{
+                          backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
+                        }}
+                      ></div>
                     </label>
                   </div>
                 </div>
 
-                <div className="border-t border-zinc-700 pt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Scroll Indicator
-                  </h5>
 
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Scroll Indicator</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.scrollIndicatorVisible ?? customization.scrollIndicatorVisible}
-                        onChange={(e) => updateDraftCustomization("scrollIndicatorVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
-                    </label>
-                  </div>
-
-                  {(draftCustomization?.scrollIndicatorVisible ?? customization.scrollIndicatorVisible) && (
-                    <div>
-                      <label className="block text-white font-medium mb-3">
-                        Indicator Color
-                      </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[
-                          { value: "gray-400", label: "Light", color: "bg-gray-400" },
-                          { value: "gray-500", label: "Medium", color: "bg-gray-500" },
-                          { value: "gray-600", label: "Dark", color: "bg-gray-600" },
-                        ].map(({ value, label, color }) => (
-                          <div
-                            key={value}
-                            onClick={() => updateDraftCustomization("scrollIndicatorColor", value)}
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.scrollIndicatorColor ?? customization.scrollIndicatorColor) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                            <div className="text-center text-xs text-white">{label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
           </div>
@@ -1239,12 +1117,15 @@ const Hero: NextPage = ({ customCSS }: any) => {
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
-              <button
-                onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors"
-              >
-                Done
-              </button>
+                              <button
+                  onClick={saveDraftCustomization}
+                  className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                  style={{
+                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  }}
+                >
+                  Done
+                </button>
             </div>
           </div>
         </div>

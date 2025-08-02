@@ -18,12 +18,6 @@ import {
   Plus_Jakarta_Sans,
   DM_Sans,
   Sora,
-  Figtree,
-  Syne,
-  Lora,
-  Oswald,
-  Dancing_Script,
-  Crimson_Text,
 } from "next/font/google";
 
 export type FontName =

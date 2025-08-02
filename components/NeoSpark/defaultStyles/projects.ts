@@ -19,4 +19,10 @@ export const defaultProjectsStyles: ProjectsCustomizationState = {
   cardPadding: 4,
   imageOverlay: true,
   imagePosition: "left",
+  
+  // Typography
+  titleSize: "md",
+  titleWeight: "semibold",
+  descriptionSize: "md",
+  descriptionWeight: "normal",
 };

@@ -14,7 +14,7 @@ export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationS
   cardBackground: "solid",
   cardBorderStyle: "subtle",
   cardShadow: "light",
-  cardBorderRadius: "lg",
+  cardBorderRadius: 8,
   
   // Header Section
   headerVisible: true,
@@ -28,9 +28,10 @@ export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationS
   
   // Project Cards
   showImages: true,
-  imageAspectRatio: "video",
   imagePosition: "left",
   imageOverlay: true,
+  imageBorderRadius: 8,
+  cardPadding: 4,
   projectTitleSize: "lg",
   projectTitleWeight: "bold",
   projectTitleColor: "primary",
@@ -40,8 +41,7 @@ export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationS
   // Tech Stack
   techStackVisible: true,
   techStackStyle: "badges",
-  techStackLimit: 5,
-  techStackColor: "blue",
+  techStackSize: "md",
   
   // Project Links
   linksVisible: true,
@@ -49,6 +49,7 @@ export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationS
   linksPosition: "bottom",
   githubLinkVisible: true,
   liveLinkVisible: true,
+  buttonSize: "md",
   
   // Hover Effects
   hoverEffects: true,

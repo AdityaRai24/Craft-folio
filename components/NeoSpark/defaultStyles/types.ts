@@ -17,6 +17,12 @@ export interface ProjectsCustomizationState {
   cardPadding: number;
   imageOverlay: boolean;
   imagePosition: "left" | "right";
+  
+  // Typography
+  titleSize: "sm" | "md" | "lg" | "xl";
+  titleWeight: "normal" | "medium" | "semibold" | "bold";
+  descriptionSize: "sm" | "md" | "lg";
+  descriptionWeight: "normal" | "medium" | "semibold" | "bold";
 }
 
 export interface CustomizationState {
@@ -31,7 +37,9 @@ export interface CustomizationState {
     | "pearl-mist"
     | "aurora-midnight"
     | "crimson-shadow"
-    | "ocean-abyss";
+    | "ocean-abyss"
+    | "noise-pattern"
+    | "diagonal-lines";
 
   // Badge Customization
   badgeVisible: boolean;
@@ -44,10 +52,11 @@ export interface CustomizationState {
   subtitleSize: "sm" | "md" | "lg" | "xl";
   subtitleWeight: "normal" | "medium" | "semibold";
   descriptionSize: "sm" | "md" | "lg";
+  descriptionWeight: "normal" | "medium" | "semibold" | "bold";
   descriptionMaxWidth: "sm" | "md" | "lg" | "xl" | "full";
 
   // Button Customization
-  buttonLayout: "horizontal" | "vertical" | "stacked";
+  buttonLayout: "horizontal" | "vertical";
   buttonSize: "sm" | "md" | "lg";
   buttonStyle: "default" | "rounded" | "square" | "pill";
 

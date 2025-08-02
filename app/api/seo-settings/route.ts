@@ -1,5 +1,48 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { getThemeNameApi } from "@/app/actions/portfolio";
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const portfolioId = searchParams.get('portfolioId');
+
+    if (!portfolioId) {
+      return NextResponse.json({ error: "Portfolio ID is required" }, { status: 400 });
+    }
+
+    // Fetch existing SEO settings from the portfolio
+    const themeResult = await getThemeNameApi({ portfolioId });
+    
+    if (themeResult.success && themeResult.data?.content) {
+      const content = themeResult.data.content as any;
+      const seoSection = content.sections?.find(
+        (section: any) => section.type === "seo"
+      );
+
+      if (seoSection?.data) {
+        return NextResponse.json({
+          seoTitle: seoSection.data.title || "",
+          seoDescription: seoSection.data.description || "",
+          favicon: seoSection.data.favicon || ""
+        });
+      }
+    }
+
+    // Return empty data if no SEO settings found
+    return NextResponse.json({
+      seoTitle: "",
+      seoDescription: "",
+      favicon: ""
+    });
+  } catch (error) {
+    console.error("Error fetching SEO settings:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch SEO settings" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(req: Request) {
   try {

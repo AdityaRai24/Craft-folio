@@ -164,16 +164,26 @@ const ButtonStyleSelector: React.FC<{
 
 // Visual Background Theme Selector Component
 const BackgroundThemeSelector: React.FC<{
-  value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss";
+  value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines";
   onChange: (
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss"
+    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines"
   ) => void;
 }> = ({ value, onChange }) => {
   const themes: Array<{
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss";
+    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines";
     label: string;
     background: string;
   }> = [
+    {
+      value: "noise-pattern",
+      label: "Noise Pattern",
+      background: "#000000",
+    },
+    {
+      value: "diagonal-lines",
+      label: "Diagonal Lines",
+      background: "#000000",
+    },
     {
       value: "pearl-mist",
       label: "Pearl Mist",
@@ -264,6 +274,18 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
+  // Debug logging for effectiveCustomization calculation
+  useEffect(() => {
+    console.log("effectiveCustomization calculation:", {
+      visualEditorOpen,
+      hasDraftCustomization: !!draftCustomization,
+      draftScrollIndicatorStyle: draftCustomization?.scrollIndicatorStyle,
+      customizationScrollIndicatorStyle: customization.scrollIndicatorStyle,
+      effectiveScrollIndicatorStyle: effectiveCustomization.scrollIndicatorStyle,
+      usingDraft: visualEditorOpen && draftCustomization
+    });
+  }, [visualEditorOpen, draftCustomization?.scrollIndicatorStyle, customization.scrollIndicatorStyle, effectiveCustomization.scrollIndicatorStyle]);
+
   // Load customizations from database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
@@ -286,6 +308,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
+    console.log("openVisualEditor called:", {
+      currentCustomization: customization,
+      scrollIndicatorStyle: customization.scrollIndicatorStyle
+    });
     setDraftCustomization({ ...customization });
     setVisualEditorOpen(true);
   };
@@ -293,12 +319,17 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   // All visual editor controls update draftCustomization
   const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
     if (!draftCustomization) return;
+    console.log("updateDraftCustomization called:", { key, value });
     setDraftCustomization({ ...draftCustomization, [key]: value });
   };
 
   // When 'Done' is clicked, save draft to DB and update main state
   const saveDraftCustomization = async () => {
     if (!draftCustomization) return;
+    console.log("saveDraftCustomization called:", { 
+      scrollIndicatorStyle: draftCustomization.scrollIndicatorStyle,
+      scrollIndicator: draftCustomization.scrollIndicator 
+    });
     setCustomization(draftCustomization);
     setVisualEditorOpen(false);
     try {
@@ -451,6 +482,13 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       lg: "text-2xl",
     };
 
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+
     const maxWidthMap = {
       sm: "max-w-sm",
       md: "max-w-xl",
@@ -461,7 +499,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
     return `section-description ${
       sizeMap[effectiveCustomization.descriptionSize]
-    } font-medium ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${
+    } ${weightMap[effectiveCustomization.descriptionWeight]} ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${
       effectiveCustomization.contentAlignment === "center" ? "mx-auto" : ""
     }`;
   };
@@ -686,28 +724,54 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     switch (effectiveCustomization.backgroundTheme) {
       case "pearl-mist":
         return {
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%), #000000",
+          backgroundColor: "#000000",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%)",
         };
       case "aurora-midnight":
         return {
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.25), transparent 90%), #000000",
+          backgroundColor: "#000000",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.25), transparent 90%)",
         };
       case "crimson-shadow":
         return {
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.25), transparent 90%), #000000",
+          backgroundColor: "#000000",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.25), transparent 90%)",
         };
       case "ocean-abyss":
         return {
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.25), transparent 90%), #000000",
+          backgroundColor: "#000000",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.25), transparent 90%)",
+        };
+      case "noise-pattern":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.2) 1px, transparent 0),
+            radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.18) 1px, transparent 0),
+            radial-gradient(circle at 1px 1px, rgba(236, 72, 153, 0.15) 1px, transparent 0)
+          `,
+          backgroundSize: "20px 20px, 30px 30px, 25px 25px",
+          backgroundPosition: "0 0, 10px 10px, 15px 5px",
+        };
+      case "diagonal-lines":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
+            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
+          `,
+          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
         };
       default:
         return {
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%), #000000",
+          backgroundColor: "#000000",
+          backgroundImage:
+            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%)",
         };
     }
   };
@@ -870,7 +934,16 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             className="mt-16 text-center"
           >
             <p>Scroll to explore</p>
-            {effectiveCustomization.scrollIndicatorStyle === "line" && (
+            {(() => {
+              const style = effectiveCustomization.scrollIndicatorStyle?.toLowerCase();
+              console.log("Rendering scroll indicator:", {
+                style: style,
+                originalStyle: effectiveCustomization.scrollIndicatorStyle,
+                scrollIndicator: effectiveCustomization.scrollIndicator
+              });
+              return null;
+            })()}
+            {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "line") && (
               <motion.div
                 initial={{ height: 32 }}
                 animate={{ height: 32 }}
@@ -881,7 +954,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 }}
               ></motion.div>
             )}
-            {effectiveCustomization.scrollIndicatorStyle === "arrow" && (
+            {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "arrow") && (
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -890,14 +963,14 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 ↓
               </motion.div>
             )}
-            {effectiveCustomization.scrollIndicatorStyle === "dot" && (
+            {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "dot") && (
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-2 h-2 bg-current rounded-full mx-auto mt-2"
               ></motion.div>
             )}
-            {effectiveCustomization.scrollIndicatorStyle === "animated" && (
+            {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "animated") && (
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
@@ -1260,19 +1333,53 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
                     <div>
                       <label className="block text-white font-medium mb-3">
+                        Description Weight
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: "normal", label: "Normal", weight: "font-normal" },
+                          { value: "medium", label: "Medium", weight: "font-medium" },
+                          { value: "semibold", label: "Semibold", weight: "font-semibold" },
+                          { value: "bold", label: "Bold", weight: "font-bold" },
+                        ].map(({ value, label, weight }) => (
+                          <div
+                            key={value}
+                            onClick={() =>
+                              updateDraftCustomization("descriptionWeight", value)
+                            }
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                              (draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            }`}
+                          >
+                            <div className="flex justify-center mb-2">
+                              <div
+                                className={`text-white text-center px-3 py-1 ${weight}`}
+                                style={{ fontSize: "14px" }}
+                              >
+                                Aa
+                              </div>
+                            </div>
+                            <div className="text-center text-xs text-white">
+                              {label}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white font-medium mb-3">
                         Description Max Width
                       </label>
                       <div className="grid grid-cols-2 gap-2">
                         {[
-                          { value: "sm", label: "Small", width: "w-16" },
-                          { value: "md", label: "Medium", width: "w-24" },
-                          { value: "lg", label: "Large", width: "w-32" },
-                          { value: "xl", label: "Extra Large", width: "w-40" },
-                          {
-                            value: "full",
-                            label: "Full Width",
-                            width: "w-full",
-                          },
+                          { value: "sm", label: "Small", width: "25%" },
+                          { value: "md", label: "Medium", width: "50%" },
+                          { value: "lg", label: "Large", width: "75%" },
+                          { value: "xl", label: "Extra Large", width: "90%" },
+                          { value: "full", label: "Full Width", width: "100%" },
                         ].map(({ value, label, width }) => (
                           <div
                             key={value}
@@ -1285,13 +1392,19 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                           >
-                            <div className="flex justify-center mb-2">
-                              <div
-                                className={`h-3 bg-gradient-to-r  rounded ${width}`}
-                              ></div>
-                            </div>
-                            <div className="text-center text-xs text-white">
-                              {label}
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="w-full block mx-auto">
+                                <div
+                                  className="h-3 rounded"
+                                  style={{
+                                    width: width,
+                                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                                  }}
+                                ></div>
+                              </div>
+                              <div className="text-xs text-white font-medium text-center">
+                                {label}
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -1307,11 +1420,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                     <label className="block text-white text-left font-medium mb-3">
                       Button Layout
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: "horizontal", label: "Horizontal", icon: "↔" },
                         { value: "vertical", label: "Vertical", icon: "↕" },
-                        { value: "stacked", label: "Stacked", icon: "⊞" },
                       ].map(({ value, label, icon }) => (
                         <div
                           key={value}
@@ -1438,6 +1550,16 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                             >
+                              {(() => {
+                                console.log("Visual editor option:", { 
+                                  value, 
+                                  label, 
+                                  isSelected: (draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value,
+                                  draftValue: draftCustomization?.scrollIndicatorStyle,
+                                  customizationValue: customization.scrollIndicatorStyle
+                                });
+                                return null;
+                              })()}
                               <div className="text-center text-lg text-white mb-1">
                                 {icon}
                               </div>
@@ -1564,3 +1686,5 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 };
 
 export default Hero;
+
+

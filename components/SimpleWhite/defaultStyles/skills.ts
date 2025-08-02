@@ -30,7 +30,6 @@ export const defaultSimpleWhiteSkillsStyles: SimpleWhiteSkillsCustomizationState
   cardStyle: "elevated",
   showIcons: true,
   iconSize: "lg",
-  iconStyle: "rounded",
   showLabels: true,
   labelSize: "md",
   labelWeight: "medium",
@@ -59,7 +58,6 @@ export const defaultSimpleWhiteSkillsStyles: SimpleWhiteSkillsCustomizationState
   // Animations
   animationSpeed: "normal",
   staggerAnimation: true,
-  entranceAnimation: "scaleUp",
   
   // Filter & Search
   enableFiltering: false,

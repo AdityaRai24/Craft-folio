@@ -42,7 +42,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  console.log('Host:', req.headers.get('host'));
 
 
   // 🌐 CUSTOM DOMAIN HANDLING

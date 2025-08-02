@@ -20,6 +20,7 @@ import {
   RectangleHorizontal,
   RectangleVertical,
   Circle,
+  Type,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -111,7 +112,7 @@ const LayoutSelector: React.FC<{
               Grid Columns
             </label>
             <div className="flex gap-2">
-              {[2, 3, 4].map((cols) => (
+              {[2, 3].map((cols) => (
                 <div
                   key={cols}
                   onClick={() => onGridColumnsChange(cols)}
@@ -321,9 +322,9 @@ const AspectRatioSelector: React.FC<{
               background: `linear-gradient(to right, ${
                 ColorTheme.primary
               } 0%, ${ColorTheme.primary} ${
-                ((imageHeight - 150) / 150) * 100
+                Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))
               }%, #3f3f46 ${
-                ((imageHeight - 150) / 150) * 100
+                Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))
               }%, #3f3f46 100%)`,
             }}
           />
@@ -410,7 +411,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "layout" | "styling" | "timing"
+    "layout" | "typography" | "styling" | "timing"
   >("layout");
 
   // Dragging state for floating window
@@ -580,7 +581,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   };
 
   const getCardClasses = () => {
-    let classes = `${effectiveCustomization.cardBackground} section-card border ${
+    let classes = `${effectiveCustomization.cardBackground}  section-card border ${
       effectiveCustomization.cardBorder
     } overflow-hidden transition-all duration-${Math.round(
       effectiveCustomization.animationSpeed * 1000
@@ -689,6 +690,41 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
       default:
         return "text-left";
     }
+  };
+
+  const getTitleClasses = () => {
+    const sizeMap = {
+      sm: "text-lg md:text-xl",
+      md: "text-xl md:text-2xl",
+      lg: "text-2xl md:text-3xl",
+      xl: "text-3xl md:text-4xl",
+    };
+
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+
+    return `section-sub-title ${sizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]} transition-colors duration-300`;
+  };
+
+  const getDescriptionClasses = () => {
+    const sizeMap = {
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
+    };
+
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+
+    return `section-sub-description ${sizeMap[effectiveCustomization.descriptionSize]} ${weightMap[effectiveCustomization.descriptionWeight]}`;
   };
 
   useEffect(() => {
@@ -816,6 +852,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
           background: ${ColorTheme.primary};
           cursor: pointer;
           border: none;
+          z-index: 10;
+          position: relative;
         }
         .slider::-moz-range-thumb {
           height: 16px;
@@ -824,6 +862,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
           background: ${ColorTheme.primary};
           cursor: pointer;
           border: none;
+          z-index: 10;
+          position: relative;
         }
       `}</style>
       <div className="container relative mx-auto max-w-6xl px-4">
@@ -938,7 +978,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                       } mb-3`}
                     >
                       <h3
-                        className={`text-xl section-sub-title md:text-2xl font-bold text-white transition-colors duration-300 ${getTitleAlignment()}`}
+                        className={`${getTitleClasses()} ${getTitleAlignment()}`}
                         style={{ color: titleColor }}
                       >
                         {project?.projectName}
@@ -950,7 +990,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                     </div>
 
                     <p
-                      className={`section-sub-description text-gray-300 mb-4 ${getTitleAlignment()}`}
+                      className={`${getDescriptionClasses()} text-gray-300 mb-4 ${getTitleAlignment()}`}
                     >
                       {project?.projectDescription}
                     </p>
@@ -1038,7 +1078,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
 
             {/* Tab Navigation */}
             <div className="flex border-b border-zinc-700">
-              {["layout", "styling", "timing"].map((tab) => (
+              {["layout", "typography", "styling", "timing"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
@@ -1056,6 +1096,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                   }
                 >
                   {tab === "layout" && <Layout className="h-4 w-4 mx-auto mb-1" />}
+                  {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
                   {tab === "styling" && <Palette className="h-4 w-4 mx-auto mb-1" />}
                   {tab === "timing" && <Move className="h-4 w-4 mx-auto mb-1" />}
                   {tab}
@@ -1097,34 +1138,179 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                     onChange={value => updateDraftCustomization("titleAlignment", value)}
                   />
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Image Position
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[{ value: "left", label: "Left Side" }, { value: "right", label: "Right Side" }].map(({ value, label }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("imagePosition", value)}
-                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.imagePosition ?? customization.imagePosition) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className={`flex items-center gap-2 ${value === "right" ? "flex-row-reverse" : ""}`}>
-                            <div className="w-6 h-4 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
-                            <div className="flex-1 space-y-1">
-                              <div className="h-1 bg-gray-400 rounded"></div>
-                              <div className="h-1 bg-gray-500 rounded w-3/4"></div>
+                  {(draftCustomization?.layout ?? customization.layout) === "single" && (
+                    <div>
+                      <label className="block text-white text-left font-medium mb-3">
+                        Image Position
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[{ value: "left", label: "Left Side" }, { value: "right", label: "Right Side" }].map(({ value, label }) => (
+                          <div
+                            key={value}
+                            onClick={() => updateDraftCustomization("imagePosition", value)}
+                            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
+                              (draftCustomization?.imagePosition ?? customization.imagePosition) === value
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            }`}
+                          >
+                            <div className={`flex items-center gap-2 ${value === "right" ? "flex-row-reverse" : ""}`}>
+                              <div className="w-6 h-4 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
+                              <div className="flex-1 space-y-1">
+                                <div className="h-1 bg-gray-400 rounded"></div>
+                                <div className="h-1 bg-gray-500 rounded w-3/4"></div>
+                              </div>
                             </div>
+                            <div className="text-center text-xs text-white mt-2">{label}</div>
                           </div>
-                          <div className="text-center text-xs text-white mt-2">{label}</div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {activeTab === "typography" && (
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-white text-left font-medium mb-3">Title Size</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: "sm", label: "Small", size: "0.875rem" },
+                          { value: "md", label: "Medium", size: "1rem" },
+                          { value: "lg", label: "Large", size: "1.125rem" },
+                          { value: "xl", label: "Extra Large", size: "1.25rem" },
+                        ].map(({ value, label, size }) => (
+                          <div
+                            key={value}
+                            onClick={() => updateDraftCustomization("titleSize", value)}
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                              (draftCustomization?.titleSize ?? customization.titleSize) === value
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            }`}
+                          >
+                            <div className="flex justify-center mb-2">
+                              <div
+                                className="rounded text-white text-center font-bold"
+                                style={{ 
+                                  fontSize: size,
+                                  color: ColorTheme.primary
+                                }}
+                              >
+                                Aa
+                              </div>
+                            </div>
+                            <div className="text-center text-xs text-white">{label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-white text-left font-medium mb-3">Title Weight</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: "normal", label: "Normal", weight: "font-normal" },
+                          { value: "medium", label: "Medium", weight: "font-medium" },
+                          { value: "semibold", label: "Semibold", weight: "font-semibold" },
+                          { value: "bold", label: "Bold", weight: "font-bold" },
+                        ].map(({ value, label, weight }) => (
+                          <div
+                            key={value}
+                            onClick={() => updateDraftCustomization("titleWeight", value)}
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                              (draftCustomization?.titleWeight ?? customization.titleWeight) === value
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            }`}
+                          >
+                            <div className="flex justify-center mb-2">
+                              <div
+                                className={`text-white text-center ${weight}`}
+                                style={{ fontSize: "14px" }}
+                              >
+                                Aa
+                              </div>
+                            </div>
+                            <div className="text-center text-xs text-white">{label}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </>
+
+                  <div className="border-t border-zinc-700 pt-4">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white text-left font-medium mb-3">Description Size</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { value: "sm", label: "Small", size: "0.875rem" },
+                            { value: "md", label: "Medium", size: "1rem" },
+                            { value: "lg", label: "Large", size: "1.125rem" },
+                          ].map(({ value, label, size }) => (
+                            <div
+                              key={value}
+                              onClick={() => updateDraftCustomization("descriptionSize", value)}
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                                (draftCustomization?.descriptionSize ?? customization.descriptionSize) === value
+                                  ? "border-white bg-zinc-700"
+                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              }`}
+                            >
+                              <div className="flex justify-center mb-2">
+                                <div
+                                  className="rounded text-white text-center font-bold"
+                                  style={{ 
+                                    fontSize: size,
+                                    color: ColorTheme.primary
+                                  }}
+                                >
+                                  Aa
+                                </div>
+                              </div>
+                              <div className="text-center text-xs text-white">{label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-white text-left font-medium mb-3">Description Weight</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { value: "normal", label: "Normal", weight: "font-normal" },
+                            { value: "medium", label: "Medium", weight: "font-medium" },
+                            { value: "semibold", label: "Semibold", weight: "font-semibold" },
+                            { value: "bold", label: "Bold", weight: "font-bold" },
+                          ].map(({ value, label, weight }) => (
+                            <div
+                              key={value}
+                              onClick={() => updateDraftCustomization("descriptionWeight", value)}
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                                (draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
+                                  ? "border-white bg-zinc-700"
+                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              }`}
+                            >
+                              <div className="flex justify-center mb-2">
+                                <div
+                                  className={`text-white text-center ${weight}`}
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  Aa
+                                </div>
+                              </div>
+                              <div className="text-center text-xs text-white">{label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {activeTab === "styling" && (

@@ -1089,10 +1089,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
 
             {activeTab === "timeline" && (
               <div className="space-y-6">
-                <h4 className="text-md font-semibold text-white mb-4">
-                  Timeline Settings
-                </h4>
-
+               
                 <div className="mb-4">
                   <label className="block text-left text-sm font-medium text-gray-300 mb-2">
                     Timeline Width: {customization.timelineWidth}px
@@ -1113,10 +1110,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                 </div>
 
                 <div className="border-t border-zinc-700 pt-4">
-                  <h5 className="text-sm font-medium text-white mb-3">
-                    Dot Settings
-                  </h5>
-
+               
                   <div className="space-y-4">
                     <div>
                       <label className="block text-white text-left font-medium mb-3">Dot Size</label>

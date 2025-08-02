@@ -7,6 +7,7 @@ import { RootState } from '@/store/store';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
 import EditButton from '@/components/EditButton';
+import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { defaultSimpleWhiteSkillsStyles } from "./defaultStyles/skills";
@@ -353,13 +354,13 @@ const Skills: NextPage = ({ customCSS }: any) => {
 
     const hoverMap = {
       lift: "hover:shadow-lg hover:-translate-y-1",
-      glow: `hover:shadow-lg hover:shadow-[${ColorTheme.primary}]/20`,
+      glow: `hover:shadow-lg hover:shadow-blue-500/20`,
       scale: "hover:scale-105",
       rotate: "hover:rotate-3",
       none: "",
     };
 
-    return `flex flex-col cursor-pointer items-center p-4 ${styleMap[effectiveCustomization.cardStyle]} ${radiusMap[effectiveCustomization.cardBorderRadius]} ${shadowMap[effectiveCustomization.cardShadow]} ${effectiveCustomization.hoverEffects ? hoverMap[effectiveCustomization.cardHoverEffect] : ""} transition-all duration-300`;
+    return `flex flex-col cursor-pointer items-center p-4 ${styleMap[effectiveCustomization.cardStyle]} ${radiusMap[effectiveCustomization.cardBorderRadius]} ${shadowMap[effectiveCustomization.cardShadow]} ${effectiveCustomization.hoverEffects && !effectiveCustomization.staggerAnimation ? hoverMap[effectiveCustomization.cardHoverEffect] : ""} transition-all duration-300`;
   };
 
   const getIconClasses = () => {
@@ -370,13 +371,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
       xl: "w-20 h-20",
     };
 
-    const styleMap = {
-      square: "rounded-none",
-      rounded: "rounded-lg",
-      circular: "rounded-full",
-    };
-
-    return `${sizeMap[effectiveCustomization.iconSize]} mb-3 flex items-center justify-center ${styleMap[effectiveCustomization.iconStyle]}`;
+    return `${sizeMap[effectiveCustomization.iconSize]} mb-3 flex items-center justify-center rounded-lg`;
   };
 
   const getLabelClasses = () => {
@@ -481,46 +476,41 @@ const Skills: NextPage = ({ customCSS }: any) => {
     <section id="skills" className={getSectionClasses()}>
       <style>{customCSS}</style>
       
-      {/* Visual Editor Toggle Button */}
-      <div className=" flex items-center gap-2">
-        <EditButton sectionName="technologies" />
-        <button
-          onClick={openVisualEditor}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
-      
       <div className="container mx-auto px-4">
-        {effectiveCustomization.headerVisible && (
-          <div className={headerClasses.container}>
-            <h2 className={headerClasses.title}>
-              {portfolioData?.find((section: any) => section.type === "technologies")?.sectionTitle || "Technical Skills"}
-            </h2>
-            {effectiveCustomization.descriptionVisible && (
-              <p className={headerClasses.description}>
-                {portfolioData?.find((section: any) => section.type === "technologies")?.sectionDescription || "A comprehensive list of technologies and tools I work with"}
-              </p>
-            )}
-          </div>
-        )}
+        <SectionHeader
+          sectionName="technologies"
+          headerVisible={effectiveCustomization.headerVisible}
+          titleSize={effectiveCustomization.titleSize}
+          titleWeight={effectiveCustomization.titleWeight}
+          titleColor={effectiveCustomization.titleColor}
+          titleAlignment={effectiveCustomization.titleAlignment}
+          descriptionSize={effectiveCustomization.descriptionSize}
+          descriptionColor={effectiveCustomization.descriptionColor}
+          descriptionVisible={effectiveCustomization.descriptionVisible}
+          title={portfolioData?.find((section: any) => section.type === "technologies")?.sectionTitle || "Technical Skills"}
+          description={portfolioData?.find((section: any) => section.type === "technologies")?.sectionDescription || "A comprehensive list of technologies and tools I work with"}
+          onVisualEditorClick={openVisualEditor}
+          headerClasses={headerClasses}
+        />
 
         <motion.div 
           className={getGridClasses()}
           variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
-          initial="hidden"
-          animate="visible"
+          initial={effectiveCustomization.staggerAnimation ? "hidden" : false}
+          animate={effectiveCustomization.staggerAnimation ? "visible" : false}
         >
           {technologiesData.map((technology, index) => (
             <motion.div 
               key={index}
               className={getCardClasses()}
               variants={effectiveCustomization.staggerAnimation ? skillVariants : undefined}
+              whileHover={effectiveCustomization.hoverEffects ? {
+                scale: effectiveCustomization.hoverScale ? 1.05 : 1,
+                y: effectiveCustomization.cardHoverEffect === "lift" ? -5 : 0,
+                boxShadow: effectiveCustomization.cardHoverEffect === "glow" ? "0 0 20px rgba(59, 130, 246, 0.5)" : "none",
+                rotate: effectiveCustomization.cardHoverEffect === "rotate" ? 5 : 0,
+              } : {}}
+              transition={{ duration: 0.2 }}
             >
               {effectiveCustomization.showIcons && (
                 <div className={getIconClasses()}>
@@ -598,13 +588,13 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   <input
                     type="range"
                     min={2}
-                    max={8}
+                    max={6}
                     step={1}
                     value={draftCustomization?.gridColumns ?? customization.gridColumns}
                     onChange={(e) => updateDraftCustomization("gridColumns", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 6) * 100}%, #3f3f46 ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 6) * 100}%, #3f3f46 100%)`,
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100}%, #3f3f46 ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100}%, #3f3f46 100%)`,
                     }}
                   />
                 </div>
@@ -674,93 +664,51 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Header Settings
-                  </h5>
 
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Header</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.headerVisible ?? customization.headerVisible}
-                        onChange={(e) => updateDraftCustomization("headerVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.headerVisible ?? customization.headerVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Description</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.descriptionVisible ?? customization.descriptionVisible}
-                        onChange={(e) => updateDraftCustomization("descriptionVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.descriptionVisible ?? customization.descriptionVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
 
             {activeTab === "typography" && (
               <div className="space-y-4">
-                <AlignmentSelector
-                  value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
-                  onChange={(value) => updateDraftCustomization("titleAlignment", value)}
-                  label="Title Alignment"
-                />
-
-                <SizeSelector
-                  value={draftCustomization?.titleSize ?? customization.titleSize}
-                  onChange={(value) => updateDraftCustomization("titleSize", value)}
-                  label="Title Size"
-                  options={[
-                    { value: "sm", label: "Small", size: "24px" },
-                    { value: "md", label: "Medium", size: "32px" },
-                    { value: "lg", label: "Large", size: "40px" },
-                    { value: "xl", label: "Extra Large", size: "52px" },
-                    { value: "2xl", label: "2XL", size: "64px" },
-                    { value: "3xl", label: "3XL", size: "76px" },
-                  ]}
-                />
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium text-gray-300">Show Labels</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={draftCustomization?.showLabels ?? customization.showLabels}
+                      onChange={(e) => updateDraftCustomization("showLabels", e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                      style={{
+                        backgroundColor: (draftCustomization?.showLabels ?? customization.showLabels) ? ColorTheme.primary : "",
+                      }}
+                    ></div>
+                  </label>
+                </div>
 
                 <div>
                   <label className="block text-white text-left font-medium mb-3">
-                    Title Weight
+                    Label Size
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { value: "normal", label: "Normal", weight: "font-normal" },
-                      { value: "medium", label: "Medium", weight: "font-medium" },
-                      { value: "semibold", label: "Semibold", weight: "font-semibold" },
-                      { value: "bold", label: "Bold", weight: "font-bold" },
-                      { value: "extrabold", label: "Extrabold", weight: "font-extrabold" },
-                    ].map(({ value, label, weight }) => (
+                      { value: "xs", label: "Extra Small", size: "12px" },
+                      { value: "sm", label: "Small", size: "14px" },
+                      { value: "md", label: "Medium", size: "16px" },
+                      { value: "lg", label: "Large", size: "18px" },
+                    ].map(({ value, label, size }) => (
                       <div
                         key={value}
-                        onClick={() => updateDraftCustomization("titleWeight", value)}
+                        onClick={() => updateDraftCustomization("labelSize", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.titleWeight ?? customization.titleWeight) === value
+                          (draftCustomization?.labelSize ?? customization.labelSize) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                       >
                         <div className="flex justify-center mb-2">
-                          <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "14px" }}>
+                          <div className="text-white text-center px-3 py-1" style={{ fontSize: size }}>
                             Aa
                           </div>
                         </div>
@@ -770,69 +718,34 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Label Settings
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Labels</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.showLabels ?? customization.showLabels}
-                        onChange={(e) => updateDraftCustomization("showLabels", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.showLabels ?? customization.showLabels) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <SizeSelector
-                    value={draftCustomization?.labelSize ?? customization.labelSize}
-                    onChange={(value) => updateDraftCustomization("labelSize", value)}
-                    label="Label Size"
-                    options={[
-                      { value: "xs", label: "Extra Small", size: "12px" },
-                      { value: "sm", label: "Small", size: "14px" },
-                      { value: "md", label: "Medium", size: "16px" },
-                      { value: "lg", label: "Large", size: "18px" },
-                    ]}
-                  />
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Label Weight
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "normal", label: "Normal", weight: "font-normal" },
-                        { value: "medium", label: "Medium", weight: "font-medium" },
-                        { value: "semibold", label: "Semibold", weight: "font-semibold" },
-                        { value: "bold", label: "Bold", weight: "font-bold" },
-                      ].map(({ value, label, weight }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("labelWeight", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.labelWeight ?? customization.labelWeight) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="flex justify-center mb-2">
-                            <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "12px" }}>
-                              Aa
-                            </div>
+                <div>
+                  <label className="block text-white text-left font-medium mb-3">
+                    Label Weight
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "normal", label: "Normal", weight: "font-normal" },
+                      { value: "medium", label: "Medium", weight: "font-medium" },
+                      { value: "semibold", label: "Semibold", weight: "font-semibold" },
+                      { value: "bold", label: "Bold", weight: "font-bold" },
+                    ].map(({ value, label, weight }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("labelWeight", value)}
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.labelWeight ?? customization.labelWeight) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="flex justify-center mb-2">
+                          <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "12px" }}>
+                            Aa
                           </div>
-                          <div className="text-center text-xs text-white">{label}</div>
                         </div>
-                      ))}
-                    </div>
+                        <div className="text-center text-xs text-white">{label}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -895,38 +808,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Icon Style
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "square", label: "Square", style: "rounded-none" },
-                      { value: "rounded", label: "Rounded", style: "rounded-lg" },
-                      { value: "circular", label: "Circular", style: "rounded-full" },
-                    ].map(({ value, label, style }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("iconStyle", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.iconStyle ?? customization.iconStyle) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div
-                            className={`w-6 h-6 bg-gradient-to-r ${style}`}
-                            style={{
-                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div>
                   <label className="block text-white text-left font-medium mb-3">
@@ -1061,38 +943,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div className="border-t border-zinc-700 pt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Entrance Animation
-                  </h5>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "fadeUp", label: "Fade Up", icon: "↗️" },
-                      { value: "slideIn", label: "Slide In", icon: "➡️" },
-                      { value: "scaleUp", label: "Scale Up", icon: "📈" },
-                      { value: "flipIn", label: "Flip In", icon: "🔄" },
-                      { value: "none", label: "None", icon: "❌" },
-                    ].map(({ value, label, icon }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("entranceAnimation", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.entranceAnimation ?? customization.entranceAnimation) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="text-center text-lg text-white mb-1">
-                          {icon}
-                        </div>
-                        <div className="text-center text-xs text-white">
-                          {label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
           </div>

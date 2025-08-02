@@ -27,6 +27,7 @@ export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizat
   
   // Timeline Settings
   timelineVisible: true,
+  timelinePosition: "center",
   timelineColor: "gray-300",
   timelineWidth: "thin",
   timelineDots: true,

@@ -21,6 +21,7 @@ export const defaultHeroStyles: CustomizationState = {
   subtitleSize: "lg",
   subtitleWeight: "medium",
   descriptionSize: "md",
+  descriptionWeight: "medium",
   descriptionMaxWidth: "lg",
 
   // Button Customization

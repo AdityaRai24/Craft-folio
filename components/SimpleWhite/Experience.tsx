@@ -7,6 +7,7 @@ import { setCurrentEdit } from '@/slices/editModeSlice';
 import { supabase } from '@/lib/supabase-client';
 import { useParams } from 'next/navigation';
 import EditButton from '@/components/EditButton';
+import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { defaultSimpleWhiteExperienceStyles } from "./defaultStyles/experience";
@@ -113,10 +114,9 @@ const SizeSelector: React.FC<{
           >
             <div className="flex justify-center mb-2">
               <div
-                className="rounded text-white text-center font-bold"
+                className="text-white text-center font-bold"
                 style={{ 
                   fontSize: size,
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
               >
                 Aa
@@ -306,14 +306,6 @@ const Experience: React.FC = ({ customCSS }: any) => {
   };
 
   const getTimelineClasses = () => {
-    if (!effectiveCustomization.timelineVisible) return { line: "hidden", dot: "hidden" };
-
-    const colorMap = {
-      "gray-300": "bg-gray-300",
-      "gray-400": "bg-gray-400",
-      primary: `bg-[${ColorTheme.primary}]`,
-    };
-
     const widthMap = {
       thin: "w-px",
       normal: "w-0.5",
@@ -332,15 +324,9 @@ const Experience: React.FC = ({ customCSS }: any) => {
       lg: "w-8 h-8",
     };
 
-    const positionMap = {
-      left: "left-8",
-      center: "left-8 md:left-1/2",
-      right: "right-8",
-    };
-
     return {
-      line: `absolute ${positionMap[effectiveCustomization.timelinePosition]} top-0 bottom-0 ${widthMap[effectiveCustomization.timelineWidth]} ${colorMap[effectiveCustomization.timelineColor]} transform md:-translate-x-px`,
-      dot: effectiveCustomization.timelineDots ? `absolute top-1/2 ${dotSizeMap[effectiveCustomization.timelineDotSize]} rounded-full ${dotColorMap[effectiveCustomization.timelineDotColor]} border-4 border-white hidden md:block transform -translate-y-1/2` : "hidden",
+      line: `${widthMap[effectiveCustomization.timelineWidth]} bg-gray-300`,
+      dot: effectiveCustomization.timelineDots ? `absolute top-1/2 ${dotSizeMap[effectiveCustomization.timelineDotSize]} rounded-full ${dotColorMap[effectiveCustomization.timelineDotColor]} border-4 border-white transform -translate-y-1/2` : "hidden",
     };
   };
 
@@ -533,7 +519,7 @@ const Experience: React.FC = ({ customCSS }: any) => {
       <style>{customCSS}</style>
       
       {/* Visual Editor Toggle Button */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+      {/* <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
         <EditButton sectionName="experience" />
         <button
           onClick={openVisualEditor}
@@ -545,65 +531,95 @@ const Experience: React.FC = ({ customCSS }: any) => {
           <Settings className="h-4 w-4" />
           Visual Editor
         </button>
-      </div>
+      </div> */}
       
-      <div className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-        {effectiveCustomization.headerVisible && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className={headerClasses.container}
-          >
-            <h2 className={`${headerClasses.title} ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
-              {portfolioData?.find((section: any) => section.type === "experience")?.sectionTitle || "Professional Experience"}
-            </h2>
-            {effectiveCustomization.descriptionVisible && (
-              <p className={`${headerClasses.description} ${isHeadingVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
-                {portfolioData?.find((section: any) => section.type === "experience")?.sectionDescription || "My journey in the industry"}
-              </p>
-            )}
-          </motion.div>
-        )}
+      <div className={`relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 ${
+        effectiveCustomization.maxWidth === "md" ? "max-w-4xl" :
+        effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
+        effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
+        effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
+        effectiveCustomization.maxWidth === "full" ? "max-w-full" :
+        "max-w-7xl"
+      }`}>
+        <SectionHeader
+          sectionName="experience"
+          headerVisible={effectiveCustomization.headerVisible}
+          titleSize={effectiveCustomization.titleSize}
+          titleWeight={effectiveCustomization.titleWeight}
+          titleColor={effectiveCustomization.titleColor}
+          titleAlignment={effectiveCustomization.titleAlignment}
+          descriptionSize={effectiveCustomization.descriptionSize}
+          descriptionColor={effectiveCustomization.descriptionColor}
+          descriptionVisible={effectiveCustomization.descriptionVisible}
+          title={portfolioData?.find((section: any) => section.type === "experience")?.sectionTitle || "Professional Experience"}
+          description={portfolioData?.find((section: any) => section.type === "experience")?.sectionDescription || "My journey in the industry"}
+          onVisualEditorClick={openVisualEditor}
+          headerClasses={headerClasses}
+        />
 
         {experienceData.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             No professional experience added yet.
           </div>
         ) : (
-          <motion.div
-            variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="relative"
-          >
-            <div className={timelineClasses.line} />
-
-            {experienceData.map((exp, index) => (
+          <>
+            {effectiveCustomization.layout === "timeline" && (
+              <div 
+                className={timelineClasses.line}
+                style={{
+                  position: 'absolute',
+                  top: '0',
+                  bottom: '0',
+                  left: effectiveCustomization.timelinePosition === "left" ? '2rem' : undefined,
+                  right: effectiveCustomization.timelinePosition === "right" ? '2rem' : undefined,
+                  transform: effectiveCustomization.timelinePosition === "center" ? 'translateX(-50%)' : undefined,
+                }}
+              />
+            )}
+            
+            <motion.div
+              variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="relative"
+            >
+              {experienceData.map((exp, index) => (
               <motion.div
                 key={index}
                 variants={effectiveCustomization.staggerAnimation ? itemVariants : undefined}
                 className={`${getCardClasses()} ${
                   visibleItems[index] ? 'opacity-100' : 'opacity-0'
                 } ${
-                  effectiveCustomization.alternatingLayout && effectiveCustomization.layout === "timeline"
+                  effectiveCustomization.layout === "timeline" && effectiveCustomization.timelinePosition === "center" && effectiveCustomization.alternatingLayout
                     ? index % 2 === 0
                       ? "md:mr-[calc(50%+2rem)]"
                       : "md:ml-[calc(50%+2rem)]"
+                    : effectiveCustomization.layout === "timeline" && effectiveCustomization.timelinePosition === "left"
+                    ? "md:ml-[calc(4rem+2rem)]"
+                    : effectiveCustomization.layout === "timeline" && effectiveCustomization.timelinePosition === "right"
+                    ? "md:mr-[calc(4rem+2rem)]"
                     : ""
                 }`}
               >
-                <div
-                  className={`${timelineClasses.dot} ${
-                    effectiveCustomization.alternatingLayout && effectiveCustomization.layout === "timeline"
-                      ? index % 2 === 0
+                {effectiveCustomization.layout === "timeline" && (
+                  <div
+                    className={`${timelineClasses.dot} ${
+                      effectiveCustomization.timelinePosition === "center" && effectiveCustomization.alternatingLayout
+                        ? index % 2 === 0
+                          ? "right-0 translate-x-[calc(100%+1rem+5px)]"
+                          : "left-0 -translate-x-[calc(100%+1rem+6px)]"
+                        : effectiveCustomization.timelinePosition === "center"
                         ? "right-0 translate-x-[calc(100%+1rem+5px)]"
-                        : "left-0 -translate-x-[calc(100%+1rem+6px)]"
-                      : "right-0 translate-x-[calc(100%+1rem+5px)]"
-                  }`}
-                />
+                        : ""
+                    }`}
+                    style={{
+                      left: effectiveCustomization.timelinePosition === "left" ? "calc(100% + 1rem)" : undefined,
+                      right: effectiveCustomization.timelinePosition === "right" ? "calc(100% + 1rem)" : undefined,
+                      display: effectiveCustomization.timelineDots ? "block" : "none",
+                    }}
+                  />
+                )}
 
                 <motion.div className="mb-6">
                   <h3 className={`font-title section-sub-title mb-2 ${
@@ -673,6 +689,7 @@ const Experience: React.FC = ({ customCSS }: any) => {
               </motion.div>
             ))}
           </motion.div>
+          </>
         )}
       </div>
 
@@ -703,7 +720,7 @@ const Experience: React.FC = ({ customCSS }: any) => {
 
           {/* Tab Navigation */}
           <div className="flex border-b border-zinc-700">
-            {["layout", "typography", "timeline", "effects"].map((tab) => (
+            {["layout", "typography", "effects"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -715,7 +732,6 @@ const Experience: React.FC = ({ customCSS }: any) => {
               >
                 {tab === "layout" && <Grid3X3 className="h-4 w-4 mx-auto mb-1" />}
                 {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
-                {tab === "timeline" && <Clock className="h-4 w-4 mx-auto mb-1" />}
                 {tab === "effects" && <Eye className="h-4 w-4 mx-auto mb-1" />}
                 {tab}
               </button>
@@ -730,11 +746,10 @@ const Experience: React.FC = ({ customCSS }: any) => {
                   <label className="block text-white text-left font-medium mb-3">
                     Layout Style
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       { value: "timeline", label: "Timeline", icon: "⏰" },
                       { value: "cards", label: "Cards", icon: "🎴" },
-                      { value: "list", label: "List", icon: "📋" },
                     ].map(({ value, label, icon }) => (
                       <div
                         key={value}
@@ -783,120 +798,122 @@ const Experience: React.FC = ({ customCSS }: any) => {
 
                 <div>
                   <label className="block text-white text-left font-medium mb-3">
-                    Background Color
+                    Max Width
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
-                      { value: "white", label: "White", color: "bg-white" },
-                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
-                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
-                    ].map(({ value, label, color }) => (
+                      { value: "md", label: "Medium", width: "max-w-4xl" },
+                      { value: "lg", label: "Large", width: "max-w-5xl" },
+                      { value: "xl", label: "Extra Large", width: "max-w-6xl" },
+                      { value: "2xl", label: "2XL", width: "max-w-7xl" },
+                      { value: "full", label: "Full", width: "max-w-full" },
+                    ].map(({ value, label, width }) => (
                       <div
                         key={value}
-                        onClick={() => updateDraftCustomization("backgroundColor", value)}
+                        onClick={() => updateDraftCustomization("maxWidth", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
+                          (draftCustomization?.maxWidth ?? customization.maxWidth) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                       >
-                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
                         <div className="text-center text-xs text-white">{label}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Card Background
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "solid", label: "Solid", style: "bg-white" },
-                      { value: "gradient", label: "Gradient", style: "bg-gradient-to-br from-white to-gray-50" },
-                      { value: "glass", label: "Glass", style: "bg-white/50 backdrop-blur-sm" },
-                    ].map(({ value, label, style }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("cardBackground", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.cardBackground ?? customization.cardBackground) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className={`w-full h-8 rounded mb-2 ${style}`}></div>
-                        <div className="text-center text-xs text-white">{label}</div>
+                {/* Timeline Settings - Only show when timeline layout is selected */}
+                {(draftCustomization?.layout ?? customization.layout) === "timeline" && (
+                  <>
+                    <div className="border-t border-zinc-700 pt-4">
+                      <h5 className="text-sm text-left font-medium text-white mb-3">
+                        Timeline Settings
+                      </h5>
+
+                      <div>
+                        <label className="block text-white text-left font-medium mb-3">
+                          Timeline Position
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: "left", label: "Left", icon: "←", desc: "Timeline on left, cards on right" },
+                            { value: "center", label: "Center", icon: "↕", desc: "Timeline in center, cards alternate" },
+                            { value: "right", label: "Right", icon: "→", desc: "Timeline on right, cards on left" },
+                          ].map(({ value, label, icon, desc }) => (
+                            <div
+                              key={value}
+                              onClick={() => updateDraftCustomization("timelinePosition", value)}
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                                (draftCustomization?.timelinePosition ?? customization.timelinePosition) === value
+                                  ? "border-white bg-zinc-700"
+                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              }`}
+                            >
+                              <div className="text-center text-lg text-white mb-1">
+                                {icon}
+                              </div>
+                              <div className="text-center text-xs text-white mb-1">
+                                {label}
+                              </div>
+                              <div className="text-center text-xs text-gray-400">
+                                {desc}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Header Settings
-                  </h5>
+                      <div>
+                        <label className="block text-white text-left font-medium mb-3">
+                          Timeline Width
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: "thin", label: "Thin", width: "1px" },
+                            { value: "normal", label: "Normal", width: "2px" },
+                            { value: "thick", label: "Thick", width: "4px" },
+                          ].map(({ value, label, width }) => (
+                            <div
+                              key={value}
+                              onClick={() => updateDraftCustomization("timelineWidth", value)}
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                                (draftCustomization?.timelineWidth ?? customization.timelineWidth) === value
+                                  ? "border-white bg-zinc-700"
+                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              }`}
+                            >
+                              <div className="text-center text-xs text-white">{label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Header</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.headerVisible ?? customization.headerVisible}
-                        onChange={(e) => updateDraftCustomization("headerVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.headerVisible ?? customization.headerVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-300">Show Timeline Dots</label>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={draftCustomization?.timelineDots ?? customization.timelineDots}
+                            onChange={(e) => updateDraftCustomization("timelineDots", e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                            style={{
+                              backgroundColor: (draftCustomization?.timelineDots ?? customization.timelineDots) ? ColorTheme.primary : "",
+                            }}
+                          ></div>
+                        </label>
+                      </div>
+                    </div>
+                  </>
+                )}
 
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Description</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.descriptionVisible ?? customization.descriptionVisible}
-                        onChange={(e) => updateDraftCustomization("descriptionVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.descriptionVisible ?? customization.descriptionVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
 
             {activeTab === "typography" && (
               <div className="space-y-4">
-                <AlignmentSelector
-                  value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
-                  onChange={(value) => updateDraftCustomization("titleAlignment", value)}
-                  label="Title Alignment"
-                />
-
-                <SizeSelector
-                  value={draftCustomization?.titleSize ?? customization.titleSize}
-                  onChange={(value) => updateDraftCustomization("titleSize", value)}
-                  label="Title Size"
-                  options={[
-                    { value: "sm", label: "Small", size: "24px" },
-                    { value: "md", label: "Medium", size: "32px" },
-                    { value: "lg", label: "Large", size: "40px" },
-                    { value: "xl", label: "Extra Large", size: "52px" },
-                    { value: "2xl", label: "2XL", size: "64px" },
-                    { value: "3xl", label: "3XL", size: "76px" },
-                  ]}
-                />
-
                 <div className="border-t border-zinc-700 pt-4 mt-4">
                   <h5 className="text-sm text-left font-medium text-white mb-3">
                     Experience Card Typography
@@ -914,35 +931,6 @@ const Experience: React.FC = ({ customCSS }: any) => {
                     ]}
                   />
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Role Title Color
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "gray-900", label: "Dark Gray", color: "bg-gray-900" },
-                        { value: "gray-800", label: "Medium Gray", color: "bg-gray-800" },
-                        { value: "primary", label: "Primary", color: ColorTheme.primary },
-                      ].map(({ value, label, color }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("roleColor", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.roleColor ?? customization.roleColor) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div
-                            className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
-                            style={{ backgroundColor: value === "primary" ? color : "" }}
-                          ></div>
-                          <div className="text-center text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
                   <SizeSelector
                     value={draftCustomization?.companyNameSize ?? customization.companyNameSize}
                     onChange={(value) => updateDraftCustomization("companyNameSize", value)}
@@ -954,32 +942,6 @@ const Experience: React.FC = ({ customCSS }: any) => {
                       { value: "xl", label: "Extra Large", size: "24px" },
                     ]}
                   />
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Date Format
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "month-year", label: "Month Year", example: "Jan 2024" },
-                        { value: "full-date", label: "Full Date", example: "January 2024" },
-                        { value: "year-only", label: "Year Only", example: "2024" },
-                      ].map(({ value, label, example }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("dateFormat", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.dateFormat ?? customization.dateFormat) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="text-center text-xs text-white mb-1">{label}</div>
-                          <div className="text-center text-xs text-gray-400">{example}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
 
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium text-gray-300">Show Location</label>
@@ -1001,236 +963,7 @@ const Experience: React.FC = ({ customCSS }: any) => {
               </div>
             )}
 
-            {activeTab === "timeline" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-300">Show Timeline</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={draftCustomization?.timelineVisible ?? customization.timelineVisible}
-                      onChange={(e) => updateDraftCustomization("timelineVisible", e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                      style={{
-                        backgroundColor: (draftCustomization?.timelineVisible ?? customization.timelineVisible) ? ColorTheme.primary : "",
-                      }}
-                    ></div>
-                  </label>
-                </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Timeline Position
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "left", label: "Left", icon: "←" },
-                      { value: "center", label: "Center", icon: "↕" },
-                      { value: "right", label: "Right", icon: "→" },
-                    ].map(({ value, label, icon }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("timelinePosition", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.timelinePosition ?? customization.timelinePosition) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="text-center text-lg text-white mb-1">
-                          {icon}
-                        </div>
-                        <div className="text-center text-xs text-white">
-                          {label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Timeline Color
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "gray-300", label: "Light Gray", color: "bg-gray-300" },
-                      { value: "gray-400", label: "Gray", color: "bg-gray-400" },
-                      { value: "primary", label: "Primary", color: ColorTheme.primary },
-                    ].map(({ value, label, color }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("timelineColor", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.timelineColor ?? customization.timelineColor) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div
-                          className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
-                          style={{ backgroundColor: value === "primary" ? color : "" }}
-                        ></div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Timeline Width
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "thin", label: "Thin", width: "1px" },
-                      { value: "normal", label: "Normal", width: "2px" },
-                      { value: "thick", label: "Thick", width: "4px" },
-                    ].map(({ value, label, width }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("timelineWidth", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.timelineWidth ?? customization.timelineWidth) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div
-                            className="bg-gradient-to-r rounded"
-                            style={{
-                              width: width,
-                              height: "24px",
-                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Timeline Dots
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Dots</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.timelineDots ?? customization.timelineDots}
-                        onChange={(e) => updateDraftCustomization("timelineDots", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.timelineDots ?? customization.timelineDots) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Dot Size
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "sm", label: "Small", size: "16px" },
-                        { value: "md", label: "Medium", size: "24px" },
-                        { value: "lg", label: "Large", size: "32px" },
-                      ].map(({ value, label, size }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("timelineDotSize", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.timelineDotSize ?? customization.timelineDotSize) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="flex justify-center mb-2">
-                            <div
-                              className="rounded-full"
-                              style={{
-                                width: size,
-                                height: size,
-                                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                              }}
-                            ></div>
-                          </div>
-                          <div className="text-center text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Tech Stack Settings
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Tech Stack</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
-                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.techStackVisible ?? customization.techStackVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Tech Stack Limit: {draftCustomization?.techStackLimit ?? customization.techStackLimit}
-                    </label>
-                    <input
-                      type="range"
-                      min={3}
-                      max={7}
-                      step={1}
-                      value={draftCustomization?.techStackLimit ?? customization.techStackLimit}
-                      onChange={(e) => updateDraftCustomization("techStackLimit", Number(e.target.value))}
-                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                      style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 4) * 100}%, #3f3f46 ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 4) * 100}%, #3f3f46 100%)`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Tech Icons</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.techStackShowIcons ?? customization.techStackShowIcons}
-                        onChange={(e) => updateDraftCustomization("techStackShowIcons", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.techStackShowIcons ?? customization.techStackShowIcons) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {activeTab === "effects" && (
               <div className="space-y-4">

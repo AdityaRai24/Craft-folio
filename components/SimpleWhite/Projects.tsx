@@ -13,6 +13,7 @@ import { getComponentCustomization, saveComponentCustomization, deleteComponentC
 import { defaultSimpleWhiteProjectsStyles } from "./defaultStyles/projects";
 import { SimpleWhiteProjectsCustomizationState } from "./defaultStyles/types";
 import { ColorTheme } from "@/lib/colorThemes";
+import SectionHeader from './SectionHeader';
 
 interface ProjectType {
   id: string;
@@ -112,10 +113,9 @@ const SizeSelector: React.FC<{
           >
             <div className="flex justify-center mb-2">
               <div
-                className="rounded text-white text-center font-bold"
+                className="text-white text-center font-bold"
                 style={{ 
                   fontSize: size,
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
               >
                 Aa
@@ -139,7 +139,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
   const [projectsData, setProjectsData] = useState<ProjectType[]>([]);
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "cards" | "effects"
+    "layout" | "typography" | "styling" | "effects"
   >("layout");
 
   // Dragging state for floating window
@@ -266,16 +266,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
       "gray-100": "bg-gray-100",
     };
     
-    const maxWidthMap = {
-      sm: "max-w-4xl",
-      md: "max-w-5xl",
-      lg: "max-w-6xl",
-      xl: "max-w-7xl",
-      "2xl": "max-w-8xl",
-      full: "w-full",
-    };
-
-    return `min-h-screen pb-24 bg-gradient-to-b text-gray-900 from-white to-white relative ${bgMap[effectiveCustomization.backgroundColor]} ${maxWidthMap[effectiveCustomization.maxWidth]}`;
+    return `min-h-screen pb-24 bg-gradient-to-b text-gray-900 from-white to-white relative ${bgMap[effectiveCustomization.backgroundColor]}`;
   };
 
   const getHeaderClasses = () => {
@@ -310,16 +301,15 @@ const Projects: NextPage = ({ customCSS }: any) => {
   };
 
   const getProjectCardClasses = () => {
-    const layoutMap = {
-      grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
-      list: "space-y-20",
-      masonry: "columns-1 md:columns-2 lg:columns-3 gap-8",
+    const spacingMap = {
+      compact: "gap-4",
+      normal: "gap-8",
+      spacious: "gap-12",
     };
 
-    const spacingMap = {
-      compact: "space-y-12",
-      normal: "space-y-20",
-      spacious: "space-y-32",
+    const layoutMap = {
+      grid: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${spacingMap[effectiveCustomization.spacing]}`,
+      list: `space-y-${effectiveCustomization.spacing === "compact" ? "12" : effectiveCustomization.spacing === "normal" ? "20" : "32"}`,
     };
 
     const shadowMap = {
@@ -329,30 +319,28 @@ const Projects: NextPage = ({ customCSS }: any) => {
       heavy: "shadow-2xl",
     };
 
-    const borderRadiusMap = {
-      none: "rounded-none",
-      sm: "rounded-sm",
-      md: "rounded-md",
-      lg: "rounded-lg",
-      xl: "rounded-xl",
-    };
-
     return {
-      container: effectiveCustomization.layout === "list" ? spacingMap[effectiveCustomization.spacing] : layoutMap[effectiveCustomization.layout],
-      card: `group relative border-b-2 border-primary-200 pb-12 last:border-none ${shadowMap[effectiveCustomization.cardShadow]} ${borderRadiusMap[effectiveCustomization.cardBorderRadius]}`,
-      image: `w-full lg:w-[40%] aspect-${effectiveCustomization.imageAspectRatio} relative ${borderRadiusMap[effectiveCustomization.cardBorderRadius]} overflow-hidden shadow-xl ${effectiveCustomization.hoverScale ? "group-hover:scale-105" : ""} transition-transform duration-500 ease-in-out`,
+      container: layoutMap[effectiveCustomization.layout],
+      card: `group relative border-2 border-black border-gray-200 ${shadowMap[effectiveCustomization.cardShadow]}`,
+      image: `w-full ${effectiveCustomization.layout === "grid" ? "h-48" : "lg:w-[40%]"} cursor-pointer relative overflow-hidden shadow-xl transition-transform duration-500 ease-in-out`,
     };
   };
 
   const getTechStackClasses = () => {
-    const colorMap = {
-      blue: "bg-blue-100 text-blue-700",
-      green: "bg-green-100 text-green-700",
-      purple: "bg-purple-100 text-purple-700",
-      gray: "bg-gray-100 text-gray-700",
+    const sizeMap = {
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-base",
     };
 
-    return `px-4 py-2 text-sm font-medium ${colorMap[effectiveCustomization.techStackColor]} rounded-lg`;
+    const styleMap = {
+      pills: "rounded-full border border-gray-500 text-white",
+      badges: "rounded bg-gray-600 text-white",
+      minimal: "text-gray-300",
+      colorful: "rounded-full border-2 text-white",
+    };
+
+    return `px-4 py-2 font-medium ${styleMap[effectiveCustomization.techStackStyle]} ${sizeMap[effectiveCustomization.techStackSize]}`;
   };
 
   useEffect(() => {
@@ -433,58 +421,55 @@ const Projects: NextPage = ({ customCSS }: any) => {
     >
       <style>{customCSS}</style>
       
-      {/* Visual Editor Toggle Button */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-        <EditButton sectionName="projects" />
-        <button
-          onClick={openVisualEditor}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 ${
+        effectiveCustomization.maxWidth === "md" ? "max-w-4xl" :
+        effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
+        effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
+        effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
+        effectiveCustomization.maxWidth === "full" ? "max-w-full" :
+        "max-w-7xl"
+      }`}>
+        <SectionHeader
+          sectionName="projects"
+          headerVisible={effectiveCustomization.headerVisible}
+          titleSize={effectiveCustomization.titleSize}
+          titleWeight={effectiveCustomization.titleWeight}
+          titleColor={effectiveCustomization.titleColor}
+          titleAlignment={effectiveCustomization.titleAlignment}
+          descriptionSize={effectiveCustomization.descriptionSize}
+          descriptionColor={effectiveCustomization.descriptionColor}
+          descriptionVisible={effectiveCustomization.descriptionVisible}
+          title={portfolioData?.find((section: any) => section.type === "projects")?.sectionTitle || "My Projects"}
+          description={portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that i have worked on."}
+          onVisualEditorClick={openVisualEditor}
+          headerClasses={headerClasses}
+        />
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {effectiveCustomization.headerVisible && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className={headerClasses.container}
-            >
-              <h2 className={headerClasses.title}>
-                {portfolioData?.find((section: any) => section.type === "projects")?.sectionTitle || "My Projects"}
-              </h2>
-              {effectiveCustomization.descriptionVisible && (
-                <p className={headerClasses.description}>
-                  {portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that i have worked on."}
-                </p>
-              )}
-            </motion.div>
-          )}
-
           <div className={projectCardClasses.container}>
             {projectsData.map((project, index) => (
               <motion.div
                 key={project.id || index}
-                variants={effectiveCustomization.staggerAnimation ? projectVariants : undefined}
+                variants={projectVariants}
                 className={projectCardClasses.card}
+                style={{
+                  borderRadius: `${effectiveCustomization.cardBorderRadius ?? 8}px`,
+                  padding: `${effectiveCustomization.cardPadding ?? 4}px`,
+                }}
               >
                 <div className={`flex flex-col ${effectiveCustomization.layout === "list" ? "lg:flex-row" : ""} gap-8 items-center`}>
                   {/* Project Image */}
                   {effectiveCustomization.showImages && (
-                    <div className={projectCardClasses.image}>
+                    <div 
+                      className={projectCardClasses.image}
+                      style={{
+                        borderRadius: `${effectiveCustomization.imageBorderRadius ?? 8}px`,
+                      }}
+                    >
                       {effectiveCustomization.imageOverlay && (
                         <div className="absolute inset-0 bg-primary-900/20 group-hover:bg-primary-900/0 transition-all duration-500" />
                       )}
@@ -517,20 +502,20 @@ const Projects: NextPage = ({ customCSS }: any) => {
                     </h3>
 
                     <p className={`section-sub-description leading-relaxed ${
-                      effectiveCustomization.projectDescriptionSize === "sm" ? "text-base" :
-                      effectiveCustomization.projectDescriptionSize === "md" ? "text-lg" : "text-xl"
+                      effectiveCustomization.projectDescriptionSize === "sm" ? "text-sm" :
+                      effectiveCustomization.projectDescriptionSize === "md" ? "text-base" : "text-lg"
                     } text-${effectiveCustomization.projectDescriptionColor}`}>
                       {project.projectDescription}
                     </p>
 
                     {effectiveCustomization.techStackVisible && (
                       <div className="flex flex-wrap gap-3">
-                        {project.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech, tagIndex) => (
+                        {project.techStack.map((tech, tagIndex) => (
                           <span
                             key={tagIndex}
                             className={getTechStackClasses()}
                           >
-                            {effectiveCustomization.techStackStyle === "icons" && (
+                            {effectiveCustomization.techStackStyle === "colorful" && (
                               <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>
                             )}
                             {tech.name}
@@ -551,8 +536,8 @@ const Projects: NextPage = ({ customCSS }: any) => {
                             whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
                             whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
                           >
-                            <FaGithub size={22} />
-                            <span className="font-medium">View Code</span>
+                            <FaGithub size={effectiveCustomization.buttonSize === "sm" ? 16 : effectiveCustomization.buttonSize === "md" ? 20 : 24} />
+                            <span className={`font-medium ${effectiveCustomization.buttonSize === "sm" ? "text-sm" : effectiveCustomization.buttonSize === "md" ? "text-base" : "text-lg"}`}>View Code</span>
                           </motion.a>
                         )}
                         {effectiveCustomization.liveLinkVisible && project.liveLink && (
@@ -565,8 +550,8 @@ const Projects: NextPage = ({ customCSS }: any) => {
                             whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
                             whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
                           >
-                            <FaExternalLinkAlt size={20} />
-                            <span className="font-medium">Live Demo</span>
+                            <FaExternalLinkAlt size={effectiveCustomization.buttonSize === "sm" ? 16 : effectiveCustomization.buttonSize === "md" ? 20 : 24} />
+                            <span className={`font-medium ${effectiveCustomization.buttonSize === "sm" ? "text-sm" : effectiveCustomization.buttonSize === "md" ? "text-base" : "text-lg"}`}>Live Demo</span>
                           </motion.a>
                         )}
                       </div>
@@ -606,7 +591,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
 
           {/* Tab Navigation */}
           <div className="flex border-b border-zinc-700">
-            {["layout", "typography", "cards", "effects"].map((tab) => (
+            {["layout", "typography", "styling", "effects"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -618,7 +603,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
               >
                 {tab === "layout" && <Layout className="h-4 w-4 mx-auto mb-1" />}
                 {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
-                {tab === "cards" && <Image className="h-4 w-4 mx-auto mb-1" />}
+                {tab === "styling" && <Image className="h-4 w-4 mx-auto mb-1" />}
                 {tab === "effects" && <Eye className="h-4 w-4 mx-auto mb-1" />}
                 {tab}
               </button>
@@ -633,11 +618,10 @@ const Projects: NextPage = ({ customCSS }: any) => {
                   <label className="block text-white text-left font-medium mb-3">
                     Layout Style
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       { value: "list", label: "List", icon: "☰" },
                       { value: "grid", label: "Grid", icon: "⊞" },
-                      { value: "masonry", label: "Masonry", icon: "⊡" },
                     ].map(({ value, label, icon }) => (
                       <div
                         key={value}
@@ -686,67 +670,28 @@ const Projects: NextPage = ({ customCSS }: any) => {
 
                 <div>
                   <label className="block text-white text-left font-medium mb-3">
-                    Background Color
+                    Max Width
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
-                      { value: "white", label: "White", color: "bg-white" },
-                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
-                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
-                    ].map(({ value, label, color }) => (
+                      { value: "md", label: "Medium", width: "max-w-4xl" },
+                      { value: "lg", label: "Large", width: "max-w-5xl" },
+                      { value: "xl", label: "Extra Large", width: "max-w-6xl" },
+                      { value: "2xl", label: "2XL", width: "max-w-7xl" },
+                      { value: "full", label: "Full", width: "max-w-full" },
+                    ].map(({ value, label, width }) => (
                       <div
                         key={value}
-                        onClick={() => updateDraftCustomization("backgroundColor", value)}
+                        onClick={() => updateDraftCustomization("maxWidth", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
+                          (draftCustomization?.maxWidth ?? customization.maxWidth) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                       >
-                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
                         <div className="text-center text-xs text-white">{label}</div>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Header Settings
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Header</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.headerVisible ?? customization.headerVisible}
-                        onChange={(e) => updateDraftCustomization("headerVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.headerVisible ?? customization.headerVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Description</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.descriptionVisible ?? customization.descriptionVisible}
-                        onChange={(e) => updateDraftCustomization("descriptionVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.descriptionVisible ?? customization.descriptionVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
                   </div>
                 </div>
               </div>
@@ -754,62 +699,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
 
             {activeTab === "typography" && (
               <div className="space-y-4">
-                <AlignmentSelector
-                  value={draftCustomization?.titleAlignment ?? customization.titleAlignment}
-                  onChange={(value) => updateDraftCustomization("titleAlignment", value)}
-                  label="Title Alignment"
-                />
-
-                <SizeSelector
-                  value={draftCustomization?.titleSize ?? customization.titleSize}
-                  onChange={(value) => updateDraftCustomization("titleSize", value)}
-                  label="Title Size"
-                  options={[
-                    { value: "sm", label: "Small", size: "24px" },
-                    { value: "md", label: "Medium", size: "32px" },
-                    { value: "lg", label: "Large", size: "40px" },
-                    { value: "xl", label: "Extra Large", size: "52px" },
-                    { value: "2xl", label: "2XL", size: "64px" },
-                    { value: "3xl", label: "3XL", size: "76px" },
-                  ]}
-                />
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Title Weight
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "normal", label: "Normal", weight: "font-normal" },
-                      { value: "medium", label: "Medium", weight: "font-medium" },
-                      { value: "semibold", label: "Semibold", weight: "font-semibold" },
-                      { value: "bold", label: "Bold", weight: "font-bold" },
-                      { value: "extrabold", label: "Extrabold", weight: "font-extrabold" },
-                    ].map(({ value, label, weight }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("titleWeight", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "14px" }}>
-                            Aa
-                          </div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Project Typography
-                  </h5>
+                <div className="">
 
                   <SizeSelector
                     value={draftCustomization?.projectTitleSize ?? customization.projectTitleSize}
@@ -823,217 +713,152 @@ const Projects: NextPage = ({ customCSS }: any) => {
                     ]}
                   />
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Project Title Color
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "gray-900", label: "Dark Gray", color: "bg-gray-900" },
-                        { value: "gray-800", label: "Medium Gray", color: "bg-gray-800" },
-                        { value: "primary", label: "Primary", color: ColorTheme.primary },
-                      ].map(({ value, label, color }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("projectTitleColor", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.projectTitleColor ?? customization.projectTitleColor) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div
-                            className="w-full h-8 rounded mb-2"
-                            style={{ backgroundColor: value === "primary" ? color : "" }}
-                            className={value === "primary" ? "w-full h-8 rounded mb-2" : `w-full h-8 rounded mb-2 ${color}`}
-                          ></div>
-                          <div className="text-center text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <SizeSelector
+                    value={draftCustomization?.projectDescriptionSize ?? customization.projectDescriptionSize}
+                    onChange={(value) => updateDraftCustomization("projectDescriptionSize", value)}
+                    label="Description Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "14px" },
+                      { value: "md", label: "Medium", size: "16px" },
+                      { value: "lg", label: "Large", size: "18px" },
+                    ]}
+                  />
+
+                  <SizeSelector
+                    value={draftCustomization?.techStackSize ?? customization.techStackSize}
+                    onChange={(value) => updateDraftCustomization("techStackSize", value)}
+                    label="Tech Stack Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "12px" },
+                      { value: "md", label: "Medium", size: "14px" },
+                      { value: "lg", label: "Large", size: "16px" },
+                    ]}
+                  />
+
+                  <SizeSelector
+                    value={draftCustomization?.buttonSize ?? customization.buttonSize}
+                    onChange={(value) => updateDraftCustomization("buttonSize", value)}
+                    label="Button Size"
+                    options={[
+                      { value: "sm", label: "Small", size: "12px" },
+                      { value: "md", label: "Medium", size: "14px" },
+                      { value: "lg", label: "Large", size: "16px" },
+                    ]}
+                  />
+
                 </div>
               </div>
             )}
 
-            {activeTab === "cards" && (
+            {activeTab === "styling" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-300">Show Images</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                <div className="mb-4">
+                  <label className="block text-left text-sm font-medium text-gray-300 mb-2">
+                    Card Border Radius: {(draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius ?? 8)}px
+                  </label>
                     <input
-                      type="checkbox"
-                      checked={draftCustomization?.showImages ?? customization.showImages}
-                      onChange={(e) => updateDraftCustomization("showImages", e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                    type="range"
+                    min={0}
+                    max={24}
+                    step={2}
+                    value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius ?? 8}
+                    onChange={(e) => updateDraftCustomization("cardBorderRadius", Number(e.target.value))}
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        backgroundColor: (draftCustomization?.showImages ?? customization.showImages) ? ColorTheme.primary : "",
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius ?? 8) / 24) * 100)}%, #3f3f46 ${(((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius ?? 8) / 24) * 100)}%, #3f3f46 100%)`,
                       }}
-                    ></div>
-                  </label>
+                  />
                 </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Image Aspect Ratio
+                <div className="mb-4">
+                  <label className="block text-left text-sm font-medium text-gray-300 mb-2">
+                    Image Border Radius: {(draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius ?? 8)}px
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "square", label: "Square", ratio: "1:1" },
-                      { value: "video", label: "Video", ratio: "16:9" },
-                      { value: "portrait", label: "Portrait", ratio: "3:4" },
-                    ].map(({ value, label, ratio }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("imageAspectRatio", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.imageAspectRatio ?? customization.imageAspectRatio) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div
-                            className="bg-gradient-to-r rounded"
+                  <input
+                    type="range"
+                    min={0}
+                    max={24}
+                    step={2}
+                    value={draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius ?? 8}
+                    onChange={(e) => updateDraftCustomization("imageBorderRadius", Number(e.target.value))}
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                             style={{
-                              width: value === "square" ? "24px" : value === "video" ? "32px" : "20px",
-                              height: value === "square" ? "24px" : value === "video" ? "18px" : "26px",
-                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                            }}
-                          ></div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius ?? 8) / 24) * 100)}%, #3f3f46 ${(((draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius ?? 8) / 24) * 100)}%, #3f3f46 100%)`,
+                    }}
+                  />
                 </div>
 
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Tech Stack Settings
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Tech Stack</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                <div className="mb-4">
+                  <label className="block text-left text-sm font-medium text-gray-300 mb-2">
+                    Card Padding: {(draftCustomization?.cardPadding ?? customization.cardPadding ?? 4)}px
+                  </label>
                       <input
-                        type="checkbox"
-                        checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
-                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
+                    type="range"
+                    min={0}
+                    max={12}
+                    step={2}
+                    value={draftCustomization?.cardPadding ?? customization.cardPadding ?? 4}
+                    onChange={(e) => updateDraftCustomization("cardPadding", Number(e.target.value))}
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                         style={{
-                          backgroundColor: (draftCustomization?.techStackVisible ?? customization.techStackVisible) ? ColorTheme.primary : "",
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.cardPadding ?? customization.cardPadding ?? 4) / 12) * 100)}%, #3f3f46 ${(((draftCustomization?.cardPadding ?? customization.cardPadding ?? 4) / 12) * 100)}%, #3f3f46 100%)`,
                         }}
-                      ></div>
-                    </label>
+                  />
                   </div>
 
                   <div>
                     <label className="block text-white text-left font-medium mb-3">
-                      Tech Stack Color
+                    Tech Stack Style
                     </label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { value: "blue", label: "Blue", color: "bg-blue-100" },
-                        { value: "green", label: "Green", color: "bg-green-100" },
-                        { value: "purple", label: "Purple", color: "bg-purple-100" },
-                        { value: "gray", label: "Gray", color: "bg-gray-100" },
-                      ].map(({ value, label, color }) => (
+                      { value: "pills", label: "Pills" },
+                      { value: "badges", label: "Badges" },
+                      { value: "minimal", label: "Minimal" },
+                      { value: "colorful", label: "Colorful" },
+                    ].map(({ value, label }) => (
                         <div
                           key={value}
-                          onClick={() => updateDraftCustomization("techStackColor", value)}
+                        onClick={() => updateDraftCustomization("techStackStyle", value)}
                           className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.techStackColor ?? customization.techStackColor) === value
+                          (draftCustomization?.techStackStyle ?? customization.techStackStyle) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                         >
-                          <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
+                        <div className="flex flex-wrap gap-1 justify-center mb-2">
+                          {["React", "TS"].map((tech, i) => (
+                            <span
+                              key={i}
+                              className={`text-xs px-2 py-1 ${
+                                value === "pills"
+                                  ? "rounded-full border border-gray-500 text-white"
+                                  : value === "badges"
+                                  ? "rounded bg-gray-600 text-white"
+                                  : value === "minimal"
+                                  ? "text-gray-300"
+                                  : "rounded-full border-2 text-white"
+                              }`}
+                              style={
+                                value === "colorful"
+                                  ? {
+                                      borderColor: ColorTheme.primary,
+                                      backgroundColor: `${ColorTheme.primary}20`,
+                                    }
+                                  : {}
+                              }
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                           <div className="text-center text-xs text-white">{label}</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Tech Stack Limit: {draftCustomization?.techStackLimit ?? customization.techStackLimit}
-                    </label>
-                    <input
-                      type="range"
-                      min={3}
-                      max={6}
-                      step={1}
-                      value={draftCustomization?.techStackLimit ?? customization.techStackLimit}
-                      onChange={(e) => updateDraftCustomization("techStackLimit", Number(e.target.value))}
-                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                      style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 3) * 100}%, #3f3f46 ${(((draftCustomization?.techStackLimit ?? customization.techStackLimit) - 3) / 3) * 100}%, #3f3f46 100%)`,
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <h5 className="text-sm text-left font-medium text-white mb-3">
-                    Project Links
-                  </h5>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show Links</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.linksVisible ?? customization.linksVisible}
-                        onChange={(e) => updateDraftCustomization("linksVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.linksVisible ?? customization.linksVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Show GitHub Link</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.githubLinkVisible ?? customization.githubLinkVisible}
-                        onChange={(e) => updateDraftCustomization("githubLinkVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.githubLinkVisible ?? customization.githubLinkVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Show Live Link</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.liveLinkVisible ?? customization.liveLinkVisible}
-                        onChange={(e) => updateDraftCustomization("liveLinkVisible", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.liveLinkVisible ?? customization.liveLinkVisible) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
 
@@ -1078,22 +903,7 @@ const Projects: NextPage = ({ customCSS }: any) => {
                     </label>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Stagger Animation</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.staggerAnimation ?? customization.staggerAnimation}
-                        onChange={(e) => updateDraftCustomization("staggerAnimation", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
+
                 </div>
 
                 <div className="border-t border-zinc-700 pt-4">

@@ -16,7 +16,6 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
     // Fetch theme data which contains SEO settings
     const themeResult = await getThemeNameApi({ portfolioId: response.portfolioId });
-
     if (themeResult.success && themeResult.data?.content) {
       const content = themeResult.data.content as any;
       const seoSection = content.sections?.find(

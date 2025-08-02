@@ -9,7 +9,8 @@ export const defaultSimpleWhiteHeroStyles: SimpleWhiteHeroCustomizationState = {
   
   // Background & Theme
   backgroundColor: "white",
-  cardBackground: "gradient",
+  backgroundTheme: "diagonal-grid",
+  cardBackground: "solid",
   cardBorderStyle: "subtle",
   cardShadow: "medium",
   
@@ -37,7 +38,7 @@ export const defaultSimpleWhiteHeroStyles: SimpleWhiteHeroCustomizationState = {
   
   // Resume Button
   resumeButtonVisible: true,
-  resumeButtonStyle: "animated",
+  resumeButtonStyle: "default",
   resumeButtonSize: "md",
   
   // Scroll Indicator

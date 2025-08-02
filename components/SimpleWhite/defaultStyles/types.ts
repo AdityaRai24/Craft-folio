@@ -7,6 +7,7 @@ export interface SimpleWhiteHeroCustomizationState {
   
   // Background & Theme
   backgroundColor: "white" | "gray-50" | "gray-100";
+  backgroundTheme: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
   cardBackground: "solid" | "gradient" | "transparent";
   cardBorderStyle: "none" | "subtle" | "bold";
   cardShadow: "none" | "light" | "medium" | "heavy";
@@ -51,7 +52,7 @@ export interface SimpleWhiteHeroCustomizationState {
 
 export interface SimpleWhiteProjectsCustomizationState {
   // Layout & Structure
-  layout: "grid" | "list" | "masonry";
+  layout: "grid" | "list";
   columnsDesktop: 1 | 2 | 3;
   columnsMobile: 1 | 2;
   spacing: "compact" | "normal" | "spacious";
@@ -63,7 +64,7 @@ export interface SimpleWhiteProjectsCustomizationState {
   cardBackground: "solid" | "gradient" | "transparent";
   cardBorderStyle: "none" | "subtle" | "bold";
   cardShadow: "none" | "light" | "medium" | "heavy";
-  cardBorderRadius: "none" | "sm" | "md" | "lg" | "xl";
+  cardBorderRadius: number;
   
   // Header Section
   headerVisible: boolean;
@@ -77,9 +78,10 @@ export interface SimpleWhiteProjectsCustomizationState {
   
   // Project Cards
   showImages: boolean;
-  imageAspectRatio: "square" | "video" | "portrait";
   imagePosition: "top" | "left" | "right";
   imageOverlay: boolean;
+  imageBorderRadius: number;
+  cardPadding: number;
   projectTitleSize: "sm" | "md" | "lg" | "xl";
   projectTitleWeight: "normal" | "medium" | "semibold" | "bold";
   projectTitleColor: "gray-900" | "gray-800" | "primary";
@@ -88,9 +90,8 @@ export interface SimpleWhiteProjectsCustomizationState {
   
   // Tech Stack
   techStackVisible: boolean;
-  techStackStyle: "badges" | "icons" | "text";
-  techStackLimit: 3 | 4 | 5 | 6;
-  techStackColor: "blue" | "green" | "purple" | "gray";
+  techStackStyle: "pills" | "badges" | "minimal" | "colorful";
+  techStackSize: "sm" | "md" | "lg";
   
   // Project Links
   linksVisible: boolean;
@@ -98,6 +99,7 @@ export interface SimpleWhiteProjectsCustomizationState {
   linksPosition: "bottom" | "top" | "overlay";
   githubLinkVisible: boolean;
   liveLinkVisible: boolean;
+  buttonSize: "sm" | "md" | "lg";
   
   // Hover Effects
   hoverEffects: boolean;
@@ -113,7 +115,7 @@ export interface SimpleWhiteProjectsCustomizationState {
 
 export interface SimpleWhiteExperienceCustomizationState {
   // Layout & Structure
-  layout: "timeline" | "cards" | "list";
+  layout: "timeline" | "cards";
   timelinePosition: "left" | "center" | "right";
   cardSpacing: "compact" | "normal" | "spacious";
   containerPadding: number;
@@ -138,6 +140,7 @@ export interface SimpleWhiteExperienceCustomizationState {
   
   // Timeline Settings
   timelineVisible: boolean;
+  timelinePosition: "center" | "left" | "right";
   timelineColor: "gray-300" | "gray-400" | "primary";
   timelineWidth: "thin" | "normal" | "thick";
   timelineDots: boolean;
@@ -181,7 +184,7 @@ export interface SimpleWhiteExperienceCustomizationState {
 export interface SimpleWhiteSkillsCustomizationState {
   // Layout & Structure
   layout: "grid" | "masonry" | "list" | "carousel";
-  gridColumns: 2 | 3 | 4 | 5 | 6 | 8;
+  gridColumns: 2 | 3 | 4 | 5 | 6;
   mobileColumns: 1 | 2 | 3;
   spacing: "compact" | "normal" | "spacious";
   containerPadding: number;
@@ -208,7 +211,6 @@ export interface SimpleWhiteSkillsCustomizationState {
   cardStyle: "minimal" | "elevated" | "outlined" | "filled";
   showIcons: boolean;
   iconSize: "sm" | "md" | "lg" | "xl";
-  iconStyle: "square" | "rounded" | "circular";
   showLabels: boolean;
   labelSize: "xs" | "sm" | "md" | "lg";
   labelWeight: "normal" | "medium" | "semibold" | "bold";
@@ -237,7 +239,6 @@ export interface SimpleWhiteSkillsCustomizationState {
   // Animations
   animationSpeed: "slow" | "normal" | "fast";
   staggerAnimation: boolean;
-  entranceAnimation: "fadeUp" | "slideIn" | "scaleUp" | "flipIn" | "none";
   
   // Filter & Search
   enableFiltering: boolean;
