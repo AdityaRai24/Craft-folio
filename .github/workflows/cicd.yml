@@ -40,6 +40,18 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
+      - name: Check disk space before cleanup
+        run: |
+          df -h
+          docker system df
+
+      - name: Clear npm cache and temp files
+        run: |
+          npm cache clean --force || true
+          rm -rf ~/.npm || true
+          rm -rf /tmp/* || true
+          rm -rf /var/tmp/* || true
+
       - name: Stop and remove all containers
         run: |
           docker stop $(docker ps -aq) || true
@@ -53,8 +65,39 @@ jobs:
         run: |
           docker system prune -af --volumes
 
+      - name: Clean up Docker build cache
+        run: |
+          docker builder prune -af
+
+      - name: Clear Docker cache directories
+        run: |
+          rm -rf /var/lib/docker/tmp/* || true
+          rm -rf /var/lib/docker/overlay2/* || true
+
+      - name: Check disk space after cleanup
+        run: |
+          df -h
+          docker system df
+
       - name: Pull image from docker hub
         run: docker pull adityarai24/craft-folio-app:latest
 
       - name: Run docker container
         run: docker run -d -p 3000:3000 --name craftfolio-container adityarai24/craft-folio-app
+
+  deploy-alternative:
+    needs: build
+    runs-on: self-hosted
+    if: failure()
+    steps:
+      - name: Emergency cleanup
+        run: |
+          docker system prune -af --volumes
+          docker builder prune -af
+          rm -rf /var/lib/docker/* || true
+          df -h
+
+      - name: Pull and run with minimal resources
+        run: |
+          docker pull adityarai24/craft-folio-app:latest
+          docker run -d -p 3000:3000 --name craftfolio-container --memory=512m --storage-opt size=1G adityarai24/craft-folio-app
