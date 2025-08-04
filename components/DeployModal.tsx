@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown, Globe } from "lucide-react";
+import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown, Globe, UserPlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from "@clerk/nextjs";
@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import Confetti from "react-confetti";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { useRouter } from "next/navigation";
+import { SignInButton } from "@clerk/nextjs";
 
 interface DeployModalProps {
   isOpen: boolean;
@@ -22,7 +23,7 @@ interface DeployModalProps {
 }
 
 const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLink }: DeployModalProps) => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
   const dispatch = useDispatch();
   const [isDeploying, setIsDeploying] = useState(false);
@@ -32,6 +33,9 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
   const [isDeployed, setIsDeployed] = useState(false);
   const [deployedUrl, setDeployedUrl] = useState("");
   const [activeTab, setActiveTab] = useState("slug");
+
+  // Check if user can deploy
+  const canDeploy = isLoaded && user;
 
   const validatePortfolioSlug = (slug: string) => {
     if (slug.length < 3 || slug.length > 30) {
@@ -508,34 +512,69 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                 </TabsContent>
 
                 {activeTab !== "custom" && (
-                  <motion.button
-                    className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
-                    style={{
-                      backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
-                      color: isDeploying ? ColorTheme.textSecondary : "#000",
-                      boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
-                      cursor: isDeploying ? "not-allowed" : "pointer"
-                    }}
-                    whileHover={{
-                      boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
-                      scale: isDeploying ? 1 : 1.02,
-                    }}
-                    whileTap={{ scale: isDeploying ? 1 : 0.98 }}
-                    onClick={handleDeploy}
-                    disabled={isDeploying}
-                  >
-                    {isDeploying ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Deploying...
-                      </>
-                    ) : (
-                      <>
-                        <Rocket className="h-4 w-4" />
-                        Deploy Portfolio
-                      </>
-                    )}
-                  </motion.button>
+                  canDeploy ? (
+                    <motion.button
+                      className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
+                      style={{
+                        backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
+                        color: isDeploying ? ColorTheme.textSecondary : "#000",
+                        boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
+                        cursor: isDeploying ? "not-allowed" : "pointer"
+                      }}
+                      whileHover={{
+                        boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                        scale: isDeploying ? 1 : 1.02,
+                      }}
+                      whileTap={{ scale: isDeploying ? 1 : 0.98 }}
+                      onClick={handleDeploy}
+                      disabled={isDeploying}
+                    >
+                      {isDeploying ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Deploying...
+                        </>
+                      ) : (
+                        <>
+                          <Rocket className="h-4 w-4" />
+                          Deploy Portfolio
+                        </>
+                      )}
+                    </motion.button>
+                  ) : (
+                    <div className="mt-6 p-4 rounded-lg border" style={{ 
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                      borderColor: 'rgba(16, 185, 129, 0.2)' 
+                    }}>
+                      <div className="flex items-start gap-3">
+                        <UserPlus className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-green-400 mb-1">Sign Up to Deploy</h4>
+                          <p className="text-sm mb-3" style={{ color: ColorTheme.textSecondary }}>
+                            Create a free account to deploy your portfolio and get access to all features including custom domains, analytics, and more.
+                          </p>
+                          <SignInButton mode="modal">
+                            <motion.button
+                              className="px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
+                              style={{
+                                backgroundColor: ColorTheme.primary,
+                                color: "#000",
+                                boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
+                              }}
+                              whileHover={{
+                                boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
+                                scale: 1.02,
+                              }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <UserPlus className="h-4 w-4" />
+                              Sign Up to Deploy
+                            </motion.button>
+                          </SignInButton>
+                        </div>
+                      </div>
+                    </div>
+                  )
                 )}
               </Tabs>
             ) : (

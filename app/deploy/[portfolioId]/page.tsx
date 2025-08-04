@@ -10,10 +10,12 @@ import {
   Linkedin,
   Facebook,
   Link2,
+  UserPlus,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from "@clerk/nextjs";
+import { SignInButton } from "@clerk/nextjs";
 import { deployPortfolio, checkUserSubdomain, getThemeNameApi } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import Confetti from "react-confetti";
@@ -806,50 +808,85 @@ const DeployPage = () => {
             </Tabs>
 
             {activeTab !== "custom" && !getExistingDeployment(activeTab as 'slug' | 'subdomain' | 'custom') && (
-              <motion.button
-                onClick={handleDeploy}
-                disabled={isDeploying}
-                className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
-                style={{
-                  backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
-                  color: isDeploying ? ColorTheme.textSecondary : "#000",
-                  boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
-                }}
-                whileHover={{
-                  boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
-                  scale: isDeploying ? 1 : 1.02,
-                }}
-                whileTap={{ scale: isDeploying ? 1 : 0.98 }}
-              >
-                {isDeploying ? (
-                  <>
-                    <div className="animate-spin">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          fill="none"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
+              user ? (
+                <motion.button
+                  onClick={handleDeploy}
+                  disabled={isDeploying}
+                  className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
+                  style={{
+                    backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
+                    color: isDeploying ? ColorTheme.textSecondary : "#000",
+                    boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
+                  }}
+                  whileHover={{
+                    boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                    scale: isDeploying ? 1 : 1.02,
+                  }}
+                  whileTap={{ scale: isDeploying ? 1 : 0.98 }}
+                >
+                  {isDeploying ? (
+                    <>
+                      <div className="animate-spin">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      </div>
+                      Deploying...
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-4 w-4" />
+                      Deploy Portfolio
+                    </>
+                  )}
+                </motion.button>
+              ) : (
+                <div className="mt-6 p-4 rounded-lg border" style={{ 
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                  borderColor: 'rgba(16, 185, 129, 0.2)' 
+                }}>
+                  <div className="flex items-start gap-3">
+                    <UserPlus className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-green-400 mb-1">Sign Up to Deploy</h4>
+                      <p className="text-sm mb-3" style={{ color: ColorTheme.textSecondary }}>
+                        Create a free account to deploy your portfolio and get access to all features including custom domains, analytics, and more.
+                      </p>
+                      <SignInButton mode="modal">
+                        <motion.button
+                          className="px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
+                          style={{
+                            backgroundColor: ColorTheme.primary,
+                            color: "#000",
+                            boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
+                          }}
+                          whileHover={{
+                            boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
+                            scale: 1.02,
+                          }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <UserPlus className="h-4 w-4" />
+                          Sign Up to Deploy
+                        </motion.button>
+                      </SignInButton>
                     </div>
-                    Deploying...
-                  </>
-                ) : (
-                  <>
-                    <Rocket className="h-4 w-4" />
-                    Deploy Portfolio
-                  </>
-                )}
-              </motion.button>
+                  </div>
+                </div>
+              )
             )}
           </div>
         </div>
