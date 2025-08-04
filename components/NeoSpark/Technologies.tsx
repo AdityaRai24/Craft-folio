@@ -538,7 +538,7 @@ const Technologies = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       <style>{customCSS}</style>
 
       <SectionHeader
-        sectionName="project"
+        sectionName="technologies"
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         titleColor={titleColor}
