@@ -4,102 +4,27 @@ import { RootState } from "@/store/store";
 import { setCurrentEdit } from "@/slices/editModeSlice";
 import { supabase } from "@/lib/supabase-client";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
 import { Switch } from "@/components/ui/switch";
 import { ColorTheme } from "@/lib/colorThemes";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
+import MagicWrite from "@/components/MagicWrite";
 import {
-  Settings,
   RotateCcw,
   Grid3X3,
-  Type,
-  Move,
-  Zap,
-  Eye,
-  Clock,
+  Type, Clock,
   MapPin,
   Building,
   Calendar,
-  X,
+  X
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-// Visual Layout Selector Component
-const LayoutSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; icon: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">{label}</label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, icon }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="text-center text-lg text-white mb-1">{icon}</div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Size Selector Component
-const SizeSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; size: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">{label}</label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, size }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div
-                className="rounded text-white text-center font-bold"
-                style={{ 
-                  fontSize: size,
-                  color: ColorTheme.primary
-                }}
-              >
-                Aa
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 
 
-// Visual Tech Stack Style Selector Component
+
 const TechStackStyleSelector: React.FC<{
   value: "pills" | "badges" | "minimal" | "colorful";
   onChange: (value: "pills" | "badges" | "minimal" | "colorful") => void;
@@ -161,35 +86,6 @@ const TechStackStyleSelector: React.FC<{
   );
 };
 
-// Visual Spacing Selector Component
-const SpacingSelector: React.FC<{
-  value: number;
-  onChange: (value: number) => void;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-}> = ({ value, onChange, label, min, max, step }) => {
-  return (
-    <div>
-      <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-        {label}: {value}px
-      </label>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-        style={{
-          background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(value / max) * 100}%, #3f3f46 ${(value / max) * 100}%, #3f3f46 100%)`
-        }}
-      />
-    </div>
-  );
-};
 
 interface CustomizationState {
   // Layout & Structure
@@ -268,6 +164,64 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
   const sectionDescription =
     experienceSection?.sectionDescription ||
     "Building real-world experience through innovative projects";
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this experience description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "experience-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (experienceIndex: number, newDescription: string) => {
+    try {
+      const updatedExperience = [...experienceData];
+      updatedExperience[experienceIndex] = {
+        ...updatedExperience[experienceIndex],
+        description: newDescription
+      };
+      setExperienceData(updatedExperience);
+      
+      // Save to database
+      const result = await updateSection({
+        sectionName: "experience",
+        portfolioId,
+        sectionContent: updatedExperience,
+        sectionTitle: "Experience",
+        sectionDescription: "Experience section"
+      });
+      
+      if (result.success) {
+        toast.success("Experience description enhanced and saved successfully!");
+      } else {
+        toast.error("Failed to save changes to database");
+      }
+    } catch (error) {
+      console.error("Error saving experience description:", error);
+      toast.error("Failed to save changes to database");
+    }
+  };
 
   const [experienceData, setExperienceData] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -612,91 +566,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     return variants[effectiveCustomization.entranceAnimation];
   };
 
-  // Render control components
-  const renderSelect = (
-    label: string,
-    value: string,
-    options: string[],
-    onChange: (value: string) => void
-  ) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
-        {label}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option.charAt(0).toUpperCase() + option.slice(1)}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
 
-  const renderSlider = (
-    label: string,
-    value: number,
-    min: number,
-    max: number,
-    step: number = 1,
-    onChange: (value: number) => void
-  ) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
-        {label}: {value}
-      </label>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-      />
-    </div>
-  );
-
-  const renderToggle = (
-    label: string,
-    value: boolean,
-    onChange: (value: boolean) => void
-  ) => (
-    <div className="mb-4 flex items-center justify-between">
-      <label className="text-sm font-medium text-gray-300">{label}</label>
-      <Switch checked={value} onCheckedChange={onChange} />
-    </div>
-  );
-
-  const renderColorPicker = (
-    label: string,
-    value: string,
-    onChange: (value: string) => void
-  ) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-300 mb-2">
-        {label}
-      </label>
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-8 h-8 rounded border border-zinc-600 cursor-pointer"
-        />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-    </div>
-  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -932,9 +802,25 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                     )}
                   </div>
 
-                  <p className={getDescriptionClasses()}>
-                    {experience.description}
-                  </p>
+                  <div className="relative">
+                    <p className={getDescriptionClasses()}>
+                      {experience.description}
+                    </p>
+                    {/* Magic Write Button */}
+                    <div className="absolute -top-2 -right-2 z-10">
+                      <MagicWrite
+                        onMagicWrite={async (prompt: string, context?: string) => {
+                          const enhancedDescription = await handleMagicWrite(prompt, experience.description);
+                          handleDescriptionUpdate(index, enhancedDescription);
+                          return enhancedDescription;
+                        }}
+                        placeholder="Enhance this experience description..."
+                        buttonText=""
+                        context={experience.description}
+                        className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                      />
+                    </div>
+                  </div>
 
                   {customization.techStackVisible &&
                     experience.techStack &&
@@ -1266,7 +1152,6 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                                   className="rounded text-white text-center font-bold"
                                   style={{ 
                                     fontSize: size,
-                                    color: ColorTheme.primary
                                   }}
                                 >
                                   Aa
@@ -1337,7 +1222,6 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                                   className="rounded text-white text-center font-bold"
                                   style={{ 
                                     fontSize: size,
-                                    color: ColorTheme.primary
                                   }}
                                 >
                                   Aa
@@ -1372,11 +1256,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                                   className="rounded text-white text-center font-bold"
                                   style={{ 
                                     fontSize: size,
-                                    color: ColorTheme.primary
                                   }}
                                 >
                                   Aa
-                                </div>
+                                </div>  
                               </div>
                               <div className="text-center text-xs text-white">{label}</div>
                             </div>
@@ -1431,8 +1314,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                                   <div
                                     className="rounded text-white text-center font-bold"
                                     style={{ 
-                                      fontSize: size,
-                                      color: ColorTheme.primary
+                                      fontSize: size
                                     }}
                                   >
                                     Aa

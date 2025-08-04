@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import EditButton from '@/components/EditButton';
 
-const Navbar = ({ currentPortTheme, customCSS }: any) => {
+const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -106,13 +106,13 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
 
   const spring = {
     type: "spring",
-    damping: 50,
-    stiffness: 250,
+    damping: 40,
+    stiffness: 300,
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 20);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -127,17 +127,18 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
 
   return (
     <motion.div
-      className={`flex items-center justify-between mx-auto backdrop-blur-3xl z-50 bg-black/10 rounded-lg border ${
-        scrolled ? "w-4/5 border-gray-300/20 text-white" : "w-full"
+      className={`flex items-center justify-between mx-auto z-50 rounded-lg border transition-all duration-300 ${
+        scrolled ? "w-[95%] sm:w-4/5 border-gray-300/20 text-white backdrop-blur-xl bg-black/30" : "w-full backdrop-blur-sm bg-black/10"
       }`}
       layout
       transition={spring}
       style={{
         position: "sticky",
-        top: scrolled ? "1rem" : "0",
-        padding: scrolled ? "0.75rem" : "1.25rem",
-        height: scrolled ? "4rem" : "5rem",
-        boxShadow: scrolled ? "0 2px 10px rgba(0,0,0,0.1)" : "none",
+        top: scrolled ? "0.5rem" : "0",
+        padding: scrolled ? "0.5rem" : "1rem",
+        height: scrolled ? "3.5rem" : "4rem",
+        boxShadow: scrolled ? "0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(0,0,0,0.2)" : "none",
+        ...(backgroundTheme && getBackgroundStyle ? getBackgroundStyle() : {}),
       }}
     >
       <style>{customCSS}</style>
@@ -153,7 +154,7 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
               marginRight: scrolled ? 0 : "1rem",
             }}
           >
-            <h1 className="text-2xl font-semibold tracking-wide whitespace-nowrap">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-semibold tracking-wide whitespace-nowrap">
               {heroData?.name}
             </h1>
           </motion.div>
@@ -239,8 +240,8 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
 
             <motion.div layout transition={spring} className="md:hidden">
               <Menu
-                className="cursor-pointer ml-4"
-                size={24}
+                className="cursor-pointer ml-2 sm:ml-4"
+                size={20}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               />
             </motion.div>
@@ -251,17 +252,21 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden absolute top-full right-0 left-0 bg-black/90 backdrop-blur-3xl p-4 flex flex-col gap-4 border-t border-white/10"
+            className="md:hidden absolute top-full right-0 left-0 backdrop-blur-xl p-3 sm:p-4 flex flex-col gap-3 sm:gap-4 border-t border-white/10"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
+            style={{
+              ...(backgroundTheme && getBackgroundStyle ? getBackgroundStyle() : {}),
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+            }}
           >
             {navItems.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="text-gray-400 hover:text-white p-2 transition duration-200 ease-in"
+                className="text-gray-400 hover:text-white p-2 transition duration-200 ease-in text-sm sm:text-base"
                 onClick={e => {
                   const section = document.getElementById(item.href.replace('#', ''));
                   if (section) {
@@ -274,14 +279,14 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
                 {item.name}
               </a>
             ))}
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-3 sm:gap-4 mt-2">
               <a
                 href={userInfo?.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-green-300"
               >
-                <GithubIcon size={20} />
+                <GithubIcon size={18} />
               </a>
               <a
                 href={userInfo?.linkedin}
@@ -289,14 +294,14 @@ const Navbar = ({ currentPortTheme, customCSS }: any) => {
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-green-300"
               >
-                <LinkedinIcon size={20} />
+                <LinkedinIcon size={18} />
               </a>
               <Button
                 onClick={handleResumeDownload}
                 style={{ background: buttonBgColor, color: buttonTextColor }}
                 className="px-2 py-1 rounded-md cursor-pointer flex items-center gap-1 font-medium text-xs"
               >
-                <PaperclipIcon size={16} /> Resume
+                <PaperclipIcon size={14} /> Resume
               </Button>
             </div>
           </motion.div>

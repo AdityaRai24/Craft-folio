@@ -21,6 +21,7 @@ import {
   AlignRight,
   Eye,
   Type,
+  Send,
 } from "lucide-react";
 import Projects from "./Projects";
 import Navbar from "./Navbar";
@@ -42,7 +43,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HeaderComponent } from "./Components";
 import { toast } from "react-hot-toast";
 import { Switch } from "@/components/ui/switch";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
+import MagicWrite from "@/components/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 
 // Helper function to convert hex to rgba
@@ -62,6 +64,7 @@ function hexToRgba(hex: string, alpha: number): string {
 // Customization interface for Hero component
 interface CustomizationState {
   // Profile Settings
+  showProfileImage: boolean;
   profileImageSize: number;
   profileImageBorder: boolean;
   profileImageBorderWidth: number;
@@ -100,6 +103,7 @@ interface CustomizationState {
 
 // Default styles for Hero (current LumenFlow style)
 const defaultHeroStyles: CustomizationState = {
+  showProfileImage: true,
   profileImageSize: 160,
   profileImageBorder: true,
   profileImageBorderWidth: 4,
@@ -200,6 +204,7 @@ const MobileProfileCard = ({
   contactData,
   theme,
   themeClasses,
+  effectiveCustomization,
 }: any) => (
   <div className="block lg:hidden w-full mx-auto ">
     <div
@@ -213,93 +218,119 @@ const MobileProfileCard = ({
       <div className="p-4">
         {/* Top Section: Profile Image and Social Links */}
         <div className="flex items-center justify-between mb-3">
-          {/* Profile Image */}
-          <div className="flex-shrink-0">
-            <div className={`w-24 h-24 rounded-full border-2 ${
-              theme === "light"
-                ? "border-orange-500/50 bg-gray-50"
-                : "border-orange-500/50 bg-gray-800"
-            } overflow-hidden shadow-lg`}>
-              <img
-                src={
-                  contactData?.profileImage ||
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                }
-                alt={contactData?.name || "Profile"}
-                className="w-full h-full object-cover"
-              />
+          {/* Profile Image - Only show if enabled */}
+          {effectiveCustomization.showProfileImage && (
+            <div className="flex-shrink-0">
+              <div 
+                className={`rounded-full overflow-hidden shadow-lg ${
+                  theme === "light"
+                    ? "bg-gray-50"
+                    : "bg-gray-800"
+                }`}
+                style={{
+                  width: `${Math.min(effectiveCustomization.profileImageSize, 96)}px`,
+                  height: `${Math.min(effectiveCustomization.profileImageSize, 96)}px`,
+                  border: effectiveCustomization.profileImageBorder 
+                    ? `${effectiveCustomization.profileImageBorderWidth}px solid ${
+                        theme === "light" ? "#f97316" : "#f97316"
+                      }` 
+                    : "none",
+                }}
+              >
+                <img
+                  src={
+                    contactData?.profileImage ||
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+                  }
+                  alt={contactData?.name || "Profile"}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contact Info */}
-          <div className="flex flex-wrap items-center justify-end gap-2 max-w-[60%]">
-            {contactData?.github && (
-              <a
-                href={contactData.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                  theme === "light"
-                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                }`}
-              >
-                <Github size={16} />
-              </a>
-            )}
-            {contactData?.linkedin && (
-              <a
-                href={contactData.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                  theme === "light"
-                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                }`}
-              >
-                <Linkedin size={16} />
-              </a>
-            )}
-            {contactData?.email && (
-              <a
-                href={`mailto:${contactData.email}`}
-                className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                  theme === "light"
-                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                }`}
-              >
-                <Mail size={16} />
-              </a>
-            )}
-            {contactData?.location && (
-              <div
-                className={`rounded-full p-2 ${
-                  theme === "light"
-                    ? "bg-gray-50 text-gray-700"
-                    : "bg-gray-800/80 text-gray-300"
-                }`}
-              >
-                <MapPin size={16} />
-              </div>
-            )}
-          </div>
+          {effectiveCustomization.socialLinksVisible && (
+            <div className="flex flex-wrap items-center justify-end gap-2 max-w-[60%]">
+              {contactData?.github && (
+                <a
+                  href={contactData.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
+                    theme === "light"
+                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                  }`}
+                >
+                  <Github size={16} />
+                </a>
+              )}
+              {contactData?.linkedin && (
+                <a
+                  href={contactData.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
+                    theme === "light"
+                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                  }`}
+                >
+                  <Linkedin size={16} />
+                </a>
+              )}
+              {contactData?.email && (
+                <a
+                  href={`mailto:${contactData.email}`}
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
+                    theme === "light"
+                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                  }`}
+                >
+                  <Mail size={16} />
+                </a>
+              )}
+              {contactData?.location && (
+                <div
+                  className={`rounded-full p-2 ${
+                    theme === "light"
+                      ? "bg-gray-50 text-gray-700"
+                      : "bg-gray-800/80 text-gray-300"
+                  }`}
+                >
+                  <MapPin size={16} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Profile Information */}
-        <div className="space-y-1">
+        <div className={`space-y-1 ${!effectiveCustomization.showProfileImage ? 'text-center' : ''}`}>
           <div
-            className={`text-lg font-bold leading-tight ${
+            className={`font-bold leading-tight ${
               theme === "light" ? "text-gray-900" : "text-white"
+            } ${
+              effectiveCustomization.showProfileImage 
+                ? (effectiveCustomization.nameSize === "sm" ? "text-base" : 
+                   effectiveCustomization.nameSize === "md" ? "text-lg" :
+                   effectiveCustomization.nameSize === "lg" ? "text-xl" : "text-2xl")
+                : "text-2xl"
             }`}
           >
             {contactData?.name || "Your Name"}
           </div>
 
           <div
-            className={`text-sm font-medium ${
+            className={`font-medium ${
               theme === "light" ? "text-orange-600" : "text-orange-400"
+            } ${
+              effectiveCustomization.showProfileImage 
+                ? (effectiveCustomization.titleSize === "sm" ? "text-xs" : 
+                   effectiveCustomization.titleSize === "md" ? "text-sm" : "text-base")
+                : "text-base"
             }`}
           >
             {heroData?.title || "Your Title"}
@@ -364,6 +395,62 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          context: context || ""
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Magic Write API error');
+      }
+
+      const data = await response.json();
+      return data.result || context || "";
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      toast.error('Failed to enhance text');
+      return context || "";
+    }
+  };
+
+  const handleHeroDescriptionUpdate = async (newDescription: string) => {
+    try {
+      // Update the hero data with the new description
+      const updatedHeroData = {
+        ...heroData,
+        longSummary: newDescription
+      };
+      setHeroData(updatedHeroData);
+      
+      // Save to database
+      const result = await updateSection({
+        sectionName: "hero",
+        portfolioId,
+        sectionContent: updatedHeroData,
+        sectionTitle: "Hero",
+        sectionDescription: "Hero section"
+      });
+      
+      if (result.success) {
+        toast.success("Hero description enhanced and saved successfully!");
+      } else {
+        toast.error("Failed to save changes to database");
+      }
+    } catch (error) {
+      console.error("Error saving hero description:", error);
+      toast.error("Failed to save changes to database");
+    }
+  };
 
   // Comprehensive customization state
   const [customization, setCustomization] = useState<CustomizationState>(defaultHeroStyles);
@@ -538,7 +625,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
       default:
         return (
           <motion.div
-            className="space-y-4  md:space-y-8 max-h-screen overflow-y-auto scrollbar-none md:px-4"
+            className="space-y-4 md:space-y-6 lg:space-y-8 max-h-screen overflow-hidden scrollbar-none px-4 md:px-6 lg:px-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
@@ -550,27 +637,16 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 contactData={contactData}
                 theme={theme}
                 themeClasses={themeClasses}
+                effectiveCustomization={effectiveCustomization}
               />
             </div>
-            {/* Visual Editor Button */}
-            <div className="absolute top-4 right-4 z-20">
-              <button
-                onClick={openVisualEditor}
-                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              >
-                <Settings className="h-4 w-4" />
-                Visual Editor
-              </button>
-            </div>
-
             <HeaderComponent
               currentTheme={currentTheme}
               sectionTitle="About Me"
               sectionDescription="Discover my journey, skills, and passion for creating amazing digital experiences."
               sectionName="hero"
+              openVisualEditor={openVisualEditor}
+              visualEditorOpen={visualEditorOpen}
             />
 
             {/* Main Content Cards */}
@@ -585,8 +661,8 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 className="group relative overflow-hidden"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                whileHover={{ y: -2 }}
+                transition={{ duration: effectiveCustomization.animationSpeed / 1000, delay: 0.6 }}
+                whileHover={effectiveCustomization.hoverEffects ? { y: -2 } : {}}
               >
                 <div
                   className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
@@ -595,15 +671,22 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 <div
                   className={`relative ${
                     theme === "light"
-                      ? "bg-white shadow-xl border-gray-200/60"
+                      ? "bg-white border-gray-200/60"
                       : "bg-transparent"
-                  } rounded-2xl overflow-hidden border transition-all duration-500 transform group-hover:translate-y-[-2px]`}
+                  } overflow-hidden border transition-all duration-500 transform ${
+                    effectiveCustomization.hoverEffects ? "group-hover:translate-y-[-2px]" : ""
+                  }`}
                   style={{
                     borderColor:
                       theme === "light" ? "rgba(0,0,0,0.08)" : undefined,
+                    borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+                    padding: `${effectiveCustomization.cardPadding}px`,
+                    boxShadow: effectiveCustomization.cardShadow 
+                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8}px rgba(0, 0, 0, 0.1)` 
+                      : undefined,
                   }}
                 >
-                  <div className="p-8 space-y-6">
+                  <div className="space-y-6">
                     <div className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
                         <motion.div
@@ -636,35 +719,40 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                         >
                           My Story
                         </motion.h3>
-                        <motion.p
-                          className={` hidden md:block text-base leading-relaxed ${
-                            theme === "dark" ? "text-gray-300" : "text-gray-700"
-                          }`}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: 0.8 }}
-                        >
-                          {heroData?.longSummary || "No description available"}
-                        </motion.p>
+                        <div className="relative">
+                          <motion.p
+                            className={` hidden md:block text-base leading-relaxed ${
+                              theme === "dark" ? "text-gray-300" : "text-gray-700"
+                            }`}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.8 }}
+                          >
+                            {heroData?.longSummary || "No description available"}
+                          </motion.p>
+                          <div className="absolute -top-1 -right-1 z-10">
+                            <MagicWrite
+                              onMagicWrite={async (prompt: string, context?: string) => {
+                                const enhancedDescription = await handleMagicWrite(prompt, heroData?.longSummary || "No description available");
+                                handleHeroDescriptionUpdate(enhancedDescription);
+                                return enhancedDescription;
+                              }}
+                              placeholder="Enhance this description..."
+                              buttonText=""
+                              context={heroData?.longSummary || "No description available"}
+                              className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <motion.p
-                      className={`block md:hidden text-justify text-base leading-relaxed ${
-                        theme === "dark" ? "text-gray-300" : "text-gray-700"
-                      }`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.8 }}
-                    >
-                      {heroData?.longSummary || "No description available"}
-                    </motion.p>
+                    
                   </div>
                   <div
-                    className={`absolute left-0 top-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                      theme === "light"
-                        ? "bg-gradient-to-b from-orange-500 to-orange-600"
-                        : "bg-gradient-to-b from-orange-400 to-purple-600"
-                    }`}
+                    className="absolute left-0 top-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: `linear-gradient(to bottom, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                    }}
                   ></div>
                 </div>
               </motion.div>
@@ -674,8 +762,8 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 className="group relative overflow-hidden"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-                whileHover={{ y: -2 }}
+                transition={{ duration: effectiveCustomization.animationSpeed / 1000, delay: 0.8 }}
+                whileHover={effectiveCustomization.hoverEffects ? { y: -2 } : {}}
               >
                 <div
                   className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
@@ -684,15 +772,22 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 <div
                   className={`relative ${
                     theme === "light"
-                      ? "bg-white shadow-xl border-gray-200/60"
+                      ? "bg-white border-gray-200/60"
                       : "backdrop-blur-sm"
-                  } rounded-2xl overflow-hidden border transition-all duration-500 transform group-hover:translate-y-[-2px]`}
+                  } overflow-hidden border transition-all duration-500 transform ${
+                    effectiveCustomization.hoverEffects ? "group-hover:translate-y-[-2px]" : ""
+                  }`}
                   style={{
                     borderColor:
                       theme === "light" ? "rgba(0,0,0,0.08)" : undefined,
+                    borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+                    padding: `${effectiveCustomization.cardPadding}px`,
+                    boxShadow: effectiveCustomization.cardShadow 
+                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8}px rgba(0, 0, 0, 0.1)` 
+                      : undefined,
                   }}
                 >
-                  <div className="p-8 space-y-6">
+                  <div className="space-y-6">
                     <div className="md:flex items-center justify-between">
                       <div className="space-y-4 mb-4 md:mb-0">
                         <motion.h3
@@ -729,7 +824,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                           href={contactData?.resumeLink || contactData?.resumeLink || undefined}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex cursor-pointer items-center space-x-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/25 hover:scale-105 group"
+                          className="inline-flex cursor-pointer items-center space-x-3 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/25 hover:scale-105 group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           initial={{ opacity: 0, scale: 0.8 }}
@@ -852,32 +947,35 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
       )}
 
       {/* Gradient Overlay with controlled color opacity */}
-      <motion.div
-        className="fixed inset-0 z-0"
-        style={{
-          display: theme === "light" ? "none" : "block",
-          backgroundColor: theme === "dark" ? "#05020A" : "#ffffff",
-          background: `
-            radial-gradient(
-              at 50% 0%, 
-              ${hexToRgba(
-                themeClasses.gradientPrimary.split(", ")[1].split(" ")[0],
-                theme === "dark" ? 0.23 : 0.4
-              )} 0%, 
-              transparent 70%
-            )
-          `,
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      />
+      {effectiveCustomization.gradientOverlay && (
+        <motion.div
+          className="fixed inset-0 z-0"
+          style={{
+            display: theme === "light" ? "none" : "block",
+            backgroundColor: theme === "dark" ? "#05020A" : "#ffffff",
+            background: `
+              radial-gradient(
+                at 50% 0%, 
+                ${hexToRgba(
+                  themeClasses.gradientPrimary.split(", ")[1].split(" ")[0],
+                  theme === "dark" ? 0.23 : 0.4
+                )} 0%, 
+                transparent 70%
+              )
+            `,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        />
+      )}
 
       <div className="container mx-auto px-4 lg:px-8 max-w-[1600px]">
         <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
           {/* Sidebar Profile Card (hidden on mobile, left on desktop) */}
           <motion.div
-            className="hidden lg:block w-full max-w-xs mt-16 flex-shrink-0 sticky h-fit"
+            className="hidden lg:block mt-16 flex-shrink-0 sticky h-fit"
+            style={{ width: `${effectiveCustomization.sidebarWidth}px` }}
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -885,59 +983,87 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
             <div
               className={`relative p-6 rounded-2xl border transition-all duration-300 ${
                 theme === "light"
-                  ? "bg-white/80 backdrop-blur-sm shadow-2xl border-gray-200/50"
-                  : "backdrop-blur-md"
+                  ? "bg-white/80 shadow-2xl border-gray-200/50"
+                  : ""
+              } ${
+                effectiveCustomization.backgroundBlur ? "backdrop-blur-md" : ""
               }`}
+              style={{
+                backdropFilter: effectiveCustomization.backgroundBlur 
+                  ? `blur(${effectiveCustomization.blurIntensity}px)` 
+                  : undefined,
+              }}
             >
               <div className="absolute -inset-1 rounded-2xl opacity-50 blur-xl"></div>
 
               <div className="relative z-10">
-                <motion.div
-                  className="relative mb-6"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  {/* Profile Image with Enhanced Styling */}
-                  <div className="relative w-40 h-40 block mx-auto">
-                    <div
-                      className={`absolute -inset-2 rounded-full opacity-20 blur-lg ${
-                        theme === "light" ? "opacity-30" : ""
-                      }`}
-                      style={{ background: themeClasses.gradientPrimary }}
-                    ></div>
-                    <motion.div
-                      className={`relative w-full h-full rounded-full overflow-hidden border-4 shadow-2xl ${
-                        theme === "light"
-                          ? "border-white shadow-orange-100/50"
-                          : "border-gray-600/50"
-                      }`}
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: "spring", stiffness: 300 }}
+                {/* Profile Image with Enhanced Styling - Only show if enabled */}
+                {effectiveCustomization.showProfileImage && (
+                  <motion.div
+                    className="relative mb-6"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    <div 
+                      className="relative block mx-auto"
+                      style={{
+                        width: `${effectiveCustomization.profileImageSize}px`,
+                        height: `${effectiveCustomization.profileImageSize}px`
+                      }}
                     >
-                      <img
-                        src={
-                          contactData?.profileImage ||
-                          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                        }
-                        alt={contactData?.name || "Profile"}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                    </motion.div>
-                  </div>
-                </motion.div>
+                      <div
+                        className={`absolute -inset-2 rounded-full opacity-20 blur-lg ${
+                          theme === "light" ? "opacity-30" : ""
+                        }`}
+                        style={{ background: themeClasses.gradientPrimary }}
+                      ></div>
+                      <motion.div
+                        className={`relative w-full h-full rounded-full overflow-hidden shadow-2xl ${
+                          theme === "light"
+                            ? "border-white shadow-orange-100/50"
+                            : "border-gray-600/50"
+                        }`}
+                        style={{
+                          border: effectiveCustomization.profileImageBorder 
+                            ? `${effectiveCustomization.profileImageBorderWidth}px solid ${
+                                theme === "light" ? "#ffffff" : "rgba(75, 85, 99, 0.5)"
+                              }` 
+                            : "none",
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        <img
+                          src={
+                            contactData?.profileImage ||
+                            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+                          }
+                          alt={contactData?.name || "Profile"}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
 
-                {/* Name and Title */}
+                {/* Name and Title - Larger when profile image is hidden */}
                 <motion.div
-                  className="space-y-1 mb-6 text-center"
+                  className={`space-y-1 mb-6 text-center ${!effectiveCustomization.showProfileImage ? 'py-8' : ''}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
                 >
                   <motion.h1
-                    className={`text-xl font-bold ${
+                    className={`font-bold ${
                       theme === "light" ? "text-gray-900" : ""
+                    } ${
+                      effectiveCustomization.showProfileImage 
+                        ? (effectiveCustomization.nameSize === "sm" ? "text-lg" : 
+                           effectiveCustomization.nameSize === "md" ? "text-xl" :
+                           effectiveCustomization.nameSize === "lg" ? "text-2xl" : "text-3xl")
+                        : "text-3xl"
                     }`}
                     style={{
                       color:
@@ -952,8 +1078,13 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                     {heroData?.name || "Your Name"}
                   </motion.h1>
                   <motion.p
-                    className={`text-sm leading-relaxed max-w-xs mx-auto ${
+                    className={`leading-relaxed max-w-xs mx-auto ${
                       theme === "light" ? "text-gray-600" : ""
+                    } ${
+                      effectiveCustomization.showProfileImage 
+                        ? (effectiveCustomization.titleSize === "sm" ? "text-xs" : 
+                           effectiveCustomization.titleSize === "md" ? "text-sm" : "text-base")
+                        : "text-lg"
                     }`}
                     style={{
                       color:
@@ -970,12 +1101,13 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                 </motion.div>
 
                 {/* Social Links */}
-                <motion.div
-                  className="space-y-2 w-full pt-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
-                >
+                {effectiveCustomization.socialLinksVisible && (
+                  <motion.div
+                    className="space-y-2 w-full pt-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                  >
                   {/* GitHub */}
                   {contactData?.github && (
                     <motion.a
@@ -1297,6 +1429,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                     </motion.div>
                   )}
                 </motion.div>
+                )}
 
                 <div className="absolute -right-24 top-8">
                   <EditButton
@@ -1312,7 +1445,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
           <div className="flex-1 w-full">
             {/* Navbar always at the top */}
             <motion.div
-              className="sticky top-0 z-50 w-full flex justify-center md:px-4 pt-8 pb-4"
+              className="sticky top-0 z-5 w-full flex justify-center md:px-4 pt-8 pb-4"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
@@ -1350,7 +1483,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -1359,15 +1492,15 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Hero Settings</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Hero Settings</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -1377,7 +1510,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveEditorTab(tab as any)}
-                className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                   activeEditorTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -1399,38 +1532,30 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
             {activeEditorTab === "layout" && (
               <>
-                <CustomSlider
-                  value={draftCustomization?.profileImageSize ?? customization.profileImageSize}
-                  onChange={(value) => updateDraftCustomization("profileImageSize", value)}
-                  label="Profile Image Size"
-                  min={120}
-                  max={200}
-                  step={10}
-                  unit="px"
-                />
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">Show Profile Image</span>
+                  <Switch
+                    checked={draftCustomization?.showProfileImage ?? customization.showProfileImage}
+                    onCheckedChange={(checked) =>
+                      updateDraftCustomization("showProfileImage", checked)
+                    }
+                  />
+                </div>
 
-                <CustomSlider
-                  value={draftCustomization?.sidebarWidth ?? customization.sidebarWidth}
-                  onChange={(value) => updateDraftCustomization("sidebarWidth", value)}
-                  label="Sidebar Width"
-                  min={280}
-                  max={400}
-                  step={20}
-                  unit="px"
-                />
-
-                <CustomSlider
-                  value={draftCustomization?.cardSpacing ?? customization.cardSpacing}
-                  onChange={(value) => updateDraftCustomization("cardSpacing", value)}
-                  label="Card Spacing"
-                  min={4}
-                  max={16}
-                  step={2}
-                  unit="px"
-                />
+                {(draftCustomization?.showProfileImage ?? customization.showProfileImage) && (
+                  <CustomSlider
+                    value={draftCustomization?.profileImageSize ?? customization.profileImageSize}
+                    onChange={(value) => updateDraftCustomization("profileImageSize", value)}
+                    label="Profile Image Size"
+                    min={120}
+                    max={200}
+                    step={10}
+                    unit="px"
+                  />
+                )}
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">Social Links Visible</span>
@@ -1458,8 +1583,31 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                       <div
                         key={value}
                         onClick={() => updateDraftCustomization("nameSize", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                           (draftCustomization?.nameSize ?? customization.nameSize) === value
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        }`}
+                      >
+                        <div className="text-center text-sm text-white">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white font-medium mb-3">Title Size</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "sm", label: "Small" },
+                      { value: "md", label: "Medium" },
+                      { value: "lg", label: "Large" },
+                    ].map(({ value, label }) => (
+                      <div
+                        key={value}
+                        onClick={() => updateDraftCustomization("titleSize", value)}
+                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
+                          (draftCustomization?.titleSize ?? customization.titleSize) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
@@ -1490,15 +1638,17 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                   unit="px"
                 />
 
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Profile Border</span>
-                  <Switch
-                    checked={draftCustomization?.profileImageBorder ?? customization.profileImageBorder}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("profileImageBorder", checked)
-                    }
-                  />
-                </div>
+                {(draftCustomization?.showProfileImage ?? customization.showProfileImage) && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-white font-medium">Profile Border</span>
+                    <Switch
+                      checked={draftCustomization?.profileImageBorder ?? customization.profileImageBorder}
+                      onCheckedChange={(checked) =>
+                        updateDraftCustomization("profileImageBorder", checked)
+                      }
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">Card Shadow</span>
@@ -1565,23 +1715,33 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
                     }
                   />
                 </div>
+
+                <CustomSlider
+                  value={draftCustomization?.shadowIntensity ?? customization.shadowIntensity}
+                  onChange={(value) => updateDraftCustomization("shadowIntensity", value)}
+                  label="Shadow Intensity"
+                  min={1}
+                  max={5}
+                  step={1}
+                  unit=""
+                />
               </>
             )}
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
@@ -1600,6 +1760,8 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+
     </motion.div>
   );
 };

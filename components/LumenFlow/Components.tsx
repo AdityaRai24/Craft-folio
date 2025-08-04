@@ -1,22 +1,25 @@
 import { motion } from "framer-motion";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
-import { User } from "lucide-react";
+import { User, Settings } from "lucide-react";
 import EditButton from '@/components/EditButton';
 
 const HeaderComponent = ({
   currentTheme,
   sectionTitle,
   sectionDescription,
-  sectionName
+  sectionName,
+  openVisualEditor,
+  visualEditorOpen
 }: {
   currentTheme: string;
   sectionTitle: string;
   sectionDescription: string;
-  sectionName : string;
+  sectionName: string;
+  openVisualEditor?: () => void;
+  visualEditorOpen?: boolean;
 }) => {
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
-
 
   return (
     <motion.div
@@ -59,11 +62,25 @@ const HeaderComponent = ({
                 {sectionTitle || "About me"}
               </motion.h2>
               </motion.div>
-              <EditButton
-                sectionName={sectionName}
-                divStyles="ml-auto"
-                styles={` ${theme === "light" ? "text-gray-700" : ""} opacity-70 hover:opacity-100 transition-opacity`}
-              />
+              <div className="flex items-center gap-2">
+                <EditButton
+                  sectionName={sectionName}
+                  divStyles=""
+                  styles={` ${theme === "light" ? "text-gray-700" : ""} opacity-70 hover:opacity-100 transition-opacity`}
+                />
+                {openVisualEditor && (
+                  <button
+                    onClick={openVisualEditor}
+                    className="flex items-center gap-2 px-4 py-3 cursor-pointer text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+                    style={{
+                      background: `linear-gradient(135deg, #10b981, #059669)`,
+                    }}
+                  >
+                    <Settings className="h-3 w-3" />
+                    Visual Editor
+                  </button>
+                )}
+              </div>
             </motion.div>
             <motion.p
               className="text-base md:text-lg leading-relaxed max-w-4xl"

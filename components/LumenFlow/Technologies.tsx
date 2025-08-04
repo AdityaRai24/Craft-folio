@@ -28,9 +28,9 @@ import {
   getComponentCustomization,
   saveComponentCustomization,
   deleteComponentCustomization,
+  updateSection,
 } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import { ColorTheme } from "@/lib/colorThemes";
 
 interface TechnologiesProps {
   currentTheme: string;
@@ -45,7 +45,6 @@ interface Technology {
 
 interface CustomizationState {
   gridColumns: number;
-  cardLayout: "grid" | "list" | "masonry";
   cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
   cardBorderRadius: number;
   cardPadding: number;
@@ -98,7 +97,6 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   // Default styles matching current LumenFlow Technologies appearance
   const defaultTechnologiesStyles: CustomizationState = {
     gridColumns: 5,
-    cardLayout: "grid",
     cardStyle: "default",
     cardBorderRadius: 16,
     cardPadding: 32,
@@ -123,7 +121,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
     accentLine: true,
     accentLineStyle: "gradient",
     accentLineWidth: 4,
-    accentLineColor: "#f97316",
+    accentLineColor: "#10b981",
     cardShadow: false,
     shadowIntensity: 1,
     backgroundBlur: false,
@@ -153,6 +151,10 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   const sectionDescription =
     techSection?.sectionDescription ||
     "A comprehensive collection of technologies, frameworks, and tools I've mastered throughout my development journey, enabling me to build robust and scalable applications.";
+
+
+
+
 
   // Load customizations from database on component mount
   useEffect(() => {
@@ -299,6 +301,99 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   }, [portfolioId]);
 
   // Visual Editor Components
+  // 1. Update SpacingSelector slider color and thumb
+  const CustomSlider: React.FC<{
+    value: number;
+    onChange: (value: number) => void;
+    label: string;
+    min: number;
+    max: number;
+    step?: number;
+    unit?: string;
+  }> = ({ value, onChange, label, min, max, step = 1, unit = "px" }) => {
+    const percentage = ((value - min) / (max - min)) * 100;
+    
+    return (
+      <div>
+        <label className="block text-white font-medium mb-2">
+          {label}: {value}{unit}
+        </label>
+        <div className="relative">
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onChange={(e) => onChange(Number(e.target.value))}
+            className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #10b981 0%, #10b981 ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
+              WebkitAppearance: "none",
+              outline: "none",
+            }}
+          />
+        </div>
+        <style jsx>{`
+          input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s ease-in-out;
+          }
+          
+          input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          }
+          
+          input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s ease-in-out;
+          }
+          
+          input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          }
+        `}</style>
+      </div>
+    );
+  };
+
+  const SpacingSelector: React.FC<{
+    value: number;
+    onChange: (value: number) => void;
+    label: string;
+    min: number;
+    max: number;
+    step: number;
+  }> = ({ value, onChange, label, min, max, step }) => {
+    return (
+      <CustomSlider
+        value={value}
+        onChange={onChange}
+        label={label}
+        min={min}
+        max={max}
+        step={step}
+        unit="px"
+      />
+    );
+  };
+
+  // 2. Update GridColumnsSelector to just show '4 Cols' and '5 Cols' as text
   const GridColumnsSelector: React.FC<{
     value: number;
     onChange: (value: number) => void;
@@ -319,20 +414,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
-              <div className={`grid grid-cols-${cols} gap-1`}>
-                {Array.from({ length: cols }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-4 rounded"
-                    style={{
-                      background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                    }}
-                  ></div>
-                ))}
-              </div>
-              <div className="text-center text-sm text-white mt-2">
-                {cols} Cols
-              </div>
+              <div className="text-center text-lg font-bold text-white">{cols} Cols</div>
             </div>
           ))}
         </div>
@@ -340,40 +422,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
     );
   };
 
-  const CardLayoutSelector: React.FC<{
-    value: "grid" | "list" | "masonry";
-    onChange: (value: "grid" | "list" | "masonry") => void;
-  }> = ({ value, onChange }) => {
-    const layouts = [
-      { value: "grid", label: "Grid", icon: LayoutGrid },
-      { value: "list", label: "List", icon: LayoutList },
-      { value: "masonry", label: "Masonry", icon: Sparkles },
-    ];
 
-    return (
-      <div>
-        <label className="block text-white text-left font-medium mb-3">
-          Card Layout
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          {layouts.map(({ value: layout, label, icon: Icon }) => (
-            <div
-              key={layout}
-              onClick={() => onChange(layout as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                value === layout
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-            >
-              <Icon className="h-6 w-6 mx-auto mb-2 text-white" />
-              <div className="text-center text-sm text-white">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   const CardStyleSelector: React.FC<{
     value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
@@ -382,11 +431,11 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
     ) => void;
   }> = ({ value, onChange }) => {
     const styles = [
-      { value: "default", label: "Default" },
-      { value: "minimal", label: "Minimal" },
-      { value: "glassmorphism", label: "Glass" },
-      { value: "neon", label: "Neon" },
-      { value: "gradient", label: "Gradient" },
+      { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+      { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+      { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+      { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+      { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
     ];
 
     return (
@@ -399,31 +448,17 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
                 value === style.value
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
               <div className="space-y-2">
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
+                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                  <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                  <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                </div>
               </div>
               <div className="text-center text-sm text-white mt-2">
                 {style.label}
@@ -453,7 +488,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
             <div
               key={align}
               onClick={() => onChange(align as any)}
-              className={`cursor-pointer flex-1 p-4 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer flex-1 p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
                 value === align
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -470,40 +505,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
     );
   };
 
-  const SpacingSelector: React.FC<{
-    value: number;
-    onChange: (value: number) => void;
-    label: string;
-    min: number;
-    max: number;
-    step: number;
-  }> = ({ value, onChange, label, min, max, step }) => {
-    return (
-      <div>
-        <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-          {label}: {value}px
-        </label>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-          style={{
-            background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${
-              ColorTheme.primary
-            } ${(value / max) * 100}%, #3f3f46 ${
-              (value / max) * 100
-            }%, #3f3f46 100%)`,
-          }}
-        />
-      </div>
-    );
-  };
-
-  // Typography Selectors
+  // 3. Update TitleSizeSelector and TitleWeightSelector to use green for active state
   const TitleSizeSelector: React.FC<{
     value: "sm" | "md" | "lg" | "xl";
     onChange: (value: "sm" | "md" | "lg" | "xl") => void;
@@ -514,7 +516,6 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
       { value: "lg", label: "Large", size: "text-2xl" },
       { value: "xl", label: "Extra Large", size: "text-3xl" },
     ];
-
     return (
       <div>
         <label className="block text-white text-left font-medium mb-3">
@@ -525,9 +526,9 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
             <div
               key={size}
               onClick={() => onChange(size as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === size
-                  ? "border-white bg-zinc-700"
+                  ? "border-white bg-[linear-gradient(135deg,#10b981,#059669)]"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
@@ -552,7 +553,6 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
       { value: "semibold", label: "Semi Bold", weight: "font-semibold" },
       { value: "bold", label: "Bold", weight: "font-bold" },
     ];
-
     return (
       <div>
         <label className="block text-white text-left font-medium mb-3">
@@ -563,9 +563,9 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
             <div
               key={weight}
               onClick={() => onChange(weight as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === weight
-                  ? "border-white bg-zinc-700"
+                  ? "border-white bg-[linear-gradient(135deg,#10b981,#059669)]"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
@@ -582,50 +582,40 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto">
+      <div className="space-y-8 max-h-screen overflow-hidden scrollbar-none max-w-7xl mx-auto">
         <div className="flex items-center justify-center h-64">
           <div className="relative">
-            <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-orange-300 rounded-full animate-ping"></div>
+            <div className="w-12 h-12 border-4 border-green-400/20 border-t-green-400 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-green-300 rounded-full animate-ping"></div>
           </div>
         </div>
       </div>
     );
   }
 
-  const titleColor = theme === "light" ? "#f97316" : "#f97316";
+  const titleColor = theme === "light" ? "#10b981" : "#10b981";
 
   return (
-    <div className="space-y-4 md:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto md:px-4 relative">
-      {/* Visual Editor Button */}
-      <button
-        onClick={openVisualEditor}
-        className="absolute top-4 right-4 z-20 flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-        style={{
-          background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-        }}
-      >
-        <Settings className="h-4 w-4" />
-        Visual Editor
-      </button>
-
+            <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-hidden scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative">
       {/* Header Section */}
       <HeaderComponent
         currentTheme={currentTheme}
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         sectionName="technologies"
+        openVisualEditor={openVisualEditor}
+        visualEditorOpen={visualEditorOpen}
       />
 
-      <div
-        className={`grid gap-${effectiveCustomization.cardSpacing / 4} sm:gap-${
-          effectiveCustomization.cardSpacing / 4
-        } md:gap-${effectiveCustomization.cardSpacing / 4}`}
-        style={{
-          gridTemplateColumns: `repeat(${effectiveCustomization.gridColumns}, minmax(0, 1fr))`,
-          gap: `${effectiveCustomization.cardSpacing}px`,
-        }}
-      >
+              <div
+          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4} sm:gap-${
+            effectiveCustomization.cardSpacing / 4
+          } md:gap-${effectiveCustomization.cardSpacing / 4}`}
+          style={{
+            gridTemplateColumns: `repeat(${effectiveCustomization.gridColumns}, minmax(0, 1fr))`,
+            gap: `${effectiveCustomization.cardSpacing}px`,
+          }}
+        >
         {technologiesData.map((tech: Technology, index: number) => (
           <div
             key={index}
@@ -665,20 +655,31 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                   boxShadow: "none",
                 }),
                 ...(effectiveCustomization.cardStyle === "glassmorphism" && {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: theme === "light" 
+                    ? "rgba(255, 255, 255, 0.1)" 
+                    : "rgba(0, 0, 0, 0.1)",
                   backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  border: theme === "light"
+                    ? "1px solid rgba(255, 255, 255, 0.2)"
+                    : "1px solid rgba(255, 255, 255, 0.1)",
                 }),
                 ...(effectiveCustomization.cardStyle === "neon" && {
                   border: `2px solid ${titleColor}`,
                   boxShadow: `0 0 20px ${titleColor}50`,
+                  backgroundColor: theme === "light" 
+                    ? "rgba(249, 115, 22, 0.05)" 
+                    : "rgba(249, 115, 22, 0.1)",
                 }),
                 ...(effectiveCustomization.cardStyle === "gradient" && {
-                  background: `linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))`,
-                  border: "1px solid rgba(249, 115, 22, 0.3)",
+                  background: theme === "light"
+                    ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))"
+                    : "linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.15))",
+                  border: theme === "light"
+                    ? "1px solid rgba(249, 115, 22, 0.3)"
+                    : "1px solid rgba(249, 115, 22, 0.4)",
                 }),
                 ...(effectiveCustomization.cardStyle === "default" && {
-                  backgroundColor: "transparent",
+                  backgroundColor: theme === "light" ? "rgba(255, 255, 255, 1)" : "rgba(39, 39, 42, 1)",
                   border:
                     theme === "light"
                       ? "1px solid rgba(229, 231, 235, 0.5)"
@@ -686,13 +687,13 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                 }),
               }}
             >
-              <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3 md:space-y-4 md:h-48">
+              <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3 md:space-y-4 ">
                 <div className="flex-shrink-0">
                   {tech.logo ? (
                     <div
                       className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl overflow-hidden ${
                         theme === "light"
-                          ? "bg-gray-100/50 group-hover:bg-orange-50/50"
+                          ? "bg-gray-100/50 group-hover:bg-green-50/50"
                           : "bg-gray-700/30 group-hover:bg-gray-600/30"
                       } flex items-center justify-center transition-colors duration-300`}
                     >
@@ -729,7 +730,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                     <div
                       className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl ${
                         theme === "light"
-                          ? "bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-orange-50 group-hover:to-orange-100"
+                          ? "bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-green-50 group-hover:to-green-100"
                           : "bg-gradient-to-br from-gray-700 to-gray-800 group-hover:from-gray-600 group-hover:to-gray-700"
                       } flex items-center justify-center border ${
                         theme === "light"
@@ -809,6 +810,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                     >
                       {tech.description}
                     </p>
+
                   </div>
                 </div>
               </div>
@@ -858,7 +860,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -867,17 +869,17 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-base sm:text-lg font-bold text-white">
               Technologies Settings
             </h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -887,7 +889,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                   activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -895,7 +897,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                 style={
                   activeTab === tab
                     ? {
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                        background: `linear-gradient(135deg, #10b981, #059669)`,
                       }
                     : {}
                 }
@@ -916,7 +918,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
             {activeTab === "layout" && (
               <>
                 <GridColumnsSelector
@@ -928,14 +930,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                   }
                 />
 
-                <CardLayoutSelector
-                  value={
-                    draftCustomization?.cardLayout ?? customization.cardLayout
-                  }
-                  onChange={(value) =>
-                    updateDraftCustomization("cardLayout", value)
-                  }
-                />
+
 
                 <AlignmentSelector
                   value={
@@ -995,28 +990,15 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                   }
                 />
 
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Icon Size:{" "}
-                    {draftCustomization?.iconSize ?? customization.iconSize}px
-                  </label>
-                  <input
-                    type="range"
-                    min={32}
-                    max={120}
-                    value={
-                      draftCustomization?.iconSize ?? customization.iconSize
-                    }
-                    onChange={(e) =>
-                      updateDraftCustomization(
-                        "iconSize",
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
+                <CustomSlider
+                  value={draftCustomization?.iconSize ?? customization.iconSize}
+                  onChange={(value) => updateDraftCustomization("iconSize", value)}
+                  label="Icon Size"
+                  min={32}
+                  max={120}
+                  step={1}
+                  unit="px"
+                />
               </>
             )}
 
@@ -1031,88 +1013,39 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                   }
                 />
 
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Border Radius:{" "}
-                    {draftCustomization?.cardBorderRadius ??
-                      customization.cardBorderRadius}
-                    px
-                  </label>
-                  <input
-                    type="range"
-                    min={0}
-                    max={32}
-                    value={
-                      draftCustomization?.cardBorderRadius ??
-                      customization.cardBorderRadius
-                    }
-                    onChange={(e) =>
-                      updateDraftCustomization(
-                        "cardBorderRadius",
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
+                <CustomSlider
+                  value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
+                  onChange={(value) => updateDraftCustomization("cardBorderRadius", value)}
+                  label="Border Radius"
+                  min={0}
+                  max={32}
+                  step={1}
+                  unit="px"
+                />
 
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Border Width:{" "}
-                    {draftCustomization?.borderWidth ??
-                      customization.borderWidth}
-                    px
-                  </label>
-                  <input
-                    type="range"
-                    min={0}
-                    max={4}
-                    value={
-                      draftCustomization?.borderWidth ??
-                      customization.borderWidth
-                    }
-                    onChange={(e) =>
-                      updateDraftCustomization(
-                        "borderWidth",
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
+                <CustomSlider
+                  value={draftCustomization?.borderWidth ?? customization.borderWidth}
+                  onChange={(value) => updateDraftCustomization("borderWidth", value)}
+                  label="Border Width"
+                  min={0}
+                  max={4}
+                  step={1}
+                  unit="px"
+                />
               </>
             )}
 
             {activeTab === "effects" && (
               <>
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Animation Speed:{" "}
-                    {draftCustomization?.animationSpeed ??
-                      customization.animationSpeed}
-                    ms
-                  </label>
-                  <input
-                    type="range"
-                    min={100}
-                    max={800}
-                    step={50}
-                    value={
-                      draftCustomization?.animationSpeed ??
-                      customization.animationSpeed
-                    }
-                    onChange={(e) =>
-                      updateDraftCustomization(
-                        "animationSpeed",
-                        Number(e.target.value)
-                      )
-                    }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                </div>
+                <CustomSlider
+                  value={draftCustomization?.animationSpeed ?? customization.animationSpeed}
+                  onChange={(value) => updateDraftCustomization("animationSpeed", value)}
+                  label="Animation Speed"
+                  min={100}
+                  max={800}
+                  step={50}
+                  unit="ms"
+                />
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">Hover Effects</span>
@@ -1182,24 +1115,24 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
-              <button
-                onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              >
-                Done
-              </button>
+                              <button
+                  onClick={saveDraftCustomization}
+                  className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
+                  style={{
+                    background: `linear-gradient(135deg, #10b981, #059669)`,
+                  }}
+                >
+                  Done
+                </button>
             </div>
           </div>
         </div>
@@ -1212,6 +1145,8 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+
     </div>
   );
 };

@@ -3,19 +3,11 @@ import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { supabase } from "@/lib/supabase-client";
-import EditButton from "@/components/EditButton";
 import {
   GraduationCap,
   MapPin,
-  Calendar,
-  BookOpen,
-  Star,
-  ArrowUpRight,
-  School,
-  Settings,
-  Palette,
-  Move,
-  Grid3X3,
+  Calendar, ArrowUpRight, Settings,
+  Palette, Grid3X3,
   RotateCcw,
   X,
   AlignLeft,
@@ -25,20 +17,20 @@ import {
   LayoutList,
   Sparkles,
   Zap,
-  Clock,
-  MapPin as MapPinIcon,
+  Clock
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
-import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import {
   getComponentCustomization,
   saveComponentCustomization,
   deleteComponentCustomization,
+  updateSection
 } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import { ColorTheme } from "@/lib/colorThemes";
+import MagicWrite from "@/components/MagicWrite";
+
 
 interface Technology {
   name: string;
@@ -55,7 +47,6 @@ interface Education {
 }
 
 interface CustomizationState {
-  cardLayout: "timeline" | "grid" | "list" | "masonry";
   cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
   cardBorderRadius: number;
   cardPadding: number;
@@ -84,12 +75,6 @@ interface CustomizationState {
   shadowIntensity: number;
   backgroundBlur: boolean;
   blurIntensity: number;
-  timelineStyle: "vertical" | "horizontal" | "zigzag";
-  timelinePosition: "left" | "right" | "center";
-  timelineWidth: number;
-  timelineColor: string;
-  dotSize: number;
-  dotStyle: "circle" | "square" | "diamond" | "star";
   showArrow: boolean;
   arrowStyle: "simple" | "animated" | "glow";
   dateFormat: "short" | "long" | "relative";
@@ -121,7 +106,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
 
   // Default styles matching current LumenFlow Education appearance
   const defaultEducationStyles: CustomizationState = {
-    cardLayout: "timeline",
     cardStyle: "default",
     cardBorderRadius: 16,
     cardPadding: 24,
@@ -150,12 +134,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
     shadowIntensity: 1,
     backgroundBlur: false,
     blurIntensity: 10,
-    timelineStyle: "vertical",
-    timelinePosition: "left",
-    timelineWidth: 4,
-    timelineColor: "#f97316",
-    dotSize: 12,
-    dotStyle: "circle",
     showArrow: true,
     arrowStyle: "animated",
     dateFormat: "short",
@@ -184,6 +162,63 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
   const sectionDescription =
     educationSection?.sectionDescription ||
     "My educational journey through various institutions and courses, building the foundation of knowledge and skills that drive my professional growth and expertise.";
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this education description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "education-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (educationIndex: number, newDescription: string) => {
+    const updatedEducation = [...educationData];
+    updatedEducation[educationIndex] = {
+      ...updatedEducation[educationIndex],
+      description: newDescription
+    };
+    setEducationData(updatedEducation);
+    toast.success("Education description enhanced successfully!");
+          try {
+        const result = await updateSection({
+          sectionName: "education",
+          portfolioId,
+          sectionContent: updatedEducation,
+          sectionTitle: "Education",
+          sectionDescription: "Education section"
+        });
+        if (result.success) {
+          toast.success("Education description enhanced and saved successfully!");
+        } else {
+          toast.error("Failed to save changes to database");
+        }
+      } catch (error) {
+        console.error("Error saving education description:", error);
+        toast.error("Failed to save changes to database");
+      }
+  };
+
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
 
@@ -331,67 +366,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
     };
   }, [portfolioId]);
 
-  // Visual Editor Components
-  const CardLayoutSelector: React.FC<{
-    value: "timeline" | "grid" | "list" | "masonry";
-    onChange: (value: "timeline" | "grid" | "list" | "masonry") => void;
-  }> = ({ value, onChange }) => {
-    const layouts = [
-      {
-        value: "timeline",
-        label: "Timeline",
-        icon: Clock,
-        desc: "Vertical timeline with dots",
-      },
-      {
-        value: "grid",
-        label: "Grid",
-        icon: LayoutGrid,
-        desc: "Card grid layout",
-      },
-      {
-        value: "list",
-        label: "List",
-        icon: LayoutList,
-        desc: "Horizontal list with year badges",
-      },
-      {
-        value: "masonry",
-        label: "Masonry",
-        icon: Sparkles,
-        desc: "Pinterest-style masonry",
-      },
-    ];
 
-    return (
-      <div>
-        <label className="block text-white text-left font-medium mb-3">
-          Layout Style
-        </label>
-        <div className="grid grid-cols-1 gap-3">
-          {layouts.map(({ value: layout, label, icon: Icon, desc }) => (
-            <div
-              key={layout}
-              onClick={() => onChange(layout as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                value === layout
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <Icon className="h-5 w-5 text-white" />
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-white">{label}</div>
-                  <div className="text-xs text-gray-400">{desc}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   // Add creative selectors for LumenFlow
   const AnimationStyleSelector: React.FC<{
@@ -434,40 +409,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
     );
   };
 
-  const TimelineStyleSelector: React.FC<{
-    value: "vertical" | "horizontal" | "zigzag";
-    onChange: (value: "vertical" | "horizontal" | "zigzag") => void;
-  }> = ({ value, onChange }) => {
-    const styles = [
-      { value: "vertical", label: "Vertical", icon: "│" },
-      { value: "horizontal", label: "Horizontal", icon: "─" },
-      { value: "zigzag", label: "Zigzag", icon: "⟋" },
-    ];
 
-    return (
-      <div>
-        <label className="block text-white text-left font-medium mb-3">
-          Timeline Style
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {styles.map(({ value: style, label, icon }) => (
-            <div
-              key={style}
-              onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                value === style
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-            >
-              <div className="text-lg text-white text-center">{icon}</div>
-              <div className="text-xs text-white text-center mt-1">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   const CardStyleSelector: React.FC<{
     value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
@@ -476,11 +418,11 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
     ) => void;
   }> = ({ value, onChange }) => {
     const styles = [
-      { value: "default", label: "Default" },
-      { value: "minimal", label: "Minimal" },
-      { value: "glassmorphism", label: "Glass" },
-      { value: "neon", label: "Neon" },
-      { value: "gradient", label: "Gradient" },
+      { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+      { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+      { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+      { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+      { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" },
     ];
 
     return (
@@ -493,31 +435,17 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
                 value === style.value
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
               <div className="space-y-2">
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
-                <div
-                  className="h-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                ></div>
+                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                  <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                  <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                </div>
               </div>
               <div className="text-center text-sm text-white mt-2">
                 {style.label}
@@ -592,7 +520,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
             onChange={(e) => onChange(Number(e.target.value))}
             className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
+              background: `linear-gradient(to right, #10b981 0%, #10b981 ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
               WebkitAppearance: "none",
               outline: "none",
             }}
@@ -604,7 +532,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: ${ColorTheme.primary};
+            background: #10b981;
             cursor: pointer;
             border: 3px solid #ffffff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -620,7 +548,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: ${ColorTheme.primary};
+            background: #10b981;
             cursor: pointer;
             border: 3px solid #ffffff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -736,7 +664,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto">
+              <div className="space-y-4 md:space-y-6 lg:space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-center h-64">
           <div className="relative">
             <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
@@ -751,17 +679,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
 
   return (
     <div className="space-y-8 relative">
-      {/* Visual Editor Button */}
-      <button
-        onClick={openVisualEditor}
-        className="absolute top-4 right-4 z-20 flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-        style={{
-          background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-        }}
-      >
-        <Settings className="h-4 w-4" />
-        Visual Editor
-      </button>
+
 
       {/* Header Section */}
       <HeaderComponent
@@ -769,31 +687,19 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         sectionName="education"
+        openVisualEditor={openVisualEditor}
+        visualEditorOpen={visualEditorOpen}
       />
 
       {/* Education Content */}
       <div
-        className={
-          effectiveCustomization.cardLayout === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            : effectiveCustomization.cardLayout === "list"
-            ? "space-y-4"
-            : effectiveCustomization.cardLayout === "masonry"
-            ? "columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6"
-            : "space-y-8 pl-12" // timeline layout with left padding for timeline
-        }
+        className="space-y-6"
         style={{ gap: `${effectiveCustomization.cardSpacing}px` }}
       >
         {educationData.map((edu, index) => (
           <div
             key={index}
-            className={`group relative overflow-hidden ${
-              effectiveCustomization.cardLayout === "list"
-                ? "flex items-start space-x-6"
-                : effectiveCustomization.cardLayout === "masonry"
-                ? "break-inside-avoid mb-6"
-                : ""
-            }`}
+            className="group relative"
             onMouseEnter={() => setHoveredEducation(index)}
             onMouseLeave={() => setHoveredEducation(null)}
           >
@@ -808,74 +714,37 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
               }}
             ></div>
 
-            {/* Timeline Dot for Timeline Layout - Outside Card */}
-            {effectiveCustomization.cardLayout === "timeline" && (
-              <div className="absolute left-[-32px] top-8 z-10 flex flex-col items-center">
-                <div
-                  className={`rounded-full ${
-                    effectiveCustomization.dotStyle === "square"
-                      ? "rounded-none"
-                      : effectiveCustomization.dotStyle === "diamond"
-                      ? "rotate-45"
-                      : effectiveCustomization.dotStyle === "star"
-                      ? "star-shape"
-                      : ""
-                  }`}
-                  style={{
-                    background:
-                      theme === "light"
-                        ? "linear-gradient(to right, rgba(249,115,22,0.8), rgba(234,88,12,0.8))"
-                        : themeClasses.gradientPrimary,
-                    width: `${effectiveCustomization.dotSize}px`,
-                    height: `${effectiveCustomization.dotSize}px`,
-                    boxShadow: `0 0 ${
-                      effectiveCustomization.dotSize / 2
-                    }px rgba(249,115,22,0.4)`,
-                  }}
-                ></div>
-                {/* Timeline Line - Only show if not last item */}
-                {index < educationData.length - 1 && (
-                  <div
-                    className="mt-2 opacity-50"
-                    style={{
-                      width: `${effectiveCustomization.timelineWidth}px`,
-                      height: "100px",
-                      background:
-                        theme === "light"
-                          ? "linear-gradient(to bottom, rgba(249,115,22,0.3), rgba(249,115,22,0.1))"
-                          : effectiveCustomization.timelineColor,
-                    }}
-                  ></div>
-                )}
-              </div>
-            )}
-
-            {/* Year Badge for List Layout */}
-            {effectiveCustomization.cardLayout === "list" && (
-              <div className="flex-shrink-0 w-20 text-center">
-                <div
-                  className="text-sm font-bold px-3 py-1 rounded-full"
-                  style={{
-                    background: `linear-gradient(135deg, ${titleColor}20, ${titleColor}10)`,
-                    color: titleColor,
-                    border: `1px solid ${titleColor}30`,
-                  }}
-                >
-                  {edu.startDate.split(" ")[0]}
-                </div>
-              </div>
-            )}
-
             {/* Main Card */}
             <div
-              className={`relative overflow-hidden transition-all duration-${
+              className={`relative transition-all duration-${
                 effectiveCustomization.animationSpeed / 100
               } transform group-hover:translate-y-[-4px] h-full flex flex-col ${
-                effectiveCustomization.cardLayout === "list" ? "flex-1" : ""
+                effectiveCustomization.cardStyle === "default"
+                  ? theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
+                  : effectiveCustomization.cardStyle === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardStyle === "glassmorphism"
+                  ? theme === "light"
+                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                  : effectiveCustomization.cardStyle === "neon"
+                  ? theme === "light"
+                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                  : effectiveCustomization.cardStyle === "gradient"
+                  ? theme === "light"
+                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                    : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                  : theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
               }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
+                borderWidth: effectiveCustomization.cardStyle === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
                 transform:
                   effectiveCustomization.hoverEffects &&
                   hoveredEducation === index
@@ -893,18 +762,16 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                     effectiveCustomization.shadowIntensity * 20
                   }px ${titleColor}20`,
                 }),
-                ...(effectiveCustomization.cardStyle === "minimal" && {
-                  backgroundColor: "transparent",
-                  borderWidth: "0px",
-                  borderStyle: "none",
-                  boxShadow: "none",
-                }),
                 ...(effectiveCustomization.cardStyle === "glassmorphism" && {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  backgroundColor: theme === "light" 
+                    ? "rgba(255, 255, 255, 0.1)" 
+                    : "rgba(0, 0, 0, 0.1)",
                   backdropFilter: `blur(${effectiveCustomization.blurIntensity}px)`,
                   borderWidth: "1px",
                   borderStyle: "solid",
-                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  borderColor: theme === "light"
+                    ? "rgba(255, 255, 255, 0.2)"
+                    : "rgba(255, 255, 255, 0.1)",
                 }),
                 ...(effectiveCustomization.cardStyle === "neon" && {
                   borderWidth: "2px",
@@ -913,10 +780,14 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                   boxShadow: `0 0 20px ${titleColor}50, inset 0 0 20px ${titleColor}10`,
                 }),
                 ...(effectiveCustomization.cardStyle === "gradient" && {
-                  background: `linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))`,
+                  background: theme === "light"
+                    ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))"
+                    : "linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.15))",
                   borderWidth: "1px",
                   borderStyle: "solid",
-                  borderColor: "rgba(249, 115, 22, 0.3)",
+                  borderColor: theme === "light"
+                    ? "rgba(249, 115, 22, 0.3)"
+                    : "rgba(249, 115, 22, 0.4)",
                 }),
                 ...(effectiveCustomization.cardStyle === "default" && {
                   backgroundColor: "transparent",
@@ -979,7 +850,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
 
                 {/* Description */}
                 {effectiveCustomization.showDescription && edu.description && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <p
                       className={`text-sm leading-relaxed ${
                         theme === "light"
@@ -989,6 +860,20 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                     >
                       {edu.description}
                     </p>
+                    {/* Magic Write Button */}
+                    <div className="absolute -top-2 -right-2 z-10">
+                      <MagicWrite
+                        onMagicWrite={async (prompt: string, context?: string) => {
+                          const enhancedDescription = await handleMagicWrite(prompt, edu.description || "");
+                          handleDescriptionUpdate(index, enhancedDescription);
+                          return enhancedDescription;
+                        }}
+                        placeholder="Enhance this education description..."
+                        buttonText=""
+                        context={edu.description || ""}
+                        className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -1114,7 +999,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -1123,25 +1008,25 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Education Settings</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Education Settings</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
           {/* Tab Navigation */}
           <div className="flex border-b border-zinc-700">
-            {["layout", "design", "effects", "timeline"].map((tab) => (
+            {["layout", "design", "effects"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                   activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -1149,7 +1034,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                 style={
                   activeTab === tab
                     ? {
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                        background: `linear-gradient(135deg, #10b981, #059669)`,
                       }
                     : {}
                 }
@@ -1161,27 +1046,15 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                   <Palette className="h-3 w-3 mx-auto mb-1" />
                 )}
                 {tab === "effects" && <Zap className="h-3 w-3 mx-auto mb-1" />}
-                {tab === "timeline" && (
-                  <Clock className="h-3 w-3 mx-auto mb-1" />
-                )}
                 {tab}
               </button>
             ))}
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
             {activeTab === "layout" && (
               <>
-                <CardLayoutSelector
-                  value={
-                    draftCustomization?.cardLayout ?? customization.cardLayout
-                  }
-                  onChange={(value) =>
-                    updateDraftCustomization("cardLayout", value)
-                  }
-                />
-
                 <AlignmentSelector
                   value={
                     draftCustomization?.textAlignment ??
@@ -1396,130 +1269,23 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                 )}
               </>
             )}
-
-            {activeTab === "timeline" && (
-              <>
-                <TimelineStyleSelector
-                  value={
-                    draftCustomization?.timelineStyle ??
-                    customization.timelineStyle
-                  }
-                  onChange={(value) =>
-                    updateDraftCustomization("timelineStyle", value)
-                  }
-                />
-
-                <CustomSlider
-                  value={draftCustomization?.dotSize ?? customization.dotSize}
-                  onChange={(value) =>
-                    updateDraftCustomization("dotSize", value)
-                  }
-                  label="Dot Size"
-                  min={8}
-                  max={20}
-                  step={1}
-                  unit="px"
-                />
-
-                <CustomSlider
-                  value={
-                    draftCustomization?.timelineWidth ??
-                    customization.timelineWidth
-                  }
-                  onChange={(value) =>
-                    updateDraftCustomization("timelineWidth", value)
-                  }
-                  label="Timeline Width"
-                  min={2}
-                  max={8}
-                  step={1}
-                  unit="px"
-                />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Accent Line</span>
-                  <Switch
-                    checked={
-                      draftCustomization?.accentLine ?? customization.accentLine
-                    }
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("accentLine", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Show Arrow</span>
-                  <Switch
-                    checked={
-                      draftCustomization?.showArrow ?? customization.showArrow
-                    }
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("showArrow", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">
-                    Show Institution
-                  </span>
-                  <Switch
-                    checked={
-                      draftCustomization?.showInstitution ??
-                      customization.showInstitution
-                    }
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("showInstitution", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Show Dates</span>
-                  <Switch
-                    checked={
-                      draftCustomization?.showDates ?? customization.showDates
-                    }
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("showDates", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">
-                    Show Description
-                  </span>
-                  <Switch
-                    checked={
-                      draftCustomization?.showDescription ??
-                      customization.showDescription
-                    }
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("showDescription", checked)
-                    }
-                  />
-                </div>
-              </>
-            )}
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  background: `linear-gradient(135deg, #10b981, #059669)`,
                 }}
               >
                 Done
@@ -1536,6 +1302,8 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+
     </div>
   );
 };

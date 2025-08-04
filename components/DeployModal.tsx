@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown } from "lucide-react";
+import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown, Globe } from "lucide-react";
 import { Button } from "./ui/button";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from "@clerk/nextjs";
@@ -11,6 +11,7 @@ import { updatePortfolio, deployPortfolio, checkUserSubdomain } from "@/app/acti
 import toast from "react-hot-toast";
 import Confetti from "react-confetti";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+import { useRouter } from "next/navigation";
 
 interface DeployModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface DeployModalProps {
 
 const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLink }: DeployModalProps) => {
   const { user } = useUser();
+  const router = useRouter();
   const dispatch = useDispatch();
   const [isDeploying, setIsDeploying] = useState(false);
   const [portfolioSlug, setPortfolioSlug] = useState("");
@@ -65,6 +67,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
 
   const handleDeploy = async () => {
     if(!user) {
+      toast.error("Please sign in to deploy your portfolio");
       return;
     }
 
@@ -85,35 +88,45 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
     // Check for existing subdomain deployment if user is trying to deploy with subdomain
     if (isSubdomain) {
       try {
+        setIsDeploying(true);
         const result = await checkUserSubdomain(user.id);
         if (!result.success) {
-          toast.error("Failed to verify subdomain availability");
+          toast.error("Failed to verify subdomain availability. Please try again.");
           return;
         }
         
         if (result.isPremium) {
           if (result.hasSubdomain) {
-            toast.error(`You have reached the maximum limit of 10 subdomains for premium users.`);
+            toast.error(`You have reached the maximum limit of 10 subdomains for premium users. Please remove an existing subdomain first.`);
             return;
           }
           toast.success(`Premium user: ${10 - (result.currentCount || 0)} subdomains remaining.`);
         } else {
           if (result.hasSubdomain) {
-            toast.error("You have already deployed a portfolio with a subdomain. Free users can only have one subdomain deployment. Upgrade to premium to create up to 10 subdomains!");
+            toast.error(`You have reached the maximum limit of 1 subdomain for free users. Upgrade to premium to create up to 10 subdomains!`);
             return;
           }
+          toast.success(`Free user: 1 subdomain remaining.`);
         }
       } catch (error) {
         console.error("Error checking subdomain:", error);
-        toast.error("Failed to verify subdomain availability");
+        toast.error("Failed to verify subdomain availability. Please check your connection and try again.");
         return;
+      } finally {
+        setIsDeploying(false);
       }
     }
 
-    setIsDeploying(true);
-
     try {
-      const result = await deployPortfolio(user.id, portfolioId, value, isSubdomain);
+      setIsDeploying(true);
+      const result = await deployPortfolio(
+        user.id,
+        portfolioId,
+        value,
+        isSubdomain,
+        false
+      );
+
       if (result.success && result.data) {
         setIsDeployed(true);
         setDeployedUrl(result.data.url);
@@ -123,11 +136,18 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
         }, 5000);
         toast.success("Portfolio deployed successfully!");
       } else {
-        toast.error(result.error || "Failed to deploy portfolio");
+        const errorMessage = result.error || "Failed to deploy portfolio";
+        if (errorMessage.includes("already exists")) {
+          toast.error("This slug/subdomain is already taken. Please choose a different one.");
+        } else if (errorMessage.includes("invalid")) {
+          toast.error("Invalid slug/subdomain format. Please check the requirements.");
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Deployment error:", error);
-      toast.error("Failed to deploy portfolio");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsDeploying(false);
     }
@@ -135,12 +155,11 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
 
   const handleCopyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast.success('Portfolio URL copied to clipboard!');
+    toast.success("Portfolio URL copied to clipboard!");
   };
 
   const handleShare = (platform: string, url: string) => {
     const text = "Check out my portfolio!";
-    
     switch (platform) {
       case 'twitter':
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
@@ -152,6 +171,11 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
         break;
     }
+  };
+
+  const handleCustomDomainClick = () => {
+    onClose();
+    router.push(`/deploy/${portfolioId}?tab=custom`);
   };
 
   if (!isOpen) return null;
@@ -251,7 +275,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleShare('twitter', portfolioLink!)}
+                    onClick={() => handleShare("twitter", portfolioLink)}
                   >
                     <Twitter className="h-5 w-5" />
                   </motion.button>
@@ -263,7 +287,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleShare('linkedin', portfolioLink!)}
+                    onClick={() => handleShare("linkedin", portfolioLink)}
                   >
                     <Linkedin className="h-5 w-5" />
                   </motion.button>
@@ -275,7 +299,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleShare('facebook', portfolioLink!)}
+                    onClick={() => handleShare("facebook", portfolioLink)}
                   >
                     <Facebook className="h-5 w-5" />
                   </motion.button>
@@ -287,7 +311,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleCopyUrl(portfolioLink!)}
+                    onClick={() => handleCopyUrl(portfolioLink)}
                   >
                     <Link2 className="h-5 w-5" />
                   </motion.button>
@@ -307,7 +331,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
             {!isDeployed ? (
               <Tabs defaultValue="slug" value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList 
-                  className="w-full grid grid-cols-2 mb-6 border rounded-lg overflow-hidden"
+                  className="w-full grid grid-cols-3 mb-6 border rounded-lg overflow-hidden"
                   style={{
                     backgroundColor: ColorTheme.bgNav,
                     borderColor: 'rgba(75, 85, 99, 0.3)',
@@ -325,14 +349,27 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                   </TabsTrigger>
                   <TabsTrigger 
                     value="subdomain"
-                    className="data-[state=active]:bg-gray-700 relative rounded-r-lg cursor-pointer"
+                    className="data-[state=active]:bg-gray-700 cursor-pointer"
                     style={{ 
                       color: ColorTheme.textPrimary,
+                      borderRight: '1px solid rgba(75, 85, 99, 0.3)',
                     }}
                   >
                     <span className="flex items-center gap-2">
                       Subdomain
                       <Crown className="w-4 h-4 text-yellow-400" />
+                    </span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="custom"
+                    className="data-[state=active]:bg-gray-700 rounded-r-lg cursor-pointer"
+                    style={{ 
+                      color: ColorTheme.textPrimary,
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      Custom Domain
+                      <Globe className="w-4 h-4 text-blue-400" />
                     </span>
                   </TabsTrigger>
                 </TabsList>
@@ -431,35 +468,75 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                   </div>
                 </TabsContent>
 
-                <motion.button
-                  className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
-                  style={{
-                    backgroundColor: ColorTheme.primary,
-                    color: "#000",
-                    boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                    opacity: isDeploying ? 0.7 : 1,
-                    cursor: isDeploying ? "not-allowed" : "pointer"
-                  }}
-                  whileHover={{
-                    boxShadow: isDeploying ? `0 4px 10px ${ColorTheme.primaryGlow}` : `0 6px 14px ${ColorTheme.primaryGlow}`,
-                    scale: isDeploying ? 1 : 1.02,
-                  }}
-                  whileTap={{ scale: isDeploying ? 1 : 0.98 }}
-                  onClick={handleDeploy}
-                  disabled={isDeploying}
-                >
-                  {isDeploying ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      Deploying...
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="h-4 w-4" />
-                      Deploy Now
-                    </>
-                  )}
-                </motion.button>
+                <TabsContent value="custom" className="mt-4">
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-lg border" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
+                      <div className="flex items-start gap-3">
+                        <Globe className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-blue-400 mb-1">Custom Domain</h4>
+                          <p className="text-sm" style={{ color: ColorTheme.textSecondary }}>
+                            Connect your own domain name to your portfolio for a professional look. This requires domain configuration and DNS setup.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-center py-8">
+                      <motion.button
+                        className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
+                        style={{
+                          backgroundColor: ColorTheme.primary,
+                          color: "#000",
+                          boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
+                        }}
+                        whileHover={{
+                          boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
+                          scale: 1.02,
+                        }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleCustomDomainClick}
+                      >
+                        <Globe className="h-4 w-4" />
+                        Go to Custom Domain Setup
+                      </motion.button>
+                      <p className="text-sm mt-2" style={{ color: ColorTheme.textSecondary }}>
+                        This will take you to the dedicated custom domain deployment page
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {activeTab !== "custom" && (
+                  <motion.button
+                    className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
+                    style={{
+                      backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
+                      color: isDeploying ? ColorTheme.textSecondary : "#000",
+                      boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
+                      cursor: isDeploying ? "not-allowed" : "pointer"
+                    }}
+                    whileHover={{
+                      boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                      scale: isDeploying ? 1 : 1.02,
+                    }}
+                    whileTap={{ scale: isDeploying ? 1 : 0.98 }}
+                    onClick={handleDeploy}
+                    disabled={isDeploying}
+                  >
+                    {isDeploying ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Deploying...
+                      </>
+                    ) : (
+                      <>
+                        <Rocket className="h-4 w-4" />
+                        Deploy Portfolio
+                      </>
+                    )}
+                  </motion.button>
+                )}
               </Tabs>
             ) : (
               <motion.div
@@ -494,83 +571,81 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                   </motion.a>
                 </p>
 
-                <div className="space-y-4">
-                  <motion.button
-                    className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
-                    style={{
-                      backgroundColor: ColorTheme.primary,
-                      color: "#000",
-                      boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                    }}
-                    whileHover={{
-                      boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                      scale: 1.02,
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      if (deployedUrl) {
-                        window.open(deployedUrl, '_blank');
-                      }
-                    }}
-                  >
-                    <Rocket className="h-4 w-4" />
-                    Visit Portfolio
-                  </motion.button>
+                <motion.button
+                  className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mb-6"
+                  style={{
+                    backgroundColor: ColorTheme.primary,
+                    color: "#000",
+                    boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
+                  }}
+                  whileHover={{
+                    boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
+                    scale: 1.02,
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (deployedUrl) {
+                      window.open(deployedUrl, "_blank");
+                    }
+                  }}
+                >
+                  <Rocket className="h-4 w-4" />
+                  Visit Portfolio
+                </motion.button>
 
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm font-medium" style={{ color: ColorTheme.textSecondary }}>
-                      Share your portfolio:
-                    </p>
-                    <div className="flex justify-center gap-2">
-                      <motion.button
-                        className="p-2 rounded-lg"
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          color: ColorTheme.textPrimary,
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleShare('twitter', deployedUrl)}
-                      >
-                        <Twitter className="h-5 w-5" />
-                      </motion.button>
-                      <motion.button
-                        className="p-2 rounded-lg"
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          color: ColorTheme.textPrimary,
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleShare('linkedin', deployedUrl)}
-                      >
-                        <Linkedin className="h-5 w-5" />
-                      </motion.button>
-                      <motion.button
-                        className="p-2 rounded-lg"
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          color: ColorTheme.textPrimary,
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleShare('facebook', deployedUrl)}
-                      >
-                        <Facebook className="h-5 w-5" />
-                      </motion.button>
-                      <motion.button
-                        className="p-2 rounded-lg"
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          color: ColorTheme.textPrimary,
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleCopyUrl(deployedUrl)}
-                      >
-                        <Link2 className="h-5 w-5" />
-                      </motion.button>
-                    </div>
+                <div>
+                  <p className="text-sm font-medium mb-4" style={{ color: ColorTheme.textSecondary }}>
+                    Share your portfolio:
+                  </p>
+                  <div className="flex justify-center gap-2">
+                    <motion.button
+                      className="p-2 rounded-lg"
+                      style={{
+                        backgroundColor: ColorTheme.bgCard,
+                        color: ColorTheme.textPrimary,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleShare("twitter", deployedUrl)}
+                    >
+                      <Twitter className="h-5 w-5" />
+                    </motion.button>
+                    <motion.button
+                      className="p-2 rounded-lg"
+                      style={{
+                        backgroundColor: ColorTheme.bgCard,
+                        color: ColorTheme.textPrimary,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleShare("linkedin", deployedUrl)}
+                    >
+                      <Linkedin className="h-5 w-5" />
+                    </motion.button>
+                    <motion.button
+                      className="p-2 rounded-lg"
+                      style={{
+                        backgroundColor: ColorTheme.bgCard,
+                        color: ColorTheme.textPrimary,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleShare("facebook", deployedUrl)}
+                    >
+                      <Facebook className="h-5 w-5" />
+                    </motion.button>
+                    <motion.button
+                      className="p-2 rounded-lg"
+                      style={{
+                        backgroundColor: ColorTheme.bgCard,
+                        color: ColorTheme.textPrimary,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleCopyUrl(deployedUrl)}
+                    >
+                      <Link2 className="h-5 w-5" />
+                    </motion.button>
                   </div>
                 </div>
               </motion.div>

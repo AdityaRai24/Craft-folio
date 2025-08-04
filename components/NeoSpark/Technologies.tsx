@@ -127,6 +127,17 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
     return {};
   };
 
+  // Helper function to calculate slider percentage
+  const getSliderPercentage = (value: number, min: number, max: number) => {
+    return Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+  };
+
+  // Helper function to get slider background style
+  const getSliderBackground = (value: number, min: number, max: number) => {
+    const percentage = getSliderPercentage(value, min, max);
+    return `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`;
+  };
+
   const dispatch = useDispatch();
 
   // Load customizations from database on component mount
@@ -515,12 +526,18 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
       <div className="relative overflow-hidden px-2 sm:px-4">
         {effectiveCustomization.displayMode === "marquee" ? (
           <div
-            className="flex flex-nowrap overflow-hidden max-w-full sm:max-w-[80%] mx-auto"
+            className="flex flex-nowrap overflow-hidden max-w-full mx-auto relative"
             onMouseEnter={() => effectiveCustomization.pauseOnHover && setIsPaused(true)}
             onMouseLeave={() =>
               effectiveCustomization.pauseOnHover && setIsPaused(false)
             }
           >
+            {/* Left gradient edge */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 z-10 pointer-events-none bg-gradient-to-r from-black to-transparent"></div>
+            
+            {/* Right gradient edge */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-12 z-10 pointer-events-none bg-gradient-to-l from-black to-transparent"></div>
+            
             <Marquee
               pauseOnHover={effectiveCustomization.pauseOnHover}
               loop={0}
@@ -532,7 +549,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
           </div>
         ) : (
           // Carousel mode (simplified grid with centered layout)
-          <div className="flex flex-wrap justify-center items-center gap-4 max-w-4xl mx-auto">
+          <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 max-w-4xl mx-auto">
             {displayData.map((tech, index) => renderTechCard(tech, index))}
           </div>
         )}
@@ -542,7 +559,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -551,17 +568,17 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-base sm:text-lg font-bold text-white">
               Technology Settings
             </h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -571,7 +588,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 px-3 text-sm capitalize transition-colors ${
+                className={`flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                   activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -579,21 +596,22 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                 style={getThemeButtonStyle(activeTab === tab)}
               >
                 {tab === "display" && (
-                  <Grid3X3 className="h-4 w-4 mx-auto mb-1" />
+                  <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                 )}
                 {tab === "styling" && (
-                  <Palette className="h-4 w-4 mx-auto mb-1" />
+                  <Palette className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                 )}
                 {tab === "animation" && (
-                  <Move className="h-4 w-4 mx-auto mb-1" />
+                  <Move className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                 )}
-                {tab}
+                <span className="hidden sm:inline">{tab}</span>
+                <span className="sm:hidden">{tab.charAt(0)}</span>
               </button>
             ))}
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
             {activeTab === "display" && (
               <>
                 <div>
@@ -662,8 +680,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                         onChange={(e) =>
                           updateDraftCustomization("marqueeSpeed", Number(e.target.value))
                         }
-                        style={{ accentColor: ColorTheme.primary }}
-                        className="w-full"
+                        className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.marqueeSpeed ?? customization.marqueeSpeed, 20, 200)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.marqueeSpeed ?? customization.marqueeSpeed, 20, 200)}%, #3f3f46 100%)`
+                        }}
                       />
                     </div>
 
@@ -717,8 +737,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("iconSize", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.iconSize ?? customization.iconSize, 24, 80)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.iconSize ?? customization.iconSize, 24, 80)}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -789,8 +811,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                       onChange={(e) =>
                         updateDraftCustomization("shuffleInterval", Number(e.target.value))
                       }
-                      style={{ accentColor: ColorTheme.primary }}
-                      className="w-full"
+                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.shuffleInterval ?? customization.shuffleInterval, 2000, 15000)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.shuffleInterval ?? customization.shuffleInterval, 2000, 15000)}%, #3f3f46 100%)`
+                      }}
                     />
                   </div>
                 )}
@@ -840,8 +864,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("cardBorderRadius", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius, 0, 24)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius, 0, 24)}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -857,8 +883,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("cardPadding", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.cardPadding ?? customization.cardPadding, 2, 12)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.cardPadding ?? customization.cardPadding, 2, 12)}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -874,8 +902,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("cardSpacing", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.cardSpacing ?? customization.cardSpacing, 1, 8)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.cardSpacing ?? customization.cardSpacing, 1, 8)}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -891,8 +921,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("shadowIntensity", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: getSliderBackground(draftCustomization?.shadowIntensity ?? customization.shadowIntensity, 0, 3)
+                    }}
                   />
                 </div>
 
@@ -908,8 +940,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("backgroundOpacity", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: getSliderBackground(draftCustomization?.backgroundOpacity ?? customization.backgroundOpacity, 10, 100)
+                    }}
                   />
                 </div>
 
@@ -925,14 +959,16 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("borderWidth", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.borderWidth ?? customization.borderWidth, 0, 4)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.borderWidth ?? customization.borderWidth, 0, 4)}%, #3f3f46 100%)`,
+                    }}
                   />
                 </div>
               </>
             )}
 
-            {activeTab === "animation" && (
+            {activeTab === "animation" && (   
               <>
                 <div>
                   <label className="block text-white font-medium mb-2">
@@ -947,8 +983,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("animationSpeed", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${getSliderPercentage(draftCustomization?.animationSpeed ?? customization.animationSpeed, 100, 800)}%, #3f3f46 ${getSliderPercentage(draftCustomization?.animationSpeed ?? customization.animationSpeed, 100, 800)}%, #3f3f46 100%)`,
+                    }}
                   />
                 </div>
 
@@ -992,18 +1030,18 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}

@@ -18,8 +18,9 @@ import { supabase } from "@/lib/supabase-client";
 import EditButton from "@/components/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
 import Navbar from "./Navbar";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
+import MagicWrite from "@/components/MagicWrite";
 import { defaultHeroStyles } from "./defaultStyles/hero";
 import { CustomizationState } from "./defaultStyles/types";
 
@@ -45,34 +46,105 @@ const AlignmentSelector: React.FC<{
           <div
             key={align}
             onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
               value === align
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                ? "border-white bg-zinc-700 shadow-lg"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
             }`}
           >
             <div className="text-2xl text-white">{icon}</div>
-            <div className="space-y-1 w-full">
+            <div className="relative w-full h-8 flex items-center justify-center">
+              {/* Background line */}
+              <div className="w-full h-1 bg-gray-600 rounded-full"></div>
+              {/* Alignment indicator */}
               <div
-                className={`h-1 bg-gradient-to-r  rounded ${
+                className={`absolute h-2 w-2 rounded-full transition-all duration-300 shadow-lg ${
                   align === "left"
-                    ? "mr-auto w-3/4"
+                    ? "left-0"
                     : align === "center"
-                    ? "mx-auto w-1/2"
-                    : "ml-auto w-3/4"
+                    ? "left-1/2 transform -translate-x-1/2"
+                    : "right-0"
                 }`}
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  boxShadow: `0 0 8px ${ColorTheme.primary}40`,
+                }}
               ></div>
-              <div
-                className={`h-1 bg-gray-400 rounded ${
-                  align === "left"
-                    ? "mr-auto w-full"
-                    : align === "center"
-                    ? "mx-auto w-3/4"
-                    : "ml-auto w-full"
-                }`}
-              ></div>
+              {/* Subtle pulse animation for selected state */}
+              {value === align && (
+                <div
+                  className="absolute h-2 w-2 rounded-full animate-pulse"
+                  style={{
+                    background: `linear-gradient(135deg, ${ColorTheme.primary}20, ${ColorTheme.primaryDark}20)`,
+                  }}
+                ></div>
+              )}
             </div>
-            <div className="text-xs text-white">{alignLabel}</div>
+            <div className="text-xs text-white font-medium">{alignLabel}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Visual Vertical Alignment Selector Component
+const VerticalAlignmentSelector: React.FC<{
+  value: "top" | "center" | "bottom";
+  onChange: (value: "top" | "center" | "bottom") => void;
+  label: string;
+}> = ({ value, onChange, label }) => {
+  const alignments = [
+    { value: "top", icon: "↑", label: "Top" },
+    { value: "center", icon: "↕", label: "Center" },
+    { value: "bottom", icon: "↓", label: "Bottom" },
+  ];
+
+  return (
+    <div>
+      <label className="block text-white text-left font-medium mb-3">
+        {label}
+      </label>
+      <div className="grid grid-cols-3 gap-2">
+        {alignments.map(({ value: align, icon, label: alignLabel }) => (
+          <div
+            key={align}
+            onClick={() => onChange(align as any)}
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
+              value === align
+                ? "border-white bg-zinc-700 shadow-lg"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
+            }`}
+          >
+            <div className="text-2xl text-white">{icon}</div>
+            <div className="relative w-full h-12 flex items-center justify-center">
+              {/* Background container */}
+              <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
+              {/* Alignment indicator */}
+              <div
+                className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
+                  align === "top"
+                    ? "top-0"
+                    : align === "center"
+                    ? "top-1/2 transform -translate-y-1/2"
+                    : "bottom-0"
+                }`}
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  boxShadow: `0 0 8px ${ColorTheme.primary}40`,
+                }}
+              ></div>
+              {/* Subtle pulse animation for selected state */}
+              {value === align && (
+                <div
+                  className="absolute w-3 h-3 rounded-full animate-pulse"
+                  style={{
+                    background: `linear-gradient(135deg, ${ColorTheme.primary}20, ${ColorTheme.primaryDark}20)`,
+                  }}
+                ></div>
+              )}
+            </div>
+            <div className="text-xs text-white font-medium">{alignLabel}</div>
           </div>
         ))}
       </div>
@@ -164,49 +236,119 @@ const ButtonStyleSelector: React.FC<{
 
 // Visual Background Theme Selector Component
 const BackgroundThemeSelector: React.FC<{
-  value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines";
+  value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots";
   onChange: (
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines"
+    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots"
   ) => void;
 }> = ({ value, onChange }) => {
+  // Helper function to generate the actual background styles for each theme
+  const getThemeStyle = (themeValue: string) => {
+    switch (themeValue) {
+      case "pearl-mist":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.3), transparent 90%)",
+        };
+      case "aurora-midnight":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.4), transparent 90%)",
+        };
+      case "crimson-shadow":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.4), transparent 90%)",
+        };
+      case "ocean-abyss":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.4), transparent 90%)",
+        };
+      case "noise-pattern":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.4) 1px, transparent 0),
+            radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.35) 1px, transparent 0),
+            radial-gradient(circle at 1px 1px, rgba(236, 72, 153, 0.3) 1px, transparent 0)
+          `,
+          backgroundSize: "12px 12px, 18px 18px, 15px 15px",
+          backgroundPosition: "0 0, 6px 6px, 9px 3px",
+        };
+      case "diagonal-lines":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.2) 0, rgba(0, 255, 65, 0.2) 1px, transparent 1px, transparent 8px),
+            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.2) 0, rgba(0, 255, 65, 0.2) 1px, transparent 1px, transparent 8px),
+            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.1) 0, rgba(0, 255, 65, 0.1) 1px, transparent 1px, transparent 3px)
+          `,
+          backgroundSize: "16px 16px, 16px 16px, 6px 6px",
+        };
+      case "magenta-orb-grid":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            linear-gradient(to right, rgba(71,85,105,0.2) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(71,85,105,0.2) 1px, transparent 1px),
+            radial-gradient(circle at 50% 60%, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)
+          `,
+          backgroundSize: "20px 20px, 20px 20px, 100% 100%",
+        };
+      case "black-grid-dots":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)
+          `,
+          backgroundSize: "10px 10px, 10px 10px, 10px 10px",
+          backgroundPosition: "0 0, 0 0, 0 0",
+        };
+      default:
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.3), transparent 90%)",
+        };
+    }
+  };
+
   const themes: Array<{
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines";
+    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots";
     label: string;
-    background: string;
   }> = [
     {
       value: "noise-pattern",
       label: "Noise Pattern",
-      background: "#000000",
     },
     {
       value: "diagonal-lines",
       label: "Diagonal Lines",
-      background: "#000000",
+    },
+    {
+      value: "magenta-orb-grid",
+      label: "Magenta Orb Grid",
+    },
+    {
+      value: "black-grid-dots",
+      label: "Black Grid Dots",
     },
     {
       value: "pearl-mist",
       label: "Pearl Mist",
-      background:
-        "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%), #000000",
     },
     {
       value: "aurora-midnight",
       label: "Aurora Midnight",
-      background:
-        "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.25), transparent 90%), #000000",
     },
     {
       value: "crimson-shadow",
       label: "Crimson Shadow",
-      background:
-        "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.25), transparent 90%), #000000",
     },
     {
       value: "ocean-abyss",
       label: "Ocean Abyss",
-      background:
-        "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.25), transparent 90%), #000000",
     },
   ];
 
@@ -216,7 +358,7 @@ const BackgroundThemeSelector: React.FC<{
         Background Theme
       </label>
       <div className="grid grid-cols-2 gap-2">
-        {themes.map(({ value: themeValue, label, background }) => (
+        {themes.map(({ value: themeValue, label }) => (
           <div
             key={themeValue}
             onClick={() => onChange(themeValue)}
@@ -227,8 +369,8 @@ const BackgroundThemeSelector: React.FC<{
             }`}
           >
             <div
-              className="w-full h-16 rounded mb-2"
-              style={{ background }}
+              className="w-full h-20 rounded mb-2"
+              style={getThemeStyle(themeValue)}
             ></div>
             <div className="text-center text-xs text-white">{label}</div>
           </div>
@@ -247,6 +389,64 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this hero description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "hero-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (newDescription: string) => {
+    try {
+      // Update the hero data with the new description
+      const updatedHeroData = {
+        ...heroData,
+        summary: newDescription
+      };
+      setHeroData(updatedHeroData);
+      
+      // Save to database
+      const result = await updateSection({
+        sectionName: "hero",
+        portfolioId,
+        sectionContent: updatedHeroData,
+        sectionTitle: "Hero",
+        sectionDescription: "Hero section"
+      });
+      
+      if (result.success) {
+        toast.success("Hero description enhanced and saved successfully!");
+      } else {
+        toast.error("Failed to save changes to database");
+      }
+    } catch (error) {
+      console.error("Error saving hero description:", error);
+      toast.error("Failed to save changes to database");
+    }
+  };
 
   const [badgeScope, animateBadge] = useAnimate();
   const [titleScope, animateTitle] = useAnimate();
@@ -274,17 +474,6 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
-  // Debug logging for effectiveCustomization calculation
-  useEffect(() => {
-    console.log("effectiveCustomization calculation:", {
-      visualEditorOpen,
-      hasDraftCustomization: !!draftCustomization,
-      draftScrollIndicatorStyle: draftCustomization?.scrollIndicatorStyle,
-      customizationScrollIndicatorStyle: customization.scrollIndicatorStyle,
-      effectiveScrollIndicatorStyle: effectiveCustomization.scrollIndicatorStyle,
-      usingDraft: visualEditorOpen && draftCustomization
-    });
-  }, [visualEditorOpen, draftCustomization?.scrollIndicatorStyle, customization.scrollIndicatorStyle, effectiveCustomization.scrollIndicatorStyle]);
 
   // Load customizations from database on component mount
   useEffect(() => {
@@ -308,10 +497,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
-    console.log("openVisualEditor called:", {
-      currentCustomization: customization,
-      scrollIndicatorStyle: customization.scrollIndicatorStyle
-    });
+   
     setDraftCustomization({ ...customization });
     setVisualEditorOpen(true);
   };
@@ -319,17 +505,13 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   // All visual editor controls update draftCustomization
   const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
     if (!draftCustomization) return;
-    console.log("updateDraftCustomization called:", { key, value });
     setDraftCustomization({ ...draftCustomization, [key]: value });
   };
 
   // When 'Done' is clicked, save draft to DB and update main state
   const saveDraftCustomization = async () => {
     if (!draftCustomization) return;
-    console.log("saveDraftCustomization called:", { 
-      scrollIndicatorStyle: draftCustomization.scrollIndicatorStyle,
-      scrollIndicator: draftCustomization.scrollIndicator 
-    });
+   
     setCustomization(draftCustomization);
     setVisualEditorOpen(false);
     try {
@@ -416,9 +598,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
 
     const verticalMap = {
-      center: "justify-center",
+      center: "justify-center min-h-screen",
       top: "justify-start pt-12",
-      bottom: "justify-end pb-12",
+      bottom: "justify-end pb-12 min-h-screen",
     };
 
     const maxWidthMap = {
@@ -429,21 +611,21 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       full: "w-full",
     };
 
-    let classes = `relative flex-1 flex pt-8 flex-col ${
+    let classes = `relative flex-1 flex pt-8 flex-col px-4 sm:px-6 md:px-8 ${
       alignmentMap[effectiveCustomization.contentAlignment]
     } ${verticalMap[effectiveCustomization.verticalAlignment]} ${
       maxWidthMap[effectiveCustomization.maxWidth]
-    } mx-auto space-y-6`;
+    } mx-auto space-y-4 sm:space-y-6`;
 
     return classes;
   };
 
   const getTitleClasses = () => {
     const sizeMap = {
-      sm: "text-2xl md:text-4xl lg:text-5xl",
-      md: "text-3xl md:text-5xl lg:text-6xl",
-      lg: "text-4xl md:text-6xl lg:text-7xl",
-      xl: "text-5xl md:text-7xl lg:text-8xl",
+      sm: "text-xl sm:text-2xl md:text-4xl lg:text-5xl",
+      md: "text-2xl sm:text-3xl md:text-5xl lg:text-6xl",
+      lg: "text-3xl sm:text-4xl md:text-6xl lg:text-7xl",
+      xl: "text-4xl sm:text-5xl md:text-7xl lg:text-8xl",
     };
 
     const weightMap = {
@@ -477,9 +659,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
   const getDescriptionClasses = () => {
     const sizeMap = {
-      sm: "text-lg",
-      md: "text-xl",
-      lg: "text-2xl",
+      sm: "text-base sm:text-lg",
+      md: "text-lg sm:text-xl",
+      lg: "text-xl sm:text-2xl",
     };
 
     const weightMap = {
@@ -505,14 +687,14 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   };
 
   const getBadgeClasses = () => {
-    return `inline-flex items-center text-sm px-4 py-2 rounded-full`;
+    return `inline-flex items-center text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full`;
   };
 
   const getButtonClasses = () => {
     const sizeMap = {
-      sm: "px-4 py-2 text-sm",
-      md: "px-7 py-5 text-sm",
-      lg: "px-8 py-6 text-base",
+      sm: "px-3 sm:px-4 py-2 text-xs sm:text-sm",
+      md: "px-4 sm:px-7 py-3 sm:py-5 text-sm",
+      lg: "px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base",
     };
 
     const styleMap = {
@@ -523,9 +705,9 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     };
 
     const layoutMap = {
-      horizontal: "flex items-center justify-center gap-6",
-      vertical: "flex flex-col items-center gap-4",
-      stacked: "flex flex-col sm:flex-row items-center gap-4",
+      horizontal: "flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6",
+      vertical: "flex flex-col items-center gap-3 sm:gap-4",
+      stacked: "flex flex-col sm:flex-row items-center gap-3 sm:gap-4",
     };
 
     return {
@@ -767,6 +949,27 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
           `,
           backgroundSize: "24px 24px, 24px 24px, 8px 8px",
         };
+      case "magenta-orb-grid":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            linear-gradient(to right, rgba(71,85,105,0.2) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(71,85,105,0.2) 1px, transparent 1px),
+            radial-gradient(circle at 50% 60%, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)
+          `,
+          backgroundSize: "20px 20px, 20px 20px, 100% 100%",
+        };
+      case "black-grid-dots":
+        return {
+          backgroundColor: "#000000",
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: "20px 20px, 20px 20px, 20px 20px",
+          backgroundPosition: "0 0, 0 0, 0 0",
+        };
       default:
         return {
           backgroundColor: "#000000",
@@ -780,7 +983,14 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
     <div className="w-full relative bg-black">
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0" style={getBackgroundStyle()} />
-      <Navbar currentPortTheme={currentPortTheme} customCSS={customCSS} />
+      {/* Fade effect at bottom to smooth transition */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-10"></div>
+      <Navbar 
+        currentPortTheme={currentPortTheme} 
+        customCSS={customCSS} 
+        backgroundTheme={effectiveCustomization.backgroundTheme}
+        getBackgroundStyle={getBackgroundStyle}
+      />
               <div
           className={getContainerClasses()}
           style={{
@@ -818,15 +1028,16 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
         )}
         
         {/* Consistent Button Layout */}
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
           <button
             onClick={openVisualEditor}
-            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
             style={getThemeButtonStyle(true)}
           >
-            <Settings className="h-4 w-4" />
-            Visual Editor
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Visual Editor</span>
+            <span className="sm:hidden">Editor</span>
           </button>
         </div>
         
@@ -849,16 +1060,32 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
         </motion.h1>
 
         {/* Description */}
-        <motion.p
-          initial={animationVariants.hidden}
-          animate={animationVariants.visible}
-          transition={{
-            duration: 0.7,
-            delay: 0.4,
-          }}
-          className={getDescriptionClasses()}
-          dangerouslySetInnerHTML={{ __html: heroData.summary }}
-        ></motion.p>
+        <div className="relative">
+          <motion.p
+            initial={animationVariants.hidden}
+            animate={animationVariants.visible}
+            transition={{
+              duration: 0.7,
+              delay: 0.4,
+            }}
+            className={getDescriptionClasses()}
+            dangerouslySetInnerHTML={{ __html: heroData.summary }}
+          ></motion.p>
+          {/* Magic Write Button */}
+          <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
+            <MagicWrite
+              onMagicWrite={async (prompt: string, context?: string) => {
+                const enhancedDescription = await handleMagicWrite(prompt, heroData.summary);
+                handleDescriptionUpdate(enhancedDescription);
+                return enhancedDescription;
+              }}
+              placeholder="Enhance this hero description..."
+              buttonText=""
+              context={heroData.summary}
+              className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+            />
+          </div>
+        </div>
 
         {/* Buttons */}
         <motion.div
@@ -923,24 +1150,19 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             );
           })}
         </motion.div>
-
         {/* Scroll Indicator */}
         {effectiveCustomization.scrollIndicator && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.7 }}
             transition={{ duration: 1, delay: 1 }}
-            style={{ color: mutedColor }}
+            style={{ color: 'white' }}
             className="mt-16 text-center"
           >
             <p>Scroll to explore</p>
             {(() => {
               const style = effectiveCustomization.scrollIndicatorStyle?.toLowerCase();
-              console.log("Rendering scroll indicator:", {
-                style: style,
-                originalStyle: effectiveCustomization.scrollIndicatorStyle,
-                scrollIndicator: effectiveCustomization.scrollIndicator
-              });
+             
               return null;
             })()}
             {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "line") && (
@@ -990,15 +1212,15 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
         {/* Floating Visual Editor Window */}
         {visualEditorOpen && (
-          <div
-            ref={dragRef}
-            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
-            style={{
-              left: `${windowPosition.x}px`,
-              top: `${windowPosition.y}px`,
-              cursor: isDragging ? "grabbing" : "grab",
-            }}
-          >
+                  <div
+          ref={dragRef}
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
             {/* Header */}
             <div
               className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
@@ -1019,28 +1241,29 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 py-3 px-3 text-sm capitalize transition-colors`}
+                  className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors`}
                   style={getThemeButtonStyle(activeTab === tab)}
                 >
                   {tab === "layout" && (
-                    <Grid3X3 className="h-4 w-4 mx-auto mb-1" />
+                    <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                   )}
                   {tab === "typography" && (
-                    <Type className="h-4 w-4 mx-auto mb-1" />
+                    <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                   )}
                   {tab === "buttons" && (
-                    <Zap className="h-4 w-4 mx-auto mb-1" />
+                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                   )}
                   {tab === "effects" && (
-                    <Eye className="h-4 w-4 mx-auto mb-1" />
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
                   )}
-                  {tab}
+                  <span className="hidden sm:inline">{tab}</span>
+                  <span className="sm:hidden">{tab.charAt(0)}</span>
                 </button>
               ))}
             </div>
 
             {/* Tab Content */}
-            <div className="max-h-96 overflow-y-auto p-4 space-y-4">
+            <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
               {activeTab === "layout" && (
                 <div className="space-y-4">
                   <BackgroundThemeSelector
@@ -1053,36 +1276,6 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                     onChange={value => updateDraftCustomization("contentAlignment", value)}
                     label="Content Alignment"
                   />
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Vertical Alignment
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { value: "top", label: "Top", icon: "⬆" },
-                        { value: "center", label: "Center", icon: "↕" },
-                        { value: "bottom", label: "Bottom", icon: "⬇" },
-                      ].map(({ value, label, icon }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("verticalAlignment", value)}
-                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                            (draftCustomization?.verticalAlignment ?? customization.verticalAlignment) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="text-2xl text-white">{icon}</div>
-                          <div className="space-y-1 w-full">
-                            <div className="h-1 bg-gradient-to-r  rounded mx-auto w-1/2"></div>
-                            <div className="h-1 bg-gray-400 rounded mx-auto w-3/4"></div>
-                          </div>
-                          <div className="text-xs text-white">{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
 
                   <div>
                     <label className="block text-white text-left font-medium mb-3">
@@ -1125,7 +1318,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
                   <div className="mb-4">
                     <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Container Padding: {customization.containerPadding}px
+                      Container Padding: {draftCustomization?.containerPadding ?? customization.containerPadding}px
                     </label>
                     <input
                       type="range"
@@ -1136,7 +1329,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                       onChange={e => updateDraftCustomization("containerPadding", Number(e.target.value))}
                       className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                       style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100}%, #3f3f46 ${((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100}%, #3f3f46 100%)`,
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100))}%, #3f3f46 100%)`,
                       }}
                     />
                   </div>
@@ -1550,16 +1743,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                             >
-                              {(() => {
-                                console.log("Visual editor option:", { 
-                                  value, 
-                                  label, 
-                                  isSelected: (draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value,
-                                  draftValue: draftCustomization?.scrollIndicatorStyle,
-                                  customizationValue: customization.scrollIndicatorStyle
-                                });
-                                return null;
-                              })()}
+                              
                               <div className="text-center text-lg text-white mb-1">
                                 {icon}
                               </div>
@@ -1577,18 +1761,18 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+            <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
               <div className="flex gap-2">
                 <button
                   onClick={resetCustomization}
-                  className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                  className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
                 >
                   <RotateCcw className="h-3 w-3" />
                   Reset
                 </button>
                 <button
                   onClick={saveDraftCustomization}
-                  className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                  className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                   style={getThemeButtonStyle(true)}
                 >
                   Done

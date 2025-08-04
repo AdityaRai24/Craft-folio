@@ -8,14 +8,15 @@ import Navbar from "./Navbar";
 import AnimatedButton from "./AnimatedButton";
 import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
+import MagicWrite from "@/components/MagicWrite";
 import { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import { motion, useAnimate } from "framer-motion";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { defaultSimpleWhiteHeroStyles } from "./defaultStyles/hero";
 import { SimpleWhiteHeroCustomizationState } from "./defaultStyles/types";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -157,30 +158,79 @@ const BackgroundThemeSelector: React.FC<{
   value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
   onChange: (value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning") => void;
 }> = ({ value, onChange }) => {
+  const getThemeStyle = (theme: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning") => {
+    switch (theme) {
+      case "diagonal-grid":
+        return {
+          backgroundColor: "#fafafa",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px),
+            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px)
+          `,
+          backgroundSize: "16px 16px",
+        };
+      case "crosshatch":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(22.5deg, transparent, transparent 1px, rgba(75, 85, 99, 0.2) 1px, rgba(75, 85, 99, 0.2) 2px, transparent 2px, transparent 4px),
+            repeating-linear-gradient(67.5deg, transparent, transparent 1px, rgba(107, 114, 128, 0.15) 1px, rgba(107, 114, 128, 0.15) 2px, transparent 2px, transparent 4px),
+            repeating-linear-gradient(112.5deg, transparent, transparent 1px, rgba(55, 65, 81, 0.1) 1px, rgba(55, 65, 81, 0.1) 2px, transparent 2px, transparent 4px),
+            repeating-linear-gradient(157.5deg, transparent, transparent 1px, rgba(31, 41, 55, 0.08) 1px, rgba(31, 41, 55, 0.08) 2px, transparent 2px, transparent 4px)
+          `,
+        };
+      case "circuit-board":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px, transparent 9px, transparent 16px, rgba(75, 85, 99, 0.25) 16px, rgba(75, 85, 99, 0.25) 17px),
+            repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px, transparent 9px, transparent 16px, rgba(75, 85, 99, 0.25) 16px, rgba(75, 85, 99, 0.25) 17px),
+            radial-gradient(circle at 8px 8px, rgba(55, 65, 81, 0.4) 1px, transparent 1px),
+            radial-gradient(circle at 16px 16px, rgba(55, 65, 81, 0.4) 1px, transparent 1px)
+          `,
+          backgroundSize: "16px 16px, 16px 16px, 16px 16px, 16px 16px",
+        };
+      case "zigzag-lightning":
+        return {
+          backgroundColor: "#ffffff",
+          backgroundImage: `
+            repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px),
+            repeating-linear-gradient(90deg, transparent, transparent 12px, rgba(107, 114, 128, 0.2) 12px, rgba(107, 114, 128, 0.2) 13px),
+            repeating-linear-gradient(60deg, transparent, transparent 16px, rgba(55, 65, 81, 0.15) 16px, rgba(55, 65, 81, 0.15) 17px),
+            repeating-linear-gradient(150deg, transparent, transparent 14px, rgba(31, 41, 55, 0.12) 14px, rgba(31, 41, 55, 0.12) 15px)
+          `,
+        };
+      default:
+        return {
+          backgroundColor: "#fafafa",
+          backgroundImage: `
+            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px),
+            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px)
+          `,
+          backgroundSize: "16px 16px",
+        };
+    }
+  };
+
   const themes: Array<{
     value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
     label: string;
-    background: string;
   }> = [
     {
       value: "diagonal-grid",
       label: "Diagonal Grid",
-      background: "#fafafa",
     },
     {
       value: "crosshatch",
       label: "Crosshatch",
-      background: "#ffffff",
     },
     {
       value: "circuit-board",
       label: "Circuit Board",
-      background: "#ffffff",
     },
     {
       value: "zigzag-lightning",
       label: "Zigzag Lightning",
-      background: "#ffffff",
     },
   ];
 
@@ -190,7 +240,7 @@ const BackgroundThemeSelector: React.FC<{
         Background Theme
       </label>
       <div className="grid grid-cols-2 gap-2">
-        {themes.map(({ value: themeValue, label, background }) => (
+        {themes.map(({ value: themeValue, label }) => (
           <div
             key={themeValue}
             onClick={() => onChange(themeValue)}
@@ -201,8 +251,8 @@ const BackgroundThemeSelector: React.FC<{
             }`}
           >
             <div
-              className="w-full h-16 rounded mb-2"
-              style={{ background }}
+              className="w-full h-20 rounded mb-2"
+              style={getThemeStyle(themeValue)}
             ></div>
             <div className="text-center text-xs text-white">{label}</div>
           </div>
@@ -212,11 +262,22 @@ const BackgroundThemeSelector: React.FC<{
   );
 };
 
-const Hero: NextPage = ({ customCSS }: any) => {
+const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
-
+  const dispatch = useDispatch();
+  
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const inTheme = portfolioData?.find((item: any) => item.type === "themes");
+  const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
+
+  // Theme colors
+  const primaryColor = theme?.colors?.primary || ColorTheme.primary;
+  const primaryHoverColor = theme?.colors?.primaryHover || ColorTheme.primaryHover;
+  const textPrimaryColor = theme?.colors?.text?.primary || ColorTheme.textPrimary;
+  const textSecondaryColor = theme?.colors?.text?.secondary || ColorTheme.textSecondary;
+  const backgroundPrimaryColor = theme?.colors?.background?.primary || ColorTheme.bgMain;
+  const backgroundSecondaryColor = theme?.colors?.background?.secondary || ColorTheme.bgCard;
 
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
@@ -380,15 +441,15 @@ const Hero: NextPage = ({ customCSS }: any) => {
 
   const getCardStyle = () => {
     const styleMap = {
-      solid: "bg-white",
-      gradient: "bg-gradient-to-br from-white to-primary-100",
+      solid: `bg-[${backgroundPrimaryColor}]`,
+      gradient: `bg-gradient-to-br from-[${backgroundPrimaryColor}] to-[${backgroundSecondaryColor}]`,
       transparent: "bg-transparent",
     };
 
     const borderMap = {
       none: "border-transparent",
-      subtle: "border-2 border-primary-100 hover:border-black/20",
-      bold: "border-4 border-primary-200 hover:border-primary-300",
+      subtle: `border-2 border-[${primaryColor}]/20 hover:border-[${primaryColor}]/40`,
+      bold: `border-4 border-[${primaryColor}]/40 hover:border-[${primaryColor}]/60`,
     };
 
     const shadowMap = {
@@ -417,13 +478,13 @@ const Hero: NextPage = ({ customCSS }: any) => {
     };
 
     const hoverMap = {
-      border: "hover:border-8 hover:border-black/30",
+      border: `hover:border-8 hover:border-[${primaryColor}]/30`,
       scale: "hover:scale-110",
-      glow: "hover:shadow-lg hover:shadow-primary-200",
+      glow: `hover:shadow-lg hover:shadow-[${primaryColor}]/20`,
       none: "",
     };
 
-    return `duration-200 ease-in border-4 border-transparent ${hoverMap[effectiveCustomization.socialLinksHoverEffect]} ${styleMap[effectiveCustomization.socialLinksStyle]} bg-white flex items-center justify-center transition-all ${sizeMap[effectiveCustomization.socialLinksSize]}`;
+    return `duration-200 ease-in border-4 border-transparent ${hoverMap[effectiveCustomization.socialLinksHoverEffect]} ${styleMap[effectiveCustomization.socialLinksStyle]} bg-[${backgroundPrimaryColor}] flex items-center justify-center transition-all ${sizeMap[effectiveCustomization.socialLinksSize]}`;
   };
 
   const getResumeButtonStyle = () => {
@@ -435,14 +496,34 @@ const Hero: NextPage = ({ customCSS }: any) => {
       lg: "px-8 py-4 text-lg",
     };
 
+    return `${sizeMap[effectiveCustomization.resumeButtonSize]} rounded transition-all duration-300`;
+  };
+
+  const getResumeButtonInlineStyle = () => {
     const styleMap = {
-      default: "bg-gray-900 hover:bg-gray-800 text-white",
-      animated: "bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white",
-      minimal: "border border-gray-300 text-gray-700 hover:bg-gray-50",
-      outline: "border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white",
+      default: {
+        backgroundColor: primaryColor,
+        color: 'white',
+        border: 'none',
+      },
+      animated: {
+        background: `linear-gradient(135deg, ${primaryColor}, ${primaryHoverColor})`,
+        color: 'white',
+        border: 'none',
+      },
+      minimal: {
+        backgroundColor: 'transparent',
+        color: textPrimaryColor,
+        border: `1px solid ${textSecondaryColor}`,
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        color: primaryColor,
+        border: `2px solid ${primaryColor}`,
+      },
     };
 
-    return `${sizeMap[effectiveCustomization.resumeButtonSize]} ${styleMap[effectiveCustomization.resumeButtonStyle]} rounded transition-all duration-300`;
+    return styleMap[effectiveCustomization.resumeButtonStyle];
   };
 
   // Load customizations from database on component mount
@@ -566,6 +647,62 @@ const Hero: NextPage = ({ customCSS }: any) => {
     }
   };
 
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          context: context || ""
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Magic Write API error');
+      }
+
+      const data = await response.json();
+      return data.result || context || "";
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      toast.error('Failed to enhance text');
+      return context || "";
+    }
+  };
+
+  const handleDescriptionUpdate = async (newDescription: string) => {
+    try {
+      // Update the hero data with the new description
+      const updatedHeroData = {
+        ...heroData,
+        summary: newDescription
+      };
+      setHeroData(updatedHeroData);
+      
+      // Save to database
+      const result = await updateSection({
+        sectionName: "hero",
+        portfolioId,
+        sectionContent: updatedHeroData,
+        sectionTitle: "Hero",
+        sectionDescription: "Hero section"
+      });
+      
+      if (result.success) {
+        toast.success("Hero description enhanced and saved successfully!");
+      } else {
+        toast.error("Failed to save changes to database");
+      }
+    } catch (error) {
+      console.error("Error saving hero description:", error);
+      toast.error("Failed to save changes to database");
+    }
+  };
+
   useEffect(() => {
     if (portfolioData) {
       const heroSectionData = portfolioData?.find(
@@ -618,37 +755,41 @@ const Hero: NextPage = ({ customCSS }: any) => {
     );
   }
 
+
+
   return (
-    <div id="about" className={`relative simple-white pt-12 sm:pt-16 md:pt-20`} style={getBackgroundThemeStyle()}>
+    <div id="about" className={`relative simple-white pt-8 sm:pt-12 md:pt-16 lg:pt-20`} style={getBackgroundThemeStyle()}>
       <style>{customCSS}</style>
       
 
 
-      <div className="flex h-full pt-24 justify-center items-end mb-24">
+      <div className="flex h-full pt-16 sm:pt-20 md:pt-24 justify-center items-end mb-16 sm:mb-20 md:mb-24">
         <div className={getContainerClasses()}>
-        <div className="flex absolute right-0 ">
+        <div className="flex absolute gap-4 right-2 sm:right-24 top-2 sm:top-24 z-20">
           <EditButton 
             sectionName={"hero"}
-            styles="text-xs px-3 py-1"
+            styles="text-xs px-2 sm:px-3 py-1"
           />
           <button
             onClick={openVisualEditor}
-            className="flex cursor-pointer items-center gap-2 px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+            className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
             }}
           >
-            <Settings className="h-3 w-3" />
-            Visual Editor
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Visual Editor</span>
+            <span className="sm:hidden">Editor</span>
           </button>
         </div>
 
           
-          <main className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-4 xl:gap-8">
+          <main className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-4 xl:gap-8">
             {/* Left Column - Main Info */}
             <div className="lg:col-span-2 relative">
               <motion.h1
                 className={getTitleClasses()}
+                style={{ color: textPrimaryColor }}
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{
@@ -663,6 +804,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
 
               <motion.h2
                 className={getSubtitleClasses()}
+                style={{ color: textSecondaryColor }}
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{
@@ -675,23 +817,39 @@ const Hero: NextPage = ({ customCSS }: any) => {
                 {heroData?.title || "Full Stack Developer"}
               </motion.h2>
 
-              <motion.p
-                className={getDescriptionClasses()}
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{
-                  type: "spring",
-                  damping: 12,
-                  stiffness: 100,
-                  delay: 0.3,
-                }}
-              >
-                {heroData?.summary ||
-                  "I build exceptional and accessible digital experiences for the web."}
-              </motion.p>
+              <div className="relative">
+                <motion.p
+                  className={getDescriptionClasses()}
+                  style={{ color: textSecondaryColor }}
+                  initial={{ y: 50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    type: "spring",
+                    damping: 12,
+                    stiffness: 100,
+                    delay: 0.3,
+                  }}
+                >
+                  {heroData?.summary ||
+                    "I build exceptional and accessible digital experiences for the web."}
+                </motion.p>
+                <div className="absolute -top-1 -right-1 z-10">
+                  <MagicWrite
+                    onMagicWrite={async (prompt: string, context?: string) => {
+                      const enhancedDescription = await handleMagicWrite(prompt, heroData?.summary || "I build exceptional and accessible digital experiences for the web.");
+                      handleDescriptionUpdate(enhancedDescription);
+                      return enhancedDescription;
+                    }}
+                    placeholder="Enhance this description..."
+                    buttonText=""
+                    context={heroData?.summary || "I build exceptional and accessible digital experiences for the web."}
+                    className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
+                  />
+                </div>
+              </div>
 
               {/* Social Links */}
-              <div className={`flex space-x-3 sm:space-x-4 mb-8 sm:mb-12 lg:mb-16 ${effectiveCustomization.socialLinksVisible ? "" : "hidden"}`}>
+              <div className={`flex space-x-2 sm:space-x-3 md:space-x-4 mb-6 sm:mb-8 md:mb-12 lg:mb-16 ${effectiveCustomization.socialLinksVisible ? "" : "hidden"}`}>
                 <motion.a
                   href={userInfo?.github}
                   target="_blank"
@@ -703,7 +861,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
                     opacity: 1,
                   }}
                 >
-                  <FaGithub className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-gray-900" />
+                  <FaGithub className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
                 </motion.a>
 
                 <motion.a
@@ -717,7 +875,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
                     opacity: 1,
                   }}
                 >
-                  <FaLinkedin className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-gray-900" />
+                  <FaLinkedin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
                 </motion.a>
               </div>
             </div>
@@ -726,7 +884,7 @@ const Hero: NextPage = ({ customCSS }: any) => {
             <div className="lg:col-span-2 relative">
               {effectiveCustomization.aboutCardVisible && (
                 <motion.div
-                  className={getCardStyle()}
+                  className={`${getCardStyle()} cursor-pointer`}
                   initial={{ x: 0, opacity: 0 }}
                   animate={{
                     x: 0, 
@@ -738,16 +896,16 @@ const Hero: NextPage = ({ customCSS }: any) => {
                       delay: 0.4,
                     },
                   }}
-                  whileHover={{
+                  style={{
                     scale: effectiveCustomization.hoverEffects ? 1.02 : 1,
                     boxShadow: effectiveCustomization.hoverEffects
                       ? "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.01)"
                       : "",
-                    transition: { type: "spring", stiffness: 300, damping: 20 },
                   }}
                 >
                   <motion.h2
-                    className="text-2xl sm:text-3xl lg:text-4xl font-bold section-sub-title text-gray-900 mb-4 sm:mb-5 lg:mb-6"
+                    className="text-2xl sm:text-3xl text-left lg:text-4xl font-bold section-sub-title mb-4 sm:mb-5 lg:mb-6"
+                    style={{ color: textPrimaryColor }}
                     initial={{ y: 20, opacity: 0 }}
                     animate={{
                       y: 0,
@@ -767,10 +925,11 @@ const Hero: NextPage = ({ customCSS }: any) => {
                       transition: { delay: 0.6, duration: 0.5 },
                     }}
                   >
-                    <MdEmail className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 mr-2 sm:mr-3 flex-shrink-0" />
+                    <MdEmail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" style={{ color: textSecondaryColor }} />
                     <a
                       href={`mailto:${userInfo?.email}`}
-                      className="text-gray-700 text-base sm:text-lg lg:text-xl font-medium hover:text-gray-900 break-all"
+                      className="text-base sm:text-lg lg:text-xl font-medium break-all"
+                      style={{ color: textSecondaryColor }}
                     >
                       {userInfo?.email}
                     </a>
@@ -785,24 +944,66 @@ const Hero: NextPage = ({ customCSS }: any) => {
                       transition: { delay: 0.7, duration: 0.5 },
                     }}
                   >
-                    <MdLocationOn className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 mr-2 sm:mr-3 flex-shrink-0" />
-                    <span className="text-gray-700 text-base sm:text-lg font-medium">
+                    <MdLocationOn className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" style={{ color: textSecondaryColor }} />
+                    <span className="text-base sm:text-lg font-medium" style={{ color: textSecondaryColor }}>
                       {userInfo?.location}
                     </span>
                   </motion.div>
 
-                  <motion.p
-                    className="text-gray-700 section-sub-description text-sm sm:text-base lg:text-md leading-relaxed"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{
-                      y: 0,
-                      opacity: 1,
-                      transition: { delay: 0.8, duration: 0.5 },
-                    }}
-                  >
-                    {userInfo?.shortSummary ||
-                      "I build exceptional and accessible digital experiences for the web."}
-                  </motion.p>
+                  <div className="relative">
+                    <motion.p
+                      className="section-sub-description text-sm sm:text-base lg:text-md leading-relaxed"
+                      style={{ color: textSecondaryColor }}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{
+                        y: 0,
+                        opacity: 1,
+                        transition: { delay: 0.8, duration: 0.5 },
+                      }}
+                    >
+                      {userInfo?.shortSummary ||
+                        "I build exceptional and accessible digital experiences for the web."}
+                    </motion.p>
+                    <div className="absolute -top-1 -right-1 z-10">
+                      <MagicWrite
+                        onMagicWrite={async (prompt: string, context?: string) => {
+                          const enhancedSummary = await handleMagicWrite(prompt, userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web.");
+                          // Update userInfo with enhanced summary
+                          const updatedUserInfo = {
+                            ...userInfo,
+                            shortSummary: enhancedSummary
+                          };
+                          setUserInfo(updatedUserInfo);
+                          
+                          // Save to database
+                          try {
+                            const result = await updateSection({
+                              sectionName: "userInfo",
+                              portfolioId,
+                              sectionContent: updatedUserInfo,
+                              sectionTitle: "User Info",
+                              sectionDescription: "User information section"
+                            });
+                            
+                            if (result.success) {
+                              toast.success("Summary enhanced and saved successfully!");
+                            } else {
+                              toast.error("Failed to save changes to database");
+                            }
+                          } catch (error) {
+                            console.error("Error saving user info:", error);
+                            toast.error("Failed to save changes to database");
+                          }
+                          
+                          return enhancedSummary;
+                        }}
+                        placeholder="Enhance this summary..."
+                        buttonText=""
+                        context={userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web."}
+                        className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
+                      />
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
@@ -815,7 +1016,8 @@ const Hero: NextPage = ({ customCSS }: any) => {
                 {effectiveCustomization.resumeButtonVisible ? (
                   <motion.button
                     onClick={handleResumeDownload}
-                    className={`${getResumeButtonStyle()} flex items-center gap-2`}
+                    className={`${getResumeButtonStyle()} cursor-pointer flex items-center gap-2`}
+                    style={getResumeButtonInlineStyle()}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -856,7 +1058,11 @@ const Hero: NextPage = ({ customCSS }: any) => {
               }}
             >
               <motion.button
-                className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center border border-gray-200 text-${effectiveCustomization.scrollIndicatorColor} hover:text-gray-600 hover:border-gray-300 transition-colors`}
+                className={`rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center border transition-colors`}
+                style={{ 
+                  borderColor: textSecondaryColor,
+                  color: textSecondaryColor
+                }}
                 whileTap={{ scale: 0.9 }}
               >
                 <FaChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -870,59 +1076,61 @@ const Hero: NextPage = ({ customCSS }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
             cursor: isDragging ? "grabbing" : "grab",
+            zIndex: 99999999,
           }}
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Visual Editor</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Visual Editor</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="flex border-b border-zinc-700">
-            {["layout", "typography", "buttons", "effects"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${
-                  activeTab === tab ? "text-white" : "text-gray-400 hover:text-white"
-                }`}
-                style={{
-                  background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
-                }}
-              >
-                {tab === "layout" && (
-                  <Grid3X3 className="h-4 w-4 mx-auto mb-1" />
-                )}
-                {tab === "typography" && (
-                  <Type className="h-4 w-4 mx-auto mb-1" />
-                )}
-                {tab === "buttons" && (
-                  <Zap className="h-4 w-4 mx-auto mb-1" />
-                )}
-                {tab === "effects" && (
-                  <Eye className="h-4 w-4 mx-auto mb-1" />
-                )}
-                {tab}
-              </button>
-            ))}
-          </div>
+                      {/* Tab Navigation */}
+            <div className="flex border-b border-zinc-700">
+              {["layout", "typography", "buttons", "effects"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
+                    activeTab === tab ? "text-white" : "text-gray-400 hover:text-white"
+                  }`}
+                  style={{
+                    background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
+                  }}
+                >
+                  {tab === "layout" && (
+                    <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
+                  )}
+                  {tab === "typography" && (
+                    <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
+                  )}
+                  {tab === "buttons" && (
+                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
+                  )}
+                  {tab === "effects" && (
+                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
+                  )}
+                  <span className="hidden sm:inline">{tab}</span>
+                  <span className="sm:hidden">{tab.charAt(0)}</span>
+                </button>
+              ))}
+            </div>
 
-          {/* Tab Content */}
-          <div className="max-h-96 overflow-y-auto p-4 space-y-4">
+                      {/* Tab Content */}
+            <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {activeTab === "layout" && (
               <div className="space-y-4">
                 <BackgroundThemeSelector
@@ -1108,24 +1316,24 @@ const Hero: NextPage = ({ customCSS }: any) => {
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+          <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
-                              <button
-                  onClick={saveDraftCustomization}
-                  className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                >
-                  Done
-                </button>
+              <button
+                onClick={saveDraftCustomization}
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
@@ -1138,6 +1346,9 @@ const Hero: NextPage = ({ customCSS }: any) => {
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+      {/* Bottom gradient edge to soften transition to next component */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent z-10"></div>
     </div>
   );
 };

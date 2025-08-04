@@ -84,16 +84,20 @@ const GridColumnsSelector: React.FC<{
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
             }`}
           >
-            <div className={`grid grid-cols-${cols} gap-1`}>
+            <div className={`grid gap-1 ${
+              cols === 2 ? "grid-cols-2" :
+              cols === 3 ? "grid-cols-3" :
+              "grid-cols-4"
+            }`}>
               {Array.from({ length: cols }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-4 rounded"
+                  className="h-3 rounded"
                   style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
                 ></div>
               ))}
             </div>
-            <div className="text-center text-sm text-white mt-2">
+            <div className="text-center text-xs text-white mt-2">
               {cols} Cols
             </div>
           </div>

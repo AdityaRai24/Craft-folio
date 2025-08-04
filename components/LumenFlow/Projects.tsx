@@ -22,6 +22,8 @@ import {
   Columns2,
   Columns3,
   Columns4,
+  Sparkles,
+  Send,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -32,9 +34,10 @@ import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
 import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import { ColorTheme } from "@/lib/colorThemes";
+import MagicWrite from "@/components/MagicWrite";
+
 
 interface Technology {
   name: string;
@@ -124,6 +127,61 @@ const Projects = ({ currentTheme }: any) => {
   const sectionDescription =
     projectsSection?.sectionDescription ||
     "Here are some of the projects I've worked on, showcasing my skills in full-stack development, UI/UX design, and problem-solving. Each project demonstrates different technologies and approaches to building scalable, user-friendly applications.";
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this project description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "project-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (projectIndex: number, newDescription: string) => {
+    const updatedProjects = [...projectsData];
+    updatedProjects[projectIndex] = {
+      ...updatedProjects[projectIndex],
+      projectDescription: newDescription
+    };
+    setProjectsData(updatedProjects);
+          try {
+        const result = await updateSection({
+          sectionName: "projects",
+          portfolioId,
+          sectionContent: updatedProjects,
+          sectionTitle: "Projects",
+          sectionDescription: "Projects section"
+        });
+        if (result.success) {
+          toast.success("Project description enhanced and saved successfully!");
+        } else {
+          toast.error("Failed to save changes to database");
+        }
+      } catch (error) {
+        console.error("Error saving project description:", error);
+        toast.error("Failed to save changes to database");
+      }
+  };
 
   const themeClasses = getThemeClasses(currentTheme);
   
@@ -338,7 +396,7 @@ const Projects = ({ currentTheme }: any) => {
                   <div
                     key={i}
                     className="h-4 rounded"
-                    style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
+                    style={{ background: `linear-gradient(135deg, #10b981, #059669)` }}
                   ></div>
                 ))}
               </div>
@@ -361,24 +419,25 @@ const Projects = ({ currentTheme }: any) => {
         <label className="block text-white text-left font-medium mb-3">Card Style</label>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: "default", label: "Default" },
-            { value: "minimal", label: "Minimal" },
-            { value: "glassmorphism", label: "Glass" },
-            { value: "neon", label: "Neon" },
+            { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+            { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+            { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+            { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
           ].map((style) => (
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
                 value === style.value
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
               <div className="space-y-2">
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
+                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                  <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                  <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                </div>
               </div>
               <div className="text-center text-sm text-white mt-2">
                 {style.label}
@@ -417,7 +476,7 @@ const Projects = ({ currentTheme }: any) => {
             onChange={(e) => onChange(Number(e.target.value))}
             className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
+              background: `linear-gradient(to right, #10b981 0%, #10b981 ${percentage}%, #3f3f46 ${percentage}%, #3f3f46 100%)`,
               WebkitAppearance: "none",
               outline: "none",
             }}
@@ -429,7 +488,7 @@ const Projects = ({ currentTheme }: any) => {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: ${ColorTheme.primary};
+            background: #10b981;
             cursor: pointer;
             border: 3px solid #ffffff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -445,7 +504,7 @@ const Projects = ({ currentTheme }: any) => {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: ${ColorTheme.primary};
+            background: #10b981;
             cursor: pointer;
             border: 3px solid #ffffff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -502,7 +561,7 @@ const Projects = ({ currentTheme }: any) => {
             <div
               key={size}
               onClick={() => onChange(size as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === size
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -538,7 +597,7 @@ const Projects = ({ currentTheme }: any) => {
             <div
               key={weight}
               onClick={() => onChange(weight as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === weight
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -576,7 +635,7 @@ const Projects = ({ currentTheme }: any) => {
             <div
               key={align}
               onClick={() => onChange(align as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
                 value === align
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -592,7 +651,7 @@ const Projects = ({ currentTheme }: any) => {
                       ? "mx-auto w-1/2"
                       : "ml-auto w-3/4"
                   }`}
-                  style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
+                  style={{ background: `linear-gradient(135deg, #10b981, #059669)` }}
                 ></div>
                 <div
                   className={`h-1 bg-gray-400 rounded ${
@@ -634,7 +693,7 @@ const Projects = ({ currentTheme }: any) => {
             <div
               key={style}
               onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === style
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -656,8 +715,8 @@ const Projects = ({ currentTheme }: any) => {
                     style={
                       style === "colorful"
                         ? {
-                            borderColor: ColorTheme.primary,
-                            backgroundColor: `${ColorTheme.primary}20`,
+                            borderColor: "#10b981",
+                            backgroundColor: "#10b98120",
                           }
                         : {}
                     }
@@ -680,7 +739,7 @@ const Projects = ({ currentTheme }: any) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto">
+      <div className="space-y-8 overflow-hidden scrollbar-none max-w-7xl mx-auto">
         <div className="flex items-center justify-center h-64">
           <div className="relative">
             <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
@@ -692,37 +751,27 @@ const Projects = ({ currentTheme }: any) => {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto md:px-4">
+            <div className="space-y-4 md:space-y-6 lg:space-y-8 overflow-hidden scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
       <HeaderComponent
         currentTheme={currentTheme}
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         sectionName="projects"
+        openVisualEditor={openVisualEditor}
+        visualEditorOpen={visualEditorOpen}
       />
 
-      {/* Visual Editor Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
-          onClick={openVisualEditor}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
+
 
       {/* Projects Grid */}
       <div 
-        className={`grid grid-cols-1 md:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4}`}
+                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4}`}
         style={{ gap: `${effectiveCustomization.cardSpacing}px` }}
       >
         {displayedProjects.map((project, index) => (
           <div
             key={index}
-            className="group relative overflow-hidden"
+            className="group relative"
             onMouseEnter={() => setHoveredProject(index)}
             onMouseLeave={() => setHoveredProject(null)}
           >
@@ -738,41 +787,31 @@ const Projects = ({ currentTheme }: any) => {
 
             {/* Main Card */}
             <div 
-              className={`relative overflow-hidden transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${
-                theme === "light"
-                  ? "bg-white text-gray-700 shadow-sm"
-                  : "bg-transparent"
+              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${
+                effectiveCustomization.cardLayout === "default"
+                  ? theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
+                  : effectiveCustomization.cardLayout === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardLayout === "glassmorphism"
+                  ? theme === "light"
+                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                  : effectiveCustomization.cardLayout === "neon"
+                  ? theme === "light"
+                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                  : theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
               }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
+                borderWidth: effectiveCustomization.cardLayout === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
                 transform: effectiveCustomization.hoverEffects && hoveredProject === index ? "translateY(-4px) scale(1.02)" : "none",
                 filter: effectiveCustomization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
-                ...(effectiveCustomization.cardLayout === "minimal" && {
-                  backgroundColor: "transparent",
-                  borderWidth: "0px",
-                  borderStyle: "none",
-                  boxShadow: "none"
-                }),
-                ...(effectiveCustomization.cardLayout === "glassmorphism" && {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  backdropFilter: "blur(10px)",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: "rgba(255, 255, 255, 0.2)"
-                }),
-                ...(effectiveCustomization.cardLayout === "neon" && {
-                  borderWidth: "2px",
-                  borderStyle: "solid",
-                  borderColor: titleColor,
-                  boxShadow: `0 0 20px ${titleColor}50, inset 0 0 20px ${titleColor}10`
-                }),
-                ...(effectiveCustomization.cardLayout === "default" && {
-                  backgroundColor: theme === "light" ? "white" : "transparent",
-                  borderWidth: `${effectiveCustomization.borderWidth}px`,
-                  borderStyle: "solid",
-                  borderColor: theme === "light" ? "rgba(229, 231, 235, 0.5)" : "rgba(55, 65, 81, 0.5)"
-                })
               }}
             >
               {/* Project Image */}
@@ -852,9 +891,9 @@ const Projects = ({ currentTheme }: any) => {
                 </div>
 
                 {/* Description */}
-                <div className="space-y-2">
+                <div className="relative">
                   <p
-                    className={`text-sm leading-relaxed transition-colors duration-300 ${
+                    className={`text-sm leading-relaxed transition-colors duration-300 mb-2 ${
                       theme === "light"
                         ? "text-gray-700"
                         : themeClasses.textSecondary
@@ -862,6 +901,20 @@ const Projects = ({ currentTheme }: any) => {
                   >
                     {project.projectDescription}
                   </p>
+                  {/* Magic Write Button */}
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <MagicWrite
+                      onMagicWrite={async (prompt: string, context?: string) => {
+                        const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription);
+                        handleDescriptionUpdate(index, enhancedDescription);
+                        return enhancedDescription;
+                      }}
+                      placeholder="Enhance this project description..."
+                      buttonText=""
+                      context={project?.projectDescription}
+                      className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                    />
+                  </div>
                   {project.projectDescription &&
                     project.projectDescription.length > 150 && (
                       <button
@@ -1045,7 +1098,7 @@ const Projects = ({ currentTheme }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+                        className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -1054,15 +1107,15 @@ const Projects = ({ currentTheme }: any) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Projects Settings</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Projects Settings</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -1072,13 +1125,13 @@ const Projects = ({ currentTheme }: any) => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
-                    activeTab === tab
-                      ? "text-white"
-                      : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                  }`}
+                                  className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
+                  activeTab === tab
+                    ? "text-white"
+                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                }`}
                   style={activeTab === tab ? {
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                    background: `linear-gradient(135deg, #10b981, #059669)`,
                   } : {}}
                 >
                   {tab === "layout" && (
@@ -1096,7 +1149,7 @@ const Projects = ({ currentTheme }: any) => {
             </div>
 
                       {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
               {activeTab === "layout" && (
                 <>
                   <GridColumnsSelector
@@ -1265,20 +1318,20 @@ const Projects = ({ currentTheme }: any) => {
             </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  background: `linear-gradient(135deg, #10b981, #059669)`,
                 }}
               >
                 Done
@@ -1291,10 +1344,12 @@ const Projects = ({ currentTheme }: any) => {
       {/* Overlay for floating window */}
       {visualEditorOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40"
+                        className="fixed inset-0 bg-black/20 z-40"
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+
     </div>
   );
 };

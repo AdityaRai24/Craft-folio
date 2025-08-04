@@ -212,12 +212,12 @@ export async function fetchThemesApi() {
       },
     });
 
-    // Reorder themes to match desired order
+    // Reorder themes to match desired order - NeoSpark first (best template), then LumenFlow, then MonoEdge
     const orderedThemes = themes.sort((a, b) => {
       const order: Record<string, number> = {
-        LumenFlow: 1,
-        NeoSpark: 2,
-        SimpleWhite: 3,
+        NeoSpark: 1,
+        LumenFlow: 2,
+        MonoEdge: 3,
       };
       return (order[a.name] || 999) - (order[b.name] || 999);
     });

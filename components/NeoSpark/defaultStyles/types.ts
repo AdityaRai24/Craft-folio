@@ -39,7 +39,9 @@ export interface CustomizationState {
     | "crimson-shadow"
     | "ocean-abyss"
     | "noise-pattern"
-    | "diagonal-lines";
+    | "diagonal-lines"
+    | "magenta-orb-grid"
+    | "black-grid-dots";
 
   // Badge Customization
   badgeVisible: boolean;

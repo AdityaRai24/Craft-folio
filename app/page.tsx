@@ -204,7 +204,7 @@ export default function Page() {
               </motion.h1>
 
               <motion.p
-                className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto"
+                className="text-xl md:text-2xl mb-6 max-w-3xl mx-auto"
                 style={{
                   color: ColorTheme.textSecondary,
                   textShadow: `0 0 10px ${ColorTheme.textSecondary}20`,
@@ -215,6 +215,62 @@ export default function Page() {
                 portfolio website. Customize it or build from scratch - no
                 coding required.
               </motion.p>
+
+              {/* Portfolio Statistics */}
+              <motion.div
+                className="mb-10"
+                variants={fadeIn}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <motion.div
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-sm"
+                  style={{
+                    backgroundColor: "rgba(28, 28, 30, 0.6)",
+                    borderColor: ColorTheme.borderLight,
+                    boxShadow: `0 2px 10px rgba(0,0,0,0.1)`,
+                  }}
+                  whileHover={{
+                    scale: 1.05,
+                    borderColor: ColorTheme.primary,
+                    boxShadow: `0 4px 15px rgba(0,0,0,0.2), 0 0 20px ${ColorTheme.primary}20`,
+                  }}
+                >
+                  <motion.div
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: ColorTheme.primary,
+                      boxShadow: `0 0 10px ${ColorTheme.primaryGlow}`,
+                    }}
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  <span
+                    className="text-sm font-medium"
+                    style={{
+                      color: ColorTheme.textSecondary,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: ColorTheme.primary,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      500+
+                    </span>{" "}
+                    portfolios created
+                  </span>
+                </motion.div>
+              </motion.div>
 
               <motion.div
                 className="flex flex-col sm:flex-row justify-center gap-4 mb-12"

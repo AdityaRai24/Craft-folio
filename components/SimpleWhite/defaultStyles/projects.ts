@@ -1,46 +1,44 @@
 import { SimpleWhiteProjectsCustomizationState } from "./types";
 
 export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationState = {
-  // Layout & Structure
-  layout: "list",
-  columnsDesktop: 2,
-  columnsMobile: 1,
-  spacing: "normal",
-  containerPadding: 16,
-  maxWidth: "xl",
+  layout: "single",
+  gridColumns: 3,
+  cardSpacing: 8,
+  cardBorderRadius: 12,
+  imageBorderRadius: 8,
+  cardBackground: "bg-white",
+  cardBorder: "border-gray-200",
+  imageAspectRatio: "auto",
+  imageHeight: 240,
+  githubButtonStyle: "default",
+  liveButtonStyle: "default",
+  buttonBorderRadius: 6,
+  techStackStyle: "pills",
+  animationSpeed: 0.3,
+  titleAlignment: "left",
+  cardPadding: 4,
+  imageOverlay: true,
+  imagePosition: "left",
   
-  // Background & Theme
-  backgroundColor: "white",
-  cardBackground: "solid",
-  cardBorderStyle: "subtle",
-  cardShadow: "light",
-  cardBorderRadius: 8,
+  // Typography
+  titleSize: "md",
+  titleWeight: "semibold",
+  descriptionSize: "md",
+  descriptionWeight: "normal",
   
   // Header Section
   headerVisible: true,
-  titleSize: "xl",
-  titleWeight: "bold",
   titleColor: "gray-900",
-  titleAlignment: "center",
-  descriptionSize: "lg",
   descriptionColor: "gray-600",
   descriptionVisible: true,
   
   // Project Cards
   showImages: true,
-  imagePosition: "left",
-  imageOverlay: true,
-  imageBorderRadius: 8,
-  cardPadding: 4,
-  projectTitleSize: "lg",
-  projectTitleWeight: "bold",
-  projectTitleColor: "primary",
-  projectDescriptionSize: "md",
-  projectDescriptionColor: "gray-700",
+  projectTitleColor: "gray-900",
+  projectDescriptionColor: "gray-600",
   
   // Tech Stack
   techStackVisible: true,
-  techStackStyle: "badges",
   techStackSize: "md",
   
   // Project Links
@@ -58,7 +56,6 @@ export const defaultSimpleWhiteProjectsStyles: SimpleWhiteProjectsCustomizationS
   imageHoverEffect: "zoom",
   
   // Animations
-  animationSpeed: "normal",
   staggerAnimation: true,
   entranceAnimation: "fadeUp",
 };

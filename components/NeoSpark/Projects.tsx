@@ -35,7 +35,8 @@ import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
 import { defaultProjectsStyles } from "./defaultStyles/projects";
 import { ProjectsCustomizationState } from "./defaultStyles/types";
-import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
+import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
+import MagicWrite from "@/components/MagicWrite";
 
 interface Technology {
   name: string;
@@ -319,13 +320,7 @@ const AspectRatioSelector: React.FC<{
             onChange={(e) => onImageHeightChange(Number(e.target.value))}
             className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
             style={{
-              background: `linear-gradient(to right, ${
-                ColorTheme.primary
-              } 0%, ${ColorTheme.primary} ${
-                Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))
-              }%, #3f3f46 ${
-                Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))
-              }%, #3f3f46 100%)`,
+              background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((imageHeight - 150) / 150) * 100))}%, #3f3f46 100%)`
             }}
           />
         </div>
@@ -413,6 +408,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   const [activeTab, setActiveTab] = useState<
     "layout" | "typography" | "styling" | "timing"
   >("layout");
+  const [editingProjectIndex, setEditingProjectIndex] = useState<number | null>(null);
+  const [editingDescriptions, setEditingDescriptions] = useState<{ [key: number]: string }>({});
 
   // Dragging state for floating window
   const [isDragging, setIsDragging] = useState(false);
@@ -727,6 +724,64 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     return `section-sub-description ${sizeMap[effectiveCustomization.descriptionSize]} ${weightMap[effectiveCustomization.descriptionWeight]}`;
   };
 
+  // MagicWrite handler for project descriptions
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this project description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "project-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (projectIndex: number, newDescription: string) => {
+    try {
+      const updatedProjects = [...projectsData];
+      updatedProjects[projectIndex] = {
+        ...updatedProjects[projectIndex],
+        projectDescription: newDescription
+      };
+      setProjectsData(updatedProjects);
+      
+      // Save to database
+      const result = await updateSection({
+        sectionName: "projects",
+        portfolioId,
+        sectionContent: updatedProjects,
+        sectionTitle: "Projects",
+        sectionDescription: "Projects section"
+      });
+      
+      if (result.success) {
+        toast.success("Project description enhanced and saved successfully!");
+      } else {
+        toast.error("Failed to save changes to database");
+      }
+    } catch (error) {
+      console.error("Error saving project description:", error);
+      toast.error("Failed to save changes to database");
+    }
+  };
+
   useEffect(() => {
     if (portfolioData) {
       const portfolioSectionData = portfolioData.find(
@@ -840,7 +895,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
     <section
       ref={sectionRef}
       id="projects"
-      className="py-24 w-full bg-black overflow-hidden min-h-screen text-white"
+      className="py-12 sm:py-16 md:py-24 w-full bg-black overflow-hidden min-h-screen text-white"
     >
       <style>{customCSS}</style>
       <style>{`
@@ -866,7 +921,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
           position: relative;
         }
       `}</style>
-      <div className="container relative mx-auto max-w-6xl px-4">
+      <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
         <SectionHeader
           sectionName="projects"
           sectionTitle={sectionTitle}
@@ -885,132 +940,143 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
             animate={isInView ? "visible" : "hidden"}
           >
             {projectsData.map((project, index) => (
-              <motion.div
-                key={index}
-                variants={projectVariants}
-                className={getCardClasses()}
-                style={getCardStyle()}
-              >
-                <div
-                  className={
-                    effectiveCustomization.layout === "grid"
-                      ? "flex flex-col items-center"
-                      : effectiveCustomization.imagePosition === "right"
-                      ? "flex flex-col md:flex-row-reverse items-center"
-                      : "flex flex-col md:flex-row items-center"
-                  }
+              <div key={index} className="relative">
+                <motion.div
+                  variants={projectVariants}
+                  className={getCardClasses()}
+                  style={getCardStyle()}
                 >
-                  {/* Project Image */}
                   <div
                     className={
                       effectiveCustomization.layout === "grid"
-                        ? "w-full"
-                        : "w-full md:w-2/5 relative"
+                        ? "flex flex-col items-center"
+                        : effectiveCustomization.imagePosition === "right"
+                        ? "flex flex-col md:flex-row-reverse items-center"
+                        : "flex flex-col md:flex-row items-center"
                     }
                   >
-                    <div className="relative overflow-hidden m-4">
-                      <motion.img
-                        src={project?.projectImage}
-                        alt={`${project?.projectTitle} project screenshot`}
-                        className="w-full section-image object-cover"
-                        style={getImageStyle()}
-                        initial="rest"
-                        whileHover="hover"
-                        variants={imageVariants}
-                      />
-                      {effectiveCustomization.imageOverlay && (
-                        <motion.div
-                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-lg z-0"
-                          style={{ backgroundColor: `${titleColor}35` }}
-                          initial={{ opacity: 0.5, scale: 1 }}
-                          whileHover={{ opacity: 0.8, scale: 1.3 }}
-                          transition={{
-                            duration: effectiveCustomization.animationSpeed,
-                          }}
-                        />
-                      )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="p-3 flex justify-center gap-3">
-                      <motion.div whileHover={{ scale: 1.05 }}>
-                        <Link
-                          href={project?.githubLink || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={getButtonClasses("github")}
-                          style={getButtonStyle("github")}
-                        >
-                          <Github className="h-4 w-4" />
-                          GitHub
-                        </Link>
-                      </motion.div>
-                      <motion.div whileHover={{ scale: 1.05 }}>
-                        <Link
-                          href={project?.liveLink || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={getButtonClasses("live")}
-                          style={getButtonStyle("live")}
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Live Demo
-                        </Link>
-                      </motion.div>
-                    </div>
-                  </div>
-
-                  {/* Project Details */}
-                  <div
-                    className={
-                      effectiveCustomization.layout === "grid"
-                        ? "w-full"
-                        : "w-full md:w-3/5 p-5 md:p-6"
-                    }
-                  >
+                    {/* Project Image */}
                     <div
-                      className={`flex flex-wrap items-center ${
-                        effectiveCustomization.titleAlignment === "center"
-                          ? "justify-center"
-                          : effectiveCustomization.titleAlignment === "right"
-                          ? "justify-end"
-                          : "justify-between"
-                      } mb-3`}
+                      className={
+                        effectiveCustomization.layout === "grid"
+                          ? "w-full"
+                          : "w-full md:w-2/5 relative"
+                      }
                     >
-                      <h3
-                        className={`${getTitleClasses()} ${getTitleAlignment()}`}
-                        style={{ color: titleColor }}
-                      >
-                        {project?.projectName}
-                      </h3>
-                      <div className="flex items-center text-gray-400 text-sm mt-1 md:mt-0">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {project?.year}
+                      <div className="relative overflow-hidden m-4">
+                        <motion.img
+                          src={project?.projectImage}
+                          alt={`${project?.projectTitle} project screenshot`}
+                          className="w-full section-image object-cover"
+                          style={getImageStyle()}
+                          initial="rest"
+                          whileHover="hover"
+                          variants={imageVariants}
+                        />
+                        {effectiveCustomization.imageOverlay && (
+                          <motion.div
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-lg z-0"
+                            style={{ backgroundColor: `${titleColor}35` }}
+                            initial={{ opacity: 0.5, scale: 1 }}
+                            whileHover={{ opacity: 0.8, scale: 1.3 }}
+                            transition={{
+                              duration: effectiveCustomization.animationSpeed,
+                            }}
+                          />
+                        )}
+                      </div>
+                      {/* Action Buttons */}
+                      <div className="p-3 flex justify-center gap-3">
+                        <motion.div whileHover={{ scale: 1.05 }}>
+                          <Link
+                            href={project?.githubLink || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={getButtonClasses("github")}
+                            style={getButtonStyle("github")}
+                          >
+                            <Github className="h-4 w-4" />
+                            GitHub
+                          </Link>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.05 }}>
+                          <Link
+                            href={project?.liveLink || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={getButtonClasses("live")}
+                            style={getButtonStyle("live")}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Live Demo
+                          </Link>
+                        </motion.div>
                       </div>
                     </div>
-
-                    <p
-                      className={`${getDescriptionClasses()} text-gray-300 mb-4 ${getTitleAlignment()}`}
+                    {/* Project Details */}
+                    <div
+                      className={
+                        effectiveCustomization.layout === "grid"
+                          ? "w-full relative"
+                          : "w-full md:w-3/5 p-5 md:p-6 relative"
+                      }
                     >
-                      {project?.projectDescription}
-                    </p>
-
-                    <div className={getTitleAlignment()}>
-                      <h4 className="flex items-center gap-2 font-semibold mb-2">
-                        <Code2 className="h-4 w-4" />
-                        Tech Stack
-                      </h4>
                       <div
-                        className={`flex flex-wrap gap-2 ${
+                        className={`flex flex-wrap items-center ${
                           effectiveCustomization.titleAlignment === "center"
                             ? "justify-center"
                             : effectiveCustomization.titleAlignment === "right"
                             ? "justify-end"
-                            : ""
-                        }`}
+                            : "justify-between"
+                        } mb-3`}
                       >
-                        {project?.techStack?.map(
-                          (tech: Technology, idx: number) => (
+                        <h3
+                          className={`${getTitleClasses()} ${getTitleAlignment()}`}
+                          style={{ color: titleColor }}
+                        >
+                          {project?.projectName}
+                        </h3>
+                        <div className="flex items-center text-gray-400 text-sm mt-1 md:mt-0">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {project?.year}
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <p
+                          className={`${getDescriptionClasses()} text-gray-300 mb-4 ${getTitleAlignment()}`}
+                        >
+                          {project?.projectDescription}
+                        </p>
+                        {/* Magic Write Button */}
+                        <div className="absolute -top-2 -right-2 z-10">
+                          <MagicWrite
+                            onMagicWrite={async (prompt: string, context?: string) => {
+                              const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription);
+                              handleDescriptionUpdate(index, enhancedDescription);
+                              return enhancedDescription;
+                            }}
+                            placeholder="Enhance this project description..."
+                            buttonText=""
+                            context={project?.projectDescription}
+                            className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                          />
+                        </div>
+                      </div>
+                      <div className={getTitleAlignment()}>
+                        <h4 className="flex items-center gap-2 font-semibold mb-2">
+                          <Code2 className="h-4 w-4" />
+                          Tech Stack
+                        </h4>
+                        <div
+                          className={`flex flex-wrap gap-2 ${
+                            effectiveCustomization.titleAlignment === "center"
+                              ? "justify-center"
+                              : effectiveCustomization.titleAlignment === "right"
+                              ? "justify-end"
+                              : ""
+                          }`}
+                        >
+                          {project?.techStack?.map((tech: Technology, idx: number) => (
                             <motion.span
                               key={idx}
                               whileHover={{ scale: 1.05 }}
@@ -1027,22 +1093,21 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                               }}
                             >
                               <img
-                                src={
-                                  tech.logo ||
-                                  `https://placehold.co/100x100?text=${tech.name}&font=montserrat&fontsize=18`
-                                }
+                                src={tech.logo ||
+                                  `https://placehold.co/100x100?text=${tech.name}&font=montserrat&fontsize=18`}
                                 alt={tech.name}
                                 className="h-4 w-4 inline-block mr-1"
                               />
                               {tech.name}
                             </motion.span>
-                          )
-                        )}
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
+                  </div> {/* <-- closes the flex layout div */}
+                </motion.div>
+
+              </div>
             ))}
           </motion.div>
         ) : (
@@ -1050,12 +1115,11 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
             No projects found. Add some projects to see them here.
           </div>
         )}
-
         {/* Floating Visual Editor Window */}
         {visualEditorOpen && (
           <div
             ref={dragRef}
-            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
             style={{
               left: `${windowPosition.x}px`,
               top: `${windowPosition.y}px`,
@@ -1064,15 +1128,15 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
           >
             {/* Header */}
             <div
-              className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+              className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
               onMouseDown={handleMouseDown}
             >
-              <h3 className="text-lg font-bold text-white">Visual Editor</h3>
+              <h3 className="text-base sm:text-lg font-bold text-white">Visual Editor</h3>
               <button
                 onClick={() => setVisualEditorOpen(false)}
                 className="text-gray-400 hover:text-white transition-colors p-1"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             </div>
 
@@ -1082,7 +1146,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${
+                  className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                     activeTab === tab
                       ? "text-white"
                       : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -1095,17 +1159,18 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                       : {}
                   }
                 >
-                  {tab === "layout" && <Layout className="h-4 w-4 mx-auto mb-1" />}
-                  {tab === "typography" && <Type className="h-4 w-4 mx-auto mb-1" />}
-                  {tab === "styling" && <Palette className="h-4 w-4 mx-auto mb-1" />}
-                  {tab === "timing" && <Move className="h-4 w-4 mx-auto mb-1" />}
-                  {tab}
+                  {tab === "layout" && <Layout className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                  {tab === "typography" && <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                  {tab === "styling" && <Palette className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                  {tab === "timing" && <Move className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                  <span className="hidden sm:inline">{tab}</span>
+                  <span className="sm:hidden">{tab.charAt(0)}</span>
                 </button>
               ))}
             </div>
 
             {/* Tab Content */}
-            <div className="max-h-96 overflow-y-auto p-4 space-y-6">
+            <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
               {activeTab === "layout" && (
                 <>
                   <LayoutSelector
@@ -1196,7 +1261,6 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                                 className="rounded text-white text-center font-bold"
                                 style={{ 
                                   fontSize: size,
-                                  color: ColorTheme.primary
                                 }}
                               >
                                 Aa
@@ -1264,8 +1328,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                                 <div
                                   className="rounded text-white text-center font-bold"
                                   style={{ 
-                                    fontSize: size,
-                                    color: ColorTheme.primary
+                                    fontSize: size
                                   }}
                                 >
                                   Aa
@@ -1422,18 +1485,18 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+            <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
               <div className="flex gap-2">
                 <button
                   onClick={resetCustomization}
-                  className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                  className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
                 >
                   <RotateCcw className="h-3 w-3" />
                   Reset
                 </button>
                 <button
                   onClick={saveDraftCustomization}
-                  className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                  className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                   style={{
                     background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                   }}
@@ -1452,7 +1515,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
             onClick={() => setVisualEditorOpen(false)}
           />
         )}
-      </div>
+      </div> {/* closes the main container div */}
     </section>
   );
 };

@@ -2,9 +2,7 @@ import { SimpleWhiteExperienceCustomizationState } from "./types";
 
 export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizationState = {
   // Layout & Structure
-  layout: "timeline",
-  timelinePosition: "center",
-  cardSpacing: "normal",
+  layout: "cards",
   containerPadding: 16,
   maxWidth: "xl",
   
@@ -25,14 +23,7 @@ export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizat
   descriptionColor: "gray-600",
   descriptionVisible: true,
   
-  // Timeline Settings
-  timelineVisible: true,
-  timelinePosition: "center",
-  timelineColor: "gray-300",
-  timelineWidth: "thin",
-  timelineDots: true,
-  timelineDotColor: "gray-500",
-  timelineDotSize: "md",
+
   
   // Experience Cards
   companyNameSize: "lg",

@@ -4,7 +4,7 @@ export const maps : any = {
         "fontName" : "Raleway"
     },
     "MonoEdge":{
-        "themeName" : "",
+        "themeName" : "simpleBlack",
         "fontName" : "Raleway"
     },
     "LumenFlow":{

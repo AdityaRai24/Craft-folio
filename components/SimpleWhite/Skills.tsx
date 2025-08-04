@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
-import { Settings, Grid3X3, RotateCcw, Type, Zap, Eye, X, Layout, Palette, Star } from "lucide-react";
+import { RotateCcw, Type, Eye, X, Layout, Palette } from "lucide-react";
 import type { NextPage } from 'next';
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
-import EditButton from '@/components/EditButton';
 import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
@@ -19,114 +18,22 @@ interface TechnologyType {
   logo: string;
 }
 
-// Visual Alignment Selector Component
-const AlignmentSelector: React.FC<{
-  value: "center" | "left" | "right";
-  onChange: (value: "center" | "left" | "right") => void;
-  label: string;
-}> = ({ value, onChange, label }) => {
-  const alignments = [
-    { value: "left", icon: "←", label: "Left" },
-    { value: "center", icon: "↔", label: "Center" },
-    { value: "right", icon: "→", label: "Right" },
-  ];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-3 gap-2">
-        {alignments.map(({ value: align, icon, label: alignLabel }) => (
-          <div
-            key={align}
-            onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-              value === align
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="text-2xl text-white">{icon}</div>
-            <div className="space-y-1 w-full">
-              <div
-                className={`h-1 bg-gradient-to-r rounded ${
-                  align === "left"
-                    ? "mr-auto w-3/4"
-                    : align === "center"
-                    ? "mx-auto w-1/2"
-                    : "ml-auto w-3/4"
-                }`}
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              ></div>
-              <div
-                className={`h-1 bg-gray-400 rounded ${
-                  align === "left"
-                    ? "mr-auto w-full"
-                    : align === "center"
-                    ? "mx-auto w-3/4"
-                    : "ml-auto w-full"
-                }`}
-              ></div>
-            </div>
-            <div className="text-xs text-white">{alignLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Size Selector Component
-const SizeSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; size: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, size }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div
-                className="rounded text-white text-center font-bold"
-                style={{ 
-                  fontSize: size,
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              >
-                Aa
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const Skills: NextPage = ({ customCSS }: any) => {
+const Skills: NextPage = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
   const dispatch = useDispatch();
   
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const inTheme = portfolioData?.find((item: any) => item.type === "themes");
+  const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
+
+  // Theme colors
+  const primaryColor = theme?.colors?.primary || ColorTheme.primary;
+  const primaryHoverColor = theme?.colors?.primaryHover || ColorTheme.primaryHover;
+  const textPrimaryColor = theme?.colors?.text?.primary || ColorTheme.textPrimary;
+  const textSecondaryColor = theme?.colors?.text?.secondary || ColorTheme.textSecondary;
+  const backgroundPrimaryColor = theme?.colors?.background?.primary || ColorTheme.bgMain;
+  const backgroundSecondaryColor = theme?.colors?.background?.secondary || ColorTheme.bgCard;
   
   const [isLoading, setIsLoading] = useState(true);
   const [technologiesData, setTechnologiesData] = useState<TechnologyType[]>([]);
@@ -332,9 +239,9 @@ const Skills: NextPage = ({ customCSS }: any) => {
   const getCardClasses = () => {
     const styleMap = {
       minimal: "bg-transparent",
-      elevated: `bg-white ${effectiveCustomization.backgroundColor === "gray-900" ? "dark:bg-gray-800" : ""}`,
-      outlined: `border-2 border-gray-300 bg-transparent ${effectiveCustomization.backgroundColor === "gray-900" ? "dark:border-gray-600" : ""}`,
-      filled: `bg-gray-100 ${effectiveCustomization.backgroundColor === "gray-900" ? "dark:bg-gray-700" : ""}`,
+      elevated: `bg-[${backgroundPrimaryColor}]`,
+      outlined: `border-2 border-[${textSecondaryColor}]/30 bg-transparent`,
+      filled: `bg-[${backgroundSecondaryColor}]`,
     };
 
     const shadowMap = {
@@ -354,7 +261,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
 
     const hoverMap = {
       lift: "hover:shadow-lg hover:-translate-y-1",
-      glow: `hover:shadow-lg hover:shadow-blue-500/20`,
+      glow: `hover:shadow-lg hover:shadow-[${primaryColor}]/20`,
       scale: "hover:scale-105",
       rotate: "hover:rotate-3",
       none: "",
@@ -389,14 +296,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
       bold: "font-bold",
     };
 
-    const colorMap = {
-      "gray-600": "text-gray-600",
-      "gray-700": "text-gray-700",
-      "gray-800": "text-gray-800",
-      "gray-200": "text-gray-200",
-    };
-
-    return `${colorMap[effectiveCustomization.labelColor]} ${effectiveCustomization.backgroundColor === "gray-900" ? "dark:text-gray-200" : ""} ${weightMap[effectiveCustomization.labelWeight]} ${sizeMap[effectiveCustomization.labelSize]} text-center`;
+    return `${weightMap[effectiveCustomization.labelWeight]} ${sizeMap[effectiveCustomization.labelSize]} text-center`;
   };
 
   useEffect(() => {
@@ -470,6 +370,8 @@ const Skills: NextPage = ({ customCSS }: any) => {
     return <div>Loading...</div>;
   }
 
+
+
   const headerClasses = getHeaderClasses();
 
   return (
@@ -491,6 +393,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
           description={portfolioData?.find((section: any) => section.type === "technologies")?.sectionDescription || "A comprehensive list of technologies and tools I work with"}
           onVisualEditorClick={openVisualEditor}
           headerClasses={headerClasses}
+          currentPortTheme={currentPortTheme}
         />
 
         <motion.div 
@@ -522,7 +425,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                 </div>
               )}
               {effectiveCustomization.showLabels && (
-                <h3 className={getLabelClasses()}>
+                <h3 className={getLabelClasses()} style={{ color: textSecondaryColor }}>
                   {technology.name}
                 </h3>
               )}
@@ -535,24 +438,25 @@ const Skills: NextPage = ({ customCSS }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-          }}
+          className="fixed bg-zinc-900 shadow-2xl rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+                      style={{
+              left: `${windowPosition.x}px`,
+              top: `${windowPosition.y}px`,
+              cursor: isDragging ? "grabbing" : "grab",
+              zIndex: 99999999,
+            }}
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Skills Visual Editor</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Skills Visual Editor</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -562,7 +466,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors`}
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors`}
                 style={{
                   background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
                   color: activeTab === tab ? "white" : "#9CA3AF",
@@ -578,7 +482,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
           </div>
 
           {/* Tab Content */}
-          <div className="max-h-96 overflow-y-auto p-4 space-y-4">
+          <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {activeTab === "layout" && (
               <div className="space-y-4">
                 <div>
@@ -594,7 +498,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                     onChange={(e) => updateDraftCustomization("gridColumns", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100}%, #3f3f46 ${(((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100}%, #3f3f46 100%)`,
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, (((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, (((draftCustomization?.gridColumns ?? customization.gridColumns) - 2) / 4) * 100))}%, #3f3f46 100%)`,
                     }}
                   />
                 </div>
@@ -637,33 +541,6 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Background Color
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "white", label: "White", color: "bg-white" },
-                      { value: "gray-50", label: "Light Gray", color: "bg-gray-50" },
-                      { value: "gray-100", label: "Gray", color: "bg-gray-100" },
-                      { value: "gray-900", label: "Dark", color: "bg-gray-900" },
-                    ].map(({ value, label, color }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("backgroundColor", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.backgroundColor ?? customization.backgroundColor) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className={`w-full h-8 rounded mb-2 ${color}`}></div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
 
               </div>
             )}
@@ -681,7 +558,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
                       style={{
-                        backgroundColor: (draftCustomization?.showLabels ?? customization.showLabels) ? ColorTheme.primary : "",
+                        backgroundColor: (draftCustomization?.showLabels ?? customization.showLabels) ? "#10b981" : "",
                       }}
                     ></div>
                   </label>
@@ -763,48 +640,54 @@ const Skills: NextPage = ({ customCSS }: any) => {
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                      style={{
-                        backgroundColor: (draftCustomization?.showIcons ?? customization.showIcons) ? ColorTheme.primary : "",
-                      }}
+                                              style={{
+                          backgroundColor: (draftCustomization?.showIcons ?? customization.showIcons) ? ColorTheme.primary : "",
+                        }}
                     ></div>
                   </label>
                 </div>
 
                 <div>
                   <label className="block text-white text-left font-medium mb-3">
-                    Icon Size
+                    Icon Size: {draftCustomization?.iconSize ?? customization.iconSize}
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "sm", label: "Small", size: "48px" },
-                      { value: "md", label: "Medium", size: "56px" },
-                      { value: "lg", label: "Large", size: "64px" },
-                      { value: "xl", label: "Extra Large", size: "80px" },
-                    ].map(({ value, label, size }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("iconSize", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.iconSize ?? customization.iconSize) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div
-                            className="rounded bg-gradient-to-r flex items-center justify-center text-white text-xs font-bold"
-                            style={{
-                              width: Math.min(parseInt(size), 32) + "px",
-                              height: Math.min(parseInt(size), 32) + "px",
-                              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                            }}
-                          >
-                            ⚛
-                          </div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
+                  <input
+                    type="range"
+                    min="16"
+                    max="80"
+                    value={
+                      (draftCustomization?.iconSize ?? customization.iconSize) === "sm" ? 16 :
+                      (draftCustomization?.iconSize ?? customization.iconSize) === "md" ? 24 :
+                      (draftCustomization?.iconSize ?? customization.iconSize) === "lg" ? 32 :
+                      (draftCustomization?.iconSize ?? customization.iconSize) === "xl" ? 48 : 24
+                    }
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      let iconSize = "md";
+                      if (value <= 20) iconSize = "sm";
+                      else if (value <= 28) iconSize = "md";
+                      else if (value <= 40) iconSize = "lg";
+                      else iconSize = "xl";
+                      updateDraftCustomization("iconSize", iconSize);
+                    }}
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${
+                        Math.max(0, Math.min(100, ((draftCustomization?.iconSize ?? customization.iconSize) === "sm" ? 16 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "md" ? 24 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "lg" ? 32 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "xl" ? 48 : 24) - 16) / 64 * 100)
+                      }%, #3f3f46 ${
+                        Math.max(0, Math.min(100, ((draftCustomization?.iconSize ?? customization.iconSize) === "sm" ? 16 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "md" ? 24 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "lg" ? 32 :
+                         (draftCustomization?.iconSize ?? customization.iconSize) === "xl" ? 48 : 24) - 16) / 64 * 100)
+                      }%, #3f3f46 100%)`,
+                    }}
+                  />
+                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>Small</span>
+                    <span>Large</span>
                   </div>
                 </div>
 
@@ -816,11 +699,11 @@ const Skills: NextPage = ({ customCSS }: any) => {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { value: "minimal", label: "Minimal", desc: "Transparent" },
-                      { value: "elevated", label: "Elevated", desc: "With shadow" },
-                      { value: "outlined", label: "Outlined", desc: "With border" },
-                      { value: "filled", label: "Filled", desc: "Background" },
-                    ].map(({ value, label, desc }) => (
+                      { value: "minimal", label: "Minimal", desc: "Transparent", preview: "bg-transparent" },
+                      { value: "elevated", label: "Elevated", desc: "With shadow", preview: "bg-white shadow-md" },
+                      { value: "outlined", label: "Outlined", desc: "With border", preview: "bg-transparent border border-gray-300" },
+                      { value: "filled", label: "Filled", desc: "Background", preview: "bg-gray-100" },
+                    ].map(({ value, label, desc, preview }) => (
                       <div
                         key={value}
                         onClick={() => updateDraftCustomization("cardStyle", value)}
@@ -830,6 +713,9 @@ const Skills: NextPage = ({ customCSS }: any) => {
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                       >
+                        <div className="flex justify-center mb-2">
+                          <div className={`w-8 h-6 rounded ${preview}`}></div>
+                        </div>
                         <div className="text-center text-xs text-white mb-1">{label}</div>
                         <div className="text-center text-xs text-gray-400">{desc}</div>
                       </div>
@@ -858,7 +744,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                         }`}
                       >
                         <div className="flex justify-center mb-2">
-                          <div className={`w-6 h-6 bg-white rounded ${shadow}`}></div>
+                          <div className={`w-8 h-6 rounded bg-white ${shadow}`} style={{ backgroundColor: '#ffffff' }}></div>
                         </div>
                         <div className="text-center text-xs text-white">{label}</div>
                       </div>
@@ -885,7 +771,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
+                                                                      style={{
                           backgroundColor: (draftCustomization?.hoverEffects ?? customization.hoverEffects) ? ColorTheme.primary : "",
                         }}
                       ></div>
@@ -902,7 +788,7 @@ const Skills: NextPage = ({ customCSS }: any) => {
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
+                                                                      style={{
                           backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
                         }}
                       ></div>
@@ -949,18 +835,18 @@ const Skills: NextPage = ({ customCSS }: any) => {
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-zinc-700 bg-zinc-800">
+          <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}

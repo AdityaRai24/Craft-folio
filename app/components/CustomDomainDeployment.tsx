@@ -29,6 +29,12 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
       return;
     }
 
+    // Basic domain validation
+    if (!customDomain.includes('.') || customDomain.length < 3) {
+      toast.error("Please enter a valid domain name (e.g., yourdomain.com)");
+      return;
+    }
+
     try {
       setIsCheckingDomain(true);
       setDomainCheckStatus('checking');
@@ -45,15 +51,22 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
         setShowDomainInstructions(true);
         setIsDomainConnected(true);
         setDomainCheckStatus('idle');
-        toast.success("Domain connected successfully!");
+        toast.success("Domain connected successfully! Please configure your DNS settings.");
       } else {
         setDomainCheckStatus('failed');
-        toast.error(result.error || "Failed to connect domain");
+        const errorMessage = result.error || "Failed to connect domain";
+        if (errorMessage.includes("already exists")) {
+          toast.error("This domain is already connected to another portfolio.");
+        } else if (errorMessage.includes("invalid")) {
+          toast.error("Invalid domain format. Please enter a valid domain name.");
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Error connecting domain:", error);
       setDomainCheckStatus('failed');
-      toast.error("Failed to connect domain");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsCheckingDomain(false);
     }
@@ -73,15 +86,22 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
 
       if (result.success) {
         setDomainCheckStatus('idle');
-        toast.success("Domain configuration verified!");
+        toast.success("Domain configuration verified! Your portfolio is now live.");
       } else {
         setDomainCheckStatus('failed');
-        toast.error(result.error || "Domain configuration failed");
+        const errorMessage = result.error || "Domain configuration failed";
+        if (errorMessage.includes("DNS")) {
+          toast.error("DNS configuration not found. Please check your DNS settings and try again.");
+        } else if (errorMessage.includes("propagation")) {
+          toast.error("DNS propagation in progress. Please wait a few minutes and try again.");
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Error checking domain:", error);
       setDomainCheckStatus('failed');
-      toast.error("Failed to verify domain configuration");
+      toast.error("Network error. Please check your connection and try again.");
     }
   };
 
@@ -100,11 +120,18 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
         onDeploySuccess(result.data.url);
         toast.success("Portfolio deployed successfully!");
       } else {
-        toast.error(result.error || "Failed to deploy portfolio");
+        const errorMessage = result.error || "Failed to deploy portfolio";
+        if (errorMessage.includes("DNS")) {
+          toast.error("DNS configuration not found. Please configure your DNS settings first.");
+        } else if (errorMessage.includes("propagation")) {
+          toast.error("DNS propagation in progress. Please wait a few minutes and try again.");
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Deployment error:", error);
-      toast.error("Failed to deploy portfolio");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsDeploying(false);
     }
@@ -158,16 +185,15 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
         disabled={isCheckingDomain}
         className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
         style={{
-          backgroundColor: ColorTheme.primary,
-          color: "#000",
-          boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-          opacity: isCheckingDomain ? 0.7 : 1,
+          backgroundColor: isCheckingDomain ? ColorTheme.bgCard : ColorTheme.primary,
+          color: isCheckingDomain ? ColorTheme.textSecondary : "#000",
+          boxShadow: isCheckingDomain ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
         }}
         whileHover={{
-          boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-          scale: 1.02,
+          boxShadow: isCheckingDomain ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+          scale: isCheckingDomain ? 1 : 1.02,
         }}
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: isCheckingDomain ? 1 : 0.98 }}
       >
         {isCheckingDomain ? (
           <>
@@ -302,19 +328,44 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
               </div>
               <motion.button
                 onClick={handleDomainCheck}
+                disabled={domainCheckStatus === 'checking'}
                 className="px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
                 style={{
-                  backgroundColor: ColorTheme.primary,
-                  color: "#000",
-                  boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
+                  backgroundColor: domainCheckStatus === 'checking' ? ColorTheme.bgCard : ColorTheme.primary,
+                  color: domainCheckStatus === 'checking' ? ColorTheme.textSecondary : "#000",
+                  boxShadow: domainCheckStatus === 'checking' ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
                 }}
                 whileHover={{
-                  boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                  scale: 1.02,
+                  boxShadow: domainCheckStatus === 'checking' ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                  scale: domainCheckStatus === 'checking' ? 1 : 1.02,
                 }}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: domainCheckStatus === 'checking' ? 1 : 0.98 }}
               >
-                Check Again
+                {domainCheckStatus === 'checking' ? (
+                  <>
+                    <div className="animate-spin">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    </div>
+                    Checking...
+                  </>
+                ) : (
+                  "Check Again"
+                )}
               </motion.button>
             </div>
           </div>
@@ -325,16 +376,15 @@ const CustomDomainDeployment: React.FC<CustomDomainDeploymentProps> = ({
               disabled={isDeploying}
               className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer"
               style={{
-                backgroundColor: ColorTheme.primary,
-                color: "#000",
-                boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                opacity: isDeploying ? 0.7 : 1,
+                backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
+                color: isDeploying ? ColorTheme.textSecondary : "#000",
+                boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
               }}
               whileHover={{
-                boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                scale: 1.02,
+                boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                scale: isDeploying ? 1 : 1.02,
               }}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: isDeploying ? 1 : 0.98 }}
             >
               {isDeploying ? (
                 <>

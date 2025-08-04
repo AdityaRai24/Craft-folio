@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Rocket,
@@ -28,6 +28,7 @@ interface DeploymentInfo {
 
 const DeployPage = () => {
   const params = useParams();
+  const searchParams = useSearchParams();
   const portfolioId = params.portfolioId as string;
   const { user } = useUser();
   const [portfolioSlug, setPortfolioSlug] = useState("");
@@ -39,6 +40,14 @@ const DeployPage = () => {
   const [isDeploying, setIsDeploying] = useState(false);
   const [existingDeployments, setExistingDeployments] = useState<DeploymentInfo[]>([]);
   const [isLoadingDeployments, setIsLoadingDeployments] = useState(true);
+
+  // Set initial tab based on URL parameter
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'custom') {
+      setActiveTab('custom');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const checkExistingDeployments = async () => {
@@ -76,7 +85,7 @@ const DeployPage = () => {
         }
       } catch (error) {
         console.error("Error checking deployments:", error);
-        toast.error("Failed to check existing deployments");
+        toast.error("Failed to load deployment information. Please refresh the page.");
       } finally {
         setIsLoadingDeployments(false);
       }
@@ -127,6 +136,7 @@ const DeployPage = () => {
 
   const handleDeploy = async () => {
     if (!user) {
+      toast.error("Please sign in to deploy your portfolio");
       return;
     }
 
@@ -149,16 +159,17 @@ const DeployPage = () => {
     // Check for existing subdomain deployment if user is trying to deploy with subdomain
     if (isSubdomain) {
       try {
+        setIsDeploying(true);
         const result = await checkUserSubdomain(user.id);
         if (!result.success) {
-          toast.error("Failed to verify subdomain availability");
+          toast.error("Failed to verify subdomain availability. Please try again.");
           return;
         }
 
         if (result.isPremium) {
           if (result.hasSubdomain) {
             toast.error(
-              `You have reached the maximum limit of 10 subdomains for premium users.`
+              `You have reached the maximum limit of 10 subdomains for premium users. Please remove an existing subdomain first.`
             );
             return;
           }
@@ -177,8 +188,10 @@ const DeployPage = () => {
         }
       } catch (error) {
         console.error("Error checking subdomain:", error);
-        toast.error("Failed to verify subdomain availability");
+        toast.error("Failed to verify subdomain availability. Please check your connection and try again.");
         return;
+      } finally {
+        setIsDeploying(false);
       }
     }
 
@@ -200,11 +213,18 @@ const DeployPage = () => {
         }, 5000);
         toast.success("Portfolio deployed successfully!");
       } else {
-        toast.error(result.error || "Failed to deploy portfolio");
+        const errorMessage = result.error || "Failed to deploy portfolio";
+        if (errorMessage.includes("already exists")) {
+          toast.error("This slug/subdomain is already taken. Please choose a different one.");
+        } else if (errorMessage.includes("invalid")) {
+          toast.error("Invalid slug/subdomain format. Please check the requirements.");
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (error) {
       console.error("Deployment error:", error);
-      toast.error("Failed to deploy portfolio");
+      toast.error("Network error. Please check your connection and try again.");
     } finally {
       setIsDeploying(false);
     }
@@ -791,16 +811,15 @@ const DeployPage = () => {
                 disabled={isDeploying}
                 className="w-full px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 cursor-pointer mt-6"
                 style={{
-                  backgroundColor: ColorTheme.primary,
-                  color: "#000",
-                  boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                  opacity: isDeploying ? 0.7 : 1,
+                  backgroundColor: isDeploying ? ColorTheme.bgCard : ColorTheme.primary,
+                  color: isDeploying ? ColorTheme.textSecondary : "#000",
+                  boxShadow: isDeploying ? "none" : `0 4px 10px ${ColorTheme.primaryGlow}`,
                 }}
                 whileHover={{
-                  boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                  scale: 1.02,
+                  boxShadow: isDeploying ? "none" : `0 6px 14px ${ColorTheme.primaryGlow}`,
+                  scale: isDeploying ? 1 : 1.02,
                 }}
-                whileTap={{ scale: 0.98 }}
+                whileTap={{ scale: isDeploying ? 1 : 0.98 }}
               >
                 {isDeploying ? (
                   <>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, Reorder } from "framer-motion";
 import { GripVertical, X } from "lucide-react";
 import { updatePortfolio } from "@/app/actions/portfolio";
@@ -72,7 +72,7 @@ const SectionReorder = ({
   };
 
   // Initialize sections from portfolio data
-  useState(() => {
+  useEffect(() => {
     if (portfolioData) {
       let mainSections: any = [];
       portfolioData.forEach((item: any) => {
@@ -89,7 +89,7 @@ const SectionReorder = ({
       });
       setReorderedSections(mainSections);
     }
-  });
+  }, [portfolioData, setReorderedSections]);
 
   const handleSectionReorder = async () => {
     try {
@@ -173,7 +173,10 @@ const SectionReorder = ({
           <Reorder.Group
             axis="y"
             values={reorderedSections}
-            onReorder={setReorderedSections}
+            onReorder={(newOrder) => {
+              console.log("Reorder triggered:", newOrder);
+              setReorderedSections(newOrder);
+            }}
             className="space-y-2"
           >
             {reorderedSections.map((section, index) => (

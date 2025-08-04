@@ -1,6 +1,14 @@
 import { SimpleWhiteHeroCustomizationState } from "./types";
 
 export const defaultSimpleWhiteHeroStyles: SimpleWhiteHeroCustomizationState = {
+  // Profile Image Settings
+  showProfileImage: true,
+  profileImageSize: 120,
+  profileImageBorder: true,
+  profileImageBorderWidth: 3,
+  profileImageShadow: true,
+  profileImagePosition: "left",
+  
   // Layout & Structure
   contentAlignment: "center",
   layoutStyle: "split",

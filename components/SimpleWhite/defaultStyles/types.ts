@@ -52,45 +52,44 @@ export interface SimpleWhiteHeroCustomizationState {
 
 export interface SimpleWhiteProjectsCustomizationState {
   // Layout & Structure
-  layout: "grid" | "list";
-  columnsDesktop: 1 | 2 | 3;
-  columnsMobile: 1 | 2;
-  spacing: "compact" | "normal" | "spacious";
-  containerPadding: number;
-  maxWidth: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
-  
-  // Background & Theme
-  backgroundColor: "white" | "gray-50" | "gray-100";
-  cardBackground: "solid" | "gradient" | "transparent";
-  cardBorderStyle: "none" | "subtle" | "bold";
-  cardShadow: "none" | "light" | "medium" | "heavy";
+  layout: "single" | "grid";
+  gridColumns: number;
+  cardSpacing: number;
   cardBorderRadius: number;
+  imageBorderRadius: number;
+  cardBackground: string;
+  cardBorder: string;
+  imageAspectRatio: "auto" | "square" | "wide" | "tall";
+  imageHeight: number;
+  githubButtonStyle: "default" | "filled" | "ghost" | "minimal";
+  liveButtonStyle: "default" | "filled" | "ghost" | "minimal";
+  buttonBorderRadius: number;
+  techStackStyle: "pills" | "badges" | "minimal" | "colorful";
+  animationSpeed: number;
+  titleAlignment: "left" | "center" | "right";
+  cardPadding: number;
+  imageOverlay: boolean;
+  imagePosition: "left" | "right";
+  
+  // Typography
+  titleSize: "sm" | "md" | "lg" | "xl";
+  titleWeight: "normal" | "medium" | "semibold" | "bold";
+  descriptionSize: "sm" | "md" | "lg";
+  descriptionWeight: "normal" | "medium" | "semibold" | "bold";
   
   // Header Section
   headerVisible: boolean;
-  titleSize: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
-  titleWeight: "normal" | "medium" | "semibold" | "bold" | "extrabold";
   titleColor: "gray-900" | "gray-800" | "black";
-  titleAlignment: "left" | "center" | "right";
-  descriptionSize: "sm" | "md" | "lg";
   descriptionColor: "gray-600" | "gray-700" | "gray-800";
   descriptionVisible: boolean;
   
   // Project Cards
   showImages: boolean;
-  imagePosition: "top" | "left" | "right";
-  imageOverlay: boolean;
-  imageBorderRadius: number;
-  cardPadding: number;
-  projectTitleSize: "sm" | "md" | "lg" | "xl";
-  projectTitleWeight: "normal" | "medium" | "semibold" | "bold";
   projectTitleColor: "gray-900" | "gray-800" | "primary";
-  projectDescriptionSize: "sm" | "md" | "lg";
   projectDescriptionColor: "gray-600" | "gray-700" | "gray-800";
   
   // Tech Stack
   techStackVisible: boolean;
-  techStackStyle: "pills" | "badges" | "minimal" | "colorful";
   techStackSize: "sm" | "md" | "lg";
   
   // Project Links
@@ -108,16 +107,13 @@ export interface SimpleWhiteProjectsCustomizationState {
   imageHoverEffect: "zoom" | "fade" | "overlay" | "none";
   
   // Animations
-  animationSpeed: "slow" | "normal" | "fast";
   staggerAnimation: boolean;
   entranceAnimation: "fadeUp" | "fadeIn" | "slideUp" | "none";
 }
 
 export interface SimpleWhiteExperienceCustomizationState {
   // Layout & Structure
-  layout: "timeline" | "cards";
-  timelinePosition: "left" | "center" | "right";
-  cardSpacing: "compact" | "normal" | "spacious";
+  layout: "cards";
   containerPadding: number;
   maxWidth: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
   
@@ -138,14 +134,7 @@ export interface SimpleWhiteExperienceCustomizationState {
   descriptionColor: "gray-600" | "gray-700" | "gray-800";
   descriptionVisible: boolean;
   
-  // Timeline Settings
-  timelineVisible: boolean;
-  timelinePosition: "center" | "left" | "right";
-  timelineColor: "gray-300" | "gray-400" | "primary";
-  timelineWidth: "thin" | "normal" | "thick";
-  timelineDots: boolean;
-  timelineDotColor: "gray-500" | "primary" | "white";
-  timelineDotSize: "sm" | "md" | "lg";
+
   
   // Experience Cards
   companyNameSize: "sm" | "md" | "lg" | "xl";

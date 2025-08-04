@@ -490,6 +490,7 @@ const HeroSidebar = () => {
                         <p className="text-xs" style={{ color: ColorTheme.textSecondary }}>Use new lines to create multiple paragraphs</p>
                       </div>
                     )}
+
                   </CardContent>
                 </TabsContent>
               )}

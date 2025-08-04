@@ -148,20 +148,20 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             backdropFilter: 'blur(4px)'
           }}
         >
-          {theme.name === 'LumenFlow' ? (
+          {theme.name === 'NeoSpark' ? (
             <>
               <Star size={14} className="text-yellow-500" />
-              Premium Choice
+              Best Template ✨
             </>
-          ) : theme.name === 'SimpleWhite' ? (
-            <>
-              <Palette size={14} />
-              Minimalistic
-            </>
-          ) : theme.name === 'NeoSpark' ? (
+          ) : theme.name === 'LumenFlow' ? (
             <>
               <Zap size={14} className="text-blue-500" />
-              Modern & Dynamic
+              Premium Choice
+            </>
+          ) : theme.name === 'MonoEdge' ? (
+            <>
+              <Palette size={14} />
+              Clean & Professional
             </>
           ) : (
             <>

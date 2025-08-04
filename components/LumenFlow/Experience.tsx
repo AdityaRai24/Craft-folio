@@ -20,13 +20,16 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Sparkles,
+  Send,
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
 import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
+import MagicWrite from "@/components/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface Technology {
@@ -121,6 +124,62 @@ const Experience = ({ currentTheme }: any) => {
   const sectionDescription =
     experienceSection?.sectionDescription ||
     "My professional journey through various roles and technologies, showcasing growth, expertise, and the impact I've made in different organizations and projects.";
+
+  // Magic Write functionality
+  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/magicwrite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Enhance this experience description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
+          context: context || "",
+          section: "experience-description"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance description');
+      }
+
+      const data = await response.json();
+      const enhancedDescription = data.response || data.content || data.result;
+      
+      return enhancedDescription;
+    } catch (error) {
+      console.error('Magic Write API error:', error);
+      throw error;
+    }
+  };
+
+  const handleDescriptionUpdate = async (experienceIndex: number, newDescription: string) => {
+    const updatedExperience = [...experienceData];
+    updatedExperience[experienceIndex] = {
+      ...updatedExperience[experienceIndex],
+      description: newDescription
+    };
+    setExperienceData(updatedExperience);
+          try {
+        const result = await updateSection({
+          sectionName: "experience",
+          portfolioId,
+          sectionContent: updatedExperience,
+          sectionTitle: "Experience",
+          sectionDescription: "Experience section"
+        });
+        if (result.success) {
+          toast.success("Experience description enhanced and saved successfully!");
+        } else {
+          toast.error("Failed to save changes to database");
+        }
+      } catch (error) {
+        console.error("Error saving experience description:", error);
+        toast.error("Failed to save changes to database");
+      }
+  };
+
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
   
@@ -315,27 +374,28 @@ const Experience = ({ currentTheme }: any) => {
   }> = ({ value, onChange }) => {
     return (
       <div>
-        <label className="block text-white text-left font-medium mb-3">Card Layout</label>
+        <label className="block text-white text-left font-medium mb-3">Card Style</label>
         <div className="grid grid-cols-2 gap-3">
           {[
-            { value: "default", label: "Default" },
-            { value: "minimal", label: "Minimal" },
-            { value: "glassmorphism", label: "Glass" },
-            { value: "neon", label: "Neon" },
+            { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+            { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+            { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+            { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
           ].map((style) => (
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
                 value === style.value
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             >
               <div className="space-y-2">
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
-                <div className="h-3 rounded" style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}></div>
+                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                  <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                  <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                </div>
               </div>
               <div className="text-center text-sm text-white mt-2">
                 {style.label}
@@ -367,7 +427,7 @@ const Experience = ({ currentTheme }: any) => {
             <div
               key={align}
               onClick={() => onChange(align as any)}
-              className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
                 value === align
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -424,7 +484,7 @@ const Experience = ({ currentTheme }: any) => {
             <div
               key={style}
               onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
                 value === style
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
@@ -486,9 +546,32 @@ const Experience = ({ currentTheme }: any) => {
           onChange={(e) => onChange(Number(e.target.value))}
           className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
           style={{
-            background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(value / max) * 100}%, #3f3f46 ${(value / max) * 100}%, #3f3f46 100%)`
+            background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))}%, #3f3f46 100%)`
           }}
         />
+        <style jsx>{`
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: ${ColorTheme.primary};
+            cursor: pointer;
+            border: none;
+            z-index: 10;
+            position: relative;
+          }
+          .slider::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: ${ColorTheme.primary};
+            cursor: pointer;
+            border: none;
+            z-index: 10;
+            position: relative;
+          }
+        `}</style>
       </div>
     );
   };
@@ -507,28 +590,18 @@ const Experience = ({ currentTheme }: any) => {
   }
 
   return (
-    <div className="space-y-4 md:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto md:px-4">
+            <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
       {/* Header Section */}
       <HeaderComponent
         currentTheme={currentTheme}
         sectionTitle={sectionTitle}
         sectionDescription={sectionDescription}
         sectionName="experience"
+        openVisualEditor={openVisualEditor}
+        visualEditorOpen={visualEditorOpen}
       />
 
-      {/* Visual Editor Button */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
-          onClick={openVisualEditor}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-          style={{
-            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-          }}
-        >
-          <Settings className="h-4 w-4" />
-          Visual Editor
-        </button>
-      </div>
+
 
       {/* Experience Timeline */}
       <div 
@@ -538,7 +611,7 @@ const Experience = ({ currentTheme }: any) => {
         {experienceData.map((exp, index) => (
           <div
             key={index}
-            className="group relative overflow-hidden"
+            className="group relative"
             onMouseEnter={() => setHoveredExperience(index)}
             onMouseLeave={() => setHoveredExperience(null)}
           >
@@ -551,15 +624,29 @@ const Experience = ({ currentTheme }: any) => {
 
             {/* Main Card */}
             <div 
-              className={`relative bg-transparent overflow-hidden border transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${
-                theme === "light"
-                  ? "border-gray-200/50 group-hover:border-orange-400/30"
-                  : "border-gray-700/50 group-hover:border-orange-400/30"
+              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${
+                effectiveCustomization.cardLayout === "default"
+                  ? theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
+                  : effectiveCustomization.cardLayout === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardLayout === "glassmorphism"
+                  ? theme === "light"
+                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                  : effectiveCustomization.cardLayout === "neon"
+                  ? theme === "light"
+                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                  : theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
               }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
-                borderWidth: `${effectiveCustomization.borderWidth}px`,
+                borderWidth: effectiveCustomization.cardLayout === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
                 transform: effectiveCustomization.hoverEffects && hoveredExperience === index ? "translateY(-4px)" : "none",
                 filter: effectiveCustomization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
               }}
@@ -589,12 +676,26 @@ const Experience = ({ currentTheme }: any) => {
                   </div>
 
                 {/* Description */}
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                   <p className={`text-sm leading-relaxed ${
                     theme === "light" ? "text-gray-600" : themeClasses.textSecondary
                   }`}>
                     {exp.description}
                   </p>
+                  {/* Magic Write Button */}
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <MagicWrite
+                      onMagicWrite={async (prompt: string, context?: string) => {
+                        const enhancedDescription = await handleMagicWrite(prompt, exp.description);
+                        handleDescriptionUpdate(index, enhancedDescription);
+                        return enhancedDescription;
+                      }}
+                      placeholder="Enhance this experience description..."
+                      buttonText=""
+                      context={exp.description}
+                      className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                    />
+                  </div>
                 </div>
 
                 {/* Tech Stack */}
@@ -720,7 +821,7 @@ const Experience = ({ currentTheme }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
+                        className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -729,15 +830,15 @@ const Experience = ({ currentTheme }: any) => {
         >
           {/* Header */}
           <div
-            className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
+            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
             onMouseDown={handleMouseDown}
           >
-            <h3 className="text-lg font-bold text-white">Experience Settings</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Experience Settings</h3>
             <button
               onClick={() => setVisualEditorOpen(false)}
               className="text-gray-400 hover:text-white transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
 
@@ -747,7 +848,7 @@ const Experience = ({ currentTheme }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 px-2 text-xs capitalize transition-colors ${
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
                   activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -768,7 +869,7 @@ const Experience = ({ currentTheme }: any) => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-96">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
             {activeTab === "layout" && (
               <>
                 <CardLayoutSelector
@@ -823,8 +924,10 @@ const Experience = ({ currentTheme }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("cardBorderRadius", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 32) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 32) * 100))}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -840,8 +943,10 @@ const Experience = ({ currentTheme }: any) => {
                     onChange={(e) =>
                       updateDraftCustomization("borderWidth", Number(e.target.value))
                     }
-                    style={{ accentColor: ColorTheme.primary }}
-                    className="w-full"
+                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.borderWidth ?? customization.borderWidth) / 4) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.borderWidth ?? customization.borderWidth) / 4) * 100))}%, #3f3f46 100%)`
+                    }}
                   />
                 </div>
 
@@ -925,8 +1030,10 @@ const Experience = ({ currentTheme }: any) => {
                       onChange={(e) =>
                         updateDraftCustomization("sideAccentWidth", Number(e.target.value))
                       }
-                      style={{ accentColor: ColorTheme.primary }}
-                      className="w-full"
+                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, (((draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth) - 1) / 7) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, (((draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth) - 1) / 7) * 100))}%, #3f3f46 100%)`
+                      }}
                     />
                   </div>
                 )}
@@ -935,18 +1042,18 @@ const Experience = ({ currentTheme }: any) => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 p-4 bg-zinc-800">
+          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
             <div className="flex gap-2">
               <button
                 onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-3 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
                 Reset
               </button>
               <button
                 onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-3 text-sm text-white rounded transition-colors"
+                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
@@ -965,6 +1072,33 @@ const Experience = ({ currentTheme }: any) => {
           onClick={() => setVisualEditorOpen(false)}
         />
       )}
+
+      {/* Custom CSS for sliders */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: none;
+          z-index: 10;
+          position: relative;
+        }
+        .slider::-moz-range-thumb {
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background: ${ColorTheme.primary};
+          cursor: pointer;
+          border: none;
+          z-index: 10;
+          position: relative;
+        }
+      `}</style>
+
+
     </div>
   );
 };

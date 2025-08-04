@@ -14,8 +14,13 @@ const menuItems = [
   { title: "Experience", href: "experience" },
 ];
 
- const Navbar = () => {
+ const Navbar = ({ currentPortTheme }: any) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Theme color variables (if theme is available)
+  const primaryColor = "#2563EB"; // Default fallback
+  const textPrimaryColor = "#1F2937"; // Default fallback
+  const textSecondaryColor = "#6B7280"; // Default fallback
   // const { personal } = usePortfolioConfig();
 
   const toggleSidebar = () => setIsOpen((state) => !state);
@@ -121,19 +126,19 @@ const menuItems = [
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-12"
+          className="mb-8 sm:mb-10 md:mb-12"
         >
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-primary-900">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-primary-900">
             Aditya Rai{/* {personal.name} Aditya Rai */}
           </h1>
-          <p className="text-primary-600 mt-2 font-title">
+          <p className="text-primary-600 mt-1 sm:mt-2 font-title text-sm sm:text-base">
             {/* {personal.role} */}
             Software Developer
             </p>
         </motion.div>
 
         {/* Navigation Items */}
-        <motion.ul variants={containerVariants} className="space-y-5 text-black">
+        <motion.ul variants={containerVariants} className="space-y-3 sm:space-y-4 md:space-y-5 text-black">
           {menuItems.map((item) => {
             // eslint-disable-next-line react-hooks/rules-of-hooks
             const [isHovered, setIsHovered] = useState(false);
@@ -150,7 +155,7 @@ const menuItems = [
                     smooth={true}
                     duration={500}
                   onClick={() => setIsOpen(false)}
-                  className="block text-lg font-title text-primary-800 hover:text-white hover:bg-black hover:font-semibold transition-all  duration-200 py-4 px-4 relative overflow-hidden"
+                  className="block text-base sm:text-lg font-title text-primary-800 hover:text-white hover:bg-black hover:font-semibold transition-all duration-200 py-3 sm:py-4 px-3 sm:px-4 relative overflow-hidden"
                 >
                   <motion.span
                     className="relative z-10 flex items-center justify-between"
@@ -186,7 +191,7 @@ const menuItems = [
                         damping: 20,
                       }}
                     >
-                      <FaArrowRight size={22} />
+                      <FaArrowRight size={18} className="sm:w-[22px] sm:h-[22px]" />
                     </motion.span>
                   </motion.span>
                   <motion.div

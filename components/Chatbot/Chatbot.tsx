@@ -35,6 +35,7 @@ import SEOSettings from "./SEOSettings";
 import ChatInterface from "./ChatInterface";
 import SettingsMenu from "./SettingsMenu";
 import GuestWarning from "./GuestWarning";
+import DeployModal from "../DeployModal";
 
 const PortfolioChatbot = ({
   portfolioData,
@@ -85,6 +86,7 @@ const PortfolioChatbot = ({
     "Processing your request..."
   );
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+  const [showDeployModal, setShowDeployModal] = useState(false);
   const seoSettingsRef = useRef<any>(null);
 
   const themeColors = CHATBOT_THEMES[chatbotTheme];
@@ -325,13 +327,16 @@ const PortfolioChatbot = ({
       });
       return;
     }
-    // Navigate to deploy page instead of opening modal
-    window.open(`/deploy/${portfolioId}`, "_blank");
+    // Open deploy modal instead of navigating to separate page
+    setShowDeployModal(true);
   };
 
   const handleSectionReorder = async () => {
     try {
       setIsProcessing(true);
+      console.log("Original sections:", sections);
+      console.log("Reordered sections:", reorderedSections);
+      
       const sectionOrder: any = [];
       portfolioData.map((item: any) => sectionOrder.push(item.type));
       const updatedOrder: any = [];
@@ -349,6 +354,8 @@ const PortfolioChatbot = ({
           idx++;
         }
       });
+      console.log("Updated order:", updatedOrder);
+      
       const finalSections: any = [];
       updatedOrder.forEach((item: any) => {
         const found = portfolioData.find((it: any) => it.type === item);
@@ -359,6 +366,7 @@ const PortfolioChatbot = ({
           return;
         }
       });
+      console.log("Final sections:", finalSections);
 
       await updatePortfolio({
         portfolioId: portfolioId,
@@ -366,7 +374,6 @@ const PortfolioChatbot = ({
       });
 
       dispatch(newPortfolioData(finalSections));
-      setSections(reorderedSections);
       toast.success("Sections reordered successfully!");
       setShowSectionReorder(false);
       handleChatClose();
@@ -379,7 +386,22 @@ const PortfolioChatbot = ({
   };
 
   const resetSectionOrder = () => {
-    setReorderedSections([...sections]);
+    if (portfolioData) {
+      let mainSections: any = [];
+      portfolioData.forEach((item: any) => {
+        if (
+          item.type === "hero" ||
+          item.type === "userInfo" ||
+          item.type === "themes" ||
+          item.type === "seo"
+        ) {
+          // Skip these sections
+        } else {
+          mainSections.push(item.type);
+        }
+      });
+      setReorderedSections(mainSections);
+    }
   };
 
   const containerVariants = {
@@ -412,6 +434,7 @@ const PortfolioChatbot = ({
     setShowSectionReorder(false);
     setShowSEOSettings(false);
     setShowAdvanced(false);
+    setShowDeployModal(false);
     setIsOpen(newIsOpen);
     onOpenChange(newIsOpen);
   };
@@ -868,24 +891,14 @@ const PortfolioChatbot = ({
                 </Button>
                   <Button
                     onClick={handleSectionReorder}
-                    disabled={
-                      isProcessing ||
-                      JSON.stringify(sections) ===
-                        JSON.stringify(reorderedSections)
-                    }
+                    disabled={isProcessing}
                     className="flex-1 font-medium py-2 px-4 rounded-lg transition-colors"
                               style={{
-                      backgroundColor:
-                        isProcessing ||
-                        JSON.stringify(sections) ===
-                          JSON.stringify(reorderedSections)
+                      backgroundColor: isProcessing
                           ? themeColors.bgCard
                           : themeColors.primary,
                                 color: themeColors.textPrimary,
-                      boxShadow:
-                        !isProcessing &&
-                        JSON.stringify(sections) !==
-                          JSON.stringify(reorderedSections)
+                      boxShadow: !isProcessing
                           ? `0 4px 14px ${themeColors.primaryGlow}`
                           : "none",
                     }}
@@ -914,6 +927,15 @@ const PortfolioChatbot = ({
           onShowSEOSettings={handleShowSEOSettings}
         />
                 )}
+
+      {/* Deploy Modal */}
+      <DeployModal
+        isOpen={showDeployModal}
+        onClose={() => setShowDeployModal(false)}
+        portfolioId={portfolioId}
+        portfolioData={portfolioData}
+        portfolioLink={portfolioLink}
+      />
     </div>
   );
 };
