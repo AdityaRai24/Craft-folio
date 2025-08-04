@@ -34,6 +34,7 @@ const AdvancedSettings = ({
         portfolioId={portfolioId}
         onClose={() => setShowSEOSettings(false)}
         themeColors={themeColors}
+        onSave={() => setShowSEOSettings(false)}
       />
     );
   }

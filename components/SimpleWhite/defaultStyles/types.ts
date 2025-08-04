@@ -1,4 +1,12 @@
 export interface SimpleWhiteHeroCustomizationState {
+  // Profile Image Settings
+  showProfileImage: boolean;
+  profileImageSize: number;
+  profileImageBorder: boolean;
+  profileImageBorderWidth: number;
+  profileImageShadow: boolean;
+  profileImagePosition: "left" | "right" | "center";
+  
   // Layout & Structure
   contentAlignment: "left" | "center" | "right";
   layoutStyle: "split" | "stacked" | "centered";
