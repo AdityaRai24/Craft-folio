@@ -40,10 +40,18 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - name: Cleanup old container and image
+      - name: Stop and remove all containers
         run: |
-          docker rm -f craftfolio-container || true
-          docker rmi adityarai24/craft-folio-app:latest || true
+          docker stop $(docker ps -aq) || true
+          docker rm $(docker ps -aq) || true
+
+      - name: Remove all Docker images
+        run: |
+          docker rmi $(docker images -aq) || true
+
+      - name: Clean up Docker system
+        run: |
+          docker system prune -af --volumes
 
       - name: Pull image from docker hub
         run: docker pull adityarai24/craft-folio-app:latest

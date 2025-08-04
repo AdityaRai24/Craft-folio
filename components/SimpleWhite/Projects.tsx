@@ -562,9 +562,9 @@ const Projects: React.FC = ({ currentPortTheme }: any) => {
   const getCardClasses = () => {
     let classes = `${effectiveCustomization.cardBackground} section-card border ${
       effectiveCustomization.cardBorder
-    } overflow-hidden transition-all duration-${Math.round(
+    }  transition-all duration-${Math.round(
       effectiveCustomization.animationSpeed * 1000
-    )} cursor-pointer z-0 hover:bg-gray-50`;
+    )} cursor-pointer hover:bg-gray-50`;
 
     return classes;
   };
@@ -824,7 +824,7 @@ const Projects: React.FC = ({ currentPortTheme }: any) => {
   return (
     <section
       id="projects"
-      className="py-12 sm:py-16 md:py-20 lg:py-24 w-full bg-white overflow-hidden min-h-screen text-gray-900"
+      className="py-12  sm:py-16 md:py-20 lg:py-24 w-full bg-white overflow-hidden min-h-screen text-gray-900"
     >
       <style>{`
         .slider::-webkit-slider-thumb {
@@ -874,7 +874,7 @@ const Projects: React.FC = ({ currentPortTheme }: any) => {
         {/* Projects Grid */}
         {Array.isArray(projects) && projects.length > 0 ? (
           <motion.div
-            className={getLayoutClasses()}
+            className={`${getLayoutClasses()}`}
             style={getLayoutStyle()}
             variants={containerVariants}
             initial="hidden"

@@ -1081,7 +1081,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
             cursor: isDragging ? "grabbing" : "grab",
-            zIndex: 99999999,
+            zIndex: 999999999,
           }}
         >
           {/* Header */}
@@ -1342,7 +1342,8 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
       {/* Overlay for floating window */}
       {visualEditorOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40"
+          className="fixed inset-0 bg-black/20"
+          style={{ zIndex: 999999998 }}
           onClick={() => setVisualEditorOpen(false)}
         />
       )}

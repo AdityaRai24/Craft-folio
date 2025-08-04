@@ -75,7 +75,7 @@ const menuItems = [
       {/* Mobile Menu Button */}
       {/* <motion.button
         onClick={toggleSidebar}
-        className="fixed top-4 right-4 bg-black cursor-pointer z-[99999] p-2 bg-primary-900 rounded-full shadow drop-shadow-lg
+        className="fixed top-4 right-4 bg-black cursor-pointer p-2 bg-primary-900 rounded-full shadow drop-shadow-lg
         hover:drop-shadow-xl hover:scale-110 group
         transition-all duration-300 ease-out"
         whileHover={{
