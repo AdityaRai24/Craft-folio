@@ -35,6 +35,7 @@ import toast from "react-hot-toast";
 
 interface TechnologiesProps {
   currentTheme: string;
+  portfolioId: string;
 }
 
 interface Technology {

@@ -396,7 +396,7 @@ const MobileProfileCard = ({
   </div>
 );
 
-const HeroContent = ({ currentPortTheme, customCSS }: any) => {
+const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("home");
   const { theme } = useLumenFlowTheme();
@@ -670,13 +670,13 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
   const renderContent = () => {
     switch (activeTab) {
       case "projects":
-        return <Projects currentTheme={currentTheme} />;
+        return <Projects currentTheme={currentTheme} portfolioId={portfolioId} />;
       case "experience":
-        return <Experience currentTheme={currentTheme} />;
+        return <Experience currentTheme={currentTheme} portfolioId={portfolioId} />;
       case "education":
-        return <Education currentTheme={currentTheme} />;
+        return <Education currentTheme={currentTheme} portfolioId={portfolioId} />;
       case "technologies":
-        return <Technologies currentTheme={currentTheme} />;
+        return <Technologies currentTheme={currentTheme} portfolioId={portfolioId} />;
       case "home":
       default:
         return (
@@ -1964,7 +1964,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
 const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   return (
     <LumenFlowThemeProvider>
-      <HeroContent currentPortTheme={currentPortTheme} customCSS={customCSS} />
+      <HeroContent currentPortTheme={currentPortTheme} customCSS={customCSS} portfolioId={portfolioId} />
     </LumenFlowThemeProvider>
   );
 };
