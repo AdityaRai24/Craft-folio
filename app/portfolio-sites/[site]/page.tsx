@@ -36,7 +36,7 @@ const Page = () => {
   const dispatch = useDispatch();
   const params = useParams();
   let subdomain = params.site as string;
-  const { user, isLoaded: isUserLoaded } = useUser();
+  const { user } = useUser();
 
   const {
     portfolioData,
@@ -141,11 +141,9 @@ const Page = () => {
       }
     };
 
-    // Only initialize if user auth state is loaded
-    if (isUserLoaded) {
-      initializePortfolio();
-    }
-  }, [subdomain, dispatch, isUserLoaded]);
+    // Initialize portfolio immediately without waiting for user auth
+    initializePortfolio();
+  }, [subdomain, dispatch]);
 
   // Don't try to access template config until we have template name
   const Template =
@@ -173,7 +171,7 @@ const Page = () => {
     return <PortfolioNotFound />;
   }
 
-  if (isLoading || !dataLoaded || !Template || !isUserLoaded) {
+  if (isLoading || !dataLoaded || !Template) {
     const portfolioMessages: any = [
       { text: "Loading the portfolio", icon: Palette },
       { text: "Fetching data", icon: Layout },
