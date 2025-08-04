@@ -291,16 +291,7 @@ const PortfolioChatbot = ({
   };
 
   const handleShowDeploy = () => {
-    if (!user) {
-      toast.error("Please sign up to deploy your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
-    // Open deploy modal instead of navigating to separate page
+    // Allow all users to open the deploy modal
     setShowDeployModal(true);
   };
 

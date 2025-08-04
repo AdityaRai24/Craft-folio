@@ -282,12 +282,12 @@ const Page = () => {
             className={cn(" min-h-screen w-full", selectedFontClass)}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {/* {NavbarComponent && (
+            {NavbarComponent && (
               <NavbarComponent
                 customCSS={customCSSState}
                 currentPortTheme={themeName}
               />
-            )} */}
+            )}
             <Sidebar />
 
             {allSections && allSections.length > 0 ? (

@@ -17,7 +17,7 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
-import Navbar from "./Navbar";
+
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import MagicWrite from "@/components/MagicWrite";
@@ -991,12 +991,6 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       <div className="absolute inset-0 z-0" style={getBackgroundStyle()} />
       {/* Fade effect at bottom to smooth transition */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-10"></div>
-      <Navbar 
-        currentPortTheme={currentPortTheme} 
-        customCSS={customCSS} 
-        backgroundTheme={effectiveCustomization.backgroundTheme}
-        getBackgroundStyle={getBackgroundStyle}
-      />
               <div
           className={getContainerClasses()}
           style={{
