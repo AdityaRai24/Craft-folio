@@ -98,7 +98,7 @@ interface CustomizationState {
   linkStyle: "default" | "minimal" | "outlined" | "glow";
 }
 
-const Projects = ({ currentTheme }: any) => {
+const Projects = ({ currentTheme, portfolioId }: any) => {
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
@@ -116,8 +116,7 @@ const Projects = ({ currentTheme }: any) => {
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
   
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+
 
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);

@@ -4,10 +4,7 @@ import { RootState } from '@/store/store';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase-client';
 
-const Contact = ({ currentPortTheme }: any) => {
-
-    const params = useParams();
-    const portfolioId = params.portfolioId as string;
+const Contact = ({ currentPortTheme, portfolioId }: any) => {
 
     const { portfolioData } = useSelector((state: RootState) => state.data);
     const inTheme = portfolioData?.find((item: any) => item.type === "themes");

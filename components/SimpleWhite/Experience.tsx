@@ -129,17 +129,14 @@ const SizeSelector: React.FC<{
   );
 };
 
-const Experience: React.FC = ({ currentPortTheme, customCSS }: any) => {
+const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme?.data?.[currentPortTheme];
   const [experienceData, setExperienceData] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const params = useParams();
   const dispatch = useDispatch();
-  
-  const portfolioId = params.portfolioId as string;
 
   const [isHeadingVisible, setIsHeadingVisible] = useState(false);
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);

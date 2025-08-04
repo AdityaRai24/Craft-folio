@@ -406,8 +406,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
   const [contactData, setContactData] = useState<any>(null);
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+
 
   // Visual Editor States
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
@@ -1962,7 +1961,7 @@ const HeroContent = ({ currentPortTheme, customCSS }: any) => {
   );
 };
 
-const Hero = ({ currentPortTheme, customCSS }: any) => {
+const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   return (
     <LumenFlowThemeProvider>
       <HeroContent currentPortTheme={currentPortTheme} customCSS={customCSS} />

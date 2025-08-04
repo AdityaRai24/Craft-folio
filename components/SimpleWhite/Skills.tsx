@@ -18,9 +18,7 @@ interface TechnologyType {
   logo: string;
 }
 
-const Skills: NextPage = ({ currentPortTheme, customCSS }: any) => {
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const dispatch = useDispatch();
   
   const { portfolioData } = useSelector((state: RootState) => state.data);

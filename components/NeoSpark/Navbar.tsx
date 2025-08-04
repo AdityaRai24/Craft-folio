@@ -11,9 +11,7 @@ import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import EditButton from '@/components/EditButton';
 
-const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle }: any) => {
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle, portfolioId }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

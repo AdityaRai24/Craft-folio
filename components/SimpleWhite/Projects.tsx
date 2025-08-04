@@ -342,9 +342,7 @@ const TechStackStyleSelector: React.FC<{
   );
 };
 
-const Projects: React.FC = ({ currentPortTheme }: any) => {
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
   const dispatch = useDispatch();
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");

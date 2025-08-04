@@ -136,7 +136,7 @@ interface CustomizationState {
   backgroundPattern: "none" | "dots" | "grid" | "waves";
 }
 
-const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
+const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   interface Technology {
     name: string;
     logo: string;
@@ -237,9 +237,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
 
-  const params = useParams();
   const dispatch = useDispatch();
-  const portfolioId = params.portfolioId as string;
 
   // Dragging functionality
   const handleMouseDown = (e: React.MouseEvent) => {

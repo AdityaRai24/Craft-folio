@@ -145,6 +145,7 @@ const Page = () => {
       <SectionComponent
         currentPortTheme={themeName}
         customCSS={customCSSState}
+        portfolioId={portfolioId}
         key={`${sectionType}`}
       />
     ) : null;
@@ -195,6 +196,7 @@ const Page = () => {
             <NavbarComponent
               customCSS={customCSSState}
               currentPortTheme={themeName}
+              portfolioId={portfolioId}
             />
           )}
           <Sidebar />

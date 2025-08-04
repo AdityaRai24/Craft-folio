@@ -85,9 +85,10 @@ interface CustomizationState {
 
 interface EducationProps {
   currentTheme: string;
+  portfolioId: string;
 }
 
-const Education: React.FC<EducationProps> = ({ currentTheme }) => {
+const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
   const [educationData, setEducationData] = useState<Education[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredEducation, setHoveredEducation] = useState<number | null>(null);
@@ -152,8 +153,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization =
     visualEditorOpen && draftCustomization ? draftCustomization : customization;
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
 
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);

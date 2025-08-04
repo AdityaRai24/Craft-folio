@@ -77,7 +77,7 @@ interface CustomizationState {
   blurIntensity: number;
 }
 
-const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
+const Technologies: React.FC<TechnologiesProps> = ({ currentTheme, portfolioId }) => {
   const [technologiesData, setTechnologiesData] = useState<Technology[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredTech, setHoveredTech] = useState<number | null>(null);
@@ -139,8 +139,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization =
     visualEditorOpen && draftCustomization ? draftCustomization : customization;
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
 

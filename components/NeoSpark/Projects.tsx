@@ -394,11 +394,9 @@ const TechStackStyleSelector: React.FC<{
 
 
 
-const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
+const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [isInView, setIsInView] = useState<boolean>(false);
   const sectionRef = useRef<HTMLElement | null>(null);
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
   const dispatch = useDispatch();
 
 

@@ -98,7 +98,7 @@ interface CustomizationState {
   sideAccentColor: string;
 }
 
-const Experience = ({ currentTheme }: any) => {
+const Experience = ({ currentTheme, portfolioId }: any) => {
   const [experienceData, setExperienceData] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredExperience, setHoveredExperience] = useState<number | null>(
@@ -114,9 +114,6 @@ const Experience = ({ currentTheme }: any) => {
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
   
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
-
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const experienceSection = portfolioData?.find(

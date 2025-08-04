@@ -53,9 +53,7 @@ interface CustomizationState {
   shuffleInterval: number;
 }
 
-const Technologies = ({ currentPortTheme, customCSS }: any) => {
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+const Technologies = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");

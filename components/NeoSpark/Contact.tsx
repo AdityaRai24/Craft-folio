@@ -232,9 +232,7 @@ const SpacingSelector: React.FC<{
 };
 
 
-const Contact = ({ currentPortTheme, customCSS }: any) => {
-  const params = useParams();
-  const portfolioId = params.portfolioId as string;
+const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const dispatch = useDispatch();
 
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
