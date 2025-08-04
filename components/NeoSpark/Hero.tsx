@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useAnimate } from "framer-motion";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
@@ -387,7 +388,8 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const dispatch = useDispatch();
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
 
@@ -481,25 +483,36 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "hero",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as unknown as CustomizationState);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["hero"]) {
+          setCustomization(componentCustomizations["hero"] as CustomizationState);
         } else {
-          setCustomization(defaultHeroStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "hero",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              hero: result.data
+            }));
+          } else {
+            setCustomization(defaultHeroStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultHeroStyles);
       }
     };
     if (portfolioId) loadCustomizations();
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -526,7 +539,16 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
         componentType: "hero",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          hero: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -542,6 +564,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultHeroStyles);
       setDraftCustomization(defaultHeroStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["hero"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -628,10 +654,10 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
 
   const getTitleClasses = () => {
     const sizeMap = {
-      sm: "text-xl sm:text-2xl md:text-4xl lg:text-5xl",
-      md: "text-2xl sm:text-3xl md:text-5xl lg:text-6xl",
-      lg: "text-3xl sm:text-4xl md:text-6xl lg:text-7xl",
-      xl: "text-4xl sm:text-5xl md:text-7xl lg:text-8xl",
+      sm: "text-3xl sm:text-2xl md:text-4xl lg:text-5xl",
+      md: "text-3xl sm:text-3xl md:text-5xl lg:text-6xl",
+      lg: "text-4xl sm:text-4xl md:text-6xl lg:text-7xl",
+      xl: "text-5xl sm:text-5xl md:text-7xl lg:text-8xl",
     };
 
     const weightMap = {
@@ -1027,18 +1053,16 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
           </motion.div>
         )}
         
-        {/* Consistent Button Layout */}
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
           {shouldShowButton && (
             <button
               onClick={openVisualEditor}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
+              className="md:flex hidden items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
               style={getThemeButtonStyle(true)}
             >
               <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Visual Editor</span>
-              <span className="sm:hidden">Editor</span>
+              <span className="">Visual Editor</span>
             </button>
           )}
         </div>
@@ -1074,7 +1098,7 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
             dangerouslySetInnerHTML={{ __html: heroData.summary }}
           ></motion.p>
           {/* Magic Write Button */}
-          <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
+          <div className="absolute hidden md:block -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
             <MagicWrite
               onMagicWrite={async (prompt: string, context?: string) => {
                 const enhancedDescription = await handleMagicWrite(prompt, heroData.summary);

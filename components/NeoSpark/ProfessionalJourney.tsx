@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setCurrentEdit } from "@/slices/editModeSlice";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import { useParams } from "next/navigation";
 import SectionHeader from "./SectionHeader";
@@ -151,7 +152,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     techStack?: Technology[];
   }
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -277,25 +278,36 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
     };
   }, [isDragging, dragOffset]);
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "professional-journey",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["professional-journey"]) {
+          setCustomization(componentCustomizations["professional-journey"] as CustomizationState);
         } else {
-          setCustomization(defaultProfessionalJourneyStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "professional-journey",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              "professional-journey": result.data
+            }));
+          } else {
+            setCustomization(defaultProfessionalJourneyStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultProfessionalJourneyStyles);
       }
     };
     if (portfolioId) loadCustomizations();
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   const [isHeadingVisible, setIsHeadingVisible] = useState(false);
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
@@ -379,7 +391,16 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
         componentType: "professional-journey",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          "professional-journey": draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -395,6 +416,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultProfessionalJourneyStyles);
       setDraftCustomization(defaultProfessionalJourneyStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["professional-journey"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -648,18 +673,21 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
   const timelineStyles = getTimelineStyles();
 
   return (
-    <div className="text-white bg-black p-2 sm:p-4 md:p-8 relative">
+    <section
+      id="experience"
+      className="py-12 sm:py-16 md:py-24 w-full bg-black overflow-hidden min-h-screen text-white relative"
+    >
       <style>{customCSS}</style>
+      <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
+        <SectionHeader
+          sectionName="experience"
+          sectionTitle={sectionTitle}
+          sectionDescription={sectionDescription}
+          titleColor={titleColor}
+          onVisualEditorOpen={openVisualEditor}
+        />
 
-      <SectionHeader
-        sectionName="experience"
-        sectionTitle={sectionTitle}
-        sectionDescription={sectionDescription}
-        titleColor={titleColor}
-        onVisualEditorOpen={openVisualEditor}
-      />
-
-      <div className={getContainerClasses()}>
+        <div className={getContainerClasses()}>
         {experienceData.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-gray-400">
             No professional experience added yet.
@@ -807,7 +835,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
                       {experience.description}
                     </p>
                     {/* Magic Write Button */}
-                    <div className="absolute -top-2 -right-2 z-10">
+                    <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                       <MagicWrite
                         onMagicWrite={async (prompt: string, context?: string) => {
                           const enhancedDescription = await handleMagicWrite(prompt, experience.description);
@@ -864,18 +892,19 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
           </div>
         )}
       </div>
+    </div>
 
       {/* Floating Visual Editor Window */}
       {visualEditorOpen && (
-        <div
-          ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-          }}
-        >
+                            <div
+            ref={dragRef}
+            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+            style={{
+              left: `${windowPosition.x}px`,
+              top: `${windowPosition.y}px`,
+              cursor: isDragging ? "grabbing" : "grab",
+            }}
+          >
           {/* Header */}
           <div
             className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
@@ -1501,7 +1530,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS }: any) => {
           background-clip: text;
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 

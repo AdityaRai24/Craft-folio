@@ -1000,7 +1000,7 @@ const Projects: React.FC = ({ currentPortTheme }: any) => {
                       >
                         {project?.projectDescription}
                       </p>
-                      <div className="absolute -top-1 -right-1 z-10">
+                      <div className="absolute -top-1 -right-1 z-10 hidden md:block">
                         <MagicWrite
                           onMagicWrite={async (prompt: string, context?: string) => {
                             const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription || "");

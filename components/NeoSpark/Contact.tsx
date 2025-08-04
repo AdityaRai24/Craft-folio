@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { setCurrentEdit } from "@/slices/editModeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
@@ -236,7 +237,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
   const portfolioId = params.portfolioId as string;
   const dispatch = useDispatch();
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -365,18 +366,29 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "contact",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["contact"]) {
+          setCustomization(componentCustomizations["contact"] as CustomizationState);
         } else {
-          setCustomization(defaultContactStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "contact",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              contact: result.data
+            }));
+          } else {
+            setCustomization(defaultContactStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultContactStyles);
@@ -386,7 +398,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
     if (portfolioId) {
       loadCustomizations();
     }
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -411,7 +423,16 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
         componentType: "contact",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          contact: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -427,6 +448,10 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultContactStyles);
       setDraftCustomization(defaultContactStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["contact"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -483,7 +508,7 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
 
   // Helper functions for styling
   const getLayoutClasses = () => {
-    return `grid grid-cols-1 md:grid-cols-${effectiveCustomization.gridColumns}`;
+    return `grid grid-cols-2 md:grid-cols-${effectiveCustomization.gridColumns}`;
   };
 
   const getLayoutStyle = () => {
@@ -493,13 +518,25 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
   const getContainerStyle = () => {
     switch (effectiveCustomization.containerWidth) {
       case "narrow":
-        return { maxWidth: "60%", margin: "0 auto" };
+        return { 
+          maxWidth: "100%", 
+          margin: "0 auto",
+          "@media (min-width: 768px)": { maxWidth: "60%" }
+        };
       case "wide":
-        return { maxWidth: "80%", margin: "0 auto" };
+        return { 
+          maxWidth: "100%", 
+          margin: "0 auto",
+          "@media (min-width: 768px)": { maxWidth: "80%" }
+        };
       case "full":
         return { maxWidth: "100%", margin: "0 auto" };
       default:
-        return { maxWidth: "80%", margin: "0 auto" };
+        return { 
+          maxWidth: "100%", 
+          margin: "0 auto",
+          "@media (min-width: 768px)": { maxWidth: "80%" }
+        };
     }
   };
 
@@ -777,8 +814,14 @@ const Contact = ({ currentPortTheme, customCSS }: any) => {
             staggerChildren: effectiveCustomization.staggerDelay / 1000,
             delayChildren: 0.2,
           }}
-          className={getLayoutClasses()}
-          style={{ ...getLayoutStyle(), ...getContainerStyle() }}
+          className={`${getLayoutClasses()} w-full ${
+            effectiveCustomization.containerWidth === "narrow" 
+              ? "md:max-w-[60%] md:mx-auto" 
+              : effectiveCustomization.containerWidth === "wide" 
+              ? "md:max-w-[80%] md:mx-auto" 
+              : "max-w-full"
+          }`}
+          style={{ ...getLayoutStyle() }}
         >
           {platforms.map((platform, index) => (
             <motion.div

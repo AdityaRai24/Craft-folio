@@ -16,6 +16,7 @@ import {
   setPortFolioUserId,
   setTemplateName,
   setThemeName,
+  setComponentCustomizations,
 } from "@/slices/dataSlice";
 import { templatesConfig } from "@/lib/templateConfig";
 import Sidebar from "../Sidebar";
@@ -176,7 +177,8 @@ const Page = () => {
           portfolioId: currentPortfolioId,
         });
         if (customizationsResult.success) {
-          // Store customizations in Redux or pass to components
+          // Store customizations in Redux
+          dispatch(setComponentCustomizations(customizationsResult.data));
           console.log("Loaded component customizations:", customizationsResult.data);
         }
 

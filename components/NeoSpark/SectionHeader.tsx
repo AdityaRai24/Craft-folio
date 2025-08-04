@@ -25,36 +25,36 @@ const SectionHeader = ({
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="max-w-xl block mx-auto">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className=" block mx-auto  max-w-xl ">
         <h1
-          className="text-4xl section-title font-bold mb-4 text-center"
+          className="text-2xl sm:text-3xl max-w-2xl md:text-4xl section-title font-bold mb-3 sm:mb-4 text-center"
           style={{ color: titleColor }}
         >
           {sectionTitle}
         </h1>
-        <p className="text-xl section-description text-gray-300 text-center mb-16">
+        <p className="text-base sm:text-lg md:text-xl  section-description text-gray-300 text-center mb-8 sm:mb-12 md:mb-16">
           {sectionDescription}
         </p>
         
         {/* Consistent Button Layout */}
-      <div className="absolute top-4 right-4 z-20">
-      <div className="flex items-center justify-center gap-2">
-          <EditButton sectionName={sectionName} />
-          {onVisualEditorOpen && shouldShowButton && (
-            <button
-              onClick={onVisualEditorOpen}
-              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"
-              style={{
-                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-              }}
-            >
-              <Settings className="h-4 w-4" />
-              Visual Editor
-            </button>
-          )}
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20">
+          <div className="flex items-center justify-center gap-1 sm:gap-2">
+            <EditButton sectionName={sectionName} />
+            {onVisualEditorOpen && shouldShowButton && (
+              <button
+                onClick={onVisualEditorOpen}
+                className="md:flex hidden items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden md:inline">Visual Editor</span>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );

@@ -115,14 +115,14 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           {shouldShowButton && (
             <button
               onClick={onVisualEditorClick}
-              className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+              className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
               }}  
             >
               <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Visual Editor</span>
-              <span className="sm:hidden">Editor</span>
+               
             </button>
           )}
         </div>

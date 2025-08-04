@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import EditButton from '@/components/EditButton';
 import {
@@ -49,7 +50,7 @@ interface Experience {
 
 interface CustomizationState {
   // Layout & Structure
-  cardLayout: "default" | "minimal" | "glassmorphism" | "neon";
+  cardLayout: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
   cardBorderRadius: number;
   cardPadding: number;
   cardSpacing: number;
@@ -116,7 +117,8 @@ const Experience = ({ currentTheme }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const dispatch = useDispatch();
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const experienceSection = portfolioData?.find(
     (item: any) => item.type === "experience"
   );
@@ -229,18 +231,29 @@ const Experience = ({ currentTheme }: any) => {
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "experience",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["experience"]) {
+          setCustomization(componentCustomizations["experience"] as CustomizationState);
         } else {
-          setCustomization(defaultExperienceStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "experience",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              experience: result.data
+            }));
+          } else {
+            setCustomization(defaultExperienceStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultExperienceStyles);
@@ -250,7 +263,7 @@ const Experience = ({ currentTheme }: any) => {
     if (portfolioId) {
       loadCustomizations();
     }
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   useEffect(() => {
     if (portfolioData) {
@@ -285,7 +298,16 @@ const Experience = ({ currentTheme }: any) => {
         componentType: "experience",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          experience: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -300,6 +322,10 @@ const Experience = ({ currentTheme }: any) => {
       setCustomization(defaultExperienceStyles);
       setDraftCustomization(defaultExperienceStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["experience"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -369,8 +395,8 @@ const Experience = ({ currentTheme }: any) => {
 
   // Visual Editor Components
   const CardLayoutSelector: React.FC<{
-    value: "default" | "minimal" | "glassmorphism" | "neon";
-    onChange: (value: "default" | "minimal" | "glassmorphism" | "neon") => void;
+    value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
+    onChange: (value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient") => void;
   }> = ({ value, onChange }) => {
     return (
       <div>
@@ -381,6 +407,7 @@ const Experience = ({ currentTheme }: any) => {
             { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
             { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
             { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+            { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
           ].map((style) => (
             <div
               key={style.value}
@@ -639,6 +666,10 @@ const Experience = ({ currentTheme }: any) => {
                   ? theme === "light"
                     ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
                     : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                  : effectiveCustomization.cardLayout === "gradient"
+                  ? theme === "light"
+                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                    : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
                   : theme === "light"
                     ? "bg-white border border-gray-200 shadow-sm"
                     : "bg-zinc-800 border border-zinc-700"
@@ -683,7 +714,7 @@ const Experience = ({ currentTheme }: any) => {
                     {exp.description}
                   </p>
                   {/* Magic Write Button */}
-                  <div className="absolute -top-2 -right-2 z-10">
+                  <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                     <MagicWrite
                       onMagicWrite={async (prompt: string, context?: string) => {
                         const enhancedDescription = await handleMagicWrite(prompt, exp.description);

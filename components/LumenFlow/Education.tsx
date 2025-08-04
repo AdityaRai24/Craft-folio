@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import {
   GraduationCap,
@@ -154,7 +155,8 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const dispatch = useDispatch();
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const educationSection = portfolioData?.find(
     (item: any) => item.type === "education"
   );
@@ -222,18 +224,29 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "education",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["education"]) {
+          setCustomization(componentCustomizations["education"] as CustomizationState);
         } else {
-          setCustomization(defaultEducationStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "education",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              education: result.data
+            }));
+          } else {
+            setCustomization(defaultEducationStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultEducationStyles);
@@ -243,7 +256,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
     if (portfolioId) {
       loadCustomizations();
     }
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -271,7 +284,16 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
         componentType: "education",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          education: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -287,6 +309,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
       setCustomization(defaultEducationStyles);
       setDraftCustomization(defaultEducationStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["education"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -762,42 +788,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                     effectiveCustomization.shadowIntensity * 20
                   }px ${titleColor}20`,
                 }),
-                ...(effectiveCustomization.cardStyle === "glassmorphism" && {
-                  backgroundColor: theme === "light" 
-                    ? "rgba(255, 255, 255, 0.1)" 
-                    : "rgba(0, 0, 0, 0.1)",
-                  backdropFilter: `blur(${effectiveCustomization.blurIntensity}px)`,
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: theme === "light"
-                    ? "rgba(255, 255, 255, 0.2)"
-                    : "rgba(255, 255, 255, 0.1)",
-                }),
-                ...(effectiveCustomization.cardStyle === "neon" && {
-                  borderWidth: "2px",
-                  borderStyle: "solid",
-                  borderColor: titleColor,
-                  boxShadow: `0 0 20px ${titleColor}50, inset 0 0 20px ${titleColor}10`,
-                }),
-                ...(effectiveCustomization.cardStyle === "gradient" && {
-                  background: theme === "light"
-                    ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))"
-                    : "linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.15))",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderColor: theme === "light"
-                    ? "rgba(249, 115, 22, 0.3)"
-                    : "rgba(249, 115, 22, 0.4)",
-                }),
-                ...(effectiveCustomization.cardStyle === "default" && {
-                  backgroundColor: "transparent",
-                  borderWidth: `${effectiveCustomization.borderWidth}px`,
-                  borderStyle: "solid",
-                  borderColor:
-                    theme === "light"
-                      ? "rgba(229, 231, 235, 0.5)"
-                      : "rgba(55, 65, 81, 0.5)",
-                }),
               }}
             >
               {/* Education Content */}
@@ -861,7 +851,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme }) => {
                       {edu.description}
                     </p>
                     {/* Magic Write Button */}
-                    <div className="absolute -top-2 -right-2 z-10">
+                    <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                       <MagicWrite
                         onMagicWrite={async (prompt: string, context?: string) => {
                           const enhancedDescription = await handleMagicWrite(prompt, edu.description || "");

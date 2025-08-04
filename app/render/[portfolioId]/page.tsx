@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   fetchContent,
   getThemeNameApi,
+  getAllComponentCustomizations,
 } from "@/app/actions/portfolio";
 import { useParams } from "next/navigation";
 import {
@@ -14,6 +15,7 @@ import {
   setPortFolioUserId,
   setTemplateName,
   setThemeName,
+  setComponentCustomizations,
 } from "@/slices/dataSlice";
 import { templatesConfig } from "@/lib/templateConfig";
 import { Spotlight } from "@/components/NeoSpark/Spotlight";
@@ -102,6 +104,16 @@ const Page = () => {
         }
         if (contentResult.success) {
           dispatch(setPortfolioData(contentResult?.data?.sections));
+        }
+
+        // Fetch component customizations
+        const customizationsResult = await getAllComponentCustomizations({
+          portfolioId: portfolioId,
+        });
+        if (customizationsResult.success) {
+          // Store customizations in Redux
+          dispatch(setComponentCustomizations(customizationsResult.data));
+          console.log("Loaded component customizations:", customizationsResult.data);
         }
 
         // Mark data as loaded only after both fetches complete

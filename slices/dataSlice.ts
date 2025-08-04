@@ -9,6 +9,7 @@ interface PortfolioState {
   portfolioUserId : string;
   sectionTitle: string;
   sectionDescription: string;
+  componentCustomizations: Record<string, any>;
 }
 
 const initialState: PortfolioState = {
@@ -20,6 +21,7 @@ const initialState: PortfolioState = {
   portfolioUserId : "",
   sectionTitle: "",
   sectionDescription: "",
+  componentCustomizations: {},
 };
 
 export const dataSlice = createSlice({
@@ -46,6 +48,10 @@ export const dataSlice = createSlice({
 
     setCustomCSSState: (state, action: PayloadAction<string>) => {
       state.customCSSState = action.payload;
+    },
+
+    setComponentCustomizations: (state, action: PayloadAction<Record<string, any>>) => {
+      state.componentCustomizations = action.payload;
     },
 
     updatePortfolioData: (
@@ -77,7 +83,8 @@ export const {
   setPortFolioUserId,
   updatePortfolioData, 
   newPortfolioData,
-  setCustomCSSState
+  setCustomCSSState,
+  setComponentCustomizations
 } = dataSlice.actions;
 
 export default dataSlice.reducer;

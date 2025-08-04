@@ -79,7 +79,7 @@ const HeaderComponent = ({
                 {openVisualEditor && shouldShowButton && (
                   <button
                     onClick={openVisualEditor}
-                    className="flex items-center gap-2 px-4 py-3 cursor-pointer text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+                    className="hidden md:flex items-center gap-2 px-4 py-3 cursor-pointer text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
                     style={{
                       background: `linear-gradient(135deg, #10b981, #059669)`,
                     }}

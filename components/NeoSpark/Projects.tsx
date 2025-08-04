@@ -27,6 +27,7 @@ import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setCurrentEdit } from "@/slices/editModeSlice";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import EditButton from "@/components/EditButton";
@@ -426,7 +427,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
 
 
   
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -450,21 +451,32 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "project",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["project"]) {
+          setCustomization(componentCustomizations["project"] as ProjectsCustomizationState);
         } else {
-          setCustomization(defaultProjectsStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "project",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              project: result.data
+            }));
+          } else {
+            setCustomization(defaultProjectsStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultProjectsStyles);
       }
     };
     if (portfolioId) loadCustomizations();
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -489,7 +501,16 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
         componentType: "project",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          project: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -505,6 +526,10 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultProjectsStyles);
       setDraftCustomization(defaultProjectsStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["project"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -1048,7 +1073,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS }: any) => {
                           {project?.projectDescription}
                         </p>
                         {/* Magic Write Button */}
-                        <div className="absolute -top-2 -right-2 z-10">
+                        <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                           <MagicWrite
                             onMagicWrite={async (prompt: string, context?: string) => {
                               const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription);

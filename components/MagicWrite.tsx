@@ -90,7 +90,7 @@ const MagicWrite: React.FC<MagicWriteProps> = ({
     };
 
     return (
-      <>
+      <div className="hidden md:block">
         {/* Backdrop to close on click outside */}
         <div 
           className="fixed inset-0 bg-black/20 z-[9998]"
@@ -138,7 +138,7 @@ const MagicWrite: React.FC<MagicWriteProps> = ({
             </button>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 

@@ -12,6 +12,7 @@ import MagicWrite from "@/components/MagicWrite";
 import { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
@@ -268,7 +269,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
   const portfolioId = params.portfolioId as string;
   const dispatch = useDispatch();
   
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
 
@@ -532,25 +533,36 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
     return styleMap[effectiveCustomization.resumeButtonStyle];
   };
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "hero",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as unknown as SimpleWhiteHeroCustomizationState);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["hero"]) {
+          setCustomization(componentCustomizations["hero"] as SimpleWhiteHeroCustomizationState);
         } else {
-          setCustomization(defaultSimpleWhiteHeroStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "hero",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              hero: result.data
+            }));
+          } else {
+            setCustomization(defaultSimpleWhiteHeroStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultSimpleWhiteHeroStyles);
       }
     };
     if (portfolioId) loadCustomizations();
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -575,7 +587,16 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
         componentType: "hero",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          hero: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -591,6 +612,10 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultSimpleWhiteHeroStyles);
       setDraftCustomization(defaultSimpleWhiteHeroStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["hero"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -780,14 +805,14 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
           {shouldShowButton && (
             <button
               onClick={openVisualEditor}
-              className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+              className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
               }}
             >
               <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Visual Editor</span>
-              <span className="sm:hidden">Editor</span>
+               
             </button>
           )}
         </div>
@@ -842,7 +867,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
                   {heroData?.summary ||
                     "I build exceptional and accessible digital experiences for the web."}
                 </motion.p>
-                <div className="absolute -top-1 -right-1 z-10">
+                <div className="absolute -top-1 -right-1 z-10 hidden md:block">
                   <MagicWrite
                     onMagicWrite={async (prompt: string, context?: string) => {
                       const enhancedDescription = await handleMagicWrite(prompt, heroData?.summary || "I build exceptional and accessible digital experiences for the web.");
@@ -973,7 +998,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
                       {userInfo?.shortSummary ||
                         "I build exceptional and accessible digital experiences for the web."}
                     </motion.p>
-                    <div className="absolute -top-1 -right-1 z-10">
+                    <div className="absolute -top-1 -right-1 z-10 hidden md:block">
                       <MagicWrite
                         onMagicWrite={async (prompt: string, context?: string) => {
                           const enhancedSummary = await handleMagicWrite(prompt, userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web.");

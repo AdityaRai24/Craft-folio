@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import EditButton from "@/components/EditButton";
 import {
@@ -143,7 +144,8 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const dispatch = useDispatch();
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const techSection = portfolioData?.find(
     (item: any) => item.type === "technologies"
   );
@@ -156,18 +158,29 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
 
 
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "technologies",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["technologies"]) {
+          setCustomization(componentCustomizations["technologies"] as CustomizationState);
         } else {
-          setCustomization(defaultTechnologiesStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "technologies",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              technologies: result.data
+            }));
+          } else {
+            setCustomization(defaultTechnologiesStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultTechnologiesStyles);
@@ -177,7 +190,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
     if (portfolioId) {
       loadCustomizations();
     }
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -205,7 +218,16 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
         componentType: "technologies",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          technologies: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -221,6 +243,10 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
       setCustomization(defaultTechnologiesStyles);
       setDraftCustomization(defaultTechnologiesStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["technologies"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -608,11 +634,10 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
       />
 
               <div
-          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4} sm:gap-${
+          className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-${Math.min(effectiveCustomization.gridColumns, 5)} xl:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4} sm:gap-${
             effectiveCustomization.cardSpacing / 4
           } md:gap-${effectiveCustomization.cardSpacing / 4}`}
           style={{
-            gridTemplateColumns: `repeat(${effectiveCustomization.gridColumns}, minmax(0, 1fr))`,
             gap: `${effectiveCustomization.cardSpacing}px`,
           }}
         >
@@ -637,11 +662,33 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
             <div
               className={`relative overflow-hidden border transition-all duration-${
                 effectiveCustomization.animationSpeed / 100
-              } transform group-hover:translate-y-[-2px] group-hover:scale-105`}
+              } transform group-hover:translate-y-[-2px] group-hover:scale-105 ${
+                effectiveCustomization.cardStyle === "default"
+                  ? theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
+                  : effectiveCustomization.cardStyle === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardStyle === "glassmorphism"
+                  ? theme === "light"
+                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                  : effectiveCustomization.cardStyle === "neon"
+                  ? theme === "light"
+                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                  : effectiveCustomization.cardStyle === "gradient"
+                  ? theme === "light"
+                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                    : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                  : theme === "light"
+                    ? "bg-white border border-gray-200 shadow-sm"
+                    : "bg-zinc-800 border border-zinc-700"
+              }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
-                borderWidth: `${effectiveCustomization.borderWidth}px`,
+                borderWidth: effectiveCustomization.cardStyle === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
                 transform:
                   effectiveCustomization.hoverEffects && hoveredTech === index
                     ? "translateY(-4px)"
@@ -649,42 +696,6 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
                 filter: effectiveCustomization.glowEffect
                   ? `drop-shadow(0 0 20px ${titleColor}30)`
                   : "none",
-                ...(effectiveCustomization.cardStyle === "minimal" && {
-                  backgroundColor: "transparent",
-                  border: "none",
-                  boxShadow: "none",
-                }),
-                ...(effectiveCustomization.cardStyle === "glassmorphism" && {
-                  backgroundColor: theme === "light" 
-                    ? "rgba(255, 255, 255, 0.1)" 
-                    : "rgba(0, 0, 0, 0.1)",
-                  backdropFilter: "blur(10px)",
-                  border: theme === "light"
-                    ? "1px solid rgba(255, 255, 255, 0.2)"
-                    : "1px solid rgba(255, 255, 255, 0.1)",
-                }),
-                ...(effectiveCustomization.cardStyle === "neon" && {
-                  border: `2px solid ${titleColor}`,
-                  boxShadow: `0 0 20px ${titleColor}50`,
-                  backgroundColor: theme === "light" 
-                    ? "rgba(249, 115, 22, 0.05)" 
-                    : "rgba(249, 115, 22, 0.1)",
-                }),
-                ...(effectiveCustomization.cardStyle === "gradient" && {
-                  background: theme === "light"
-                    ? "linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1))"
-                    : "linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.15))",
-                  border: theme === "light"
-                    ? "1px solid rgba(249, 115, 22, 0.3)"
-                    : "1px solid rgba(249, 115, 22, 0.4)",
-                }),
-                ...(effectiveCustomization.cardStyle === "default" && {
-                  backgroundColor: theme === "light" ? "rgba(255, 255, 255, 1)" : "rgba(39, 39, 42, 1)",
-                  border:
-                    theme === "light"
-                      ? "1px solid rgba(229, 231, 235, 0.5)"
-                      : "1px solid rgba(55, 65, 81, 0.5)",
-                }),
               }}
             >
               <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3 md:space-y-4 ">

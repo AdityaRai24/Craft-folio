@@ -3,6 +3,7 @@ import Marquee from "react-fast-marquee";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentEdit } from "@/slices/editModeSlice";
 import { RootState } from "@/store/store";
+import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -56,7 +57,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
   const params = useParams();
   const portfolioId = params.portfolioId as string;
   
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -140,18 +141,29 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
 
   const dispatch = useDispatch();
 
-  // Load customizations from database on component mount
+  // Load customizations from Redux state or database on component mount
   useEffect(() => {
     const loadCustomizations = async () => {
       try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "technologies",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as any);
+        // First check if customizations exist in Redux state
+        if (componentCustomizations && componentCustomizations["technologies"]) {
+          setCustomization(componentCustomizations["technologies"] as CustomizationState);
         } else {
-          setCustomization(defaultTechnologiesStyles);
+          // Fallback to database
+          const result = await getComponentCustomization({
+            portfolioId,
+            componentType: "technologies",
+          });
+          if (result.success && result.data) {
+            setCustomization(result.data as any);
+            // Update Redux state
+            dispatch(setComponentCustomizations({
+              ...componentCustomizations,
+              technologies: result.data
+            }));
+          } else {
+            setCustomization(defaultTechnologiesStyles);
+          }
         }
       } catch (error) {
         setCustomization(defaultTechnologiesStyles);
@@ -161,7 +173,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
     if (portfolioId) {
       loadCustomizations();
     }
-  }, [portfolioId]);
+  }, [portfolioId, componentCustomizations, dispatch]);
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
@@ -186,7 +198,16 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
         componentType: "technologies",
         settings: draftCustomization,
       });
-      if (!result.success) toast.error("Failed to save customization");
+      if (result.success) {
+        // Update Redux state
+        dispatch(setComponentCustomizations({
+          ...componentCustomizations,
+          technologies: draftCustomization
+        }));
+        toast.success("Customization saved successfully");
+      } else {
+        toast.error("Failed to save customization");
+      }
     } catch (error) {
       toast.error("Failed to save customization");
     }
@@ -202,6 +223,10 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
       setCustomization(defaultTechnologiesStyles);
       setDraftCustomization(defaultTechnologiesStyles);
       setVisualEditorOpen(false);
+      // Update Redux state
+      const updatedCustomizations = { ...componentCustomizations };
+      delete updatedCustomizations["technologies"];
+      dispatch(setComponentCustomizations(updatedCustomizations));
       toast.success("Customization reset successfully");
     } catch (error) {
       toast.error("Failed to reset customization");
@@ -511,7 +536,7 @@ const Technologies = ({ currentPortTheme, customCSS }: any) => {
   return (
     <div
       id="tech-stack"
-      className="text-white bg-black p-2 sm:p-4 md:p-8 relative"    >
+      className="text-white bg-black pt-8 sm:pt-8 md:pt-16 relative"    >
       <style>{customCSS}</style>
 
       <SectionHeader
