@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
-import EditButton from "@/components/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
 import Navbar from "./Navbar";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import MagicWrite from "@/components/MagicWrite";
 import { defaultHeroStyles } from "./defaultStyles/hero";
 import { CustomizationState } from "./defaultStyles/types";
+import { useUser } from '@clerk/nextjs';
 
 // Visual Alignment Selector Component
 const AlignmentSelector: React.FC<{
@@ -389,6 +390,11 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
+
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   // Magic Write functionality
   const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
@@ -1030,15 +1036,17 @@ const Hero = ({ currentPortTheme, customCSS }: any) => {
         {/* Consistent Button Layout */}
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
-          <button
-            onClick={openVisualEditor}
-            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
-            style={getThemeButtonStyle(true)}
-          >
-            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Visual Editor</span>
-            <span className="sm:hidden">Editor</span>
-          </button>
+          {shouldShowButton && (
+            <button
+              onClick={openVisualEditor}
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
+              style={getThemeButtonStyle(true)}
+            >
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Visual Editor</span>
+              <span className="sm:hidden">Editor</span>
+            </button>
+          )}
         </div>
         
         {/* Title */}

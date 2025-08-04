@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { User, Settings } from "lucide-react";
-import EditButton from '@/components/EditButton';
+import EditButton, { shouldShowEditButtons } from '@/components/EditButton';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useUser } from '@clerk/nextjs';
 
 const HeaderComponent = ({
   currentTheme,
@@ -20,6 +23,11 @@ const HeaderComponent = ({
 }) => {
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
+  
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   return (
     <motion.div
@@ -68,7 +76,7 @@ const HeaderComponent = ({
                   divStyles=""
                   styles={` ${theme === "light" ? "text-gray-700" : ""} opacity-70 hover:opacity-100 transition-opacity`}
                 />
-                {openVisualEditor && (
+                {openVisualEditor && shouldShowButton && (
                   <button
                     onClick={openVisualEditor}
                     className="flex items-center gap-2 px-4 py-3 cursor-pointer text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"

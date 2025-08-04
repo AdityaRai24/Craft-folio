@@ -596,7 +596,7 @@ const Technologies: React.FC<TechnologiesProps> = ({ currentTheme }) => {
   const titleColor = theme === "light" ? "#10b981" : "#10b981";
 
   return (
-            <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-hidden scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative">
+    <div className="space-y-4 md:space-y-6 lg:space-y-12 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative">
       {/* Header Section */}
       <HeaderComponent
         currentTheme={currentTheme}

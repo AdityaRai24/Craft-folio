@@ -2,6 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, X } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useUser } from '@clerk/nextjs';
+import { shouldShowEditButtons } from './EditButton';
 
 interface MagicWriteProps {
   onMagicWrite?: (prompt: string, context?: string) => Promise<string>;
@@ -22,6 +26,11 @@ const MagicWrite: React.FC<MagicWriteProps> = ({
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -61,6 +70,11 @@ const MagicWrite: React.FC<MagicWriteProps> = ({
     setIsExpanded(false);
     setInputValue("");
   };
+
+  // Don't render if user shouldn't see the button
+  if (!shouldShowButton) {
+    return null;
+  }
 
   if (isExpanded) {
     // Use a simpler, more reliable positioning approach

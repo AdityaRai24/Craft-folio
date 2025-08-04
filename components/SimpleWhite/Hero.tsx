@@ -6,7 +6,7 @@ import { Settings, Grid3X3, RotateCcw, Type, Zap, Eye, X } from "lucide-react";
 import type { NextPage } from "next";
 import Navbar from "./Navbar";
 import AnimatedButton from "./AnimatedButton";
-import EditButton from "@/components/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/MagicWrite";
 import { useEffect, useState, useRef } from "react";
@@ -20,6 +20,7 @@ import { getComponentCustomization, saveComponentCustomization, deleteComponentC
 import { defaultSimpleWhiteHeroStyles } from "./defaultStyles/hero";
 import { SimpleWhiteHeroCustomizationState } from "./defaultStyles/types";
 import { ColorTheme } from "@/lib/colorThemes";
+import { useUser } from '@clerk/nextjs';
 
 // Visual Alignment Selector Component
 const AlignmentSelector: React.FC<{
@@ -270,6 +271,11 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
+
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   // Theme colors
   const primaryColor = theme?.colors?.primary || ColorTheme.primary;
@@ -766,21 +772,23 @@ const Hero: NextPage = ({ currentPortTheme, customCSS }: any) => {
       <div className="flex h-full pt-16 sm:pt-20 md:pt-24 justify-center items-end mb-16 sm:mb-20 md:mb-24">
         <div className={getContainerClasses()}>
         <div className="flex absolute gap-4 right-2 sm:right-24 top-2 sm:top-24 z-20">
-          <EditButton 
+          <EditButton
             sectionName={"hero"}
             styles="text-xs px-2 sm:px-3 py-1"
           />
-          <button
-            onClick={openVisualEditor}
-            className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-            }}
-          >
-            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Visual Editor</span>
-            <span className="sm:hidden">Editor</span>
-          </button>
+          {shouldShowButton && (
+            <button
+              onClick={openVisualEditor}
+              className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+              }}
+            >
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Visual Editor</span>
+              <span className="sm:hidden">Editor</span>
+            </button>
+          )}
         </div>
 
           

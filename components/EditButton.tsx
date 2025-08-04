@@ -5,6 +5,11 @@ import { useUser } from "@clerk/nextjs";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+// Utility function to check if buttons should be shown
+export const shouldShowEditButtons = (portfolioUserId: string, user: any, isLoaded: boolean) => {
+  return isLoaded && (portfolioUserId === "guest" || (user && user.id === portfolioUserId));
+};
+
 const EditButton = ({
   sectionName,
   styles,
@@ -29,7 +34,7 @@ const EditButton = ({
     }
   };
 
-  const shouldShowButton = isLoaded && (portfolioUserId === "guest" || (user && user.id === portfolioUserId));
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   return (
     <div className={divStyles ? divStyles : "hidden md:block "}>

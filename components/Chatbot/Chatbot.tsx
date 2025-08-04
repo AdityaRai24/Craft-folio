@@ -209,6 +209,15 @@ const PortfolioChatbot = ({
   };
 
   const handleApplyFont = async (font: string) => {
+    if (!user) {
+      toast.error("Please sign up to apply changes to your portfolio", {
+        duration: 2500,
+        style: {
+          zIndex: 999999,
+        },
+      });
+      return;
+    }
     await updateFont({ fontName: font, portfolioId });
     toast.success("Font applied successfully!");
     setShowFontOptions(false);
@@ -217,6 +226,15 @@ const PortfolioChatbot = ({
   };
 
   const handleApplySelectedTheme = async () => {
+    if (!user) {
+      toast.error("Please sign up to apply changes to your portfolio", {
+        duration: 2500,
+        style: {
+          zIndex: 999999,
+        },
+      });
+      return;
+    }
     setCurrentPortTheme(selectedTheme);
     await updateTheme({ themeName: selectedTheme, portfolioId });
     toast.success(`Theme "${selectedTheme}" applied!`);
@@ -226,15 +244,6 @@ const PortfolioChatbot = ({
   };
 
   const handleShowThemeOptions = () => {
-    if (!user) {
-      toast.error("Please sign up to customize your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
     setShowHelpPanel(false);
     setShowFontOptions(false);
     setShowThemeOptions(true);
@@ -243,15 +252,6 @@ const PortfolioChatbot = ({
   };
 
   const handleShowFontOptions = () => {
-    if (!user) {
-      toast.error("Please sign up to customize your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
     setShowHelpPanel(false);
     setShowThemeOptions(false);
     setShowFontOptions(true);
@@ -260,15 +260,6 @@ const PortfolioChatbot = ({
   };
 
   const handleShowSectionReorder = () => {
-    if (!user) {
-      toast.error("Please sign up to customize your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
     setShowHelpPanel(false);
     setShowThemeOptions(false);
     setShowFontOptions(false);
@@ -279,15 +270,6 @@ const PortfolioChatbot = ({
   };
 
   const handleShowAdvanced = () => {
-    if (!user) {
-      toast.error("Please sign up to customize your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
     setShowHelpPanel(false);
     setShowThemeOptions(false);
     setShowFontOptions(false);
@@ -298,15 +280,6 @@ const PortfolioChatbot = ({
   };
 
   const handleShowSEOSettings = () => {
-    if (!user) {
-      toast.error("Please sign up to customize your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
     setShowHelpPanel(false);
     setShowThemeOptions(false);
     setShowFontOptions(false);
@@ -332,6 +305,16 @@ const PortfolioChatbot = ({
   };
 
   const handleSectionReorder = async () => {
+    if (!user) {
+      toast.error("Please sign up to apply changes to your portfolio", {
+        duration: 2500,
+        style: {
+          zIndex: 999999,
+        },
+      });
+      return;
+    }
+    
     try {
       setIsProcessing(true);
       console.log("Original sections:", sections);
@@ -518,6 +501,16 @@ const PortfolioChatbot = ({
   };
 
   const handleSaveSEO = async () => {
+    if (!user) {
+      toast.error("Please sign up to apply changes to your portfolio", {
+        duration: 2500,
+        style: {
+          zIndex: 999999,
+        },
+      });
+      return;
+    }
+    
     // Call the save function from SEOSettings component
     console.log("handleSaveSEO called, seoSettingsRef:", seoSettingsRef.current);
     if (seoSettingsRef.current) {

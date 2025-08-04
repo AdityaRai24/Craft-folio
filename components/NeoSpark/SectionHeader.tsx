@@ -1,7 +1,10 @@
 import React from "react";
-import EditButton from "../EditButton";
+import EditButton, { shouldShowEditButtons } from "../EditButton";
 import { Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
+import { useUser } from '@clerk/nextjs';
 
 const SectionHeader = ({ 
   sectionName, 
@@ -16,6 +19,11 @@ const SectionHeader = ({
   titleColor: string,
   onVisualEditorOpen?: () => void
 }) => {
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="max-w-xl block mx-auto">
@@ -33,7 +41,7 @@ const SectionHeader = ({
       <div className="absolute top-4 right-4 z-20">
       <div className="flex items-center justify-center gap-2">
           <EditButton sectionName={sectionName} />
-          {onVisualEditorOpen && (
+          {onVisualEditorOpen && shouldShowButton && (
             <button
               onClick={onVisualEditorOpen}
               className="flex items-center gap-2 px-4 py-2 text-white rounded-lg transition-colors"

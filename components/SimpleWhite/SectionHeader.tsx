@@ -1,10 +1,11 @@
 import React from 'react';
 import { Settings } from "lucide-react";
-import EditButton from '@/components/EditButton';
+import EditButton, { shouldShowEditButtons } from '@/components/EditButton';
 import MagicWrite from "@/components/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { useUser } from '@clerk/nextjs';
 
 interface SectionHeaderProps {
   sectionName: string;
@@ -49,6 +50,11 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
   const textSecondaryColor = theme?.colors?.text?.secondary || "#6B7280";
+
+  // Authentication check
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   // Magic Write functionality
   const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
@@ -106,17 +112,19 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
             sectionName={sectionName}
             styles="text-xs px-2 sm:px-3 py-1"
           />
-          <button
-            onClick={onVisualEditorClick}
-            className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-            }}  
-          >
-            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Visual Editor</span>
-            <span className="sm:hidden">Editor</span>
-          </button>
+          {shouldShowButton && (
+            <button
+              onClick={onVisualEditorClick}
+              className="flex cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+              }}  
+            >
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Visual Editor</span>
+              <span className="sm:hidden">Editor</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
