@@ -6,7 +6,7 @@ import { prompts } from "@/lib/prompts";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-2.5-flash",
 });
 
 const parsingTemplate = PromptTemplate.fromTemplate(`
@@ -202,7 +202,7 @@ export async function POST(req: Request) {
     ]);
     const resumeContent = extractedContent.response.text();
 
-    // Use a direct approach with Gemini instead of template if issues persist
+    // Parse resume with enhanced generation config
     const formattedPrompt = await parsingTemplate.format({
       resume_content: resumeContent,
     });
@@ -212,24 +212,25 @@ export async function POST(req: Request) {
       generationConfig: {
         temperature: 0.1,
         maxOutputTokens: 8192,
+        responseMimeType: "application/json", // This helps force JSON output
       },
     });
 
     const parsedText = parsingResponse.response.text();
 
-    // Clean the output to ensure it's valid JSON
-    const cleanedJson = cleanJsonOutput(parsedText);
-
-    // Validate and parse the JSON
+    // Clean and validate JSON
     let resumeData;
     try {
+      const cleanedJson = cleanJsonOutput(parsedText);
       resumeData = JSON.parse(cleanedJson);
     } catch (error) {
-      console.error("Error parsing JSON:", error);
+      console.error("Error parsing resume JSON:", error);
+      console.error("Raw response:", parsedText);
       return new Response(
         JSON.stringify({
           error: "Failed to parse resume data",
-          raw: cleanedJson,
+          details: error instanceof Error ? error.message : String(error),
+          raw: parsedText.substring(0, 500), // First 500 chars for debugging
         }),
         {
           status: 500,
@@ -244,85 +245,121 @@ export async function POST(req: Request) {
     let shortSummaryInfo;
     let longSummaryInfo;
 
+    // Helper function to safely parse AI responses
+    async function safeAIGeneration(
+      template: any,
+      data: any,
+      temperature: number = 0.7,
+      maxTokens: number = 500
+    ) {
+      try {
+        const prompt = await template.format(data);
+        const response = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature,
+            maxOutputTokens: maxTokens,
+            responseMimeType: "application/json",
+          },
+        });
+
+        const responseText = response.response.text();
+        
+        if (!responseText || responseText.trim() === "") {
+          console.warn("Empty response from model");
+          return null;
+        }
+
+        const cleaned = cleanJsonOutput(responseText);
+        return JSON.parse(cleaned);
+      } catch (error) {
+        console.error("Error in AI generation:", error);
+        return null;
+      }
+    }
+
     // Generate title based on template configuration
     if (themePrompts?.titlePrefixSuffix) {
-      const titlePrompt = await titleGeneratorTemplate.format({
-        resume_data: JSON.stringify(resumeData),
-      });
+      titleInfo = await safeAIGeneration(
+        titleGeneratorTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        500
+      );
       
-      const titleResponse = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: titlePrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        },
-      });
-      
-      const titleData = titleResponse.response.text();
-      titleInfo = JSON.parse(cleanJsonOutput(titleData));
+      // Provide fallback if generation failed
+      if (!titleInfo) {
+        titleInfo = {
+          titlePrefix: "Software",
+          titleSuffixOptions: ["Engineer", "Developer", "Architect"]
+        };
+      }
     } else if (themePrompts?.title) {
-      const titlePrompt = await onlyTitleTemplate.format({
-        resume_data: JSON.stringify(resumeData),
-      });
+      titleInfo = await safeAIGeneration(
+        onlyTitleTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        300
+      );
       
-      const titleResponse = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: titlePrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 300,
-        },
-      });
-      
-      const titleData = titleResponse.response.text();
-      titleInfo = JSON.parse(cleanJsonOutput(titleData));
+      if (!titleInfo) {
+        titleInfo = {
+          title: resumeData.experience?.[0]?.role || "Software Developer"
+        };
+      }
     }
 
     // Generate summary lines
     if (themePrompts?.summaryPrompt) {
-      const summaryPrompt = await summaryGeneratorTemplate.format({
-        resume_data: JSON.stringify(resumeData),
-      });
-      const summaryResponse = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: summaryPrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        },
-      });
-      const summaryData = summaryResponse.response.text();
-      summaryInfo = JSON.parse(cleanJsonOutput(summaryData));
+      summaryInfo = await safeAIGeneration(
+        summaryGeneratorTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        500
+      );
+      
+      if (!summaryInfo) {
+        summaryInfo = {
+          summaryLines: [
+            "Passionate developer focused on creating innovative solutions.",
+            "Enthusiastic about learning new technologies and best practices.",
+            "Committed to delivering high-quality, scalable applications."
+          ]
+        };
+      }
     }
 
     // Generate short summary
     if (themePrompts?.shortSummaryPrompt) {
-      const shortSummaryPrompt = await shortSummaryTemplate.format({
-        resume_data: JSON.stringify(resumeData),
-      });
-      const shortSummaryResponse = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: shortSummaryPrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 300,
-        },
-      });
-      const shortSummaryData = shortSummaryResponse.response.text();
-      shortSummaryInfo = JSON.parse(cleanJsonOutput(shortSummaryData));
+      shortSummaryInfo = await safeAIGeneration(
+        shortSummaryTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        300
+      );
+      
+      if (!shortSummaryInfo) {
+        shortSummaryInfo = {
+          shortSummary: "Building exceptional digital experiences with modern technology."
+        };
+      }
     }
 
     // Generate long summary
     if (themePrompts?.longSummaryPrompt) {
-      const longSummaryPrompt = await longSummaryTemplate.format({
-        resume_data: JSON.stringify(resumeData),
-      });
-      const longSummaryResponse = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: longSummaryPrompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 800,
-        },
-      });
-      const longSummaryData = longSummaryResponse.response.text();
-      longSummaryInfo = JSON.parse(cleanJsonOutput(longSummaryData));
+      longSummaryInfo = await safeAIGeneration(
+        longSummaryTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        800
+      );
+      
+      if (!longSummaryInfo) {
+        const skills = resumeData.skills?.slice(0, 3).map((s: any) => s.name).join(", ") || "various technologies";
+        longSummaryInfo = {
+          longSummary: `I'm a passionate developer with experience in ${skills}. I focus on creating intuitive user experiences and building scalable solutions. My journey in tech has been driven by continuous learning and adapting to new technologies. I believe in the power of technology to solve real-world problems and am always excited to take on new challenges.`
+        };
+      }
     }
 
     // Process and map tech stack with techList
@@ -337,7 +374,9 @@ export async function POST(req: Request) {
       longSummaryInfo,
       themePrompts
     );
-    console.log(titleInfo, summaryInfo, shortSummaryInfo, longSummaryInfo);
+
+    console.log("Generated data:", { titleInfo, summaryInfo, shortSummaryInfo, longSummaryInfo });
+
     return new Response(JSON.stringify(portfolioData), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -348,6 +387,7 @@ export async function POST(req: Request) {
       JSON.stringify({
         error: "Failed to process resume",
         message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
       }),
       {
         status: 500,
@@ -370,15 +410,35 @@ function fileToGenerativePart(imageData: string) {
 }
 
 function cleanJsonOutput(text: string): string {
-  let cleaned = text.replace(/```json\n|\n```|```\n|\n```/g, "");
-  const jsonPattern = /\{[\s\S]*\}/;
-  const matches = cleaned.match(jsonPattern);
-
-  if (matches && matches[0]) {
-    return matches[0];
+  if (!text || text.trim() === "") {
+    throw new Error("Empty response from model");
   }
 
-  return cleaned;
+  // Remove markdown code blocks
+  let cleaned = text.replace(/```json\n?|\n?```|```\n?/g, "");
+  
+  // Remove any leading/trailing whitespace
+  cleaned = cleaned.trim();
+  
+  // Try to find JSON object or array
+  const jsonObjectPattern = /\{[\s\S]*\}/;
+  const jsonArrayPattern = /\[[\s\S]*\]/;
+  
+  let matches = cleaned.match(jsonObjectPattern);
+  if (!matches) {
+    matches = cleaned.match(jsonArrayPattern);
+  }
+
+  if (matches && matches[0]) {
+    return matches[0].trim();
+  }
+
+  // If no match found but string looks like JSON, return it
+  if (cleaned.startsWith('{') || cleaned.startsWith('[')) {
+    return cleaned;
+  }
+
+  throw new Error("No valid JSON found in response");
 }
 
 function mapTechStackWithTechList(resumeData: any) {
