@@ -18,7 +18,7 @@ CraftFolio is a modern, AI-powered portfolio builder that helps users create stu
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Frontend : 
 - **Framework**: Next.js 15.3.1
 - **Language**: TypeScript
 - **UI Library**: React 19
