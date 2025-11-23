@@ -11,5 +11,8 @@ export const maps : any = {
         "themeName" : "SunsetOcean",
         "fontName" : "Raleway"
     },
-    
+    "MacOS":{
+        "themeName" : "MacOS",
+        "fontName" : "Raleway"
+    }
 }

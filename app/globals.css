@@ -243,3 +243,19 @@ html {
   --lumenflow-border: rgba(0, 0, 0, 0.1);
   --lumenflow-hover: rgba(0, 0, 0, 0.05);
 }
+
+.macos-dark {
+  --macos-bg: #1f2937;
+  --macos-text: #f3f4f6;
+  --macos-text-secondary: #d1d5db;
+  --macos-border: rgba(255, 255, 255, 0.1);
+  --macos-hover: rgba(255, 255, 255, 0.05);
+}
+
+.macos-light {
+  --macos-bg: #ffffff;
+  --macos-text: #1f2937;
+  --macos-text-secondary: #4b5563;
+  --macos-border: rgba(0, 0, 0, 0.1);
+  --macos-hover: rgba(0, 0, 0, 0.05);
+}

@@ -56,4 +56,10 @@ export const templatesConfig: TemplatesConfig = {
     },
     hero: ["name", "title","longSummary"],
   },
+  MacOS: {
+    sections: {
+      desktop: dynamic(() => import("@/components/MacOS/Desktop")),
+    },
+    hero: [],
+  }
 };

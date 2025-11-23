@@ -257,6 +257,43 @@ const Page = () => {
   const hasSpotlight = Template.spotlight;
   const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
 
+  // Special handling for MacOS template - render Desktop component
+  if (templateName === "MacOS") {
+    const DesktopComponent = Template.sections?.desktop as React.ComponentType<{
+      currentPortTheme?: string;
+      customCSS?: string;
+      portfolioId?: string;
+    }>;
+    return (
+      <>
+        <GuestWarningModal open={showGuestModal} onClose={() => setShowGuestModal(false)} />
+        <Sidebar />
+        {DesktopComponent && (
+          <DesktopComponent
+            currentPortTheme={themeName}
+            customCSS={customCSSState}
+            portfolioId={finalPortfolioId}
+          />
+        )}
+        {/* Only render Chatbot after data is loaded */}
+        {/* {dataLoaded && (
+          <Chatbot
+            portfolioData={portfolioData}
+            themeOptions={themes}
+            setCurrentFont={(font) => dispatch(setFontName(font))}
+            setCurrentPortTheme={(theme) => dispatch(setThemeName(theme))}
+            portfolioId={finalPortfolioId}
+            currentPortTheme={themeName}
+            currentFont={fontName}
+            portfolioLink={portfolioLink}
+            onOpenChange={setIsChatOpen}
+            setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
+            customCSSState={customCSSState}
+          />
+        )} */}
+      </>
+    );
+  }
 
   return (
     <>
@@ -307,7 +344,7 @@ const Page = () => {
         </div>
 
         {/* Only render Chatbot after data is loaded */}
-        {dataLoaded && (
+        {/* {dataLoaded && (
           <Chatbot
             portfolioData={portfolioData}
             themeOptions={themes}
@@ -321,7 +358,7 @@ const Page = () => {
             setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
             customCSSState={customCSSState}
           />
-        )}
+        )} */}
       </div>
     </>
   );

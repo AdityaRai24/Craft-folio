@@ -5,31 +5,19 @@ import {
   Github,
   ExternalLink,
   Code2,
-  Calendar,
-  Settings,
-  Palette,
+  Calendar, Palette,
   Layout,
   Move,
   RotateCcw,
-  X,
-  Grid3X3,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Square,
+  X, Square,
   RectangleHorizontal,
-  RectangleVertical,
-  Circle,
-  Type,
+  RectangleVertical, Type
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setCurrentEdit } from "@/slices/editModeSlice";
 import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
-import EditButton from "@/components/EditButton";
 import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
