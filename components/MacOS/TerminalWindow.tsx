@@ -124,7 +124,7 @@ ${summary}`;
     if (!currentCommand.trim()) return;
 
     const cmd = currentCommand.trim();
-    
+
     // Handle clear command separately
     if (cmd.toLowerCase() === "clear") {
       setCommandHistory([""]);
@@ -134,7 +134,7 @@ ${summary}`;
 
     const newHistory = [...commandHistory];
     newHistory.push(`$ ${cmd}`);
-    
+
     const output = executeCommand(cmd);
     if (output) {
       newHistory.push(output);
@@ -158,13 +158,13 @@ ${summary}`;
   // Extract command keywords for highlighting
   const highlightCommand = (line: string) => {
     if (!line.startsWith("$ ")) return line;
-    
+
     const parts = line.split(" ");
     if (parts.length < 2) return line;
-    
+
     const command = parts[1];
     const rest = parts.slice(2).join(" ");
-    
+
     return (
       <>
         <span style={{ color: "#4ec9b0" }}>$</span>{" "}
@@ -179,8 +179,8 @@ ${summary}`;
       <div
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-5 space-y-1"
-        style={{ 
-          scrollbarWidth: "thin", 
+        style={{
+          scrollbarWidth: "thin",
           scrollbarColor: isDark ? "rgba(100, 100, 100, 0.3) transparent" : "rgba(0, 0, 0, 0.2) transparent",
           fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace"
         }}
@@ -188,15 +188,15 @@ ${summary}`;
         {commandHistory.map((line, index) => {
           const isCommand = line.startsWith("$ ");
           const isError = line.includes("Command not found");
-          
+
           return (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="whitespace-pre-wrap break-words leading-relaxed"
-              style={{ 
-                color: isCommand 
+              style={{
+                color: isCommand
                   ? (isDark ? "#4ec9b0" : "#059669")
-                  : isError 
+                  : isError
                     ? (isDark ? "#f48771" : "#dc2626")
                     : (isDark ? "#d4d4d4" : "#1f2937")
               }}
@@ -213,7 +213,7 @@ ${summary}`;
             value={currentCommand}
             onChange={(e) => setCurrentCommand(e.target.value)}
             className={`flex-1 bg-transparent border-none outline-none ${isDark ? "text-[#d4d4d4]" : "text-[#1f2937]"}`}
-            style={{ 
+            style={{
               fontFamily: "inherit",
               caretColor: isDark ? "#4ec9b0" : "#059669"
             }}

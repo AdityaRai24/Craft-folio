@@ -1,0 +1,33 @@
+export interface ContactCustomizationState {
+  // Layout
+  layout: "grid";
+  gridColumns: number;
+  cardLayout: "flex" | "stacked";
+  cardSize: "compact" | "default" | "large";
+  containerWidth: "full" | "narrow" | "wide";
+  cardSpacing: number;
+  
+  // Styling
+  cardStyle: "default" | "minimal" | "glassmorphism" | "neon";
+  cardBorderRadius: number;
+  cardPadding: number;
+  iconSize: number;
+  iconStyle: "outline" | "filled";
+  backgroundOpacity: number;
+  borderWidth: number;
+  
+  // Content
+  showLabels: boolean;
+  showDescriptions: boolean;
+  textAlignment: "center" | "left" | "right";
+  
+  // Animation
+  animationStyle: "scale" | "slide" | "rotate" | "bounce" | "none";
+  animationSpeed: number;
+  staggerDelay: number;
+  hoverEffects: boolean;
+  
+  // Behavior
+  copyToClipboard: boolean;
+  openInNewTab: boolean;
+}

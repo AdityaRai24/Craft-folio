@@ -13,7 +13,7 @@ import {
 } from "framer-motion";
 import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail } from "lucide-react";
 import TopBar from "./TopBar";
-import ProjectsGrid from "./ProjectsGrid";
+import ProjectsGrid from "./Projects";
 import TerminalWindow from "./TerminalWindow";
 import ResumeViewer from "./ResumeViewer";
 import Contact from "./Contact";
@@ -163,7 +163,7 @@ const Desktop: React.FC<DesktopProps> = ({
     setWindows((prev) => {
       const window = prev[id];
       if (!window) return prev;
-      
+
       if (window.isFullscreen) {
         // Restore to previous size
         return {
@@ -230,10 +230,10 @@ const Desktop: React.FC<DesktopProps> = ({
       const minVisibleHeight = 40;
       const maxX = viewportWidth - minVisibleHeight;
       const maxY = viewportHeight - minVisibleHeight;
-      
+
       // Clamp X position
       newX = Math.max(-win.size.width + minVisibleHeight, Math.min(newX, maxX));
-      
+
       // Clamp Y position (account for topbar)
       newY = Math.max(topBarHeight - win.size.height + minVisibleHeight, Math.min(newY, maxY));
 
@@ -347,10 +347,10 @@ const DesktopContent = ({
       const minVisibleHeight = 40;
       const maxX = viewportWidth - minVisibleHeight;
       const maxY = viewportHeight - minVisibleHeight;
-      
+
       // Clamp X position
       newX = Math.max(-win.size.width + minVisibleHeight, Math.min(newX, maxX));
-      
+
       // Clamp Y position (account for topbar)
       newY = Math.max(topBarHeight - win.size.height + minVisibleHeight, Math.min(newY, maxY));
 
@@ -437,26 +437,26 @@ const DesktopContent = ({
                 style={
                   win.isFullscreen
                     ? {
-                        left: 0,
-                        top: "28px", // Start below topbar
-                        width: "100vw",
-                        height: "calc(100vh - 28px)", // Full height minus topbar
-                        zIndex: win.zIndex,
-                      }
+                      left: 0,
+                      top: "28px", // Start below topbar
+                      width: "100vw",
+                      height: "calc(100vh - 28px)", // Full height minus topbar
+                      zIndex: win.zIndex,
+                    }
                     : {
-                        left: `${win.position.x}px`,
-                        top: `${win.position.y}px`,
-                        width: `${win.size.width}px`,
-                        height: win.size.height ? `${win.size.height}px` : "auto",
-                        maxWidth: "90vw",
-                        maxHeight: "85vh",
-                        zIndex: win.zIndex,
-                      }
+                      left: `${win.position.x}px`,
+                      top: `${win.position.y}px`,
+                      width: `${win.size.width}px`,
+                      height: win.size.height ? `${win.size.height}px` : "auto",
+                      maxWidth: "90vw",
+                      maxHeight: "85vh",
+                      zIndex: win.zIndex,
+                    }
                 }
                 onMouseDown={() => bringToFront(id)}
               >
                 {/* macOS Window */}
-                <div 
+                <div
                   className={`${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-300"} rounded-t-lg border shadow-2xl overflow-hidden flex flex-col`}
                   style={{
                     height: win.isFullscreen ? "calc(100vh - 28px)" : win.size.height ? `${win.size.height}px` : "auto",
@@ -506,11 +506,10 @@ const DesktopContent = ({
 
                   {/* Window Content */}
                   <div
-                    className={`${isDark ? "bg-gray-800" : "bg-white"} flex-1 ${
-                      id === "terminal" || id === "resume" || id === "safari"
+                    className={`${isDark ? "bg-gray-800" : "bg-white"} flex-1 ${id === "terminal" || id === "resume" || id === "safari"
                         ? "overflow-hidden"
                         : "overflow-y-auto"
-                    }`}
+                      }`}
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: isDark ? "rgba(255,255,255,0.2) transparent" : "rgba(0,0,0,0.2) transparent",
@@ -662,7 +661,7 @@ const DesktopIcons = ({
                 group-hover:shadow-xl group-hover:shadow-white/20
                 shadow-lg
               `}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.1,
                 rotate: [0, -5, 5, -5, 0],
                 transition: { duration: 0.3 }
@@ -746,9 +745,8 @@ const DockIcon = ({
 
       {/* Active Dot Indicator */}
       <div
-        className={`w-1 h-1 rounded-full bg-white/80 transition-opacity duration-300 ${
-          isActive ? "opacity-100" : "opacity-0"
-        }`}
+        className={`w-1 h-1 rounded-full bg-white/80 transition-opacity duration-300 ${isActive ? "opacity-100" : "opacity-0"
+          }`}
       />
 
       {/* Tooltip */}

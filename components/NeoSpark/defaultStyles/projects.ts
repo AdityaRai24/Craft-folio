@@ -1,4 +1,4 @@
-import { ProjectsCustomizationState } from "./types";
+import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 
 export const defaultProjectsStyles: ProjectsCustomizationState = {
   layout: "single",

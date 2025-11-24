@@ -3,25 +3,9 @@ import {
   Github,
   Linkedin,
   Mail,
-  MapPin,
-  Twitter,
-  Sparkles,
-  User,
-  ExternalLink,
-  Heart,
-  Link,
-  Settings,
-  Palette,
-  Move,
-  Grid3X3,
+  MapPin, Sparkles, ExternalLink, Palette, Grid3X3,
   RotateCcw,
-  X,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Eye,
-  Type,
-  Send,
+  X, Eye
 } from "lucide-react";
 import Projects from "./Projects";
 import Navbar from "./Navbar";
@@ -38,7 +22,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
-import { useParams } from "next/navigation";
 import EditButton from "@/components/EditButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { HeaderComponent } from "./Components";
@@ -215,11 +198,10 @@ const MobileProfileCard = ({
 }: any) => (
   <div className="block lg:hidden w-full mx-auto ">
     <div
-      className={`relative rounded-2xl overflow-hidden border ${
-        theme === "light"
-          ? "bg-white/90 shadow-xl border-gray-200/60"
-          : "bg-transparent"
-      }`}
+      className={`relative rounded-2xl overflow-hidden border ${theme === "light"
+        ? "bg-white/90 shadow-xl border-gray-200/60"
+        : "bg-transparent"
+        }`}
     >
       {/* Main Content Container */}
       <div className="p-4">
@@ -229,9 +211,8 @@ const MobileProfileCard = ({
           {effectiveCustomization.showProfileImage && (
             <div className="flex-shrink-0">
               <div
-                className={`rounded-full overflow-hidden shadow-lg ${
-                  theme === "light" ? "bg-gray-50" : "bg-gray-800"
-                }`}
+                className={`rounded-full overflow-hidden shadow-lg ${theme === "light" ? "bg-gray-50" : "bg-gray-800"
+                  }`}
                 style={{
                   width: `${Math.min(
                     effectiveCustomization.profileImageSize,
@@ -242,9 +223,8 @@ const MobileProfileCard = ({
                     96
                   )}px`,
                   border: effectiveCustomization.profileImageBorder
-                    ? `${
-                        effectiveCustomization.profileImageBorderWidth
-                      }px solid ${theme === "light" ? "#f97316" : "#f97316"}`
+                    ? `${effectiveCustomization.profileImageBorderWidth
+                    }px solid ${theme === "light" ? "#f97316" : "#f97316"}`
                     : "none",
                 }}
               >
@@ -268,11 +248,10 @@ const MobileProfileCard = ({
                   href={contactData.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                    theme === "light"
-                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                  }`}
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
+                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                    }`}
                 >
                   <Github size={16} />
                 </a>
@@ -282,11 +261,10 @@ const MobileProfileCard = ({
                   href={contactData.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                    theme === "light"
-                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                  }`}
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
+                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                    }`}
                 >
                   <Linkedin size={16} />
                 </a>
@@ -294,22 +272,20 @@ const MobileProfileCard = ({
               {contactData?.email && (
                 <a
                   href={`mailto:${contactData.email}`}
-                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${
-                    theme === "light"
-                      ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                      : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                  }`}
+                  className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
+                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                    }`}
                 >
                   <Mail size={16} />
                 </a>
               )}
               {contactData?.location && (
                 <div
-                  className={`rounded-full p-2 ${
-                    theme === "light"
-                      ? "bg-gray-50 text-gray-700"
-                      : "bg-gray-800/80 text-gray-300"
-                  }`}
+                  className={`rounded-full p-2 ${theme === "light"
+                    ? "bg-gray-50 text-gray-700"
+                    : "bg-gray-800/80 text-gray-300"
+                    }`}
                 >
                   <MapPin size={16} />
                 </div>
@@ -320,48 +296,42 @@ const MobileProfileCard = ({
 
         {/* Profile Information */}
         <div
-          className={`space-y-1 ${
-            !effectiveCustomization.showProfileImage ? "text-center" : ""
-          }`}
+          className={`space-y-1 ${!effectiveCustomization.showProfileImage ? "text-center" : ""
+            }`}
         >
           <div
-            className={`font-bold leading-tight ${
-              theme === "light" ? "text-gray-900" : "text-white"
-            } ${
-              effectiveCustomization.showProfileImage
+            className={`font-bold leading-tight ${theme === "light" ? "text-gray-900" : "text-white"
+              } ${effectiveCustomization.showProfileImage
                 ? effectiveCustomization.nameSize === "sm"
                   ? "text-base"
                   : effectiveCustomization.nameSize === "md"
-                  ? "text-lg"
-                  : effectiveCustomization.nameSize === "lg"
-                  ? "text-xl"
-                  : "text-2xl"
+                    ? "text-lg"
+                    : effectiveCustomization.nameSize === "lg"
+                      ? "text-xl"
+                      : "text-2xl"
                 : "text-2xl"
-            }`}
+              }`}
           >
             {contactData?.name || "Your Name"}
           </div>
 
           <div
-            className={`font-medium ${
-              theme === "light" ? "text-orange-600" : "text-orange-400"
-            } ${
-              effectiveCustomization.showProfileImage
+            className={`font-medium ${theme === "light" ? "text-orange-600" : "text-orange-400"
+              } ${effectiveCustomization.showProfileImage
                 ? effectiveCustomization.titleSize === "sm"
                   ? "text-xs"
                   : effectiveCustomization.titleSize === "md"
-                  ? "text-sm"
-                  : "text-base"
+                    ? "text-sm"
+                    : "text-base"
                 : "text-base"
-            }`}
+              }`}
           >
             {heroData?.title || "Your Title"}
           </div>
 
           <div
-            className={`text-xs break-all leading-relaxed ${
-              theme === "light" ? "text-gray-600" : "text-gray-300"
-            }`}
+            className={`text-xs break-all leading-relaxed ${theme === "light" ? "text-gray-600" : "text-gray-300"
+              }`}
           >
             {contactData?.email || "your@email.com"}
           </div>
@@ -371,11 +341,10 @@ const MobileProfileCard = ({
         {heroData?.location && (
           <div className="mt-3 pt-3 border-t border-gray-200/20">
             <div
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                theme === "light"
-                  ? "bg-gray-50 text-gray-700"
-                  : "bg-gray-800/60 text-gray-400"
-              }`}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${theme === "light"
+                ? "bg-gray-50 text-gray-700"
+                : "bg-gray-800/60 text-gray-400"
+                }`}
             >
               <MapPin size={12} />
               {heroData.location}
@@ -386,11 +355,10 @@ const MobileProfileCard = ({
 
       {/* Subtle gradient overlay for depth */}
       <div
-        className={`absolute inset-0 pointer-events-none ${
-          theme === "light"
-            ? "bg-gradient-to-br from-transparent via-transparent to-orange-50/30"
-            : "bg-gradient-to-br from-transparent via-transparent to-orange-900/10"
-        }`}
+        className={`absolute inset-0 pointer-events-none ${theme === "light"
+          ? "bg-gradient-to-br from-transparent via-transparent to-orange-50/30"
+          : "bg-gradient-to-br from-transparent via-transparent to-orange-900/10"
+          }`}
       />
     </div>
   </div>
@@ -730,24 +698,21 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                   style={{ background: themeClasses.gradientHover }}
                 />
                 <div
-                  className={`relative ${
-                    theme === "light"
-                      ? "bg-white border-gray-200/60"
-                      : "bg-transparent"
-                  } overflow-hidden border transition-all duration-500 transform ${
-                    effectiveCustomization.hoverEffects
+                  className={`relative ${theme === "light"
+                    ? "bg-white border-gray-200/60"
+                    : "bg-transparent"
+                    } overflow-hidden border transition-all duration-500 transform ${effectiveCustomization.hoverEffects
                       ? "group-hover:translate-y-[-2px]"
                       : ""
-                  }`}
+                    }`}
                   style={{
                     borderColor:
                       theme === "light" ? "rgba(0,0,0,0.08)" : undefined,
                     borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                     padding: `${effectiveCustomization.cardPadding}px`,
                     boxShadow: effectiveCustomization.cardShadow
-                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${
-                          effectiveCustomization.shadowIntensity * 8
-                        }px rgba(0, 0, 0, 0.1)`
+                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8
+                      }px rgba(0, 0, 0, 0.1)`
                       : undefined,
                   }}
                 >
@@ -755,11 +720,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                       <div className="flex-shrink-0 flex justify-center sm:justify-start">
                         <motion.div
-                          className={`p-2 rounded-lg ${
-                            theme === "light"
-                              ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200/50"
-                              : "bg-gradient-to-r from-orange-400/20 to-purple-600/20"
-                          }`}
+                          className={`p-2 rounded-lg ${theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200/50"
+                            : "bg-gradient-to-r from-orange-400/20 to-purple-600/20"
+                            }`}
                           whileHover={{ scale: 1.1, rotate: 10 }}
                           transition={{ type: "spring", stiffness: 300 }}
                         >
@@ -775,9 +739,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       </div>
                       <div className="flex-1 space-y-4 w-full">
                         <motion.h3
-                          className={`text-xl font-semibold ${
-                            theme === "dark" ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.7 }}
@@ -786,11 +749,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         </motion.h3>
                         <div className="relative">
                           <motion.p
-                            className={`text-base text-justify leading-relaxed ${
-                              theme === "dark"
-                                ? "text-gray-300"
-                                : "text-gray-700"
-                            }`}
+                            className={`text-base text-justify leading-relaxed ${theme === "dark"
+                              ? "text-gray-300"
+                              : "text-gray-700"
+                              }`}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.8 }}
@@ -808,7 +770,7 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                                   await handleMagicWrite(
                                     prompt,
                                     heroData?.longSummary ||
-                                      "No description available"
+                                    "No description available"
                                   );
                                 handleHeroDescriptionUpdate(
                                   enhancedDescription
@@ -855,24 +817,21 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                   style={{ background: themeClasses.gradientHover }}
                 />
                 <div
-                  className={`relative ${
-                    theme === "light"
-                      ? "bg-white border-gray-200/60"
-                      : "backdrop-blur-sm"
-                  } overflow-hidden border transition-all duration-500 transform ${
-                    effectiveCustomization.hoverEffects
+                  className={`relative ${theme === "light"
+                    ? "bg-white border-gray-200/60"
+                    : "backdrop-blur-sm"
+                    } overflow-hidden border transition-all duration-500 transform ${effectiveCustomization.hoverEffects
                       ? "group-hover:translate-y-[-2px]"
                       : ""
-                  }`}
+                    }`}
                   style={{
                     borderColor:
                       theme === "light" ? "rgba(0,0,0,0.08)" : undefined,
                     borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                     padding: `${effectiveCustomization.cardPadding}px`,
                     boxShadow: effectiveCustomization.cardShadow
-                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${
-                          effectiveCustomization.shadowIntensity * 8
-                        }px rgba(0, 0, 0, 0.1)`
+                      ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8
+                      }px rgba(0, 0, 0, 0.1)`
                       : undefined,
                   }}
                 >
@@ -880,9 +839,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     <div className="md:flex items-center justify-between">
                       <div className="space-y-4 mb-4 md:mb-0">
                         <motion.h3
-                          className={`text-xl font-semibold ${
-                            theme === "dark" ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.9 }}
@@ -890,17 +848,15 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           Let's Work Together
                         </motion.h3>
                         <motion.p
-                          className={`text-base leading-relaxed ${
-                            theme === "dark" ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`text-base leading-relaxed ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                            }`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5, delay: 1.0 }}
                         >
                           <span
-                            className={`font-semibold ${
-                              theme === "dark" ? "text-white" : "text-gray-900"
-                            }`}
+                            className={`font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"
+                              }`}
                           >
                             Interested in collaborating?
                           </span>{" "}
@@ -959,11 +915,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     </div>
                   </div>
                   <div
-                    className={`absolute left-0 top-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                      theme === "light"
-                        ? "bg-gradient-to-b from-orange-500 to-orange-600"
-                        : "bg-gradient-to-b from-orange-400 to-orange-600"
-                    }`}
+                    className={`absolute left-0 top-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${theme === "light"
+                      ? "bg-gradient-to-b from-orange-500 to-orange-600"
+                      : "bg-gradient-to-b from-orange-400 to-orange-600"
+                      }`}
                   ></div>
                 </div>
               </motion.div>
@@ -1057,9 +1012,9 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
               radial-gradient(
                 at 50% 0%, 
                 ${hexToRgba(
-                  themeClasses.gradientPrimary.split(", ")[1].split(" ")[0],
-                  theme === "dark" ? 0.23 : 0.4
-                )} 0%, 
+              themeClasses.gradientPrimary.split(", ")[1].split(" ")[0],
+              theme === "dark" ? 0.23 : 0.4
+            )} 0%, 
                 transparent 70%
               )
             `,
@@ -1081,13 +1036,11 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <div
-              className={`relative p-6 rounded-2xl border transition-all duration-300 ${
-                theme === "light"
-                  ? "bg-white/80 shadow-2xl border-gray-200/50"
-                  : ""
-              } ${
-                effectiveCustomization.backgroundBlur ? "backdrop-blur-md" : ""
-              }`}
+              className={`relative p-6 rounded-2xl border transition-all duration-300 ${theme === "light"
+                ? "bg-white/80 shadow-2xl border-gray-200/50"
+                : ""
+                } ${effectiveCustomization.backgroundBlur ? "backdrop-blur-md" : ""
+                }`}
               style={{
                 backdropFilter: effectiveCustomization.backgroundBlur
                   ? `blur(${effectiveCustomization.blurIntensity}px)`
@@ -1113,26 +1066,22 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       }}
                     >
                       <div
-                        className={`absolute -inset-2 rounded-full opacity-20 blur-lg ${
-                          theme === "light" ? "opacity-30" : ""
-                        }`}
+                        className={`absolute -inset-2 rounded-full opacity-20 blur-lg ${theme === "light" ? "opacity-30" : ""
+                          }`}
                         style={{ background: themeClasses.gradientPrimary }}
                       ></div>
                       <motion.div
-                        className={`relative w-full h-full rounded-full overflow-hidden shadow-2xl ${
-                          theme === "light"
-                            ? "border-white shadow-orange-100/50"
-                            : "border-gray-600/50"
-                        }`}
+                        className={`relative w-full h-full rounded-full overflow-hidden shadow-2xl ${theme === "light"
+                          ? "border-white shadow-orange-100/50"
+                          : "border-gray-600/50"
+                          }`}
                         style={{
                           border: effectiveCustomization.profileImageBorder
-                            ? `${
-                                effectiveCustomization.profileImageBorderWidth
-                              }px solid ${
-                                theme === "light"
-                                  ? "#ffffff"
-                                  : "rgba(75, 85, 99, 0.5)"
-                              }`
+                            ? `${effectiveCustomization.profileImageBorderWidth
+                            }px solid ${theme === "light"
+                              ? "#ffffff"
+                              : "rgba(75, 85, 99, 0.5)"
+                            }`
                             : "none",
                         }}
                         whileHover={{ scale: 1.05 }}
@@ -1154,27 +1103,24 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
                 {/* Name and Title - Larger when profile image is hidden */}
                 <motion.div
-                  className={`space-y-1 mb-6 text-center ${
-                    !effectiveCustomization.showProfileImage ? "py-8" : ""
-                  }`}
+                  className={`space-y-1 mb-6 text-center ${!effectiveCustomization.showProfileImage ? "py-8" : ""
+                    }`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
                 >
                   <motion.h1
-                    className={`font-bold ${
-                      theme === "light" ? "text-gray-900" : ""
-                    } ${
-                      effectiveCustomization.showProfileImage
+                    className={`font-bold ${theme === "light" ? "text-gray-900" : ""
+                      } ${effectiveCustomization.showProfileImage
                         ? effectiveCustomization.nameSize === "sm"
                           ? "text-lg"
                           : effectiveCustomization.nameSize === "md"
-                          ? "text-xl"
-                          : effectiveCustomization.nameSize === "lg"
-                          ? "text-2xl"
-                          : "text-3xl"
+                            ? "text-xl"
+                            : effectiveCustomization.nameSize === "lg"
+                              ? "text-2xl"
+                              : "text-3xl"
                         : "text-3xl"
-                    }`}
+                      }`}
                     style={{
                       color:
                         theme === "light"
@@ -1188,17 +1134,15 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     {heroData?.name || "Your Name"}
                   </motion.h1>
                   <motion.p
-                    className={`leading-relaxed max-w-xs mx-auto ${
-                      theme === "light" ? "text-gray-600" : ""
-                    } ${
-                      effectiveCustomization.showProfileImage
+                    className={`leading-relaxed max-w-xs mx-auto ${theme === "light" ? "text-gray-600" : ""
+                      } ${effectiveCustomization.showProfileImage
                         ? effectiveCustomization.titleSize === "sm"
                           ? "text-xs"
                           : effectiveCustomization.titleSize === "md"
-                          ? "text-sm"
-                          : "text-base"
+                            ? "text-sm"
+                            : "text-base"
                         : "text-lg"
-                    }`}
+                      }`}
                     style={{
                       color:
                         theme === "light"
@@ -1227,24 +1171,23 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         href={contactData.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${
-                          theme === "light"
-                            ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
-                            : "backdrop-blur-sm"
-                        }`}
+                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${theme === "light"
+                          ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
+                          : "backdrop-blur-sm"
+                          }`}
                         style={{
                           borderColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.15)",
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.15)",
                           backgroundColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(0,0,0,0.2)"
-                              : "rgba(255,255,255,0.5)",
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(255,255,255,0.5)",
                         }}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -1252,11 +1195,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         whileHover={{ scale: 1.02, x: 5 }}
                       >
                         <motion.div
-                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${
-                            theme === "light"
-                              ? "bg-gradient-to-br from-orange-50 to-orange-100"
-                              : ""
-                          }`}
+                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100"
+                            : ""
+                            }`}
                           style={{
                             background:
                               theme === "light"
@@ -1267,9 +1209,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <Github
                             size={16}
-                            className={`group-hover:scale-110 transition-transform ${
-                              theme === "light" ? "text-orange-600" : ""
-                            }`}
+                            className={`group-hover:scale-110 transition-transform ${theme === "light" ? "text-orange-600" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1279,9 +1220,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           />
                         </motion.div>
                         <span
-                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${
-                            theme === "light" ? "text-gray-700" : ""
-                          }`}
+                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${theme === "light" ? "text-gray-700" : ""
+                            }`}
                           style={{
                             color:
                               theme === "light"
@@ -1298,9 +1238,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <ExternalLink
                             size={12}
-                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${
-                              theme === "light" ? "text-gray-500" : ""
-                            }`}
+                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${theme === "light" ? "text-gray-500" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1318,24 +1257,23 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         href={contactData.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${
-                          theme === "light"
-                            ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
-                            : "backdrop-blur-sm"
-                        }`}
+                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${theme === "light"
+                          ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
+                          : "backdrop-blur-sm"
+                          }`}
                         style={{
                           borderColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.15)",
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.15)",
                           backgroundColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(0,0,0,0.2)"
-                              : "rgba(255,255,255,0.5)",
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(255,255,255,0.5)",
                         }}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -1343,11 +1281,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         whileHover={{ scale: 1.02, x: 5 }}
                       >
                         <motion.div
-                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${
-                            theme === "light"
-                              ? "bg-gradient-to-br from-orange-50 to-orange-100"
-                              : ""
-                          }`}
+                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100"
+                            : ""
+                            }`}
                           style={{
                             background:
                               theme === "light"
@@ -1358,9 +1295,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <Linkedin
                             size={16}
-                            className={`group-hover:scale-110 transition-transform ${
-                              theme === "light" ? "text-orange-600" : ""
-                            }`}
+                            className={`group-hover:scale-110 transition-transform ${theme === "light" ? "text-orange-600" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1370,9 +1306,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           />
                         </motion.div>
                         <span
-                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${
-                            theme === "light" ? "text-gray-700" : ""
-                          }`}
+                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${theme === "light" ? "text-gray-700" : ""
+                            }`}
                           style={{
                             color:
                               theme === "light"
@@ -1389,9 +1324,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <ExternalLink
                             size={12}
-                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${
-                              theme === "light" ? "text-gray-500" : ""
-                            }`}
+                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${theme === "light" ? "text-gray-500" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1407,24 +1341,23 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     {contactData?.email && (
                       <motion.a
                         href={`mailto:${contactData.email}`}
-                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${
-                          theme === "light"
-                            ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
-                            : "backdrop-blur-sm"
-                        }`}
+                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border hover:shadow-lg ${theme === "light"
+                          ? "bg-white/60 backdrop-blur-sm border-gray-200/60 hover:bg-white/80 hover:shadow-orange-100/50"
+                          : "backdrop-blur-sm"
+                          }`}
                         style={{
                           borderColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.15)",
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.15)",
                           backgroundColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(0,0,0,0.2)"
-                              : "rgba(255,255,255,0.5)",
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(255,255,255,0.5)",
                         }}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -1432,11 +1365,10 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         whileHover={{ scale: 1.02, x: 5 }}
                       >
                         <motion.div
-                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${
-                            theme === "light"
-                              ? "bg-gradient-to-br from-orange-50 to-orange-100"
-                              : ""
-                          }`}
+                          className={`p-1.5 rounded-lg group-hover:from-orange-400/20 group-hover:to-purple-600/20 transition-all duration-300 ${theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100"
+                            : ""
+                            }`}
                           style={{
                             background:
                               theme === "light"
@@ -1447,9 +1379,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <Mail
                             size={16}
-                            className={`group-hover:scale-110 transition-transform ${
-                              theme === "light" ? "text-orange-600" : ""
-                            }`}
+                            className={`group-hover:scale-110 transition-transform ${theme === "light" ? "text-orange-600" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1459,9 +1390,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           />
                         </motion.div>
                         <span
-                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${
-                            theme === "light" ? "text-gray-700" : ""
-                          }`}
+                          className={`font-medium group-hover:translate-x-1 transition-transform overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${theme === "light" ? "text-gray-700" : ""
+                            }`}
                           style={{
                             color:
                               theme === "light"
@@ -1477,35 +1407,33 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     {/* Location */}
                     {contactData?.location && (
                       <motion.div
-                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border ${
-                          theme === "light"
-                            ? "bg-white/60 backdrop-blur-sm border-gray-200/60"
-                            : "backdrop-blur-sm"
-                        }`}
+                        className={`group flex items-center space-x-3 text-sm transition-all duration-300 p-3 rounded-xl border ${theme === "light"
+                          ? "bg-white/60 backdrop-blur-sm border-gray-200/60"
+                          : "backdrop-blur-sm"
+                          }`}
                         style={{
                           borderColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.15)",
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.15)",
                           backgroundColor:
                             theme === "light"
                               ? undefined
                               : theme === "dark"
-                              ? "rgba(0,0,0,0.2)"
-                              : "rgba(255,255,255,0.5)",
+                                ? "rgba(0,0,0,0.2)"
+                                : "rgba(255,255,255,0.5)",
                         }}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5, delay: 1.2 }}
                       >
                         <motion.div
-                          className={`p-1.5 rounded-lg ${
-                            theme === "light"
-                              ? "bg-gradient-to-br from-orange-50 to-orange-100"
-                              : ""
-                          }`}
+                          className={`p-1.5 rounded-lg ${theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100"
+                            : ""
+                            }`}
                           style={{
                             background:
                               theme === "light"
@@ -1515,9 +1443,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         >
                           <MapPin
                             size={16}
-                            className={`${
-                              theme === "light" ? "text-orange-600" : ""
-                            }`}
+                            className={`${theme === "light" ? "text-orange-600" : ""
+                              }`}
                             style={{
                               color:
                                 theme === "light"
@@ -1527,9 +1454,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           />
                         </motion.div>
                         <span
-                          className={`font-medium overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${
-                            theme === "light" ? "text-gray-700" : ""
-                          }`}
+                          className={`font-medium overflow-hidden whitespace-nowrap text-ellipsis flex-1 ${theme === "light" ? "text-gray-700" : ""
+                            }`}
                           style={{
                             color:
                               theme === "light"
@@ -1547,9 +1473,8 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                 <div className="absolute -right-24 top-8">
                   <EditButton
                     sectionName="contact"
-                    styles={` ${
-                      theme === "light" ? "text-gray-700" : ""
-                    } mr-14 opacity-70 hover:opacity-100 transition-opacity`}
+                    styles={` ${theme === "light" ? "text-gray-700" : ""
+                      } mr-14 opacity-70 hover:opacity-100 transition-opacity`}
                   />
                 </div>
               </div>
@@ -1627,16 +1552,15 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveEditorTab(tab as any)}
-                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
-                  activeEditorTab === tab
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                }`}
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeEditorTab === tab
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                  }`}
                 style={
                   activeEditorTab === tab
                     ? {
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                      }
+                      background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                    }
                     : {}
                 }
               >
@@ -1673,21 +1597,21 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
                 {(draftCustomization?.showProfileImage ??
                   customization.showProfileImage) && (
-                  <CustomSlider
-                    value={
-                      draftCustomization?.profileImageSize ??
-                      customization.profileImageSize
-                    }
-                    onChange={(value) =>
-                      updateDraftCustomization("profileImageSize", value)
-                    }
-                    label="Profile Image Size"
-                    min={120}
-                    max={200}
-                    step={10}
-                    unit="px"
-                  />
-                )}
+                    <CustomSlider
+                      value={
+                        draftCustomization?.profileImageSize ??
+                        customization.profileImageSize
+                      }
+                      onChange={(value) =>
+                        updateDraftCustomization("profileImageSize", value)
+                      }
+                      label="Profile Image Size"
+                      min={120}
+                      max={200}
+                      step={10}
+                      unit="px"
+                    />
+                  )}
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">
@@ -1724,12 +1648,11 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         onClick={() =>
                           updateDraftCustomization("nameSize", value)
                         }
-                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.nameSize ??
-                            customization.nameSize) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
+                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.nameSize ??
+                          customization.nameSize) === value
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
                       >
                         <div className="text-center text-sm text-white">
                           {label}
@@ -1754,12 +1677,11 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         onClick={() =>
                           updateDraftCustomization("titleSize", value)
                         }
-                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.titleSize ??
-                            customization.titleSize) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
+                        className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleSize ??
+                          customization.titleSize) === value
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          }`}
                       >
                         <div className="text-center text-sm text-white">
                           {label}
@@ -1800,21 +1722,21 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
                 {(draftCustomization?.showProfileImage ??
                   customization.showProfileImage) && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium">
-                      Profile Border
-                    </span>
-                    <Switch
-                      checked={
-                        draftCustomization?.profileImageBorder ??
-                        customization.profileImageBorder
-                      }
-                      onCheckedChange={(checked) =>
-                        updateDraftCustomization("profileImageBorder", checked)
-                      }
-                    />
-                  </div>
-                )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-medium">
+                        Profile Border
+                      </span>
+                      <Switch
+                        checked={
+                          draftCustomization?.profileImageBorder ??
+                          customization.profileImageBorder
+                        }
+                        onCheckedChange={(checked) =>
+                          updateDraftCustomization("profileImageBorder", checked)
+                        }
+                      />
+                    </div>
+                  )}
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">Card Shadow</span>
@@ -1877,21 +1799,21 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
                 {(draftCustomization?.backgroundBlur ??
                   customization.backgroundBlur) && (
-                  <CustomSlider
-                    value={
-                      draftCustomization?.blurIntensity ??
-                      customization.blurIntensity
-                    }
-                    onChange={(value) =>
-                      updateDraftCustomization("blurIntensity", value)
-                    }
-                    label="Blur Intensity"
-                    min={5}
-                    max={20}
-                    step={1}
-                    unit="px"
-                  />
-                )}
+                    <CustomSlider
+                      value={
+                        draftCustomization?.blurIntensity ??
+                        customization.blurIntensity
+                      }
+                      onChange={(value) =>
+                        updateDraftCustomization("blurIntensity", value)
+                      }
+                      label="Blur Intensity"
+                      min={5}
+                      max={20}
+                      step={1}
+                      unit="px"
+                    />
+                  )}
 
                 <div className="flex items-center justify-between">
                   <span className="text-white font-medium">
