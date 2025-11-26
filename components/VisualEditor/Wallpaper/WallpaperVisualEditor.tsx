@@ -119,7 +119,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                     }`}
             >
                 <div className="flex items-center gap-2">
-                    <ImageIcon size={16} className="text-blue-500" />
+                    <ImageIcon size={16} className="text-emerald-500" />
                     <span
                         className={`font-medium text-sm ${isDark ? "text-gray-200" : "text-gray-700"
                             }`}
@@ -130,8 +130,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                 <button
                     onClick={onClose}
                     className={`p-1 rounded-md transition-colors ${isDark
-                            ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
-                            : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"
+                        ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
+                        : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     <X size={16} />
@@ -179,9 +179,9 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                         value={wallpaperUrl}
                         onChange={(e) => setWallpaperUrl(e.target.value)}
                         placeholder="https://example.com/image.jpg"
-                        className={`w-full px-3 py-2 rounded-lg text-sm border focus:ring-2 focus:ring-blue-500 outline-none transition-all ${isDark
-                                ? "bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500"
-                                : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
+                        className={`w-full px-3 py-2 rounded-lg text-sm border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${isDark
+                            ? "bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500"
+                            : "bg-white border-gray-300 text-gray-700 placeholder-gray-400"
                             }`}
                     />
                 </div>
@@ -197,8 +197,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                     />
                     <button
                         className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors border ${isDark
-                                ? "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
-                                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                            ? "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
+                            : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                             }`}
                     >
                         {isUploading ? (
@@ -221,8 +221,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                 <button
                     onClick={() => setWallpaperUrl(initialWallpaper)}
                     className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark
-                            ? "text-gray-400 hover:text-gray-300"
-                            : "text-gray-500 hover:text-gray-700"
+                        ? "text-gray-400 hover:text-gray-300"
+                        : "text-gray-500 hover:text-gray-700"
                         }`}
                 >
                     <RotateCcw size={14} />
@@ -232,15 +232,18 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                     <button
                         onClick={onClose}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDark
-                                ? "text-gray-300 hover:bg-gray-800"
-                                : "text-gray-600 hover:bg-gray-100"
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-gray-100"
                             }`}
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white shadow-sm transition-all hover:shadow-md"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white shadow-sm transition-all hover:shadow-md"
+                        style={{
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                        }}
                     >
                         <Save size={16} />
                         Save Changes

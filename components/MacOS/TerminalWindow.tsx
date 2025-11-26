@@ -7,9 +7,9 @@ import { Edit2 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { setCurrentEdit } from "@/slices/editModeSlice";
-import { ColorTheme } from "@/lib/colorThemes";
+import { useMacOSTheme } from "./ThemeContext";
 
-const TerminalWindow = ({ theme = "light", portfolioId }: { theme?: "light" | "dark"; portfolioId?: string }) => {
+const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
@@ -23,6 +23,7 @@ const TerminalWindow = ({ theme = "light", portfolioId }: { theme?: "light" | "d
   const currentlyEditing = useSelector((state: RootState) => state.editMode.currentlyEditing);
   const dispatch = useDispatch();
   const isEditing = currentlyEditing === "terminal";
+  const { currentTheme } = useMacOSTheme();
 
   const [commandHistory, setCommandHistory] = useState<string[]>([
     "Welcome to Terminal",
@@ -184,22 +185,28 @@ ${summary}`;
 
     return (
       <>
-        <span style={{ color: "#4ec9b0" }}>$</span>{" "}
-        <span style={{ color: "#dcdcaa" }}>{command}</span>
+        <span style={{ color: currentTheme.primary }}>$</span>{" "}
+        <span style={{ color: currentTheme.primaryHover }}>{command}</span>
         {rest && <span> {rest}</span>}
       </>
     );
   };
 
   return (
-    <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f5]"} font-mono text-sm relative`}>
+    <div
+      className={`w-full h-full flex flex-col font-mono text-sm relative ${font || ""}`}
+      style={{
+        backgroundColor: currentTheme.background.primary,
+        color: currentTheme.text.primary,
+      }}
+    >
       {showEdit && !isEditing && (
         <div className="absolute top-4 right-4 z-10">
           <button
             onClick={() => dispatch(setCurrentEdit("terminal"))}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-white`}
             style={{
-              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+              background: currentTheme.gradients.primary,
             }}
             title="Edit Commands"
           >
@@ -213,7 +220,7 @@ ${summary}`;
         className="flex-1 overflow-y-auto p-5 space-y-1"
         style={{
           scrollbarWidth: "thin",
-          scrollbarColor: isDark ? "rgba(100, 100, 100, 0.3) transparent" : "rgba(0, 0, 0, 0.2) transparent",
+          scrollbarColor: `${currentTheme.states.muted} transparent`,
           fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace"
         }}
       >
@@ -227,10 +234,10 @@ ${summary}`;
               className="whitespace-pre-wrap break-words leading-relaxed"
               style={{
                 color: isCommand
-                  ? (isDark ? "#4ec9b0" : "#059669")
+                  ? currentTheme.primary
                   : isError
-                    ? (isDark ? "#f48771" : "#dc2626")
-                    : (isDark ? "#d4d4d4" : "#1f2937")
+                    ? "#f48771"
+                    : currentTheme.text.primary
               }}
             >
               {isCommand ? highlightCommand(line) : line}
@@ -238,16 +245,17 @@ ${summary}`;
           );
         })}
         <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-1">
-          <span style={{ color: isDark ? "#4ec9b0" : "#059669" }} className="font-semibold">$</span>
+          <span style={{ color: currentTheme.primary }} className="font-semibold">$</span>
           <input
             ref={inputRef}
             type="text"
             value={currentCommand}
             onChange={(e) => setCurrentCommand(e.target.value)}
-            className={`flex-1 bg-transparent border-none outline-none ${isDark ? "text-[#d4d4d4]" : "text-[#1f2937]"}`}
+            className={`flex-1 bg-transparent border-none outline-none`}
             style={{
               fontFamily: "inherit",
-              caretColor: isDark ? "#4ec9b0" : "#059669"
+              caretColor: currentTheme.primary,
+              color: currentTheme.text.primary,
             }}
             autoFocus
             autoComplete="off"

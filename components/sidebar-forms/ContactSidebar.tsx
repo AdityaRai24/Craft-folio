@@ -39,7 +39,7 @@ const ContactSidebar = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const portfolioId = params.portfolioId as string;
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, templateName } = useSelector((state: RootState) => state.data);
   const contactSectionData = portfolioData?.find(
     (section: any) => section.type === "userInfo"
   );
@@ -382,8 +382,8 @@ const ContactSidebar = () => {
                   />
                 </div>
 
-                {/* Profile Image Field */}
-                {"profileImage" in content && (
+                {/* Profile Image Field - Hide for MacOS */}
+                {"profileImage" in content && templateName !== "macos" && (
                   <div className="space-y-2">
                     <Label
                       className="text-sm font-medium"

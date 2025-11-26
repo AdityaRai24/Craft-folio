@@ -15,14 +15,15 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
-import { ColorTheme } from "@/lib/colorThemes";
+import { useMacOSTheme } from "./ThemeContext";
 
-const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "dark"; portfolioId?: string }) => {
+const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
   const isDark = theme === "dark";
   const dispatch = useDispatch();
   const { user, isLoaded } = useUser();
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const portfolioUserId = useSelector((state: RootState) => state.data.portfolioUserId);
+  const { currentTheme } = useMacOSTheme();
 
   const safariData = portfolioData?.find((item: any) => item.type === "safari")?.data || {};
   const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
@@ -104,9 +105,21 @@ const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "da
   };
 
   return (
-    <div className={`w-full h-full flex flex-col ${isDark ? "bg-gray-800" : "bg-white"}`}>
+    <div
+      className={`w-full h-full flex flex-col ${font || ""}`}
+      style={{
+        backgroundColor: currentTheme.background.primary,
+        color: currentTheme.text.primary,
+      }}
+    >
       {/* Safari Toolbar */}
-      <div className={`${isDark ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} border-b px-4 py-2.5 flex items-center gap-3`}>
+      <div
+        className={`border-b px-4 py-2.5 flex items-center gap-3`}
+        style={{
+          backgroundColor: currentTheme.background.secondary,
+          borderColor: currentTheme.states.muted,
+        }}
+      >
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -114,13 +127,13 @@ const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "da
         </div>
         <div className="flex items-center gap-2 flex-1 ml-2">
           <button className="p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowLeft size={16} className="text-gray-600" />
+            <ArrowLeft size={16} style={{ color: currentTheme.text.secondary }} />
           </button>
           <button className="p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowRight size={16} className="text-gray-600" />
+            <ArrowRight size={16} style={{ color: currentTheme.text.secondary }} />
           </button>
           <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
-            <Home size={16} className="text-gray-600" />
+            <Home size={16} style={{ color: currentTheme.text.secondary }} />
           </button>
           <button
             className="p-1.5 hover:bg-gray-200 rounded transition-colors"
@@ -128,17 +141,27 @@ const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "da
           >
             <RefreshCw
               size={16}
-              className={`text-gray-600 ${isLoading ? 'animate-spin' : ''}`}
+              className={`${isLoading ? 'animate-spin' : ''}`}
+              style={{ color: currentTheme.text.secondary }}
             />
           </button>
           <form onSubmit={handleNavigate} className="flex-1 flex items-center max-w-2xl">
-            <div className={`flex items-center gap-2 ${isDark ? "bg-gray-600 border-gray-500" : "bg-white border-gray-300"} border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow`}>
-              <Search size={14} className={isDark ? "text-gray-400" : "text-gray-400"} style={{ flexShrink: 0 }} />
+            <div
+              className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow`}
+              style={{
+                backgroundColor: currentTheme.background.primary,
+                borderColor: currentTheme.states.muted,
+              }}
+            >
+              <Search size={14} style={{ color: currentTheme.text.secondary, flexShrink: 0 }} />
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className={`flex-1 bg-transparent border-none outline-none text-sm ${isDark ? "text-gray-200 placeholder-gray-400" : "text-gray-700"}`}
+                className={`flex-1 bg-transparent border-none outline-none text-sm`}
+                style={{
+                  color: currentTheme.text.primary,
+                }}
                 placeholder="Search or enter website name"
               />
             </div>
@@ -160,14 +183,14 @@ const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "da
       </div>
 
       {/* Browser Content */}
-      <div className={`flex-1 overflow-hidden ${isDark ? "bg-gray-800" : "bg-white"}`}>
+      <div className={`flex-1 overflow-hidden`} style={{ backgroundColor: currentTheme.background.primary }}>
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             >
-              <RefreshCw size={32} className="text-blue-500" />
+              <RefreshCw size={32} style={{ color: currentTheme.primary }} />
             </motion.div>
           </div>
         ) : isEditing ? (

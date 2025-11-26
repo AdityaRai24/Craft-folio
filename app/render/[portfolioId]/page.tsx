@@ -167,7 +167,10 @@ const Page = () => {
   // By this point, we guarantee the data is loaded
   const NavbarComponent: any = Template.navbar;
   const hasSpotlight = Template.spotlight;
-  const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
+  const normalizedFontName = Object.keys(fontClassMap).find(
+    (key) => key.toLowerCase() === fontName?.toLowerCase()
+  ) || "Raleway";
+  const selectedFontClass = fontClassMap[normalizedFontName];
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
@@ -197,6 +200,7 @@ const Page = () => {
               customCSS={customCSSState}
               currentPortTheme={themeName}
               portfolioId={portfolioId}
+              font={selectedFontClass}
             />
           )}
           <Sidebar />

@@ -14,12 +14,14 @@ import { deleteComponentCustomization, getComponentCustomization, saveComponentC
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import toast from "react-hot-toast";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
+import { useMacOSTheme } from "./ThemeContext";
 
-const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | "dark"; portfolioId?: string }) => {
+const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
     const isDark = theme === "dark";
     const dispatch = useDispatch();
     const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
     const { componentCustomizations } = useSelector((state: RootState) => state.data);
+    const { currentTheme } = useMacOSTheme();
 
     const [experienceData, setExperienceData] = useState<any[]>([]);
     const [visualEditorOpen, setVisualEditorOpen] = useState(false);
@@ -39,7 +41,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
         getDescriptionClasses,
         getTechStackClasses,
         getTechStackStyle
-    } = useExperienceStyles(effectiveCustomization, theme, ColorTheme.primary);
+    } = useExperienceStyles(effectiveCustomization, theme, currentTheme.primary);
 
     useEffect(() => {
         if (portfolioData) {
@@ -130,16 +132,16 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
     };
 
     return (
-        <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f7]"} relative`}>
+        <div className={`w-full h-full flex flex-col relative ${font || ""}`} style={{ backgroundColor: currentTheme.background.primary }}>
             <div className="flex-1 overflow-y-auto p-8 relative">
                 <div className={`max-w-4xl mx-auto ${effectiveCustomization.containerWidth === "narrow" ? "max-w-2xl" : effectiveCustomization.containerWidth === "wide" ? "max-w-6xl" : ""}`}>
                     {/* Header */}
                     <div className="flex justify-between items-start md:items-center mb-10 flex-col md:flex-row gap-4">
                         <div>
-                            <h1 className={`text-3xl font-bold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
+                            <h1 className={`text-3xl font-bold mb-3`} style={{ color: currentTheme.text.primary }}>
                                 Work Experience
                             </h1>
-                            <p className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                            <p style={{ color: currentTheme.text.secondary }}>
                                 My professional journey and career highlights
                             </p>
                         </div>
@@ -149,7 +151,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
                                 onClick={openVisualEditor}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
                                 style={{
-                                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                                    background: currentTheme.gradients.primary,
                                     color: "white"
                                 }}
                             >
@@ -181,19 +183,24 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
                                     {/* Card */}
                                     <div
                                         className={`w-[calc(100%-4rem)] ${effectiveCustomization.timelinePosition === "alternating" ? "md:w-[calc(50%-2.5rem)]" : "md:w-full md:ml-12"} ${getCardClasses()}`}
-                                        style={getCardStyle(hoveredIndex === index)}
+                                        style={{
+                                            ...getCardStyle(hoveredIndex === index),
+                                            backgroundColor: currentTheme.background.secondary,
+                                            borderColor: currentTheme.states.muted,
+                                            color: currentTheme.text.primary,
+                                        }}
                                     >
                                         <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2 mb-4">
                                             <div className={effectiveCustomization.textAlignment === "center" ? "text-center w-full" : effectiveCustomization.textAlignment === "right" ? "text-right w-full" : ""}>
-                                                <h3 className={getTitleClasses()}>
+                                                <h3 className={getTitleClasses()} style={{ color: currentTheme.text.primary }}>
                                                     {exp.role}
                                                 </h3>
-                                                <div className={`font-medium ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+                                                <div className={`font-medium`} style={{ color: currentTheme.primary }}>
                                                     {exp.companyName}
                                                 </div>
                                             </div>
                                             {(effectiveCustomization.dateBadge || effectiveCustomization.locationBadge) && (
-                                                <div className={`flex flex-col ${effectiveCustomization.textAlignment === "right" ? "items-end" : effectiveCustomization.textAlignment === "center" ? "items-center" : "items-start sm:items-end"} gap-1 text-xs font-medium text-slate-500 dark:text-slate-400`}>
+                                                <div className={`flex flex-col ${effectiveCustomization.textAlignment === "right" ? "items-end" : effectiveCustomization.textAlignment === "center" ? "items-center" : "items-start sm:items-end"} gap-1 text-xs font-medium`} style={{ color: currentTheme.text.secondary }}>
                                                     {effectiveCustomization.dateBadge && (
                                                         <span className="flex items-center gap-1">
                                                             <Calendar size={12} />
@@ -210,17 +217,22 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
                                             )}
                                         </div>
 
-                                        <p className={getDescriptionClasses()}>
+                                        <p className={getDescriptionClasses()} style={{ color: currentTheme.text.secondary }}>
                                             {exp.description}
                                         </p>
 
                                         {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
-                                            <div className={`flex flex-wrap gap-2 mt-4 pt-4 border-t ${isDark ? "border-gray-700" : "border-gray-100"} ${effectiveCustomization.textAlignment === "center" ? "justify-center" : effectiveCustomization.textAlignment === "right" ? "justify-end" : ""}`}>
+                                            <div className={`flex flex-wrap gap-2 mt-4 pt-4 border-t ${effectiveCustomization.textAlignment === "center" ? "justify-center" : effectiveCustomization.textAlignment === "right" ? "justify-end" : ""}`} style={{ borderColor: currentTheme.states.muted }}>
                                                 {exp.techStack.map((tech: any, idx: number) => (
                                                     <span
                                                         key={idx}
                                                         className={getTechStackClasses()}
-                                                        style={getTechStackStyle()}
+                                                        style={{
+                                                            ...getTechStackStyle(),
+                                                            backgroundColor: currentTheme.background.primary,
+                                                            color: currentTheme.text.secondary,
+                                                            borderColor: currentTheme.states.muted,
+                                                        }}
                                                     >
                                                         {typeof tech === 'string' ? tech : tech.name}
                                                     </span>
@@ -233,13 +245,13 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
                         </div>
                     ) : (
                         <div className="text-center py-20">
-                            <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${isDark ? "bg-gray-800 text-gray-600" : "bg-gray-100 text-gray-400"}`}>
-                                <Briefcase size={32} />
+                            <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4`} style={{ background: currentTheme.background.secondary }}>
+                                <Briefcase size={32} style={{ color: currentTheme.text.secondary }} />
                             </div>
-                            <h3 className={`text-lg font-medium mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+                            <h3 className={`text-lg font-medium mb-2`} style={{ color: currentTheme.text.primary }}>
                                 No Experience Added
                             </h3>
-                            <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                            <p className={`text-sm`} style={{ color: currentTheme.text.secondary }}>
                                 Add your work experience to showcase your professional journey.
                             </p>
                         </div>
@@ -257,8 +269,8 @@ const ExperienceWindow = ({ theme = "light", portfolioId }: { theme?: "light" | 
                 onReset={resetCustomization}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
-                primaryColor={ColorTheme.primary}
-                primaryDarkColor={ColorTheme.primaryDark}
+                primaryColor={currentTheme.primary}
+                primaryDarkColor={currentTheme.primaryHover}
             />
         </div>
     );

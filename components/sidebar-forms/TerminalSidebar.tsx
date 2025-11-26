@@ -353,11 +353,13 @@ const TerminalSidebar = () => {
                                     >
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-mono text-sm px-2 py-1 rounded bg-gray-800 text-green-400">{cmd.command}</span>
-                                                    <span className="text-sm" style={{ color: ColorTheme.textSecondary }}>- {cmd.description}</span>
-                                                    {cmd.isDefault && <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Default</span>}
-                                                    {cmd.isHidden && <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">Hidden</span>}
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="font-mono text-sm px-2 py-1 rounded bg-gray-800 text-green-400">{cmd.command}</span>
+                                                        {cmd.isDefault && <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Default</span>}
+                                                        {cmd.isHidden && <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">Hidden</span>}
+                                                    </div>
+                                                    <span className="text-sm" style={{ color: ColorTheme.textSecondary }}>{cmd.description}</span>
                                                 </div>
                                                 <div className="mt-2 text-xs font-mono p-2 rounded bg-black/20 whitespace-pre-wrap" style={{ color: ColorTheme.textMuted }}>
                                                     {cmd.output.substring(0, 50)}{cmd.output.length > 50 ? '...' : ''}

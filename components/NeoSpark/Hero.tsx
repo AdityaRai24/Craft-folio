@@ -14,7 +14,6 @@ import { motion, useAnimate } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
-import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -49,8 +48,8 @@ const AlignmentSelector: React.FC<{
             key={align}
             onClick={() => onChange(align as any)}
             className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${value === align
-                ? "border-white bg-zinc-700 shadow-lg"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
+              ? "border-white bg-zinc-700 shadow-lg"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
               }`}
           >
             <div className="text-2xl text-white">{icon}</div>
@@ -60,10 +59,10 @@ const AlignmentSelector: React.FC<{
               {/* Alignment indicator */}
               <div
                 className={`absolute h-2 w-2 rounded-full transition-all duration-300 shadow-lg ${align === "left"
-                    ? "left-0"
-                    : align === "center"
-                      ? "left-1/2 transform -translate-x-1/2"
-                      : "right-0"
+                  ? "left-0"
+                  : align === "center"
+                    ? "left-1/2 transform -translate-x-1/2"
+                    : "right-0"
                   }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
@@ -111,8 +110,8 @@ const VerticalAlignmentSelector: React.FC<{
             key={align}
             onClick={() => onChange(align as any)}
             className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${value === align
-                ? "border-white bg-zinc-700 shadow-lg"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
+              ? "border-white bg-zinc-700 shadow-lg"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
               }`}
           >
             <div className="text-2xl text-white">{icon}</div>
@@ -122,10 +121,10 @@ const VerticalAlignmentSelector: React.FC<{
               {/* Alignment indicator */}
               <div
                 className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${align === "top"
-                    ? "top-0"
-                    : align === "center"
-                      ? "top-1/2 transform -translate-y-1/2"
-                      : "bottom-0"
+                  ? "top-0"
+                  : align === "center"
+                    ? "top-1/2 transform -translate-y-1/2"
+                    : "bottom-0"
                   }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
@@ -168,8 +167,8 @@ const SizeSelector: React.FC<{
             key={optionValue}
             onClick={() => onChange(optionValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex justify-center mb-2">
@@ -206,8 +205,8 @@ const ButtonStyleSelector: React.FC<{
             key={optionValue}
             onClick={() => onChange(optionValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex justify-center mb-2">
@@ -359,8 +358,8 @@ const BackgroundThemeSelector: React.FC<{
             key={themeValue}
             onClick={() => onChange(themeValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === themeValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div
@@ -1301,8 +1300,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           key={value}
                           onClick={() => updateDraftCustomization("maxWidth", value)}
                           className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                         >
                           <div className="flex flex-col items-center gap-2">
@@ -1405,8 +1404,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               updateDraftCustomization("titleWeight", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="flex justify-center mb-2">
@@ -1446,8 +1445,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               updateDraftCustomization("titleLineHeight", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleLineHeight ?? customization.titleLineHeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="flex justify-center mb-2">
@@ -1493,8 +1492,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               updateDraftCustomization("titleLetterSpacing", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleLetterSpacing ?? customization.titleLetterSpacing) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="flex justify-center mb-2">
@@ -1546,8 +1545,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               updateDraftCustomization("descriptionWeight", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="flex justify-center mb-2">
@@ -1584,8 +1583,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               updateDraftCustomization("descriptionMaxWidth", value)
                             }
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionMaxWidth ?? customization.descriptionMaxWidth) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="flex flex-col items-center gap-2">
@@ -1627,8 +1626,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             updateDraftCustomization("buttonLayout", value)
                           }
                           className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.buttonLayout ?? customization.buttonLayout) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                         >
                           <div className="text-center text-lg text-white mb-1">
@@ -1696,8 +1695,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             )
                           }
                           className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                         >
                           <div className="text-center text-lg text-white mb-1">
@@ -1739,8 +1738,8 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                                 )
                               }
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
                             >
 

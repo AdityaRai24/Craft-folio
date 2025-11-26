@@ -49,7 +49,7 @@ const Sidebar = () => {
         {currentlyEditing === "experience" && <ExperienceSidebar />}
         {currentlyEditing === "technologies" && <TechnologiesSidebar />}
         {currentlyEditing === "contact" && <ContactSidebar />}
-        {currentlyEditing === "contact" && <ContactSidebar />}
+
         {currentlyEditing === "education" && <EducationSidebar />}
         {currentlyEditing === "terminal" && <TerminalSidebar />}
       </div>

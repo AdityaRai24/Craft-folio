@@ -41,12 +41,14 @@ interface DesktopProps {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
+  font?: string;
 }
 
 const Desktop: React.FC<DesktopProps> = ({
   currentPortTheme,
   customCSS,
   portfolioId,
+  font,
 }) => {
   const portfolioData = useSelector(
     (state: RootState) => state.data.portfolioData
@@ -123,14 +125,52 @@ const Desktop: React.FC<DesktopProps> = ({
   // Physics Dock Mouse Value
   const mouseX = useMotionValue<number | null>(null);
 
-  const dockItems = [
-    { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
-    { id: "experience", icon: "https://cdn-icons-png.flaticon.com/512/3281/3281289.png", label: "Experience", component: ExperienceWindow },
-    { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
-    { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
-    { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
-    { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
-  ];
+  const dockConfig: Record<string, any> = {
+    projects: { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
+    experience: { id: "experience", icon: "https://cdn-icons-png.flaticon.com/512/3281/3281289.png", label: "Experience", component: ExperienceWindow },
+    terminal: { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
+    resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
+    contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
+    safari: { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
+  };
+
+  // Dynamically order dock items based on portfolioData
+  const getOrderedDockItems = () => {
+    if (!portfolioData) return Object.values(dockConfig);
+
+    const orderedItems: any[] = [];
+    const processedIds = new Set<string>();
+
+    // 1. Add items from portfolioData in order
+    portfolioData.forEach((section: any) => {
+      if (dockConfig[section.type]) {
+        orderedItems.push(dockConfig[section.type]);
+        processedIds.add(section.type);
+      }
+    });
+
+    // 2. Add remaining fixed apps (Terminal, Safari, Resume if not in portfolioData)
+    // Note: Resume might be a section, but Terminal and Safari are usually system apps
+    const systemApps = ["terminal", "safari", "resume"];
+    systemApps.forEach((appId) => {
+      if (!processedIds.has(appId) && dockConfig[appId]) {
+        orderedItems.push(dockConfig[appId]);
+        processedIds.add(appId);
+      }
+    });
+
+    // 3. Add any other remaining items from dockConfig that weren't added
+    Object.keys(dockConfig).forEach((key) => {
+      if (!processedIds.has(key)) {
+        orderedItems.push(dockConfig[key]);
+        processedIds.add(key);
+      }
+    });
+
+    return orderedItems;
+  };
+
+  const dockItems = getOrderedDockItems();
 
   const openWindow = (id: string) => {
     setWindows((prev) => {
@@ -284,7 +324,7 @@ const Desktop: React.FC<DesktopProps> = ({
   };
 
   return (
-    <MacOSThemeProvider>
+    <MacOSThemeProvider currentPortTheme={currentPortTheme}>
       <DesktopContent
         windows={windows}
         setWindows={setWindows}
@@ -310,6 +350,7 @@ const Desktop: React.FC<DesktopProps> = ({
         getWindowTitle={getWindowTitle}
         showWallpaperEditor={showWallpaperEditor}
         setShowWallpaperEditor={setShowWallpaperEditor}
+        font={font}
       />
     </MacOSThemeProvider>
   );
@@ -340,6 +381,7 @@ const DesktopContent = ({
   getWindowTitle,
   showWallpaperEditor,
   setShowWallpaperEditor,
+  font,
 }: any) => {
   const { theme } = useMacOSTheme();
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
@@ -402,7 +444,7 @@ const DesktopContent = ({
   const isDark = theme === "dark";
 
   return (
-    <div className={`fixed inset-0 overflow-hidden ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
+    <div className={`fixed inset-0 overflow-hidden ${isDark ? "bg-gray-900" : "bg-gray-100"} ${font || ""}`}>
       {/* Desktop Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -572,6 +614,7 @@ const DesktopContent = ({
                           customCSS={customCSS}
                           portfolioId={portfolioId}
                           theme={theme}
+                          font={font}
                         />
                       )
                     ) : (
@@ -632,52 +675,7 @@ const DesktopIcons = ({
   openWindow: (id: string) => void;
   isDark: boolean;
 }) => {
-  const desktopIcons = [
-    {
-      id: "resume",
-      label: "Resume.pdf",
-      icon: FileText,
-      action: () => openWindow("resume"),
-      show: true, // Always show resume icon
-    },
-    {
-      id: "github",
-      label: "GitHub",
-      icon: Github,
-      action: () => {
-        const url = userInfoData.github;
-        if (url) {
-          const fullUrl = url.startsWith("http") ? url : `https://${url}`;
-          window.open(fullUrl, "_blank");
-        }
-      },
-      show: !!userInfoData.github,
-    },
-    {
-      id: "linkedin",
-      label: "LinkedIn",
-      icon: Linkedin,
-      action: () => {
-        const url = userInfoData.linkedin;
-        if (url) {
-          const fullUrl = url.startsWith("http") ? url : `https://${url}`;
-          window.open(fullUrl, "_blank");
-        }
-      },
-      show: !!userInfoData.linkedin,
-    },
-    {
-      id: "email",
-      label: "Email",
-      icon: Mail,
-      action: () => {
-        if (userInfoData.email) {
-          window.location.href = `mailto:${userInfoData.email}`;
-        }
-      },
-      show: !!userInfoData.email,
-    },
-  ].filter((icon) => icon.show);
+  const desktopIcons: any[] = [];
 
   return (
     <div className="absolute left-4 top-8 flex flex-col gap-4 pointer-events-auto">

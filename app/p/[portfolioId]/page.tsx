@@ -268,15 +268,19 @@ const Page = () => {
       <>
         <GuestWarningModal open={showGuestModal} onClose={() => setShowGuestModal(false)} />
         <Sidebar />
-        {DesktopComponent && (
-          <DesktopComponent
-            currentPortTheme={themeName}
-            customCSS={customCSSState}
-            portfolioId={finalPortfolioId}
-          />
-        )}
+        <div
+          className={cn(" min-h-screen w-full", selectedFontClass)}
+        >
+          {DesktopComponent && (
+            <DesktopComponent
+              currentPortTheme={themeName}
+              customCSS={customCSSState}
+              portfolioId={finalPortfolioId}
+            />
+          )}
+        </div>
         {/* Only render Chatbot after data is loaded */}
-        {/* {dataLoaded && (
+        {dataLoaded && (
           <Chatbot
             portfolioData={portfolioData}
             themeOptions={themes}
@@ -290,7 +294,7 @@ const Page = () => {
             setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
             customCSSState={customCSSState}
           />
-        )} */}
+        )}
       </>
     );
   }
@@ -344,7 +348,7 @@ const Page = () => {
         </div>
 
         {/* Only render Chatbot after data is loaded */}
-        {/* {dataLoaded && (
+        {dataLoaded && (
           <Chatbot
             portfolioData={portfolioData}
             themeOptions={themes}
@@ -358,7 +362,7 @@ const Page = () => {
             setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
             customCSSState={customCSSState}
           />
-        )} */}
+        )}
       </div>
     </>
   );

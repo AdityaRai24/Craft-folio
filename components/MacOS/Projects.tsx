@@ -20,22 +20,25 @@ import { deleteComponentCustomization, getComponentCustomization, saveComponentC
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { ColorTheme } from "@/lib/colorThemes";
-import React from "react";
+import { useMacOSTheme } from "./ThemeContext";
 
 const ProjectsGrid = ({
   currentPortTheme,
   customCSS,
   portfolioId,
   theme = "light",
+  font,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
   theme?: "light" | "dark";
+  font?: string;
 }) => {
   const dispatch = useDispatch();
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const { componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { currentTheme } = useMacOSTheme();
 
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
@@ -173,17 +176,27 @@ const ProjectsGrid = ({
 
   if (!projectsData || projectsData.length === 0) {
     return (
-      <div className={`w-full h-full flex items-center justify-center p-8 ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f7]"}`}>
-        <div className={`text-center ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-          <p className="text-lg font-medium">No projects to display</p>
-          <p className={`text-sm mt-2 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Add projects to see them here</p>
+      <div
+        className={`w-full h-full flex items-center justify-center p-8 ${font || ""}`}
+        style={{
+          backgroundColor: currentTheme.background.primary,
+        }}
+      >
+        <div className={`text-center`} style={{ color: currentTheme.text.secondary }}>
+          <p className="text-lg font-medium" style={{ color: currentTheme.text.primary }}>No projects to display</p>
+          <p className={`text-sm mt-2`}>Add projects to see them here</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`w-full h-full ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f7]"} overflow-y-auto relative`}>
+    <div
+      className={`w-full h-full overflow-y-auto relative ${font || ""}`}
+      style={{
+        backgroundColor: currentTheme.background.primary,
+      }}
+    >
       <div className="max-w-7xl mx-auto p-6 md:p-8">
         {/* Header */}
         <div className="flex justify-between items-start md:items-center mb-8 flex-col md:flex-row gap-4">
@@ -192,10 +205,10 @@ const ProjectsGrid = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h1 className={`text-3xl md:text-4xl font-semibold ${isDark ? "text-white" : "text-[#1d1d1f]"} mb-1.5 tracking-tight`}>
+            <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight`} style={{ color: currentTheme.text.primary }}>
               Projects
             </h1>
-            <p className={`text-sm md:text-base ${isDark ? "text-gray-400" : "text-[#6e6e73]"}`}>
+            <p className={`text-sm md:text-base`} style={{ color: currentTheme.text.secondary }}>
               A collection of my recent work
             </p>
           </motion.div>
@@ -206,7 +219,7 @@ const ProjectsGrid = ({
               onClick={openVisualEditor}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
               style={{
-                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                background: currentTheme.gradients.primary,
                 color: "white"
               }}
             >
@@ -229,15 +242,19 @@ const ProjectsGrid = ({
               {/* Project Card */}
               <div
                 className={getCardClasses()}
-                style={getCardStyle()}
+                style={{
+                  ...getCardStyle(),
+                  backgroundColor: currentTheme.background.secondary,
+                  borderColor: currentTheme.states.muted,
+                }}
               >
                 {/* Project Image/Illustration */}
                 <div
-                  className={`relative overflow-hidden ${isDark
-                    ? "bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900"
-                    : "bg-gray-100 border-b border-gray-100"
-                    }`}
-                  style={getImageStyle()}
+                  className={`relative overflow-hidden`}
+                  style={{
+                    ...getImageStyle(),
+                    backgroundColor: currentTheme.background.primary,
+                  }}
                 >
                   {project.projectImage ? (
                     <img
@@ -247,15 +264,15 @@ const ProjectsGrid = ({
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className={`text-6xl ${isDark ? "opacity-20" : "opacity-30"}`}>📁</div>
+                      <div className={`text-6xl opacity-30`}>📁</div>
                     </div>
                   )}
                   {/* Subtle gradient overlay */}
                   <div
-                    className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isDark
-                      ? "bg-gradient-to-t from-black/20 to-transparent"
-                      : "bg-gradient-to-t from-black/5 to-transparent"
-                      }`}
+                    className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+                    style={{
+                      background: `linear-gradient(to top, ${currentTheme.background.primary}33, transparent)`
+                    }}
                   />
                 </div>
 
@@ -263,14 +280,14 @@ const ProjectsGrid = ({
                 <div className="mt-5">
                   {/* Project Title */}
                   <div className={getTitleAlignment()}>
-                    <h3 className={getTitleClasses()}>
+                    <h3 className={getTitleClasses()} style={{ color: currentTheme.text.primary }}>
                       {project.projectTitle || project.projectName || `Project ${index + 1}`}
                     </h3>
                   </div>
 
                   {/* Project Description */}
                   <div className="relative group/desc mt-2">
-                    <p className={getDescriptionClasses()}>
+                    <p className={getDescriptionClasses()} style={{ color: currentTheme.text.secondary }}>
                       {project.projectDescription || "No description available"}
                     </p>
                     <div className="absolute -top-2 -right-2 opacity-0 group-hover/desc:opacity-100 transition-opacity">
@@ -302,6 +319,11 @@ const ProjectsGrid = ({
                           key={techIndex}
                           className={getTechStackClasses()}
                           title={tech.name}
+                          style={{
+                            backgroundColor: currentTheme.background.primary,
+                            color: currentTheme.text.secondary,
+                            borderColor: currentTheme.states.muted,
+                          }}
                         >
                           {tech.logo ? (
                             <img src={tech.logo} alt={tech.name} className="w-4 h-4 object-contain" />
@@ -311,7 +333,11 @@ const ProjectsGrid = ({
                         </div>
                       ))}
                       {project.techStack.length > 5 && (
-                        <div className={getTechStackClasses()}>
+                        <div className={getTechStackClasses()} style={{
+                          backgroundColor: currentTheme.background.primary,
+                          color: currentTheme.text.secondary,
+                          borderColor: currentTheme.states.muted,
+                        }}>
                           <span className="text-xs font-medium">+{project.techStack.length - 5}</span>
                         </div>
                       )}
@@ -333,7 +359,11 @@ const ProjectsGrid = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         className={getButtonClasses("live")}
-                        style={getButtonStyle("live")}
+                        style={{
+                          ...getButtonStyle("live"),
+                          backgroundColor: currentTheme.primary,
+                          color: "white",
+                        }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink size={14} />
@@ -346,7 +376,12 @@ const ProjectsGrid = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         className={getButtonClasses("github")}
-                        style={getButtonStyle("github")}
+                        style={{
+                          ...getButtonStyle("github"),
+                          backgroundColor: currentTheme.background.primary,
+                          color: currentTheme.text.primary,
+                          borderColor: currentTheme.states.muted,
+                        }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Github size={14} />
@@ -372,8 +407,8 @@ const ProjectsGrid = ({
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor="#10b981"
-        primaryDarkColor="#059669"
+        primaryColor={currentTheme.primary}
+        primaryDarkColor={currentTheme.primaryHover}
       />
     </div>
   );

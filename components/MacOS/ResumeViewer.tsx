@@ -12,9 +12,11 @@ import { ColorTheme } from "@/lib/colorThemes";
 const ResumeViewer = ({
   theme = "light",
   portfolioId,
+  font,
 }: {
   theme?: "light" | "dark";
   portfolioId?: string;
+  font?: string;
 }) => {
   const isDark = theme === "dark";
   const { user, isLoaded } = useUser();
@@ -66,7 +68,7 @@ const ResumeViewer = ({
   };
 
   return (
-    <div className={`w-full h-full flex flex-col ${isDark ? "bg-gray-800" : "bg-white"} relative`}>
+    <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1e1e1e]" : "bg-white"} relative ${font || ""}`}>
       {/* Header Actions */}
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         {showEdit && (

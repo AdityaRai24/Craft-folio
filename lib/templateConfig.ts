@@ -94,6 +94,31 @@ export const templateConfig: any = {
     },
     defaults: {},
   },
+  MonoEdge: {
+    navbar: SimpleWhiteNavbar,
+    spotlight: false,
+    sections: {
+      hero: SimpleWhiteHero,
+      projects: SimpleWhiteProjects,
+      experience: SimpleWhiteExperience,
+      technologies: SimpleWhiteSkills,
+      contact: SimpleWhiteContact,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: true,
+      summary: true,
+      title: true,
+      shortSummary: true,
+      longSummary: false,
+      safari: false,
+    },
+    structure: {
+      technologies: "flat",
+    },
+    defaults: {},
+  },
   LumenFlow: {
     navbar: LumenFlowNavbar,
     spotlight: false,
@@ -125,7 +150,7 @@ export const templateConfig: any = {
     },
   },
   MacOS: {
-    navbar: null, // MacOS uses its own desktop structure
+    navbar: null, 
     spotlight: false,
     sections: {
       desktop: MacOSDesktop,

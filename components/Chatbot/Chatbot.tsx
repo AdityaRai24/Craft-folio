@@ -208,6 +208,9 @@ const PortfolioChatbot = ({
     setSelectedFont(font);
   };
 
+  const [isApplyingFont, setIsApplyingFont] = useState(false);
+  const [isApplyingTheme, setIsApplyingTheme] = useState(false);
+
   const handleApplyFont = async (font: string) => {
     if (!user) {
       toast.error("Please sign up to apply changes to your portfolio", {
@@ -218,11 +221,18 @@ const PortfolioChatbot = ({
       });
       return;
     }
-    await updateFont({ fontName: font, portfolioId });
-    toast.success("Font applied successfully!");
-    setShowFontOptions(false);
-    setSelectedFont("");
-    handleChatClose();
+    try {
+      setIsApplyingFont(true);
+      await updateFont({ fontName: font, portfolioId });
+      toast.success("Font applied successfully!");
+      setShowFontOptions(false);
+      setSelectedFont("");
+      handleChatClose();
+    } catch (error) {
+      toast.error("Failed to apply font");
+    } finally {
+      setIsApplyingFont(false);
+    }
   };
 
   const handleApplySelectedTheme = async () => {
@@ -235,12 +245,19 @@ const PortfolioChatbot = ({
       });
       return;
     }
-    setCurrentPortTheme(selectedTheme);
-    await updateTheme({ themeName: selectedTheme, portfolioId });
-    toast.success(`Theme "${selectedTheme}" applied!`);
-    setShowThemeOptions(false);
-    setSelectedTheme("");
-    handleChatClose();
+    try {
+      setIsApplyingTheme(true);
+      setCurrentPortTheme(selectedTheme);
+      await updateTheme({ themeName: selectedTheme, portfolioId });
+      toast.success(`Theme "${selectedTheme}" applied!`);
+      setShowThemeOptions(false);
+      setSelectedTheme("");
+      handleChatClose();
+    } catch (error) {
+      toast.error("Failed to apply theme");
+    } finally {
+      setIsApplyingTheme(false);
+    }
   };
 
   const handleShowThemeOptions = () => {
@@ -784,19 +801,19 @@ const PortfolioChatbot = ({
               >
                 <Button
                   onClick={() => selectedFont && handleApplyFont(selectedFont)}
-                  disabled={!selectedFont}
+                  disabled={!selectedFont || isApplyingFont}
                   className="w-full font-medium py-2 px-4 rounded-lg transition-colors"
                   style={{
-                    backgroundColor: !selectedFont
+                    backgroundColor: !selectedFont || isApplyingFont
                       ? themeColors.bgCard
                       : themeColors.primary,
                     color: themeColors.textPrimary,
-                    boxShadow: selectedFont
+                    boxShadow: selectedFont && !isApplyingFont
                       ? `0 4px 14px ${themeColors.primaryGlow}`
                       : "none",
                   }}
                 >
-                  Apply Selected Font
+                  {isApplyingFont ? "Applying Font..." : "Apply Selected Font"}
                 </Button>
               </motion.div>
             )}
@@ -812,19 +829,19 @@ const PortfolioChatbot = ({
               >
                 <Button
                   onClick={handleApplySelectedTheme}
-                  disabled={!selectedTheme}
+                  disabled={!selectedTheme || isApplyingTheme}
                   className="w-full font-medium py-2 px-4 rounded-lg transition-colors"
                   style={{
-                    backgroundColor: !selectedTheme
+                    backgroundColor: !selectedTheme || isApplyingTheme
                       ? themeColors.bgCard
                       : themeColors.primary,
                     color: themeColors.textPrimary,
-                    boxShadow: selectedTheme
+                    boxShadow: selectedTheme && !isApplyingTheme
                       ? `0 4px 14px ${themeColors.primaryGlow}`
                       : "none",
                   }}
                 >
-                  Apply Selected Theme
+                  {isApplyingTheme ? "Applying Theme..." : "Apply Selected Theme"}
                 </Button>
               </motion.div>
             )}

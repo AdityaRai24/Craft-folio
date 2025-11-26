@@ -13,18 +13,20 @@ import toast from "react-hot-toast";
 import { ContactCustomizationState } from "@/types/contact/portfolio";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
-import { ColorTheme } from "@/lib/colorThemes";
+import { useMacOSTheme } from "./ThemeContext";
 
 const Contact = ({
   currentPortTheme,
   customCSS,
   portfolioId,
   theme = "light",
+  font,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
   theme?: "light" | "dark";
+  font?: string;
 }) => {
   const params = useParams();
   const { user, isLoaded } = useUser();
@@ -33,6 +35,7 @@ const Contact = ({
   const portfolioUserId = useSelector((state: RootState) => state.data.portfolioUserId);
   const currentlyEditing = useSelector((state: RootState) => state.editMode.currentlyEditing);
   const { componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { currentTheme } = useMacOSTheme();
 
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
   const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
@@ -187,7 +190,13 @@ const Contact = ({
   ].filter((link) => link.url);
 
   return (
-    <div className={`w-full h-full ${isDark ? "bg-gray-800" : "bg-white"} overflow-y-auto relative`}>
+    <div
+      className={`w-full h-full overflow-y-auto relative ${font || ""}`}
+      style={{
+        backgroundColor: currentTheme.background.primary,
+        color: currentTheme.text.primary,
+      }}
+    >
       <div className={`mx-auto p-8 ${effectiveCustomization.containerWidth === "narrow" ? "max-w-4xl" :
         effectiveCustomization.containerWidth === "wide" ? "max-w-5xl" :
           "max-w-full"
@@ -201,10 +210,10 @@ const Contact = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <h1 className={`text-3xl md:text-4xl font-semibold ${isDark ? "text-white" : "text-[#1d1d1f]"} mb-1.5 tracking-tight`}>
+              <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight`} style={{ color: currentTheme.text.primary }}>
                 Contact
               </h1>
-              <p className={`text-sm md:text-base ${isDark ? "text-gray-400" : "text-[#6e6e73]"}`}>
+              <p className={`text-sm md:text-base`} style={{ color: currentTheme.text.secondary }}>
                 Get in touch with me
               </p>
             </motion.div>
@@ -215,7 +224,7 @@ const Contact = ({
                 onClick={openVisualEditor}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-white`}
                 style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                  background: currentTheme.gradients.primary,
                 }}
               >
                 <Settings size={16} />
@@ -231,10 +240,10 @@ const Contact = ({
           className="text-center mb-12"
           style={{ textAlign: effectiveCustomization.textAlignment }}
         >
-          <h1 className={`text-4xl font-semibold ${isDark ? "text-white" : "text-gray-900"} mb-3`}>
+          <h1 className={`text-4xl font-semibold mb-3`} style={{ color: currentTheme.text.primary }}>
             Get In Touch
           </h1>
-          <p className={`${isDark ? "text-gray-300" : "text-gray-600"} text-lg`}>
+          <p className={`text-lg`} style={{ color: currentTheme.text.secondary }}>
             Let's connect and build something amazing
           </p>
         </motion.div>
@@ -260,34 +269,37 @@ const Contact = ({
                   whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05, y: -8 } : {}}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: effectiveCustomization.animationSpeed / 1000, delay: index * (effectiveCustomization.staggerDelay / 1000) }}
-                  className={`bg-gradient-to-br ${link.color} ${link.hoverColor} rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center gap-6 group relative overflow-hidden`}
+                  className={`rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center gap-6 group relative overflow-hidden`}
                   style={{
                     borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                     padding: `${effectiveCustomization.cardPadding * 4}px`,
+                    background: currentTheme.background.secondary,
+                    border: `1px solid ${currentTheme.states.muted}`,
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   <div
-                    className={`${link.iconBg} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative z-10`}
+                    className={`rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative z-10`}
                     style={{
                       width: `${effectiveCustomization.iconSize * 2.5}px`,
                       height: `${effectiveCustomization.iconSize * 2.5}px`,
                       borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+                      background: currentTheme.primary,
                     }}
                   >
                     <Icon size={effectiveCustomization.iconSize} className="text-white" />
                   </div>
 
                   {effectiveCustomization.showLabels && (
-                    <span className="text-white text-xl font-bold relative z-10">
+                    <span className="text-xl font-bold relative z-10" style={{ color: currentTheme.text.primary }}>
                       {link.name}
                     </span>
                   )}
 
                   {effectiveCustomization.openInNewTab && link.url?.startsWith("http") && (
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink size={16} className="text-white/80" />
+                      <ExternalLink size={16} style={{ color: currentTheme.text.secondary }} />
                     </div>
                   )}
                 </motion.a>
@@ -296,13 +308,13 @@ const Contact = ({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className={`w-24 h-24 rounded-xl ${isDark ? "bg-gray-700" : "bg-gray-100"} flex items-center justify-center mb-6`}>
-              <Mail size={40} className={isDark ? "text-gray-400" : "text-gray-400"} />
+            <div className={`w-24 h-24 rounded-xl flex items-center justify-center mb-6`} style={{ background: currentTheme.background.secondary }}>
+              <Mail size={40} style={{ color: currentTheme.text.secondary }} />
             </div>
-            <p className={`${isDark ? "text-gray-300" : "text-gray-600"} text-lg font-medium`}>
+            <p className={`text-lg font-medium`} style={{ color: currentTheme.text.primary }}>
               No contact information available
             </p>
-            <p className={`${isDark ? "text-gray-500" : "text-gray-400"} text-sm mt-2`}>
+            <p className={`text-sm mt-2`} style={{ color: currentTheme.text.secondary }}>
               Add your contact details to get started
             </p>
           </div>
@@ -315,12 +327,17 @@ const Contact = ({
             transition={{ delay: 0.4 }}
             className="text-center"
           >
-            <p className={`${isDark ? "text-gray-400" : "text-gray-500"} text-sm mb-3`}>
+            <p className={`text-sm mb-3`} style={{ color: currentTheme.text.secondary }}>
               Or reach me directly at
             </p>
             <a
               href={`mailto:${userInfoData.email}`}
-              className={`inline-block ${isDark ? "text-white hover:text-blue-400 bg-gray-700 hover:bg-gray-600 border-gray-600" : "text-gray-900 hover:text-blue-600 bg-gray-50 hover:bg-gray-100 border-gray-200"} text-lg font-medium transition-colors px-6 py-3 rounded-xl border hover:border-gray-300`}
+              className={`inline-block text-lg font-medium transition-colors px-6 py-3 rounded-xl border`}
+              style={{
+                color: currentTheme.text.primary,
+                background: currentTheme.background.secondary,
+                borderColor: currentTheme.states.muted,
+              }}
             >
               {userInfoData.email}
             </a>
@@ -339,8 +356,8 @@ const Contact = ({
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor={ColorTheme.primary}
-        primaryDarkColor={ColorTheme.primaryDark}
+        primaryColor={currentTheme.primary}
+        primaryDarkColor={currentTheme.primaryHover}
       />
     </div>
   );
