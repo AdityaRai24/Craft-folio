@@ -144,22 +144,38 @@ export async function updateSection({
     const portfolioSection = allSections.find(
       (section: any) => section.type === sectionName
     );
+
+    let updatedContent;
+
     if (!portfolioSection) {
-      return { success: false, error: `${sectionName} section not found}` };
-    }
-    const updatedContent = {
-      sections: allSections.map((section: any) => {
-        if (section.type === sectionName) {
-          return {
+      // If section doesn't exist, add it
+      updatedContent = {
+        sections: [
+          ...allSections,
+          {
             type: sectionName,
             data: sectionContent,
             sectionTitle: sectionTitle,
             sectionDescription: sectionDescription,
-          };
-        }
-        return section;
-      }),
-    };
+          },
+        ],
+      };
+    } else {
+      // If section exists, update it
+      updatedContent = {
+        sections: allSections.map((section: any) => {
+          if (section.type === sectionName) {
+            return {
+              type: sectionName,
+              data: sectionContent,
+              sectionTitle: sectionTitle,
+              sectionDescription: sectionDescription,
+            };
+          }
+          return section;
+        }),
+      };
+    }
 
     await prisma.portfolio.update({
       where: { id: portfolioId },

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import {
   Loader2,
@@ -62,47 +63,47 @@ export default function LoadingSpinner({
   return (
     <div className="main-bg-noise h-screen ">
       <div
-      style={{
-        backgroundImage: `radial-gradient(circle at 50% 0%, ${ColorTheme.primaryGlow}, transparent 50%)`,
-      }}
-      className="fixed inset-0 flex items-center justify-center "
-    >
-      <div className="bg-transparent p-8 rounded-lg flex flex-col items-center">
-        <div className="relative mb-4">
-          {/* Main spinner */}
-          <Loader2
-            className="h-16 w-16 text-emerald-500 animate-spin"
-            style={{ color: "#10b981" }}
-          />
+        style={{
+          backgroundImage: `radial-gradient(circle at 50% 0%, ${ColorTheme.primaryGlow}, transparent 50%)`,
+        }}
+        className="fixed inset-0 flex items-center justify-center "
+      >
+        <div className="bg-transparent p-8 rounded-lg flex flex-col items-center">
+          <div className="relative mb-4">
+            {/* Main spinner */}
+            <Loader2
+              className="h-16 w-16 text-emerald-500 animate-spin"
+              style={{ color: "#10b981" }}
+            />
 
-          {/* Secondary icon that changes */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Icon className="h-8 w-8 opacity-90" style={{ color: "#10b981" }} />
+            {/* Secondary icon that changes */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Icon className="h-8 w-8 opacity-90" style={{ color: "#10b981" }} />
+            </div>
           </div>
-        </div>
 
-        <div className="mt-4 text-center">
-          <div className="text-xl font-medium text-white">CraftFolio</div>
-          <div className="flex items-center justify-center mt-2">
-            <span className="text-white">
-              {text}
-              {dots}
-            </span>
+          <div className="mt-4 text-center">
+            <div className="text-xl font-medium text-white">CraftFolio</div>
+            <div className="flex items-center justify-center mt-2">
+              <span className="text-white">
+                {text}
+                {dots}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Progress bar */}
-        <div className="w-64 h-3 bg-white bg-opacity-20 rounded-full mt-6 overflow-hidden">
-          <div
-            className="h-full rounded-full animate-pulse"
-            style={{
-              width: `${(currentMessageIndex + 1) * (100 / messages.length)}%`,
-              backgroundColor: "#10b981",
-            }}
-          ></div>
+          {/* Progress bar */}
+          <div className="w-64 h-3 bg-white bg-opacity-20 rounded-full mt-6 overflow-hidden">
+            <div
+              className="h-full rounded-full animate-pulse"
+              style={{
+                width: `${(currentMessageIndex + 1) * (100 / messages.length)}%`,
+                backgroundColor: "#10b981",
+              }}
+            ></div>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

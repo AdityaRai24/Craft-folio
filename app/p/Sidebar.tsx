@@ -8,6 +8,7 @@ import ExperienceSidebar from '@/components/sidebar-forms/ExperienceSidebar';
 import TechnologiesSidebar from '@/components/sidebar-forms/TechnologiesSidebar';
 import ContactSidebar from '@/components/sidebar-forms/ContactSidebar';
 import EducationSidebar from '@/components/sidebar-forms/EducationSidebar';
+import TerminalSidebar from '@/components/sidebar-forms/TerminalSidebar';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ColorTheme } from '@/lib/colorThemes';
@@ -20,12 +21,12 @@ const Sidebar = () => {
   useEffect(() => {
     if (currentlyEditing) {
       setIsExpanded(true);
-    }else{
+    } else {
       setIsExpanded(false);
     }
   }, [currentlyEditing]);
 
-  if (!currentlyEditing) return null; 
+  if (!currentlyEditing) return null;
 
   return (
     <div className={`fixed left-0 top-0 h-screen z-[99999] transition-all duration-300 ease-in-out ${isExpanded ? 'w-80' : 'w-0'} border-r border-gray-700 overflow-hidden`}>
@@ -34,7 +35,7 @@ const Sidebar = () => {
         size="icon"
         className="absolute right-4 top-4 z-50"
         onClick={() => dispatch(setCurrentEdit(""))}
-        style={{ 
+        style={{
           color: ColorTheme.textSecondary,
           backgroundColor: 'transparent'
         }}
@@ -48,7 +49,9 @@ const Sidebar = () => {
         {currentlyEditing === "experience" && <ExperienceSidebar />}
         {currentlyEditing === "technologies" && <TechnologiesSidebar />}
         {currentlyEditing === "contact" && <ContactSidebar />}
+        {currentlyEditing === "contact" && <ContactSidebar />}
         {currentlyEditing === "education" && <EducationSidebar />}
+        {currentlyEditing === "terminal" && <TerminalSidebar />}
       </div>
     </div>
   );

@@ -11,13 +11,15 @@ import {
   useTransform,
   MotionValue,
 } from "framer-motion";
-import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail } from "lucide-react";
+import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail, Image as ImageIcon } from "lucide-react";
 import TopBar from "./TopBar";
 import ProjectsGrid from "./Projects";
 import TerminalWindow from "./TerminalWindow";
 import ResumeViewer from "./ResumeViewer";
 import Contact from "./Contact";
 import SafariBrowser from "./SafariBrowser";
+import ExperienceWindow from "./ExperienceWindow";
+import WallpaperVisualEditor from "@/components/VisualEditor/Wallpaper/WallpaperVisualEditor";
 import { MacOSThemeProvider, useMacOSTheme } from "./ThemeContext";
 import Preview from "./icons/preview.svg";
 import Terminal from "./icons/terminal.svg";
@@ -53,7 +55,7 @@ const Desktop: React.FC<DesktopProps> = ({
     portfolioData?.find((item: any) => item.type === "hero")?.data || {};
 
   const backgroundImage =
-    heroData.backgroundImage ||
+    heroData.image ||
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80";
 
   const [windows, setWindows] = useState<Record<string, WindowState>>({
@@ -102,17 +104,28 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 500, y: 300 },
       size: { width: 900, height: 600 },
     },
+    experience: {
+      id: "experience",
+      isOpen: false,
+      isMinimized: false,
+      isFullscreen: false,
+      zIndex: 0,
+      position: { x: 150, y: 150 },
+      size: { width: 850, height: 650 },
+    },
   });
 
   const [nextZIndex, setNextZIndex] = useState(2);
   const [draggingWindow, setDraggingWindow] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [showWallpaperEditor, setShowWallpaperEditor] = useState(false);
 
   // Physics Dock Mouse Value
   const mouseX = useMotionValue<number | null>(null);
 
   const dockItems = [
     { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
+    { id: "experience", icon: "https://cdn-icons-png.flaticon.com/512/3281/3281289.png", label: "Experience", component: ExperienceWindow },
     { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
     { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
@@ -295,6 +308,8 @@ const Desktop: React.FC<DesktopProps> = ({
         bringToFront={bringToFront}
         handleMouseDown={handleMouseDown}
         getWindowTitle={getWindowTitle}
+        showWallpaperEditor={showWallpaperEditor}
+        setShowWallpaperEditor={setShowWallpaperEditor}
       />
     </MacOSThemeProvider>
   );
@@ -323,6 +338,8 @@ const DesktopContent = ({
   bringToFront,
   handleMouseDown,
   getWindowTitle,
+  showWallpaperEditor,
+  setShowWallpaperEditor,
 }: any) => {
   const { theme } = useMacOSTheme();
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
@@ -401,6 +418,7 @@ const DesktopContent = ({
         currentPortTheme={currentPortTheme}
         customCSS={customCSS}
         portfolioId={portfolioId}
+        onEditWallpaper={() => setShowWallpaperEditor(true)}
       />
 
       {/* Desktop Icons - positioned on left side like macOS */}
@@ -411,6 +429,32 @@ const DesktopContent = ({
           isDark={isDark}
         />
       </div>
+
+      {/* Wallpaper Visual Editor */}
+      <AnimatePresence>
+        {showWallpaperEditor && (
+          <WallpaperVisualEditor
+            initialWallpaper={backgroundImage}
+            onClose={() => setShowWallpaperEditor(false)}
+            portfolioId={portfolioId!}
+            currentTheme={currentPortTheme || "dark"}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Floating Wallpaper Edit Button */}
+      {portfolioId && (
+        <button
+          onClick={() => setShowWallpaperEditor(true)}
+          className={`fixed bottom-24 right-6 z-[45] p-3 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-110 border ${isDark
+            ? "bg-gray-800/90 border-gray-700 text-gray-200 hover:bg-gray-700"
+            : "bg-white/90 border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
+          title="Change Wallpaper"
+        >
+          <ImageIcon size={20} />
+        </button>
+      )}
 
       {/* Windows */}
       <div className="relative w-full h-full pt-7 z-[2]">
@@ -507,8 +551,8 @@ const DesktopContent = ({
                   {/* Window Content */}
                   <div
                     className={`${isDark ? "bg-gray-800" : "bg-white"} flex-1 ${id === "terminal" || id === "resume" || id === "safari"
-                        ? "overflow-hidden"
-                        : "overflow-y-auto"
+                      ? "overflow-hidden"
+                      : "overflow-y-auto"
                       }`}
                     style={{
                       scrollbarWidth: "thin",
@@ -517,8 +561,11 @@ const DesktopContent = ({
                     }}
                   >
                     {WindowComponent ? (
-                      id === "terminal" || id === "resume" || id === "safari" ? (
-                        <WindowComponent theme={theme} />
+                      id === "terminal" || id === "resume" || id === "safari" || id === "experience" ? (
+                        <WindowComponent
+                          theme={theme}
+                          portfolioId={portfolioId}
+                        />
                       ) : (
                         <WindowComponent
                           currentPortTheme={currentPortTheme}

@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,9 +15,9 @@ const menuItems = [
   { title: "Experience", href: "experience" },
 ];
 
- const Navbar = ({ currentPortTheme }: any) => {
+const Navbar = ({ currentPortTheme }: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Theme color variables (if theme is available)
   const primaryColor = "#2563EB"; // Default fallback
   const textPrimaryColor = "#1F2937"; // Default fallback
@@ -134,7 +135,7 @@ const menuItems = [
           <p className="text-primary-600 mt-1 sm:mt-2 font-title text-sm sm:text-base">
             {/* {personal.role} */}
             Software Developer
-            </p>
+          </p>
         </motion.div>
 
         {/* Navigation Items */}
@@ -151,9 +152,9 @@ const menuItems = [
                 className="relative cursor-pointer"
               >
                 <Link
-                    to={item.href}
-                    smooth={true}
-                    duration={500}
+                  to={item.href}
+                  smooth={true}
+                  duration={500}
                   onClick={() => setIsOpen(false)}
                   className="block text-base sm:text-lg font-title text-primary-800 hover:text-white hover:bg-black hover:font-semibold transition-all duration-200 py-3 sm:py-4 px-3 sm:px-4 relative overflow-hidden"
                 >

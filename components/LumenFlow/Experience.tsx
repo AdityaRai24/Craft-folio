@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";

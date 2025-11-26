@@ -1,13 +1,66 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, RefreshCw, Home, Star, Share2, ArrowLeft, ArrowRight } from "lucide-react";
+import { Search, RefreshCw, Home, Star, Share2, ArrowLeft, ArrowRight, Edit2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { useUser } from "@clerk/nextjs";
+import { shouldShowEditButtons } from "@/components/EditButton";
+import SafariEditor from "./SafariEditor";
+import { updatePortfolioData } from "@/slices/dataSlice";
+import { updateSection } from "@/app/actions/portfolio";
+import toast from "react-hot-toast";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useCreateBlockNote } from "@blocknote/react";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
+import { ColorTheme } from "@/lib/colorThemes";
 
-const SafariBrowser = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
+const SafariBrowser = ({ theme = "light", portfolioId }: { theme?: "light" | "dark"; portfolioId?: string }) => {
   const isDark = theme === "dark";
+  const dispatch = useDispatch();
+  const { user, isLoaded } = useUser();
+  const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
+  const portfolioUserId = useSelector((state: RootState) => state.data.portfolioUserId);
+
+  const safariData = portfolioData?.find((item: any) => item.type === "safari")?.data || {};
+  const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+
   const [url, setUrl] = useState("craftfolio.dev");
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Default welcome content if no data exists
+  const defaultContent = `
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-semibold mb-3">Welcome to CraftFolio</h1>
+      <p class="text-lg opacity-80">Your portfolio, reimagined as a macOS experience</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20">
+        <div class="text-4xl mb-4">💻</div>
+        <h3 class="text-xl font-semibold mb-2">Interactive Portfolio</h3>
+        <p class="text-sm opacity-80">Explore my work in an immersive macOS experience</p>
+      </div>
+      <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-900/20">
+        <div class="text-4xl mb-4">🎨</div>
+        <h3 class="text-xl font-semibold mb-2">Modern Design</h3>
+        <p class="text-sm opacity-80">Built with cutting-edge technologies and best practices</p>
+      </div>
+      <div class="p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20">
+        <div class="text-4xl mb-4">⚡</div>
+        <h3 class="text-xl font-semibold mb-2">Responsive & Fast</h3>
+        <p class="text-sm opacity-80">Optimized for all devices and lightning-fast performance</p>
+      </div>
+    </div>
+    <div class="p-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+      <h2 class="text-2xl font-semibold mb-4">Experience the Future of Portfolios</h2>
+      <p class="mb-6 opacity-80">This macOS-themed portfolio showcases my work in an innovative and interactive way. Navigate through different sections using the dock icons, each opening a unique window experience.</p>
+    </div>
+  `;
+
+  const content = safariData.content || defaultContent;
 
   const handleNavigate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,26 +68,40 @@ const SafariBrowser = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
     setTimeout(() => setIsLoading(false), 800);
   };
 
-  const features = [
-    {
-      title: "Interactive Portfolio",
-      description: "Explore my work in an immersive macOS experience",
-      icon: "💻",
-      color: "from-blue-50 to-blue-100",
-    },
-    {
-      title: "Modern Design",
-      description: "Built with cutting-edge technologies and best practices",
-      icon: "🎨",
-      color: "from-purple-50 to-purple-100",
-    },
-    {
-      title: "Responsive & Fast",
-      description: "Optimized for all devices and lightning-fast performance",
-      icon: "⚡",
-      color: "from-yellow-50 to-yellow-100",
-    },
-  ];
+  const handleSave = async (newContent: string) => {
+    if (!portfolioId) return;
+
+    try {
+      toast.loading("Saving content...", { id: "saveSafari" });
+
+      // Update Redux
+      dispatch(updatePortfolioData({
+        sectionType: "safari",
+        newData: { content: newContent },
+        sectionTitle: "",
+        sectionDescription: "",
+      }));
+
+      // Update Database
+      const result = await updateSection({
+        portfolioId,
+        sectionName: "safari",
+        sectionContent: { content: newContent },
+        sectionTitle: "",
+        sectionDescription: "",
+      });
+
+      if (result.success) {
+        toast.success("Content saved successfully!", { id: "saveSafari" });
+        setIsEditing(false);
+      } else {
+        throw new Error("Failed to save to database");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Failed to save content", { id: "saveSafari" });
+    }
+  };
 
   return (
     <div className={`w-full h-full flex flex-col ${isDark ? "bg-gray-800" : "bg-white"}`}>
@@ -55,13 +122,13 @@ const SafariBrowser = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
           <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
             <Home size={16} className="text-gray-600" />
           </button>
-          <button 
+          <button
             className="p-1.5 hover:bg-gray-200 rounded transition-colors"
             onClick={() => setIsLoading(true)}
           >
-            <RefreshCw 
-              size={16} 
-              className={`text-gray-600 ${isLoading ? 'animate-spin' : ''}`} 
+            <RefreshCw
+              size={16}
+              className={`text-gray-600 ${isLoading ? 'animate-spin' : ''}`}
             />
           </button>
           <form onSubmit={handleNavigate} className="flex-1 flex items-center max-w-2xl">
@@ -76,17 +143,24 @@ const SafariBrowser = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
               />
             </div>
           </form>
-          <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
-            <Share2 size={16} className="text-gray-600" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
-            <Star size={16} className="text-gray-600" />
-          </button>
+
+          {showEdit && !isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className={`backdrop-blur flex flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 items-center justify-center gap-3 bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium `}
+
+              title="Edit Content"
+            >
+              <Edit2 size={14} />
+              <span>Edit</span>
+            </button>
+          )}
+
         </div>
       </div>
 
       {/* Browser Content */}
-      <div className={`flex-1 overflow-y-auto ${isDark ? "bg-gray-800" : "bg-white"}`}>
+      <div className={`flex-1 overflow-hidden ${isDark ? "bg-gray-800" : "bg-white"}`}>
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <motion.div
@@ -96,66 +170,55 @@ const SafariBrowser = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
               <RefreshCw size={32} className="text-blue-500" />
             </motion.div>
           </div>
+        ) : isEditing ? (
+          <SafariEditor
+            initialContent={content}
+            onSave={handleSave}
+            onCancel={() => setIsEditing(false)}
+            isDark={isDark}
+          />
         ) : (
-          <div className="p-8 max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-12"
-            >
-              <h1 className={`text-4xl font-semibold ${isDark ? "text-white" : "text-gray-900"} mb-3`}>
-                Welcome to CraftFolio
-              </h1>
-              <p className={isDark ? "text-gray-300" : "text-gray-600"} style={{ fontSize: "1.125rem" }}>
-                Your portfolio, reimagined as a macOS experience
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`bg-gradient-to-br ${feature.color} rounded-xl p-6 ${isDark ? "border-gray-600" : "border-gray-200"} border hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
-                >
-                  <div className="text-4xl mb-4">{feature.icon}</div>
-                  <h3 className={`text-xl font-semibold ${isDark ? "text-white" : "text-gray-900"} mb-2`}>
-                    {feature.title}
-                  </h3>
-                  <p className={isDark ? "text-gray-300" : "text-gray-700"} style={{ fontSize: "0.875rem", lineHeight: "1.625" }}>{feature.description}</p>
-                </motion.div>
-              ))}
+          <div className="h-full overflow-y-auto">
+            <div className="p-8 max-w-5xl mx-auto">
+              {safariData.content ? (
+                <ReadOnlyContent content={safariData.content} isDark={isDark} />
+              ) : (
+                <div
+                  className={`prose max-w-none ${isDark ? "prose-invert prose-headings:text-white prose-p:text-gray-300 text-gray-300" : "prose-headings:text-gray-900 prose-p:text-gray-900 text-gray-900"} prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-blue-500 hover:prose-a:text-blue-600`}
+                  dangerouslySetInnerHTML={{ __html: defaultContent }}
+                />
+              )}
             </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className={`${isDark ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"} rounded-xl p-8 border`}
-            >
-              <h2 className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-900"} mb-4`}>
-                Experience the Future of Portfolios
-              </h2>
-              <p className={`${isDark ? "text-gray-300" : "text-gray-700"} mb-6`} style={{ lineHeight: "1.625" }}>
-                This macOS-themed portfolio showcases my work in an innovative and interactive way.
-                Navigate through different sections using the dock icons, each opening a unique
-                window experience. Explore projects, view my resume, check out my skills, and get in touch.
-              </p>
-              <div className="flex gap-3">
-                <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-lg transition-colors text-sm font-medium shadow-sm hover:shadow-md">
-                  Explore Projects
-                </button>
-                <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded-lg transition-colors text-sm font-medium">
-                  View Resume
-                </button>
-              </div>
-            </motion.div>
           </div>
         )}
       </div>
     </div>
+  );
+};
+
+const ReadOnlyContent = ({ content, isDark }: { content: string; isDark: boolean }) => {
+  const editor = useCreateBlockNote();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (editor && content) {
+        const blocks = await editor.tryParseHTMLToBlocks(content);
+        editor.replaceBlocks(editor.document, blocks);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [editor, content]);
+
+  if (loading) return null;
+
+  return (
+    <BlockNoteView
+      editor={editor}
+      editable={false}
+      theme={isDark ? "dark" : "light"}
+    />
   );
 };
 

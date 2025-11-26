@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
@@ -47,31 +48,29 @@ const TechStackStyleSelector: React.FC<{
           <div
             key={style}
             onClick={() => onChange(style as any)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === style
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === style
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div className="flex flex-wrap gap-1 justify-center mb-2">
               {["React", "TS"].map((tech, i) => (
                 <span
                   key={i}
-                  className={`text-xs px-2 py-1 ${
-                    style === "pills"
+                  className={`text-xs px-2 py-1 ${style === "pills"
                       ? "rounded-full border border-gray-500 text-white"
                       : style === "badges"
-                      ? "rounded bg-gray-600 text-white"
-                      : style === "minimal"
-                      ? "text-gray-300"
-                      : "rounded-full border-2 text-white"
-                  }`}
+                        ? "rounded bg-gray-600 text-white"
+                        : style === "minimal"
+                          ? "text-gray-300"
+                          : "rounded-full border-2 text-white"
+                    }`}
                   style={
                     style === "colorful"
                       ? {
-                          borderColor: ColorTheme.primary,
-                          backgroundColor: `${ColorTheme.primary}20`,
-                        }
+                        borderColor: ColorTheme.primary,
+                        backgroundColor: `${ColorTheme.primary}20`,
+                      }
                       : {}
                   }
                 >
@@ -187,7 +186,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
       const data = await response.json();
       const enhancedDescription = data.response || data.content || data.result;
-      
+
       return enhancedDescription;
     } catch (error) {
       console.error('Magic Write API error:', error);
@@ -203,7 +202,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
         description: newDescription
       };
       setExperienceData(updatedExperience);
-      
+
       // Save to database
       const result = await updateSection({
         sectionName: "experience",
@@ -212,7 +211,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
         sectionTitle: "Experience",
         sectionDescription: "Experience section"
       });
-      
+
       if (result.success) {
         toast.success("Experience description enhanced and saved successfully!");
       } else {
@@ -458,7 +457,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
   const getCardStyle = () => ({
     borderRadius: `${effectiveCustomization.cardRadius}px`,
-    padding : `${effectiveCustomization.cardPadding * 4}px`,
+    padding: `${effectiveCustomization.cardPadding * 4}px`,
   });
 
   const getTitleClasses = () => {
@@ -476,9 +475,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
       bold: "font-bold",
     };
 
-    return `${sizeMap[effectiveCustomization.titleSize]} ${
-      weightMap[effectiveCustomization.titleWeight]
-    } section-sub-title mb-2`;
+    return `${sizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]
+      } section-sub-title mb-2`;
   };
 
   const getDescriptionClasses = () => {
@@ -489,9 +487,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
       lg: "text-lg",
     };
 
-    return `${
-      sizeMap[effectiveCustomization.descriptionSize]
-    } text-gray-300 section-sub-description mb-4`;
+    return `${sizeMap[effectiveCustomization.descriptionSize]
+      } text-gray-300 section-sub-description mb-4`;
   };
 
   const getTechStackClasses = () => {
@@ -535,9 +532,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     };
 
     return {
-      dot: `${dotSizeMap[effectiveCustomization.dotSize]} ${
-        dotStyleMap[effectiveCustomization.dotStyle]
-      }`,
+      dot: `${dotSizeMap[effectiveCustomization.dotSize]} ${dotStyleMap[effectiveCustomization.dotStyle]
+        }`,
       line: `bg-opacity-30`,
       lineStyle: {
         backgroundColor: ColorTheme.primary,
@@ -686,223 +682,218 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
         />
 
         <div className={getContainerClasses()}>
-        {experienceData.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-gray-400">
-            No professional experience added yet.
-          </div>
-        ) : (
-          <div className="relative">
-            {experienceData.map((experience, index) => (
-              <motion.div
-                key={index}
-                initial={animationVariants.hidden}
-                animate={
-                  visibleItems[index]
-                    ? animationVariants.visible
-                    : animationVariants.hidden
-                }
-                transition={{
-                  duration: effectiveCustomization.animationDuration / 1000,
-                  delay:
-                    effectiveCustomization.entranceAnimation === "stagger"
-                      ? index * (effectiveCustomization.staggerDelay / 1000)
-                      : 0,
-                }}
-                className={`relative section-card max-w-[95%] mx-auto md:max-w-[90%] ${
-                  index !== experienceData.length - 1 ? "mb-10 sm:mb-16" : ""
-                }`}
-                style={{
-                  filter: effectiveCustomization.glowEffect
-                    ? `drop-shadow(0 0 20px ${titleColor}30)`
-                    : "none",
-                }}
-              >
-                {/* Timeline Elements */}
-                <div
-                  className={`absolute left-2 sm:left-6 transform -translate-x-1/2 ${timelineStyles.dot}`}
-                  style={{
-                    ...timelineStyles.dotStyle,
-                    boxShadow: effectiveCustomization.borderGlow
-                      ? `0 0 10px ${ColorTheme.primary}50`
-                      : "none",
-                    top: "1.5rem",
+          {experienceData.length === 0 ? (
+            <div className="text-center py-8 sm:py-12 text-gray-400">
+              No professional experience added yet.
+            </div>
+          ) : (
+            <div className="relative">
+              {experienceData.map((experience, index) => (
+                <motion.div
+                  key={index}
+                  initial={animationVariants.hidden}
+                  animate={
+                    visibleItems[index]
+                      ? animationVariants.visible
+                      : animationVariants.hidden
+                  }
+                  transition={{
+                    duration: effectiveCustomization.animationDuration / 1000,
+                    delay:
+                      effectiveCustomization.entranceAnimation === "stagger"
+                        ? index * (effectiveCustomization.staggerDelay / 1000)
+                        : 0,
                   }}
-                ></div>
-                {index !== experienceData.length - 1 && (
-                  <div
-                    className={`absolute left-2 sm:left-6 top-0 bottom-0 ${timelineStyles.line}`}
-                    style={{
-                      ...timelineStyles.lineStyle,
-                      transform: "translateX(-50%)",
-                      top: "3rem",
-                      height: "calc(100% + 2rem)",
-                    }}
-                  ></div>
-                )}
-
-                <div
-                  className={`ml-8 sm:ml-20 ${getCardClasses()}`}
+                  className={`relative section-card max-w-[95%] mx-auto md:max-w-[90%] ${index !== experienceData.length - 1 ? "mb-10 sm:mb-16" : ""
+                    }`}
                   style={{
-                    ...getCardStyle(),
-                    borderColor:
-                      effectiveCustomization.cardStyle === "minimal"
-                        ? titleColor
-                        : `${titleColor}30`,
-                    background: effectiveCustomization.gradientOverlay
-                      ? `linear-gradient(135deg, ${titleColor}10, transparent)`
-                      : undefined,
+                    filter: effectiveCustomization.glowEffect
+                      ? `drop-shadow(0 0 20px ${titleColor}30)`
+                      : "none",
                   }}
                 >
-                  <h2 className={getTitleClasses()}>{experience.role}</h2>
+                  {/* Timeline Elements */}
+                  <div
+                    className={`absolute left-2 sm:left-6 transform -translate-x-1/2 ${timelineStyles.dot}`}
+                    style={{
+                      ...timelineStyles.dotStyle,
+                      boxShadow: effectiveCustomization.borderGlow
+                        ? `0 0 10px ${ColorTheme.primary}50`
+                        : "none",
+                      top: "1.5rem",
+                    }}
+                  ></div>
+                  {index !== experienceData.length - 1 && (
+                    <div
+                      className={`absolute left-2 sm:left-6 top-0 bottom-0 ${timelineStyles.line}`}
+                      style={{
+                        ...timelineStyles.lineStyle,
+                        transform: "translateX(-50%)",
+                        top: "3rem",
+                        height: "calc(100% + 2rem)",
+                      }}
+                    ></div>
+                  )}
 
-                  <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400">
-                    <span
-                      className={`truncate max-w-[60vw] sm:max-w-none ${
-                        effectiveCustomization.companySize === "lg"
-                          ? "text-lg"
-                          : effectiveCustomization.companySize === "md"
-                          ? "text-base"
-                          : "text-sm"
-                      }`}
-                    >
-                      <Building className="inline h-4 w-4 mr-1" />
-                      {experience.companyName}
-                    </span>
+                  <div
+                    className={`ml-8 sm:ml-20 ${getCardClasses()}`}
+                    style={{
+                      ...getCardStyle(),
+                      borderColor:
+                        effectiveCustomization.cardStyle === "minimal"
+                          ? titleColor
+                          : `${titleColor}30`,
+                      background: effectiveCustomization.gradientOverlay
+                        ? `linear-gradient(135deg, ${titleColor}10, transparent)`
+                        : undefined,
+                    }}
+                  >
+                    <h2 className={getTitleClasses()}>{experience.role}</h2>
 
-                    {(draftCustomization?.locationBadge ?? customization.locationBadge) && experience.location && (
+                    <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400">
                       <span
-                        className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${
-                          (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                            ? "border"
-                            : ""
-                        }`}
-                        style={{
-                          backgroundColor:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? "transparent"
-                              : `${titleColor}20`,
-                          color: titleColor,
-                          borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
-                          border:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? `1px solid ${titleColor}`
-                              : "none",
-                          boxShadow:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
-                              ? `0 0 10px ${titleColor}30`
-                              : "none",
-                        }}
+                        className={`truncate max-w-[60vw] sm:max-w-none ${effectiveCustomization.companySize === "lg"
+                            ? "text-lg"
+                            : effectiveCustomization.companySize === "md"
+                              ? "text-base"
+                              : "text-sm"
+                          }`}
                       >
-                        <MapPin className="inline h-3 w-3 mr-1" />
-                        {experience.location}
+                        <Building className="inline h-4 w-4 mr-1" />
+                        {experience.companyName}
                       </span>
-                    )}
 
-                    {(draftCustomization?.dateBadge ?? customization.dateBadge) && (
-                      <span
-                        className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${
-                          (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                            ? "border"
-                            : ""
-                        }`}
-                        style={{
-                          backgroundColor:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? "transparent"
-                              : `${titleColor}20`,
-                          color: titleColor,
-                          borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
-                          border:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? `1px solid ${titleColor}`
-                              : "none",
-                          boxShadow:
-                            (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
-                              ? `0 0 10px ${titleColor}30`
-                              : "none",
-                        }}
-                      >
-                        <Calendar className="inline h-3 w-3 mr-1" />
-                        {`${experience.startDate} - ${experience.endDate}`}
-                      </span>
-                    )}
-                  </div>
+                      {(draftCustomization?.locationBadge ?? customization.locationBadge) && experience.location && (
+                        <span
+                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${(draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                              ? "border"
+                              : ""
+                            }`}
+                          style={{
+                            backgroundColor:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                                ? "transparent"
+                                : `${titleColor}20`,
+                            color: titleColor,
+                            borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
+                            border:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                                ? `1px solid ${titleColor}`
+                                : "none",
+                            boxShadow:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
+                                ? `0 0 10px ${titleColor}30`
+                                : "none",
+                          }}
+                        >
+                          <MapPin className="inline h-3 w-3 mr-1" />
+                          {experience.location}
+                        </span>
+                      )}
 
-                  <div className="relative">
-                    <p className={getDescriptionClasses()}>
-                      {experience.description}
-                    </p>
-                    {/* Magic Write Button */}
-                    <div className="absolute -top-2 -right-2 z-10 hidden md:block">
-                      <MagicWrite
-                        onMagicWrite={async (prompt: string, context?: string) => {
-                          const enhancedDescription = await handleMagicWrite(prompt, experience.description);
-                          handleDescriptionUpdate(index, enhancedDescription);
-                          return enhancedDescription;
-                        }}
-                        placeholder="Enhance this experience description..."
-                        buttonText=""
-                        context={experience.description}
-                        className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
-                      />
+                      {(draftCustomization?.dateBadge ?? customization.dateBadge) && (
+                        <span
+                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${(draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                              ? "border"
+                              : ""
+                            }`}
+                          style={{
+                            backgroundColor:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                                ? "transparent"
+                                : `${titleColor}20`,
+                            color: titleColor,
+                            borderRadius: `${draftCustomization?.badgeRadius ?? customization.badgeRadius}px`,
+                            border:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
+                                ? `1px solid ${titleColor}`
+                                : "none",
+                            boxShadow:
+                              (draftCustomization?.badgeStyle ?? customization.badgeStyle) === "glow"
+                                ? `0 0 10px ${titleColor}30`
+                                : "none",
+                          }}
+                        >
+                          <Calendar className="inline h-3 w-3 mr-1" />
+                          {`${experience.startDate} - ${experience.endDate}`}
+                        </span>
+                      )}
                     </div>
-                  </div>
 
-                  {customization.techStackVisible &&
-                    experience.techStack &&
-                    experience.techStack.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
-                        {experience.techStack.map((tech, techIndex) => (
-                          <span
-                            key={techIndex}
-                            className={getTechStackClasses()}
-                            style={{
-                              backgroundColor: `${titleColor}20`,
-                              color: titleColor,
-                              border:
-                                (draftCustomization?.techStackStyle ?? customization.techStackStyle) === "badges"
-                                  ? `1px solid ${titleColor}30`
-                                  : "none",
-                            }}
-                          >
-                            {(draftCustomization?.techStackStyle ?? customization.techStackStyle) !== "minimal" && (
-                              <img
-                                src={
-                                  tech.logo ||
-                                  `https://placehold.co/100x100?text=${tech.name}&font=montserrat&fontsize=18`
-                                }
-                                alt={tech.name}
-                                className={`${
-                                  (draftCustomization?.techStackSize ?? customization.techStackSize) === "lg"
-                                    ? "h-5 w-5"
-                                    : "h-4 w-4"
-                                } inline-block mr-1`}
-                              />
-                            )}
-                            {tech.name}
-                          </span>
-                        ))}
+                    <div className="relative">
+                      <p className={getDescriptionClasses()}>
+                        {experience.description}
+                      </p>
+                      {/* Magic Write Button */}
+                      <div className="absolute -top-2 -right-2 z-10 hidden md:block">
+                        <MagicWrite
+                          onMagicWrite={async (prompt: string, context?: string) => {
+                            const enhancedDescription = await handleMagicWrite(prompt, experience.description);
+                            handleDescriptionUpdate(index, enhancedDescription);
+                            return enhancedDescription;
+                          }}
+                          placeholder="Enhance this experience description..."
+                          buttonText=""
+                          context={experience.description}
+                          className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                        />
                       </div>
-                    )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                    </div>
+
+                    {customization.techStackVisible &&
+                      experience.techStack &&
+                      experience.techStack.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
+                          {experience.techStack.map((tech, techIndex) => (
+                            <span
+                              key={techIndex}
+                              className={getTechStackClasses()}
+                              style={{
+                                backgroundColor: `${titleColor}20`,
+                                color: titleColor,
+                                border:
+                                  (draftCustomization?.techStackStyle ?? customization.techStackStyle) === "badges"
+                                    ? `1px solid ${titleColor}30`
+                                    : "none",
+                              }}
+                            >
+                              {(draftCustomization?.techStackStyle ?? customization.techStackStyle) !== "minimal" && (
+                                <img
+                                  src={
+                                    tech.logo ||
+                                    `https://placehold.co/100x100?text=${tech.name}&font=montserrat&fontsize=18`
+                                  }
+                                  alt={tech.name}
+                                  className={`${(draftCustomization?.techStackSize ?? customization.techStackSize) === "lg"
+                                      ? "h-5 w-5"
+                                      : "h-4 w-4"
+                                    } inline-block mr-1`}
+                                />
+                              )}
+                              {tech.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
 
       {/* Floating Visual Editor Window */}
       {visualEditorOpen && (
-                            <div
-            ref={dragRef}
-            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
-            style={{
-              left: `${windowPosition.x}px`,
-              top: `${windowPosition.y}px`,
-              cursor: isDragging ? "grabbing" : "grab",
-            }}
-          >
+        <div
+          ref={dragRef}
+          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
           {/* Header */}
           <div
             className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
@@ -925,16 +916,15 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${
-                  activeTab === tab
+                className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                }`}
+                  }`}
                 style={
                   activeTab === tab
                     ? {
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                      }
+                      background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                    }
                     : {}
                 }
               >
@@ -973,11 +963,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       <div
                         key={value}
                         onClick={() => updateDraftCustomization("maxWidth", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.maxWidth ?? customization.maxWidth) === value
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center gap-2">
                           <div className="w-full block mx-auto">
@@ -1002,7 +991,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
             {activeTab === "timeline" && (
               <div className="space-y-6">
-               
+
                 <div className="mb-4">
                   <label className="block text-left text-sm font-medium text-gray-300 mb-2">
                     Timeline Width: {customization.timelineWidth}px
@@ -1016,14 +1005,14 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                     onChange={(e) => updateDraftCustomization("timelineWidth", Number(e.target.value))}
                     className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                                              background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 100%)`
+                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 ${(100 * ((draftCustomization?.timelineWidth ?? customization.timelineWidth) - 1) / 7)}%, #3f3f46 100%)`
                     }}
-                    
+
                   />
                 </div>
 
                 <div className="border-t border-zinc-700 pt-4">
-               
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-white text-left font-medium mb-3">Dot Size</label>
@@ -1036,11 +1025,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                           <div
                             key={value}
                             onClick={() => updateDraftCustomization("dotSize", value)}
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.dotSize ?? customization.dotSize) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.dotSize ?? customization.dotSize) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="text-center text-lg text-white mb-1">{icon}</div>
                             <div className="text-center text-xs text-white">{label}</div>
@@ -1061,11 +1049,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                           <div
                             key={value}
                             onClick={() => updateDraftCustomization("dotStyle", value)}
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.dotStyle ?? customization.dotStyle) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.dotStyle ?? customization.dotStyle) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="text-center text-lg text-white mb-1">{icon}</div>
                             <div className="text-center text-xs text-white">{label}</div>
@@ -1095,19 +1082,18 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       { value: "glass", label: "Glass" },
                     ].map(({ value, label }) => (
                       <button
-                      key={value}
-                      onClick={() => updateDraftCustomization("cardStyle", value)}
-                      className={`py-2 px-3 text-sm rounded transition-colors ${
-                        (draftCustomization?.cardStyle ?? customization.cardStyle) === value
-                          ? "text-white"
-                          : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
-                      }`}
-                      style={(draftCustomization?.cardStyle ?? customization.cardStyle) === value ? {
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                      } : {}}
-                    >
-                      {label}
-                    </button>
+                        key={value}
+                        onClick={() => updateDraftCustomization("cardStyle", value)}
+                        className={`py-2 px-3 text-sm rounded transition-colors ${(draftCustomization?.cardStyle ?? customization.cardStyle) === value
+                            ? "text-white"
+                            : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
+                          }`}
+                        style={(draftCustomization?.cardStyle ?? customization.cardStyle) === value ? {
+                          background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                        } : {}}
+                      >
+                        {label}
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -1168,16 +1154,15 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             <div
                               key={value}
                               onClick={() => updateDraftCustomization("titleSize", value)}
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.titleSize ?? customization.titleSize) === value
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleSize ?? customization.titleSize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
+                                }`}
                             >
                               <div className="flex justify-center mb-2">
                                 <div
                                   className="rounded text-white text-center font-bold"
-                                  style={{ 
+                                  style={{
                                     fontSize: size,
                                   }}
                                 >
@@ -1202,11 +1187,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             <div
                               key={value}
                               onClick={() => updateDraftCustomization("titleWeight", value)}
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.titleWeight ?? customization.titleWeight) === value
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
+                                }`}
                             >
                               <div className="flex justify-center mb-2">
                                 <div
@@ -1225,7 +1209,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                   </div>
 
                   <div className="border-t border-zinc-700 pt-4">
-                     <div className="space-y-4">
+                    <div className="space-y-4">
                       <div>
                         <label className="block text-white text-left font-medium mb-3">Company Size</label>
                         <div className="grid grid-cols-2 gap-2">
@@ -1238,16 +1222,15 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             <div
                               key={value}
                               onClick={() => updateDraftCustomization("companySize", value)}
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.companySize ?? customization.companySize) === value
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.companySize ?? customization.companySize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
+                                }`}
                             >
                               <div className="flex justify-center mb-2">
                                 <div
                                   className="rounded text-white text-center font-bold"
-                                  style={{ 
+                                  style={{
                                     fontSize: size,
                                   }}
                                 >
@@ -1272,21 +1255,20 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             <div
                               key={value}
                               onClick={() => updateDraftCustomization("descriptionSize", value)}
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.descriptionSize ?? customization.descriptionSize) === value
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionSize ?? customization.descriptionSize) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
+                                }`}
                             >
                               <div className="flex justify-center mb-2">
                                 <div
                                   className="rounded text-white text-center font-bold"
-                                  style={{ 
+                                  style={{
                                     fontSize: size,
                                   }}
                                 >
                                   Aa
-                                </div>  
+                                </div>
                               </div>
                               <div className="text-center text-xs text-white">{label}</div>
                             </div>
@@ -1305,8 +1287,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
                         <input
                           type="checkbox"
-                                                  checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
-                        onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
+                          checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
+                          onChange={(e) => updateDraftCustomization("techStackVisible", e.target.checked)}
                           className="rounded border-gray-600 bg-zinc-700 text-primary focus:ring-primary"
                         />
                         Show Tech Stack
@@ -1331,16 +1313,15 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                               <div
                                 key={value}
                                 onClick={() => updateDraftCustomization("techStackSize", value)}
-                                className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                  (draftCustomization?.techStackSize ?? customization.techStackSize) === value
+                                className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.techStackSize ?? customization.techStackSize) === value
                                     ? "border-white bg-zinc-700"
                                     : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                                }`}
+                                  }`}
                               >
                                 <div className="flex justify-center mb-2">
                                   <div
                                     className="rounded text-white text-center font-bold"
-                                    style={{ 
+                                    style={{
                                       fontSize: size
                                     }}
                                   >

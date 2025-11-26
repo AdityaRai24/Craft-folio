@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,7 +60,7 @@ const CardImageModal: React.FC<CardImageModalProps> = ({
               alt={`${theme.name} theme preview`}
               className={`w-full h-full object-contain border border-[${ColorTheme.primary}] bg-black/5`}
             />
-            
+
             {/* Navigation Arrows */}
             <button
               onClick={handlePrevious}
@@ -67,7 +68,7 @@ const CardImageModal: React.FC<CardImageModalProps> = ({
             >
               <ChevronLeft size={24} color={ColorTheme.primary} />
             </button>
-            
+
             <button
               onClick={handleNext}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-10 cursor-pointer bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all"
@@ -81,11 +82,10 @@ const CardImageModal: React.FC<CardImageModalProps> = ({
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentIndex
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentIndex
                       ? "bg-primary w-4"
                       : "bg-white/50 hover:bg-white/75"
-                  }`}
+                    }`}
                 />
               ))}
             </div>

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import Slider from "react-slick";
@@ -18,7 +19,7 @@ interface ThemeCardProps {
     description: string;
     previewImageUrl: string[]; // Changed to string array
     features: string[];
-    liveUrl : string;
+    liveUrl: string;
   };
   handleSelectTheme: (id: number) => void;
   selectedTheme: number;
@@ -55,12 +56,12 @@ const NextArrow: React.FC<{ className?: string; style?: React.CSSProperties; onC
 const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selectedTheme, isExpanded, handleCardClick }) => {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // State to track current slide index
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768); // 768px is typical md breakpoint
@@ -78,8 +79,8 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
 
   // Use the actual preview images from the theme object
   // If previewImageUrl is empty, provide a fallback
-  const previewImages = theme.previewImageUrl.length > 0 
-    ? theme.previewImageUrl 
+  const previewImages = theme.previewImageUrl.length > 0
+    ? theme.previewImageUrl
     : ['/placeholder-image.jpg'];
 
   const sliderSettings = {
@@ -123,24 +124,24 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
 
 
   return (
-    <motion.div 
+    <motion.div
       className="rounded-xl overflow-visible transition-all h-full w-full max-w-full md:max-w-none sm:max-w-md md:mx-0 mx-auto"
       variants={fadeInScale}
-      style={{ 
+      style={{
         backgroundColor: ColorTheme.bgCard,
         backdropFilter: "blur(12px)",
         border: `1px solid ${selectedTheme === theme.id ? ColorTheme.primary : ColorTheme.borderLight}`,
         boxShadow: selectedTheme === theme.id ? `0 0 20px ${ColorTheme.primaryGlow}` : 'none'
       }}
-      whileHover={{ 
+      whileHover={{
         boxShadow: `0 8px 30px rgba(0,0,0,0.12), 0 4px 15px ${ColorTheme.primaryGlow}`,
       }}
     >
       {/* Theme Tag - Moved to extreme top left */}
       <div className="absolute -top-3 -left-3 z-20">
-        <span 
+        <span
           className="text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 transition-all duration-300 hover:scale-105"
-          style={{ 
+          style={{
             background: 'rgba(0, 0, 0, 0.75)',
             border: `1px solid ${ColorTheme.primary}`,
             color: ColorTheme.primary,
@@ -171,7 +172,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
           )}
         </span>
       </div>
-      
+
       {/* Image Section with Slider */}
       <div className="relative overflow-hidden group aspect-[16/9]">
         <Slider {...sliderSettings} className="h-full">
@@ -186,13 +187,13 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             </div>
           ))}
         </Slider>
-        
+
         {selectedTheme === theme.id && (
-          <motion.div 
+          <motion.div
             className="absolute top-4 right-4 p-1 rounded-full z-10"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            style={{ 
+            style={{
               backgroundColor: ColorTheme.primary,
               color: '#000'
             }}
@@ -201,24 +202,24 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
           </motion.div>
         )}
       </div>
-      
+
       {/* Content Section */}
       <div className="p-4 sm:p-6 md:p-6 lg:p-6 xl:p-6">
         <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl font-bold mb-2 md:mb-2" style={{ color: ColorTheme.textPrimary }}>{theme.name}</h3>
-        
+
         <p className="mb-4 text-sm sm:text-base md:text-base lg:text-lg xl:text-lg" style={{ color: ColorTheme.textSecondary }}>
           {isExpanded ? theme.description : truncateDescription(theme.description)}
         </p>
 
         {/* Top Buttons Row */}
         <div className="flex flex-row gap-2 mb-4">
-          <motion.button 
+          <motion.button
             className="flex-1 flex items-center justify-center cursor-pointer gap-2 px-3 sm:px-4 md:px-4 py-2 md:py-2 rounded-lg font-medium transition-all"
-            style={{ 
+            style={{
               backgroundColor: 'rgba(38, 38, 42, 0.8)',
               color: ColorTheme.textPrimary
             }}
-            whileHover={{ 
+            whileHover={{
               backgroundColor: 'rgba(48, 48, 52, 0.8)',
               scale: 1.05
             }}
@@ -228,15 +229,15 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             <GripHorizontalIcon className="h-4 w-4" />
             Preview
           </motion.button>
-          
-          <motion.button 
+
+          <motion.button
             className="flex-1 flex items-center justify-center cursor-pointer gap-2 px-3 sm:px-4 md:px-4 py-2 md:py-2 rounded-lg font-medium transition-all"
-            style={{ 
+            style={{
               background: `linear-gradient(to right, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
               color: '#000',
               boxShadow: selectedTheme === theme.id ? `0 4px 14px ${ColorTheme.primaryGlow}` : 'none'
             }}
-            whileHover={{ 
+            whileHover={{
               boxShadow: `0 6px 20px ${ColorTheme.primaryGlow}`,
               scale: 1.05
             }}
@@ -247,7 +248,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             {selectedTheme === theme.id ? 'Selected' : 'Select'}
           </motion.button>
         </div>
-        
+
         {/* Show More Button */}
         <motion.button
           className="w-full flex items-center justify-center cursor-pointer gap-2 text-sm mb-4"
@@ -257,7 +258,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
           whileTap={{ scale: 0.95 }}
         >
           {isExpanded ? 'Show Less' : 'Show More'}
-          <ChevronDown 
+          <ChevronDown
             className={`h-4 w-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
           />
         </motion.button>
@@ -275,10 +276,10 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
               <h4 className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-sm font-semibold mb-2" style={{ color: ColorTheme.textPrimary }}>Features:</h4>
               <div className="flex flex-wrap gap-2">
                 {theme.features.map((feature, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="text-xs px-2 py-1 rounded-full"
-                    style={{ 
+                    style={{
                       backgroundColor: 'rgba(16, 185, 129, 0.1)',
                       border: `1px solid ${ColorTheme.primary}30`,
                       color: ColorTheme.primary

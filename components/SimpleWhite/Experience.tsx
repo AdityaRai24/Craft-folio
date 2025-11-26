@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Grid3X3, RotateCcw, Type, Eye, X } from "lucide-react";
@@ -50,34 +51,31 @@ const AlignmentSelector: React.FC<{
           <div
             key={align}
             onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-              value === align
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div className="text-2xl text-white">{icon}</div>
             <div className="space-y-1 w-full">
               <div
-                className={`h-1 bg-gradient-to-r rounded ${
-                  align === "left"
+                className={`h-1 bg-gradient-to-r rounded ${align === "left"
                     ? "mr-auto w-3/4"
                     : align === "center"
-                    ? "mx-auto w-1/2"
-                    : "ml-auto w-3/4"
-                }`}
+                      ? "mx-auto w-1/2"
+                      : "ml-auto w-3/4"
+                  }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
               ></div>
               <div
-                className={`h-1 bg-gray-400 rounded ${
-                  align === "left"
+                className={`h-1 bg-gray-400 rounded ${align === "left"
                     ? "mr-auto w-full"
                     : align === "center"
-                    ? "mx-auto w-3/4"
-                    : "ml-auto w-full"
-                }`}
+                      ? "mx-auto w-3/4"
+                      : "ml-auto w-full"
+                  }`}
               ></div>
             </div>
             <div className="text-xs text-white">{alignLabel}</div>
@@ -105,16 +103,15 @@ const SizeSelector: React.FC<{
           <div
             key={optionValue}
             onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div className="flex justify-center mb-2">
               <div
                 className="text-white text-center font-bold"
-                style={{ 
+                style={{
                   fontSize: size,
                 }}
               >
@@ -260,7 +257,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
         description: newDescription
       };
       setExperienceData(updatedExperience);
-      
+
       // Save to database
       const result = await updateSection({
         sectionName: "experience",
@@ -269,7 +266,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
         sectionTitle: "Experience",
         sectionDescription: "Experience section"
       });
-      
+
       if (result.success) {
         toast.success("Experience description enhanced and saved successfully!");
       } else {
@@ -325,7 +322,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
       "gray-50": "bg-gray-50",
       "gray-100": "bg-gray-100",
     };
-    
+
     return `min-h-screen flex items-center justify-center ${bgMap[effectiveCustomization.backgroundColor]} text-black relative overflow-hidden py-12 sm:py-16 md:py-20`;
   };
 
@@ -401,7 +398,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
     const cardWidthMap = {
       sm: "max-w-xl",
       md: "max-w-2xl",
-      lg: "max-w-3xl", 
+      lg: "max-w-3xl",
       xl: "max-w-4xl",
       "2xl": "max-w-5xl",
       full: "max-w-full",
@@ -436,10 +433,10 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
 
     // Set initial size
     handleResize();
-    
+
     // Add event listener
     window.addEventListener('resize', handleResize);
-    
+
     // Clean up
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -466,7 +463,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
   useEffect(() => {
     if (experienceData.length > 0) {
       setVisibleItems(Array(experienceData.length).fill(false));
-      
+
       experienceData.forEach((_, index) => {
         setTimeout(() => {
           setVisibleItems(prev => {
@@ -482,13 +479,13 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
   useEffect(() => {
     const subscription = supabase
       .channel(`portfolio-experience-${portfolioId}`)
-      .on('postgres_changes', 
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'Portfolio', 
-          filter: `id=eq.${portfolioId}` 
-        }, 
+      .on('postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'Portfolio',
+          filter: `id=eq.${portfolioId}`
+        },
         (payload) => {
           // console.log('portfolio experience updated!', payload);
         }
@@ -560,15 +557,14 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
       className={getSectionClasses()}
     >
       <style>{customCSS}</style>
-     
-      <div className={`relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 ${
-        effectiveCustomization.maxWidth === "md" ? "max-w-4xl" :
-        effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
-        effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
-        effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
-        effectiveCustomization.maxWidth === "full" ? "max-w-full" :
-        "max-w-7xl"
-      }`}>
+
+      <div className={`relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 ${effectiveCustomization.maxWidth === "md" ? "max-w-4xl" :
+          effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
+            effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
+              effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
+                effectiveCustomization.maxWidth === "full" ? "max-w-full" :
+                  "max-w-7xl"
+        }`}>
         <SectionHeader
           sectionName="experience"
           headerVisible={effectiveCustomization.headerVisible}
@@ -603,40 +599,35 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                 <motion.div
                   key={index}
                   variants={effectiveCustomization.staggerAnimation ? itemVariants : undefined}
-                  className={`${getCardClasses()} ${
-                    visibleItems[index] ? 'opacity-100' : 'opacity-0'
-                  } mx-auto`}
+                  className={`${getCardClasses()} ${visibleItems[index] ? 'opacity-100' : 'opacity-0'
+                    } mx-auto`}
                 >
 
                   <motion.div className="mb-6">
-                    <h3 className={`font-title section-sub-title mb-2 ${
-                      effectiveCustomization.roleSize === "sm" ? "text-lg md:text-xl" :
-                      effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
-                      effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
-                    } ${
-                      effectiveCustomization.roleWeight === "normal" ? "font-normal" :
-                      effectiveCustomization.roleWeight === "medium" ? "font-medium" :
-                      effectiveCustomization.roleWeight === "semibold" ? "font-semibold" : "font-bold"
-                    }`}
-                    style={{ color: textPrimaryColor }}>
+                    <h3 className={`font-title section-sub-title mb-2 ${effectiveCustomization.roleSize === "sm" ? "text-lg md:text-xl" :
+                        effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
+                          effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
+                      } ${effectiveCustomization.roleWeight === "normal" ? "font-normal" :
+                        effectiveCustomization.roleWeight === "medium" ? "font-medium" :
+                          effectiveCustomization.roleWeight === "semibold" ? "font-semibold" : "font-bold"
+                      }`}
+                      style={{ color: textPrimaryColor }}>
                       {exp.role}
                     </h3>
-                    <p className={`font-title section-sub-title mb-3 ${
-                      effectiveCustomization.companyNameSize === "sm" ? "text-base" :
-                      effectiveCustomization.companyNameSize === "md" ? "text-lg" :
-                      effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
-                    } ${
-                      effectiveCustomization.companyNameWeight === "normal" ? "font-normal" :
-                      effectiveCustomization.companyNameWeight === "medium" ? "font-medium" :
-                      effectiveCustomization.companyNameWeight === "semibold" ? "font-semibold" : "font-bold"
-                    }`}
-                    style={{ color: textSecondaryColor }}>
+                    <p className={`font-title section-sub-title mb-3 ${effectiveCustomization.companyNameSize === "sm" ? "text-base" :
+                        effectiveCustomization.companyNameSize === "md" ? "text-lg" :
+                          effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
+                      } ${effectiveCustomization.companyNameWeight === "normal" ? "font-normal" :
+                        effectiveCustomization.companyNameWeight === "medium" ? "font-medium" :
+                          effectiveCustomization.companyNameWeight === "semibold" ? "font-semibold" : "font-bold"
+                      }`}
+                      style={{ color: textSecondaryColor }}>
                       {exp.company}
                     </p>
                     <p className={`font-sans text-sm uppercase tracking-wider font-medium`}
-                    style={{ color: textSecondaryColor }}>
-                      {effectiveCustomization.dateFormat === "year-only" 
-                        ? `${exp.startDate.split(' ')[1]} - ${exp.endDate.split(' ')[1]}` 
+                      style={{ color: textSecondaryColor }}>
+                      {effectiveCustomization.dateFormat === "year-only"
+                        ? `${exp.startDate.split(' ')[1]} - ${exp.endDate.split(' ')[1]}`
                         : `${exp.startDate} - ${exp.endDate}`}
                     </p>
                     {effectiveCustomization.locationVisible && exp.location && (
@@ -650,11 +641,10 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                     >
                       <span className="inline-block w-1.5 h-1.5 rounded-full mt-2.5 mr-3 flex-shrink-0" style={{ backgroundColor: textSecondaryColor }} />
                       <div className="flex-1 relative">
-                        <p className={`font-sans section-sub-description leading-relaxed font-normal ${
-                          effectiveCustomization.descriptionTextSize === "sm" ? "text-sm" :
-                          effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
-                        }`}
-                        style={{ color: textSecondaryColor }}>
+                        <p className={`font-sans section-sub-description leading-relaxed font-normal ${effectiveCustomization.descriptionTextSize === "sm" ? "text-sm" :
+                            effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
+                          }`}
+                          style={{ color: textSecondaryColor }}>
                           {exp.description}
                         </p>
                         <div className="absolute -top-1 -right-1 z-10 hidden md:block">
@@ -677,12 +667,12 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                   {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-6">
                       {exp.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech, techIndex) => (
-                        <span 
+                        <span
                           key={techIndex}
                           className={getTechStackClasses()}
                         >
                           {effectiveCustomization.techStackShowIcons && tech.logo && (
-                            <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1"/>
+                            <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1" />
                           )}
                           {tech.name}
                         </span>
@@ -701,12 +691,12 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
         <div
           ref={dragRef}
           className="fixed bg-zinc-900 shadow-2xl rounded-lg border border-zinc-700 w-96 max-h-[80vh] overflow-hidden"
-                      style={{
-              left: `${windowPosition.x}px`,
-              top: `${windowPosition.y}px`,
-              cursor: isDragging ? "grabbing" : "grab",
-              zIndex: 99999999,
-            }}
+          style={{
+            left: `${windowPosition.x}px`,
+            top: `${windowPosition.y}px`,
+            cursor: isDragging ? "grabbing" : "grab",
+            zIndex: 99999999,
+          }}
         >
           {/* Header */}
           <div
@@ -762,11 +752,10 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                       <div
                         key={value}
                         onClick={() => updateDraftCustomization("maxWidth", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.maxWidth ?? customization.maxWidth) === value
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center gap-2">
                           <div className="w-full block mx-auto">
@@ -887,11 +876,10 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                       <div
                         key={value}
                         onClick={() => updateDraftCustomization("cardHoverEffect", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                          (draftCustomization?.cardHoverEffect ?? customization.cardHoverEffect) === value
+                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.cardHoverEffect ?? customization.cardHoverEffect) === value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                        }`}
+                          }`}
                       >
                         <div className="text-center text-lg text-white mb-1">
                           {icon}

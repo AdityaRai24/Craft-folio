@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import { FileText, PlusCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import {

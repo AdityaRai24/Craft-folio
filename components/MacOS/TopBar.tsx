@@ -1,32 +1,32 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Apple, 
-  Wifi, 
-  Battery, 
-  Search, 
-  Signal, 
-  FileText, 
-  Github, 
-  Linkedin, 
+import {
+  Apple,
+  Wifi,
+  Battery,
+  Search,
+  Signal,
+  FileText,
+  Github,
+  Linkedin,
   Mail,
-  AppWindow,
-  Download,
   Sun,
-  Moon
+  Moon,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useMacOSTheme } from "./ThemeContext";
+import { FaApple } from "react-icons/fa6";
 
 // --- Helper: Date Formatter ---
 const getOrdinalSuffix = (day: number) => {
   if (day > 3 && day < 21) return 'th';
   switch (day % 10) {
-    case 1:  return "st";
-    case 2:  return "nd";
-    case 3:  return "rd";
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
     default: return "th";
   }
 };
@@ -34,7 +34,7 @@ const getOrdinalSuffix = (day: number) => {
 const formatFullDate = (date: Date) => {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
+
   const dayName = days[date.getDay()];
   const monthName = months[date.getMonth()];
   const dayNum = date.getDate();
@@ -64,18 +64,22 @@ const TopBar = ({
   currentPortTheme,
   customCSS,
   portfolioId,
+  onEditWallpaper,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
+  onEditWallpaper?: () => void;
 }) => {
   const [time, setTime] = useState(new Date());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { theme } = useMacOSTheme();
+  const isDark = theme === "dark";
 
   // --- Redux Integration (Preserved) ---
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
-  
+
   const topBarData = portfolioData?.find((item: any) => item.type === "topBar")?.data || {
     showTime: true,
     showControlCenter: true,
@@ -83,7 +87,7 @@ const TopBar = ({
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
-    
+
     // Click outside listener for dropdowns
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -105,6 +109,11 @@ const TopBar = ({
     setActiveMenu(null);
   };
 
+  const handleWallpaperEdit = () => {
+    onEditWallpaper?.();
+    setActiveMenu(null);
+  };
+
   const openLink = (url: string) => {
     window.open(url, "_blank");
     setActiveMenu(null);
@@ -112,17 +121,22 @@ const TopBar = ({
 
   // --- Menu Configuration ---
   const menuConfig: MenuItem[] = [
-    { label: "Portfolio", action: () => {} }, // Main app menu
-    { 
-      label: "File", 
+    { label: "Portfolio", action: () => { } }, // Main app menu
+    {
+      label: "File",
       items: [
         { label: "Resume", icon: FileText, action: handleResume }
       ]
     },
-    { label: "View", action: () => {} },
-    { label: "Window", action: () => {} },
-    { 
-      label: "Contact", 
+    {
+      label: "View",
+      items: onEditWallpaper ? [
+        { label: "Change Wallpaper", icon: ImageIcon, action: handleWallpaperEdit }
+      ] : []
+    },
+    { label: "Window", action: () => { } },
+    {
+      label: "Contact",
       items: [
         { label: "GitHub", icon: Github, action: () => openLink("https://github.com") },
         { label: "LinkedIn", icon: Linkedin, action: () => openLink("https://linkedin.com") },
@@ -132,34 +146,44 @@ const TopBar = ({
   ];
 
   return (
-    <div 
+    <div
       ref={menuRef}
-      className="fixed top-0 left-0 right-0 h-7 w-full bg-black/30 backdrop-blur-md text-white z-50 flex items-center justify-between px-4 border-b border-white/10 select-none"
+      className={`fixed top-0 left-0 right-0 h-7 w-full z-50 flex items-center justify-between px-4 border-b select-none backdrop-blur-md transition-colors duration-300
+        ${isDark
+          ? "bg-black/40 text-white border-white/10"
+          : "bg-white/40 text-black border-black/5"
+        }`}
       style={customCSS ? { style: customCSS } as React.CSSProperties : undefined}
     >
       {/* Left side - Apple logo and menu items */}
       <div className="flex items-center space-x-1 h-full">
-        <div className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors mr-3">
-          <Apple size={14} fill="currentColor" />
+        <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
+          <FaApple size={14} fill="currentColor" />
         </div>
-        
+
         {/* Menu Loop */}
         {menuConfig.map((menu, index) => (
           <div key={index} className="relative h-full flex items-center">
-            <button 
+            <button
               onClick={() => setActiveMenu(activeMenu === menu.label ? null : menu.label)}
               className={`
                 px-2.5 h-[22px] cursor-pointer rounded text-sm transition-colors  flex items-center
                 ${index === 0 ? "font-semibold" : "font-normal opacity-90 hover:opacity-100"}
-                ${activeMenu === menu.label ? "bg-white/20" : "hover:bg-white/10"}
+                ${activeMenu === menu.label
+                  ? (isDark ? "bg-white/20" : "bg-black/10")
+                  : (isDark ? "hover:bg-white/10" : "hover:bg-black/5")}
               `}
             >
               {menu.label}
             </button>
 
             {/* Dropdown (Shadcn-style) */}
-            {activeMenu === menu.label && menu.items && (
-              <div className="absolute top-full left-0 mt-1 w-48 p-1 bg-white/40 !text-black backdrop-blur-xl border border-white/10 rounded-md shadow-lg flex flex-col z-50 animate-in fade-in zoom-in-95 duration-100">
+            {activeMenu === menu.label && menu.items && menu.items.length > 0 && (
+              <div className={`absolute top-full left-0 mt-1 w-48 p-1 backdrop-blur-xl border rounded-md shadow-lg flex flex-col z-50 animate-in fade-in zoom-in-95 duration-100
+                ${isDark
+                  ? "bg-gray-800/90 border-gray-700 text-white"
+                  : "bg-white/90 border-gray-200 text-black"}
+              `}>
                 {menu.items.map((item, idx) => (
                   <button
                     key={idx}
@@ -167,7 +191,11 @@ const TopBar = ({
                       e.stopPropagation();
                       item.action();
                     }}
-                    className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-left text-black/90 cursor-pointer hover:text-white rounded-sm transition-colors"
+                    className={`flex items-center gap-2 w-full px-2 py-1.5 text-sm text-left cursor-pointer rounded-sm transition-colors
+                      ${isDark
+                        ? "hover:bg-blue-600 hover:text-white text-gray-200"
+                        : "hover:bg-blue-500 hover:text-white text-gray-800"}
+                    `}
                   >
                     {item.icon && <item.icon size={14} />}
                     <span>{item.label}</span>
@@ -184,20 +212,20 @@ const TopBar = ({
         <div className="flex items-center space-x-4">
           <ThemeToggle />
           <div className="flex items-center space-x-2 opacity-90">
-            <div className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors">
+            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
               <Search size={14} strokeWidth={2.5} />
             </div>
-            <div className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors">
+            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
               <Signal size={14} strokeWidth={2.5} />
             </div>
-            <div className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors">
+            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
               <Wifi size={14} strokeWidth={2.5} />
             </div>
-            <div className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors">
+            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
               <Battery size={16} />
             </div>
           </div>
-          
+
           {topBarData.showTime !== false && (
             <div className="text-xs font-medium min-w-[130px] text-right cursor-default">
               {formatFullDate(time)}
@@ -211,11 +239,12 @@ const TopBar = ({
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useMacOSTheme();
-  
+  const isDark = theme === "dark";
+
   return (
     <button
       onClick={toggleTheme}
-      className="hover:bg-white/10 p-1 rounded cursor-pointer transition-colors"
+      className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}
       title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
       {theme === "light" ? (

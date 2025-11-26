@@ -1,16 +1,28 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
+import { Edit2 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { shouldShowEditButtons } from "@/components/EditButton";
+import { setCurrentEdit } from "@/slices/editModeSlice";
+import { ColorTheme } from "@/lib/colorThemes";
 
-const TerminalWindow = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
+const TerminalWindow = ({ theme = "light", portfolioId }: { theme?: "light" | "dark"; portfolioId?: string }) => {
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
   const projectsData = portfolioData?.find((item: any) => item.type === "projects")?.data || [];
   const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
   const technologiesData = portfolioData?.find((item: any) => item.type === "technologies")?.data || [];
+  const terminalData = portfolioData?.find((item: any) => item.type === "terminal")?.data || {};
+  const portfolioUserId = useSelector((state: RootState) => state.data.portfolioUserId);
+  const { user, isLoaded } = useUser();
+  const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const currentlyEditing = useSelector((state: RootState) => state.editMode.currentlyEditing);
+  const dispatch = useDispatch();
+  const isEditing = currentlyEditing === "terminal";
 
   const [commandHistory, setCommandHistory] = useState<string[]>([
     "Welcome to Terminal",
@@ -33,9 +45,8 @@ const TerminalWindow = ({ theme = "light" }: { theme?: "light" | "dark" }) => {
   contact       - Contact information
   projects      - List my projects
   experience    - My work experience
-  ls            - List files
-  pwd           - Print working directory
-  whoami        - Show username`,
+
+${terminalData.commands?.map((cmd: any) => `  ${cmd.command.padEnd(12)} - ${cmd.description}`).join("\n") || ""}`,
     clear: () => {
       setCommandHistory([""]);
       return "";
@@ -89,15 +100,14 @@ ${summary}`;
       }
       return "No experience found.";
     },
-    ls: () => `portfolio/
-  projects/
-  experience/
-  contact.md
-  resume.pdf
-  README.md`,
-    pwd: () => `/Users/${heroData.name?.toLowerCase().replace(/\s+/g, "") || "portfolio"}`,
-    whoami: () => heroData.name?.toLowerCase().replace(/\s+/g, "") || "portfolio-user",
   };
+
+  // Add custom commands
+  if (terminalData.commands) {
+    terminalData.commands.forEach((cmd: any) => {
+      commands[cmd.command.toLowerCase()] = () => cmd.output;
+    });
+  }
 
   const executeCommand = (cmd: string) => {
     const trimmedCmd = cmd.trim();
@@ -175,7 +185,22 @@ ${summary}`;
   };
 
   return (
-    <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f5]"} font-mono text-sm`}>
+    <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1e1e1e]" : "bg-[#f5f5f5]"} font-mono text-sm relative`}>
+      {showEdit && !isEditing && (
+        <div className="absolute top-4 right-4 z-10">
+          <button
+            onClick={() => dispatch(setCurrentEdit("terminal"))}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-white`}
+            style={{
+              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+            }}
+            title="Edit Commands"
+          >
+            <Edit2 size={14} />
+            <span>Edit</span>
+          </button>
+        </div>
+      )}
       <div
         ref={terminalRef}
         className="flex-1 overflow-y-auto p-5 space-y-1"

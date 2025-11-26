@@ -1,0 +1,361 @@
+{
+    "sections": [
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "badge": {
+                    "color": "green",
+                    "texts": [
+                        "Open to work",
+                        "Available for freelance",
+                        "Let's Collaborate!"
+                    ],
+                    "isVisible": true
+                },
+                "actions": [
+                    {
+                        "url": "#projects",
+                        "type": "button",
+                        "label": "View Projects",
+                        "style": "primary"
+                    },
+                    {
+                        "url": "#contact",
+                        "type": "button",
+                        "label": "Contact Me",
+                        "style": "outline"
+                    }
+                ],
+                "summary": "Highly motivated and skilled Full-Stack Developer with experience in Python, Java, and JavaScript frameworks like React and Flask, seeking a challenging role to leverage my expertise in building scalable and robust applications.",
+                "titlePrefix": "Full Stack",
+                "titleSuffixOptions": [
+                    "Engineer",
+                    "Developer",
+                    "Software Engineer"
+                ]
+            },
+            "type": "hero"
+        },
+        {
+            "data": [
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                            "name": "Python"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/project",
+                    "projectName": "Gitlytics",
+                    "projectImage": "https://gitlytics.com/assets/images/homepage2.png",
+                    "projectTitle": "Gitlytics",
+                    "projectDescription": "Developed a full-stack web application with Flask serving a REST API and React as the frontend. Implemented GitHub OAuth to get data and visualized GitHub data to show collaboration. Used Celery and Redis for asynchronous tasks."
+                },
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                            "name": "Java"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                            "name": "Git"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/project",
+                    "projectName": "Weather API Project",
+                    "projectImage": "https://nordicapis.com/wp-content/uploads/How-to-Build-an-API-Driven-Weather-App.png",
+                    "projectTitle": "Weather API Project",
+                    "projectDescription": "Developed a React.js application that fetches and displays weather data using a public weather API. Implemented features for searching locations and displaying various weather parameters."
+                }
+            ],
+            "type": "projects",
+            "sectionTitle": "My Projects",
+            "sectionDescription": "Some cool things that i have worked on."
+        },
+        {
+            "data": [
+                {
+                    "role": "Undergraduate Research Assistant",
+                    "endDate": "Present",
+                    "location": "College Station, TX",
+                    "startDate": "06/2020",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "companyName": "Texas A&M University",
+                    "description": "Developed a REST API using FastAPI and PostgreSQL to store data. Developed a full-stack web application using Flask, React, PostgreSQL, and Docker to analyze GitHub data. Explored ways to visualize GitHub collaboration in a classroom setting."
+                },
+                {
+                    "role": "Information Technology Support Specialist",
+                    "endDate": "Present",
+                    "location": "Georgetown, TX",
+                    "startDate": "09/2018",
+                    "techStack": [],
+                    "companyName": "Southwestern University",
+                    "description": "Communicated with managers to set up campus computers. Assessed and troubleshooted computer problems. Maintained upkeep of computers, classroom equipment, and 200 printers."
+                },
+                {
+                    "role": "Artificial Intelligence Research Assistant",
+                    "endDate": "07/2019",
+                    "location": "Georgetown, TX",
+                    "startDate": "05/2019",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                            "name": "Java"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                            "name": "Git"
+                        }
+                    ],
+                    "companyName": "Southwestern University",
+                    "description": "Explored methods to generate video game dungeons. Developed a game in Java to test the generated dungeons. Contributed to an established codebase and conducted a human subject study."
+                }
+            ],
+            "type": "experience",
+            "sectionTitle": "Professional Experience",
+            "sectionDescription": "My journey in the industry"
+        },
+        {
+            "data": [
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                    "name": "Java"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                    "name": "Python"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+                    "name": "C++"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+                    "name": "SQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                    "name": "PostgreSQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "JavaScript"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+                    "name": "HTML"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+                    "name": "CSS"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "R"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                    "name": "React.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                    "name": "Node.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                    "name": "Flask"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                    "name": "Git"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                    "name": "Docker"
+                }
+            ],
+            "type": "technologies",
+            "sectionTitle": "Technical Skills",
+            "sectionDescription": "A comprehensive list of technologies and tools I work with."
+        },
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "email": "jake@su.edu",
+                "title": "Full Stack Engineer",
+                "github": "github.com/jake",
+                "linkedin": "linkedin.com/in/jake",
+                "location": "San Francisco, CA",
+                "resumeLink": ""
+            },
+            "type": "userInfo",
+            "sectionTitle": "Let's Work Together!",
+            "sectionDescription": "Interested in collaborating, hiring, or just having a chat? Reach out to me on your favorite platform!"
+        },
+        {
+            "data": {
+                "neonCyan": {
+                    "colors": {
+                        "text": {
+                            "primary": "#E0FFFF",
+                            "secondary": "#06B6D4"
+                        },
+                        "accent": "#67E8F9",
+                        "states": {
+                            "muted": "rgba(224, 255, 255, 0.6)"
+                        },
+                        "primary": "#22D3EE",
+                        "secondary": "#0F172A",
+                        "background": {
+                            "primary": "#000000",
+                            "secondary": "rgba(255, 255, 255, 0.25)"
+                        },
+                        "primaryHover": "#0891B2"
+                    }
+                },
+                "oceanBlue": {
+                    "colors": {
+                        "text": {
+                            "primary": "#E0F2FE",
+                            "secondary": "#1E3A8A"
+                        },
+                        "accent": "#38BDF8",
+                        "states": {
+                            "muted": "rgba(255, 255, 255, 0.4)"
+                        },
+                        "primary": "#3B82F6",
+                        "secondary": "#FFFFFF",
+                        "background": {
+                            "primary": "#0C0A09",
+                            "secondary": "rgba(255, 255, 255, 0.4)"
+                        },
+                        "primaryHover": "#1D4ED8"
+                    }
+                },
+                "SparklyGreen": {
+                    "colors": {
+                        "text": {
+                            "primary": "#000000",
+                            "secondary": "#FFFFFF"
+                        },
+                        "accent": "#FFFF00",
+                        "states": {
+                            "muted": "rgba(255, 255, 255, 0.7)"
+                        },
+                        "primary": "#22C55E",
+                        "secondary": "#FFFFFF",
+                        "background": {
+                            "primary": "#000000",
+                            "secondary": "rgba(255, 255, 255, 0.5)"
+                        },
+                        "primaryHover": "#077a5a"
+                    }
+                },
+                "flamingoPink": {
+                    "colors": {
+                        "text": {
+                            "primary": "#FFFFFF",
+                            "secondary": "#F472B6"
+                        },
+                        "accent": "#F9A8D4",
+                        "states": {
+                            "muted": "rgba(255, 255, 255, 0.5)"
+                        },
+                        "primary": "#EC4899",
+                        "secondary": "#1F1F1F",
+                        "background": {
+                            "primary": "#000000",
+                            "secondary": "rgba(255, 255, 255, 0.3)"
+                        },
+                        "primaryHover": "#BE185D"
+                    }
+                },
+                "sunsetOrange": {
+                    "colors": {
+                        "text": {
+                            "primary": "#FFF7ED",
+                            "secondary": "#EA580C"
+                        },
+                        "accent": "#FDBA74",
+                        "states": {
+                            "muted": "rgba(255, 247, 237, 0.6)"
+                        },
+                        "primary": "#F97316",
+                        "secondary": "#1C1917",
+                        "background": {
+                            "primary": "#0F0F0F",
+                            "secondary": "rgba(255, 255, 255, 0.2)"
+                        },
+                        "primaryHover": "#C2410C"
+                    }
+                },
+                "sunburstYellow": {
+                    "colors": {
+                        "text": {
+                            "primary": "#000000",
+                            "secondary": "#FFFFFF"
+                        },
+                        "accent": "#FFD700",
+                        "states": {
+                            "muted": "rgba(0, 0, 0, 0.5)"
+                        },
+                        "primary": "#FACC15",
+                        "secondary": "#FFFFFF",
+                        "background": {
+                            "primary": "#000000",
+                            "secondary": "rgba(255, 255, 255, 0.4)"
+                        },
+                        "primaryHover": "#EAB308"
+                    }
+                }
+            },
+            "type": "themes"
+        },
+        {
+            "data": {
+                "title": "Jake Ryan's Portfolio",
+                "favicon": "",
+                "description": "Jake Ryan's Portfolio"
+            },
+            "type": "seo",
+            "sectionTitle": "SEO Settings",
+            "sectionDescription": "SEO settings for your portfolio"
+        }
+    ]
+}

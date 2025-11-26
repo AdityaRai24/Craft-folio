@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useLumenFlowTheme } from "./ThemeContext";
@@ -51,56 +52,53 @@ const Navbar = ({
   return (
     <>
       <nav
-        className={`flex items-center justify-between border backdrop-blur-md rounded-2xl shadow-xl px-4 sm:px-6 lg:px-8 py-2 md:py-4 mx-auto w-full transition-colors duration-300 ${
-          theme === "light" 
-            ? "bg-white/80 border-gray-200" 
+        className={`flex items-center justify-between border backdrop-blur-md rounded-2xl shadow-xl px-4 sm:px-6 lg:px-8 py-2 md:py-4 mx-auto w-full transition-colors duration-300 ${theme === "light"
+            ? "bg-white/80 border-gray-200"
             : themeClasses.bgSecondary
-        }`}
-        style={{ 
-          background: theme === "light" 
-            ? "linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95))" 
-            : themeClasses.gradientHover 
+          }`}
+        style={{
+          background: theme === "light"
+            ? "linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95))"
+            : themeClasses.gradientHover
         }}
       >
         {/* Logo */}
         <div className="flex items-center">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
-            {/* <div className="w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-md"></div> */} 
+            {/* <div className="w-4 h-4 sm:w-5 sm:h-5 bg-white rounded-md"></div> */}
             {name
               ? name
-                  .split(' ')
-                  .map((n: string) => n[0])
-                  .slice(0, 2)
-                  .join('')
-                  .toUpperCase()
+                .split(' ')
+                .map((n: string) => n[0])
+                .slice(0, 2)
+                .join('')
+                .toUpperCase()
               : ''}
           </div>
         </div>
 
         {/* Desktop Navigation Links */}
         <div className="hidden lg:flex items-center space-x-8">
-          {tabs.map((tab : any) => (
+          {tabs.map((tab: any) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`text-base cursor-pointer font-medium transition-all duration-300 relative ${
-                activeTab === tab.id
-                  ? theme === "light" 
-                    ? "text-orange-600" 
+              className={`text-base cursor-pointer font-medium transition-all duration-300 relative ${activeTab === tab.id
+                  ? theme === "light"
+                    ? "text-orange-600"
                     : themeClasses.accent
                   : theme === "light"
                     ? "text-gray-700 hover:text-orange-600"
                     : themeClasses.textSecondary
-              }`}
+                }`}
             >
               {tab.label}
               {activeTab === tab.id && (
                 <div
-                  className={`absolute -bottom-1 left-0 right-0 h-0.5 ${
-                    theme === "light"
+                  className={`absolute -bottom-1 left-0 right-0 h-0.5 ${theme === "light"
                       ? "bg-gradient-to-r from-orange-500 to-orange-600"
                       : themeClasses.gradientPrimary
-                  } rounded-full`}
+                    } rounded-full`}
                 />
               )}
             </button>
@@ -112,11 +110,10 @@ const Navbar = ({
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className={`p-2 rounded-full transition-colors duration-300 ${
-              theme === "dark"
+            className={`p-2 rounded-full transition-colors duration-300 ${theme === "dark"
                 ? "text-gray-300 hover:text-white hover:bg-gray-800"
                 : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
-            }`}
+              }`}
           >
             {theme === "dark" ? (
               <Sun size={18} className="sm:w-5 sm:h-5" />
@@ -128,11 +125,10 @@ const Navbar = ({
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMobileMenu}
-            className={`lg:hidden p-2 rounded-full transition-colors duration-300 ${
-              theme === "dark"
+            className={`lg:hidden p-2 rounded-full transition-colors duration-300 ${theme === "dark"
                 ? "text-gray-300 hover:text-white hover:bg-gray-800"
                 : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
-            }`}
+              }`}
           >
             {isMobileMenuOpen ? (
               <X size={18} className="sm:w-5 sm:h-5" />
@@ -146,31 +142,29 @@ const Navbar = ({
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div
-          className={`lg:hidden mt-2 border backdrop-blur-md rounded-2xl shadow-xl mx-auto w-full transition-colors duration-300 ${
-            theme === "light"
+          className={`lg:hidden mt-2 border backdrop-blur-md rounded-2xl shadow-xl mx-auto w-full transition-colors duration-300 ${theme === "light"
               ? "bg-white/80 border-gray-200"
               : themeClasses.bgSecondary
-          }`}
-          style={{ 
-            background: theme === "light" 
-              ? "linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95))" 
-              : themeClasses.gradientHover 
+            }`}
+          style={{
+            background: theme === "light"
+              ? "linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95))"
+              : themeClasses.gradientHover
           }}
         >
           <div className="px-4 py-2 space-y-2">
-            {tabs.map((tab : any) => (
+            {tabs.map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`block w-full text-left px-4 py-3 text-base font-medium transition-all duration-300 rounded-lg ${
-                  activeTab === tab.id
+                className={`block w-full text-left px-4 py-3 text-base font-medium transition-all duration-300 rounded-lg ${activeTab === tab.id
                     ? theme === "light"
                       ? "text-orange-600 bg-orange-50"
                       : themeClasses.accent
                     : theme === "light"
                       ? "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
                       : themeClasses.textSecondary
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>

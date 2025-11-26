@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -69,7 +70,7 @@ const ContactSidebar = () => {
   const [originalContent, setOriginalContent] = useState({});
   const [isUploaded, setIsUploaded] = useState(false);
   const [isProfileImageUploaded, setIsProfileImageUploaded] = useState(false);
-  console.log(content,contactData)
+  console.log(content, contactData)
 
   useEffect(() => {
     if (contactData && Object.keys(contactData).length > 0) {
@@ -106,7 +107,7 @@ const ContactSidebar = () => {
   useEffect(() => {
     setHasHeaderChanges(
       sectionTitle !== (contactSectionData?.sectionTitle || "") ||
-        sectionDescription !== (contactSectionData?.sectionDescription || "")
+      sectionDescription !== (contactSectionData?.sectionDescription || "")
     );
   }, [sectionTitle, sectionDescription, contactSectionData]);
 
@@ -256,8 +257,8 @@ const ContactSidebar = () => {
     }
   };
 
-  const handleProfileImageUpload = async(event: React.ChangeEvent<HTMLInputElement>) => {
-    if(!event.target.files) return
+  const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return
     const formData = new FormData();
     formData.append("file", event.target.files[0]);
     formData.append(
@@ -267,7 +268,7 @@ const ContactSidebar = () => {
 
     try {
       toast.loading("Uploading image...", { id: "profileImageUpload" });
-      
+
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
@@ -282,7 +283,7 @@ const ContactSidebar = () => {
       }
 
       const data = await response.json();
-      setContent({...content, profileImage: data.secure_url});
+      setContent({ ...content, profileImage: data.secure_url });
       setIsProfileImageUploaded(true);
       toast.success("Image uploaded successfully!", { id: "profileImageUpload" });
     } catch (error) {
@@ -292,7 +293,7 @@ const ContactSidebar = () => {
   }
 
   const removeProfileImage = () => {
-    setContent({...content, profileImage: ""});
+    setContent({ ...content, profileImage: "" });
     setIsProfileImageUploaded(false);
   }
 

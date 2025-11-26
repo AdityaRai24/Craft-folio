@@ -55,7 +55,7 @@ const ProjectsGrid = ({
   useEffect(() => {
     if (portfolioData) {
       const data = portfolioData.find((item: any) => item.type === "projects")?.data || [];
-      setProjectsData(data);
+      setProjectsData(data.projects);
     }
   }, [portfolioData]);
 
@@ -157,6 +157,8 @@ const ProjectsGrid = ({
     setProjectsData: setProjectsData,
   });
 
+  console.log(projectsData)
+
 
 
   const {
@@ -235,7 +237,7 @@ const ProjectsGrid = ({
               <div
                 className={`${getCardClasses()} ${isDark
                   ? "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl"
-                  : "bg-white border-gray-200 hover:border-gray-300 shadow-md hover:shadow-xl"
+                  : "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg"
                   } transition-all duration-300`}
                 style={{
                   ...getCardStyle(),
@@ -246,7 +248,7 @@ const ProjectsGrid = ({
                 <div
                   className={`relative overflow-hidden ${isDark
                     ? "bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900"
-                    : "bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200"
+                    : "bg-gray-100 border-b border-gray-100"
                     }`}
                   style={getImageStyle()}
                 >
@@ -275,7 +277,7 @@ const ProjectsGrid = ({
                   {/* Project Title */}
                   <div className={getTitleAlignment()}>
                     <h3
-                      className={`${getTitleClasses()} ${isDark ? "text-white" : "text-[#1d1d1f]"
+                      className={`${getTitleClasses()} ${isDark ? "text-white" : "text-gray-900"
                         } font-semibold tracking-tight`}
                     >
                       {project.projectTitle || project.projectName || `Project ${index + 1}`}
@@ -285,7 +287,7 @@ const ProjectsGrid = ({
                   {/* Project Description */}
                   <div className="relative group/desc mt-2">
                     <p
-                      className={`${getDescriptionClasses()} ${isDark ? "text-gray-400" : "text-[#6e6e73]"
+                      className={`${getDescriptionClasses()} ${isDark ? "text-gray-400" : "text-gray-600"
                         } leading-relaxed`}
                     >
                       {project.projectDescription || "No description available"}

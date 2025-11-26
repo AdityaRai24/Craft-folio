@@ -3,6 +3,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { techList } from "@/lib/techlist";
 import { themeContent } from "@/lib/themeContent";
 import { prompts } from "@/lib/prompts";
+import { templateConfig } from "@/lib/templateConfig";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({
@@ -185,6 +186,50 @@ Return ONLY valid JSON in this format without any explanations:
 }}
 `);
 
+const categorizationTemplate = PromptTemplate.fromTemplate(`
+Based on the list of skills below, categorize them into "Frontend", "Backend", and "DevOps & Tools".
+Return a JSON object with a "categories" array.
+
+Skills:
+{skills}
+
+Return ONLY valid JSON in this format:
+{{
+  "categories": [
+    {{
+      "category": string, // "Frontend", "Backend", or "DevOps & Tools"
+      "technologies": [
+        {{
+          "name": string,
+          "proficiency": number // Estimate proficiency 0-100 based on context or default to 80
+        }}
+      ]
+    }}
+  ]
+}}
+`);
+
+const safariContentTemplate = PromptTemplate.fromTemplate(`
+Generate rich HTML content for a personal portfolio "About Me" page based on the resume data.
+The content should be styled with Tailwind CSS classes.
+Include:
+1. A welcoming header.
+2. A grid of 3 cards highlighting key strengths/features (use emojis).
+3. A section describing the person's background.
+4. A "Key Skills" or "Features" section.
+
+Use the following style for cards: "p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20".
+Use standard Tailwind colors and spacing.
+
+Resume Data:
+{resume_data}
+
+Return ONLY valid JSON in this format:
+{{
+  "content": string // The HTML string
+}}
+`);
+
 let finalTheme = "";
 
 export async function POST(req: Request) {
@@ -218,6 +263,7 @@ export async function POST(req: Request) {
 
     const parsedText = parsingResponse.response.text();
 
+
     // Clean and validate JSON
     let resumeData;
     try {
@@ -239,11 +285,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const themePrompts = prompts[finalTheme];
+    const config = templateConfig[finalTheme] || templateConfig["NeoSpark"]; // Fallback
+    const themePrompts = config.features;
+
     let titleInfo;
     let summaryInfo;
     let shortSummaryInfo;
     let longSummaryInfo;
+    let categorizedSkills;
+    let safariContent;
 
     // Helper function to safely parse AI responses
     async function safeAIGeneration(
@@ -264,7 +314,7 @@ export async function POST(req: Request) {
         });
 
         const responseText = response.response.text();
-        
+
         if (!responseText || responseText.trim() === "") {
           console.warn("Empty response from model");
           return null;
@@ -286,7 +336,7 @@ export async function POST(req: Request) {
         0.7,
         500
       );
-      
+
       // Provide fallback if generation failed
       if (!titleInfo) {
         titleInfo = {
@@ -301,7 +351,7 @@ export async function POST(req: Request) {
         0.7,
         300
       );
-      
+
       if (!titleInfo) {
         titleInfo = {
           title: resumeData.experience?.[0]?.role || "Software Developer"
@@ -310,14 +360,14 @@ export async function POST(req: Request) {
     }
 
     // Generate summary lines
-    if (themePrompts?.summaryPrompt) {
+    if (themePrompts?.summary) {
       summaryInfo = await safeAIGeneration(
         summaryGeneratorTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
         500
       );
-      
+
       if (!summaryInfo) {
         summaryInfo = {
           summaryLines: [
@@ -330,14 +380,14 @@ export async function POST(req: Request) {
     }
 
     // Generate short summary
-    if (themePrompts?.shortSummaryPrompt) {
+    if (themePrompts?.shortSummary) {
       shortSummaryInfo = await safeAIGeneration(
         shortSummaryTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
         300
       );
-      
+
       if (!shortSummaryInfo) {
         shortSummaryInfo = {
           shortSummary: "Building exceptional digital experiences with modern technology."
@@ -346,14 +396,14 @@ export async function POST(req: Request) {
     }
 
     // Generate long summary
-    if (themePrompts?.longSummaryPrompt) {
+    if (themePrompts?.longSummary || config.features.safari) { // Safari needs long summary context usually
       longSummaryInfo = await safeAIGeneration(
         longSummaryTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
         800
       );
-      
+
       if (!longSummaryInfo) {
         const skills = resumeData.skills?.slice(0, 3).map((s: any) => s.name).join(", ") || "various technologies";
         longSummaryInfo = {
@@ -372,7 +422,9 @@ export async function POST(req: Request) {
       summaryInfo,
       shortSummaryInfo,
       longSummaryInfo,
-      themePrompts
+      config,
+      categorizedSkills,
+      safariContent
     );
 
     console.log("Generated data:", { titleInfo, summaryInfo, shortSummaryInfo, longSummaryInfo });
@@ -416,14 +468,14 @@ function cleanJsonOutput(text: string): string {
 
   // Remove markdown code blocks
   let cleaned = text.replace(/```json\n?|\n?```|```\n?/g, "");
-  
+
   // Remove any leading/trailing whitespace
   cleaned = cleaned.trim();
-  
+
   // Try to find JSON object or array
   const jsonObjectPattern = /\{[\s\S]*\}/;
   const jsonArrayPattern = /\[[\s\S]*\]/;
-  
+
   let matches = cleaned.match(jsonObjectPattern);
   if (!matches) {
     matches = cleaned.match(jsonArrayPattern);
@@ -559,9 +611,12 @@ function convertToPortfolioFormat(
   summaryInfo: any,
   shortSummaryInfo: any,
   longSummaryInfo: any,
-  themePrompts: any
+  config: any,
+  categorizedSkills: any,
+  safariContent: any
 ) {
   const sections = [];
+  const themePrompts = config.features;
 
   sections.push({
     type: "theme",
@@ -579,9 +634,9 @@ function convertToPortfolioFormat(
       name: resumeData.personalInfo.name || "Alex Morgan",
     };
 
-    // Add profile image only for LumenFlow template
-    if (finalTheme === "LumenFlow") {
-      userInfoData.profileImage = "https://placehold.co/400x400?text=Profile+Image";
+    // Add profile image only if enabled
+    if (themePrompts.profileImage) {
+      userInfoData.profileImage = config.defaults.userInfo?.profileImage || "https://placehold.co/400x400?text=Profile+Image";
     }
 
     // Add title/role to userInfo
@@ -599,10 +654,10 @@ function convertToPortfolioFormat(
       data: userInfoData,
     });
   }
-  
+
   // Hero Section - Always include, with fallbacks for all required fields
   const name = resumeData.personalInfo?.name || "Developer";
-  
+
   // Use generated summary lines or fall back to alternatives
   let summaryLines;
   if (summaryInfo && summaryInfo.summaryLines && summaryInfo.summaryLines.length > 0) {
@@ -617,11 +672,12 @@ function convertToPortfolioFormat(
     const primarySkill = skillNames[0] || "Software";
     summaryLines = `Passionate ${primarySkill} developer.\nEnthusiastic about creating innovative solutions.\nDedicated to continuous learning and growth.`;
   }
-  
+
   // Use generated title info or fallback based on template type
   let heroData: any = {
     name: name,
     summary: summaryLines,
+    ...config.defaults.hero // Merge defaults like wallpaper
   };
 
   // Add title based on template configuration
@@ -633,7 +689,7 @@ function convertToPortfolioFormat(
   }
 
   // Add short summary if template needs it
-  if (themePrompts?.shortSummaryPrompt) {
+  if (themePrompts?.shortSummary) {
     let shortSummary =
       "I build exceptional and accessible digital experiences for the web."; // Default fallback
     if (shortSummaryInfo && shortSummaryInfo.shortSummary) {
@@ -648,7 +704,7 @@ function convertToPortfolioFormat(
   }
 
   // Add long summary if template needs it
-  if (themePrompts?.longSummaryPrompt) {
+  if (themePrompts?.longSummary) {
     let longSummary =
       "I'm a passionate Full Stack Developer with 4+ years of experience building modern web applications. I specialize in React, Node.js, and cloud technologies, with a strong focus on creating intuitive user experiences and scalable backend systems. My journey in tech started during my Computer Science studies, and I've been continuously learning and adapting to new technologies ever since. When I'm not coding, you'll find me contributing to open-source projects, writing technical blogs, or exploring the latest in AI and machine learning. I believe in the power of technology to solve real-world problems and am always excited to take on new challenges that push the boundaries of what's possible on the web.";
     if (longSummaryInfo && longSummaryInfo.longSummary) {
@@ -659,7 +715,7 @@ function convertToPortfolioFormat(
 
   // Add badge only if template has badge enabled
   if (themePrompts?.badge) {
-    heroData.badge = {
+    heroData.badge = config.defaults.hero?.badge || {
       texts: [
         "Open to work",
         "Available for freelance",
@@ -672,7 +728,7 @@ function convertToPortfolioFormat(
 
   // Add actions only if template has actions enabled
   if (themePrompts?.actions) {
-    heroData.actions = [
+    heroData.actions = config.defaults.hero?.actions || [
       {
         type: "button",
         label: "View Projects",
@@ -687,7 +743,7 @@ function convertToPortfolioFormat(
       },
     ];
   }
-  
+
   // Always include hero section with robust fallbacks
   sections.push({
     type: "hero",
@@ -733,7 +789,26 @@ function convertToPortfolioFormat(
   }
 
   // Technologies Section
-  if (resumeData.skills && resumeData.skills.length > 0) {
+  if (config.structure.technologies === "categorized" && categorizedSkills?.categories) {
+    // Map logos to categorized skills
+    const categories = categorizedSkills.categories.map((cat: any) => ({
+      ...cat,
+      technologies: cat.technologies.map((tech: any) => {
+        const matched = techList.find((t: any) => t.name.toLowerCase() === tech.name.toLowerCase()) ||
+          techList.find((t: any) => t.name.toLowerCase().includes(tech.name.toLowerCase()));
+        return {
+          name: tech.name,
+          proficiency: tech.proficiency || 85,
+          icon: matched?.logo || "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" // Fallback icon
+        };
+      })
+    }));
+
+    sections.push({
+      type: "technologies",
+      data: { categories }
+    });
+  } else if (resumeData.skills && resumeData.skills.length > 0) {
     const techStack = resumeData.skills;
 
     sections.push({
@@ -747,6 +822,16 @@ function convertToPortfolioFormat(
     sections.push({
       type: "education",
       data: resumeData.education,
+    });
+  }
+
+  // Safari Section (MacOS specific)
+  if (themePrompts.safari && safariContent?.content) {
+    sections.push({
+      type: "safari",
+      data: {
+        content: safariContent.content
+      }
     });
   }
 

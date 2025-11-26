@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,7 @@ const GuestWarningModal: React.FC<GuestWarningModalProps> = ({ open, onClose }) 
         </div>
 
         <DialogFooter className="gap-2 mt-4 flex-col sm:flex-row sm:justify-end">
-          <SignInButton 
+          <SignInButton
             mode="modal"
             fallbackRedirectUrl={pathname}
             signUpFallbackRedirectUrl={pathname}

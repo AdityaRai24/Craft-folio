@@ -1,5 +1,5 @@
+"use client"
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
@@ -7,18 +7,12 @@ import { supabase } from "@/lib/supabase-client";
 import {
   GraduationCap,
   MapPin,
-  Calendar, ArrowUpRight, Settings,
-  Palette, Grid3X3,
+  Calendar, ArrowUpRight, Palette, Grid3X3,
   RotateCcw,
   X,
   AlignLeft,
   AlignCenter,
-  AlignRight,
-  LayoutGrid,
-  LayoutList,
-  Sparkles,
-  Zap,
-  Clock
+  AlignRight, Zap
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
@@ -185,7 +179,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
       const data = await response.json();
       const enhancedDescription = data.response || data.content || data.result;
-      
+
       return enhancedDescription;
     } catch (error) {
       console.error('Magic Write API error:', error);
@@ -201,23 +195,23 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
     };
     setEducationData(updatedEducation);
     toast.success("Education description enhanced successfully!");
-          try {
-        const result = await updateSection({
-          sectionName: "education",
-          portfolioId,
-          sectionContent: updatedEducation,
-          sectionTitle: "Education",
-          sectionDescription: "Education section"
-        });
-        if (result.success) {
-          toast.success("Education description enhanced and saved successfully!");
-        } else {
-          toast.error("Failed to save changes to database");
-        }
-      } catch (error) {
-        console.error("Error saving education description:", error);
+    try {
+      const result = await updateSection({
+        sectionName: "education",
+        portfolioId,
+        sectionContent: updatedEducation,
+        sectionTitle: "Education",
+        sectionDescription: "Education section"
+      });
+      if (result.success) {
+        toast.success("Education description enhanced and saved successfully!");
+      } else {
         toast.error("Failed to save changes to database");
       }
+    } catch (error) {
+      console.error("Error saving education description:", error);
+      toast.error("Failed to save changes to database");
+    }
   };
 
   const themeClasses = getThemeClasses(currentTheme);
@@ -415,11 +409,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
             <div
               key={style}
               onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                value === style
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === style
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                }`}
             >
               <div className="text-sm font-medium text-white text-center">
                 {label}
@@ -460,11 +453,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
-                value === style.value
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                }`}
             >
               <div className="space-y-2">
                 <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
@@ -500,11 +492,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
             <div
               key={align}
               onClick={() => onChange(align as any)}
-              className={`cursor-pointer flex-1 p-4 rounded-lg border-2 transition-all duration-200 ${
-                value === align
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+              className={`cursor-pointer flex-1 p-4 rounded-lg border-2 transition-all duration-200 ${value === align
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                }`}
             >
               <Icon className="h-6 w-6 mx-auto text-white" />
               <div className="text-center text-xs text-white mt-2 capitalize">
@@ -632,11 +623,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
             <div
               key={size}
               onClick={() => onChange(size as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                value === size
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === size
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                }`}
             >
               <div className={`${sizeClass} font-bold text-white text-center`}>
                 Aa
@@ -670,11 +660,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
             <div
               key={weight}
               onClick={() => onChange(weight as any)}
-              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                value === weight
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === weight
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                }`}
             >
               <div className={`text-xl ${weightClass} text-white text-center`}>
                 Aa
@@ -689,7 +678,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
   if (isLoading) {
     return (
-              <div className="space-y-4 md:space-y-6 lg:space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div className="space-y-4 md:space-y-6 lg:space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex items-center justify-center h-64">
           <div className="relative">
             <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
@@ -741,51 +730,46 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
             {/* Main Card */}
             <div
-              className={`relative transition-all duration-${
-                effectiveCustomization.animationSpeed / 100
-              } transform group-hover:translate-y-[-4px] h-full flex flex-col ${
-                effectiveCustomization.cardStyle === "default"
+              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100
+                } transform group-hover:translate-y-[-4px] h-full flex flex-col ${effectiveCustomization.cardStyle === "default"
                   ? theme === "light"
                     ? "bg-white border border-gray-200 shadow-sm"
                     : "bg-zinc-800 border border-zinc-700"
                   : effectiveCustomization.cardStyle === "minimal"
-                  ? "bg-transparent border-0"
-                  : effectiveCustomization.cardStyle === "glassmorphism"
-                  ? theme === "light"
-                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
-                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
-                  : effectiveCustomization.cardStyle === "neon"
-                  ? theme === "light"
-                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
-                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
-                  : effectiveCustomization.cardStyle === "gradient"
-                  ? theme === "light"
-                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
-                    : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
-                  : theme === "light"
-                    ? "bg-white border border-gray-200 shadow-sm"
-                    : "bg-zinc-800 border border-zinc-700"
-              }`}
+                    ? "bg-transparent border-0"
+                    : effectiveCustomization.cardStyle === "glassmorphism"
+                      ? theme === "light"
+                        ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                        : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                      : effectiveCustomization.cardStyle === "neon"
+                        ? theme === "light"
+                          ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                          : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                        : effectiveCustomization.cardStyle === "gradient"
+                          ? theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                            : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                          : theme === "light"
+                            ? "bg-white border border-gray-200 shadow-sm"
+                            : "bg-zinc-800 border border-zinc-700"
+                }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
                 borderWidth: effectiveCustomization.cardStyle === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
                 transform:
                   effectiveCustomization.hoverEffects &&
-                  hoveredEducation === index
+                    hoveredEducation === index
                     ? "translateY(-4px) scale(1.02)"
                     : "none",
                 filter: effectiveCustomization.glowEffect
                   ? `drop-shadow(0 0 20px ${titleColor}30)`
                   : "none",
                 ...(effectiveCustomization.cardShadow && {
-                  boxShadow: `0 ${
-                    effectiveCustomization.shadowIntensity * 4
-                  }px ${
-                    effectiveCustomization.shadowIntensity * 8
-                  }px rgba(0,0,0,0.1), 0 0 ${
-                    effectiveCustomization.shadowIntensity * 20
-                  }px ${titleColor}20`,
+                  boxShadow: `0 ${effectiveCustomization.shadowIntensity * 4
+                    }px ${effectiveCustomization.shadowIntensity * 8
+                    }px rgba(0,0,0,0.1), 0 0 ${effectiveCustomization.shadowIntensity * 20
+                    }px ${titleColor}20`,
                 }),
               }}
             >
@@ -804,33 +788,29 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                       }}
                     ></div>
                     <h3
-                      className={`transition-colors duration-300 ${
-                        theme === "light"
-                          ? "text-gray-900"
-                          : themeClasses.textPrimary
-                      } ${
-                        effectiveCustomization.textAlignment === "center"
+                      className={`transition-colors duration-300 ${theme === "light"
+                        ? "text-gray-900"
+                        : themeClasses.textPrimary
+                        } ${effectiveCustomization.textAlignment === "center"
                           ? "text-center"
                           : effectiveCustomization.textAlignment === "right"
-                          ? "text-right"
-                          : "text-left"
-                      } ${
-                        effectiveCustomization.titleSize === "sm"
+                            ? "text-right"
+                            : "text-left"
+                        } ${effectiveCustomization.titleSize === "sm"
                           ? "text-lg"
                           : effectiveCustomization.titleSize === "md"
-                          ? "text-xl"
-                          : effectiveCustomization.titleSize === "lg"
-                          ? "text-2xl"
-                          : "text-3xl"
-                      } ${
-                        effectiveCustomization.titleWeight === "normal"
+                            ? "text-xl"
+                            : effectiveCustomization.titleSize === "lg"
+                              ? "text-2xl"
+                              : "text-3xl"
+                        } ${effectiveCustomization.titleWeight === "normal"
                           ? "font-normal"
                           : effectiveCustomization.titleWeight === "medium"
-                          ? "font-medium"
-                          : effectiveCustomization.titleWeight === "semibold"
-                          ? "font-semibold"
-                          : "font-bold"
-                      }`}
+                            ? "font-medium"
+                            : effectiveCustomization.titleWeight === "semibold"
+                              ? "font-semibold"
+                              : "font-bold"
+                        }`}
                     >
                       {edu.degree}
                     </h3>
@@ -841,11 +821,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                 {effectiveCustomization.showDescription && edu.description && (
                   <div className="space-y-2 relative">
                     <p
-                      className={`text-sm leading-relaxed ${
-                        theme === "light"
-                          ? "text-gray-600"
-                          : themeClasses.textSecondary
-                      }`}
+                      className={`text-sm leading-relaxed ${theme === "light"
+                        ? "text-gray-600"
+                        : themeClasses.textSecondary
+                        }`}
                     >
                       {edu.description}
                     </p>
@@ -868,22 +847,20 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
                 {/* Bottom Section */}
                 <div
-                  className={`flex items-center justify-between pt-4 mt-auto border-t ${
-                    theme === "light"
-                      ? "border-gray-200/50"
-                      : "border-gray-700/50"
-                  }`}
+                  className={`flex items-center justify-between pt-4 mt-auto border-t ${theme === "light"
+                    ? "border-gray-200/50"
+                    : "border-gray-700/50"
+                    }`}
                 >
                   <div className="flex items-center space-x-3">
                     {effectiveCustomization.showInstitution && (
                       <div className="flex items-center space-x-1">
                         <MapPin size={14} className="text-orange-400" />
                         <span
-                          className={`text-sm ${
-                            theme === "light"
-                              ? "text-gray-600"
-                              : themeClasses.textSecondary
-                          }`}
+                          className={`text-sm ${theme === "light"
+                            ? "text-gray-600"
+                            : themeClasses.textSecondary
+                            }`}
                         >
                           {edu.institution}
                         </span>
@@ -893,11 +870,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                       <div className="flex items-center space-x-1">
                         <Calendar size={14} className="text-orange-400" />
                         <span
-                          className={`text-sm ${
-                            theme === "light"
-                              ? "text-gray-600"
-                              : themeClasses.textSecondary
-                          }`}
+                          className={`text-sm ${theme === "light"
+                            ? "text-gray-600"
+                            : themeClasses.textSecondary
+                            }`}
                         >
                           {edu.startDate} - {edu.endDate}
                         </span>
@@ -908,11 +884,10 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                   {/* View More Arrow */}
                   {effectiveCustomization.showArrow && (
                     <div
-                      className={`transition-all duration-300 ${
-                        hoveredEducation === index
-                          ? "opacity-100 translate-x-0"
-                          : "opacity-0 translate-x-2"
-                      }`}
+                      className={`transition-all duration-300 ${hoveredEducation === index
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 translate-x-2"
+                        }`}
                     >
                       <ArrowUpRight size={18} className="text-orange-400" />
                     </div>
@@ -952,9 +927,8 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
         <div className="text-center py-16">
           <div className="space-y-4">
             <div
-              className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto ${
-                theme === "light" ? "bg-gray-50" : themeClasses.bgSecondary
-              }`}
+              className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto ${theme === "light" ? "bg-gray-50" : themeClasses.bgSecondary
+                }`}
             >
               <GraduationCap
                 size={32}
@@ -966,16 +940,14 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
               />
             </div>
             <h3
-              className={`text-xl font-semibold ${
-                theme === "light" ? "text-gray-600" : themeClasses.textSecondary
-              }`}
+              className={`text-xl font-semibold ${theme === "light" ? "text-gray-600" : themeClasses.textSecondary
+                }`}
             >
               No education yet
             </h3>
             <p
-              className={`max-w-md mx-auto ${
-                theme === "light" ? "text-gray-500" : themeClasses.textSecondary
-              }`}
+              className={`max-w-md mx-auto ${theme === "light" ? "text-gray-500" : themeClasses.textSecondary
+                }`}
             >
               Start adding your educational background to showcase your academic
               journey and qualifications.
@@ -1015,16 +987,15 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
-                  activeTab === tab
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                }`}
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                  }`}
                 style={
                   activeTab === tab
                     ? {
-                        background: `linear-gradient(135deg, #10b981, #059669)`,
-                      }
+                      background: `linear-gradient(135deg, #10b981, #059669)`,
+                    }
                     : {}
                 }
               >
@@ -1154,21 +1125,21 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
                 {(draftCustomization?.cardShadow ??
                   customization.cardShadow) && (
-                  <CustomSlider
-                    value={
-                      draftCustomization?.shadowIntensity ??
-                      customization.shadowIntensity
-                    }
-                    onChange={(value) =>
-                      updateDraftCustomization("shadowIntensity", value)
-                    }
-                    label="Shadow Intensity"
-                    min={1}
-                    max={5}
-                    step={1}
-                    unit=""
-                  />
-                )}
+                    <CustomSlider
+                      value={
+                        draftCustomization?.shadowIntensity ??
+                        customization.shadowIntensity
+                      }
+                      onChange={(value) =>
+                        updateDraftCustomization("shadowIntensity", value)
+                      }
+                      label="Shadow Intensity"
+                      min={1}
+                      max={5}
+                      step={1}
+                      unit=""
+                    />
+                  )}
               </>
             )}
 
@@ -1241,21 +1212,21 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
                 {(draftCustomization?.backgroundBlur ??
                   customization.backgroundBlur) && (
-                  <CustomSlider
-                    value={
-                      draftCustomization?.blurIntensity ??
-                      customization.blurIntensity
-                    }
-                    onChange={(value) =>
-                      updateDraftCustomization("blurIntensity", value)
-                    }
-                    label="Blur Intensity"
-                    min={5}
-                    max={20}
-                    step={1}
-                    unit="px"
-                  />
-                )}
+                    <CustomSlider
+                      value={
+                        draftCustomization?.blurIntensity ??
+                        customization.blurIntensity
+                      }
+                      onChange={(value) =>
+                        updateDraftCustomization("blurIntensity", value)
+                      }
+                      label="Blur Intensity"
+                      min={5}
+                      max={20}
+                      step={1}
+                      unit="px"
+                    />
+                  )}
               </>
             )}
           </div>

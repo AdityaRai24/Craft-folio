@@ -1,3 +1,4 @@
+"use client";
 import { RootState } from '@/store/store'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -19,7 +20,7 @@ const ProjectSidebar = () => {
     name: string;
     logo: string;
   }
-  
+
   interface Project {
     projectTitle?: string;
     projectName?: string;
@@ -30,7 +31,7 @@ const ProjectSidebar = () => {
     liveLink?: string;
     year?: string;
   }
-  
+
   const emptyProject: Project = {
     projectName: "",
     projectTitle: "",
@@ -45,7 +46,7 @@ const ProjectSidebar = () => {
   const { portfolioData } = useSelector((state: RootState) => state.data)
   const projectsData = portfolioData?.find((item: any) => item.type === "projects")?.data || [];
   const projectsSection = portfolioData?.find((item: any) => item.type === "projects");
-  
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project>(emptyProject);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -53,12 +54,12 @@ const ProjectSidebar = () => {
   const [sectionTitle, setSectionTitle] = useState(projectsSection?.sectionTitle || "");
   const [sectionDescription, setSectionDescription] = useState(projectsSection?.sectionDescription || "");
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
-  
+
   // Tech search state
   const [techSearchValue, setTechSearchValue] = useState<string>("");
   const [techSuggestions, setTechSuggestions] = useState<Technology[]>([]);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
-  
+
   const params = useParams();
   const portfolioId = params.portfolioId as string;
 
@@ -79,14 +80,14 @@ const ProjectSidebar = () => {
 
   const handleSaveHeader = async () => {
     try {
-      dispatch(updatePortfolioData({ 
-        sectionType: "projects", 
+      dispatch(updatePortfolioData({
+        sectionType: "projects",
         newData: projects,
         sectionTitle,
         sectionDescription
       }));
-      await updateSection({ 
-        portfolioId: portfolioId, 
+      await updateSection({
+        portfolioId: portfolioId,
         sectionName: "projects",
         sectionContent: projects,
         sectionTitle,
@@ -109,11 +110,11 @@ const ProjectSidebar = () => {
   const handleTechSearch = (value: string): void => {
     setTechSearchValue(value)
     setHasSearched(value.trim() !== "")
-    
-    if(value.trim() === "") {
+
+    if (value.trim() === "") {
       setTechSuggestions([])
     } else {
-      const results = techList.filter((item: Technology) => 
+      const results = techList.filter((item: Technology) =>
         item.name.toLowerCase().includes(value.toLowerCase()))
       setTechSuggestions(results.slice(0, 6))
     }
@@ -149,24 +150,24 @@ const ProjectSidebar = () => {
     });
   }
 
-  const handleSaveProject = async() => {
+  const handleSaveProject = async () => {
     const originalProjects = [...projects];
     const originalCurrentProject = { ...currentProject };
-    
+
     try {
       if (editingIndex !== null) {
         const updatedProjects = [...projects];
         updatedProjects[editingIndex] = currentProject;
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "projects", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "projects",
           newData: updatedProjects,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
-          portfolioId: portfolioId, 
+        const result = await updateSection({
+          portfolioId: portfolioId,
           sectionName: "projects",
           sectionContent: updatedProjects,
           sectionTitle,
@@ -174,8 +175,8 @@ const ProjectSidebar = () => {
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "projects", 
+          dispatch(updatePortfolioData({
+            sectionType: "projects",
             newData: originalProjects,
             sectionTitle,
             sectionDescription
@@ -187,16 +188,16 @@ const ProjectSidebar = () => {
         setEditingIndex(null);
       } else {
         const updatedProjects = [...projects, currentProject];
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "projects", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "projects",
           newData: updatedProjects,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
-          portfolioId: portfolioId, 
+        const result = await updateSection({
+          portfolioId: portfolioId,
           sectionName: "projects",
           sectionContent: updatedProjects,
           sectionTitle,
@@ -204,8 +205,8 @@ const ProjectSidebar = () => {
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "projects", 
+          dispatch(updatePortfolioData({
+            sectionType: "projects",
             newData: originalProjects,
             sectionTitle,
             sectionDescription
@@ -234,18 +235,18 @@ const ProjectSidebar = () => {
     setEditingIndex(index);
   }
 
-  const deleteProject = async(index: number) => {
+  const deleteProject = async (index: number) => {
     const updatedProjects = [...projects];
     updatedProjects.splice(index, 1);
-    dispatch(updatePortfolioData({ 
-      sectionType: "projects", 
+    dispatch(updatePortfolioData({
+      sectionType: "projects",
       newData: updatedProjects,
       sectionTitle,
       sectionDescription
     }));
-    await updateSection({ 
+    await updateSection({
       portfolioId: portfolioId,
-      sectionName: "projects", 
+      sectionName: "projects",
       sectionContent: updatedProjects,
       sectionTitle,
       sectionDescription
@@ -253,8 +254,8 @@ const ProjectSidebar = () => {
     setProjects(updatedProjects);
   }
 
-  const handleImageUpload = async(event: React.ChangeEvent<HTMLInputElement>) => {
-    if(!event.target.files) return
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return
     const formData = new FormData();
     formData.append("file", event.target.files[0]);
     formData.append(
@@ -264,7 +265,7 @@ const ProjectSidebar = () => {
 
     try {
       toast.loading("Uploading image...", { id: "imageUpload" });
-      
+
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
@@ -279,7 +280,7 @@ const ProjectSidebar = () => {
       }
 
       const data = await response.json();
-      setCurrentProject({...currentProject, projectImage: data.secure_url});
+      setCurrentProject({ ...currentProject, projectImage: data.secure_url });
       setIsUploaded(true);
       toast.success("Image uploaded successfully!", { id: "imageUpload" });
     } catch (error) {
@@ -289,7 +290,7 @@ const ProjectSidebar = () => {
   }
 
   const removeImage = () => {
-    setCurrentProject({...currentProject, projectImage: ""});
+    setCurrentProject({ ...currentProject, projectImage: "" });
     setIsUploaded(false);
   }
 
@@ -305,12 +306,12 @@ const ProjectSidebar = () => {
             {projectsSection?.sectionTitle && (
               <div className="space-y-2">
                 <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input 
-                  id="sectionTitle" 
-                  value={sectionTitle} 
-                  onChange={(e) => setSectionTitle(e.target.value)} 
-                  placeholder="Enter section title" 
-                  style={{ 
+                <Input
+                  id="sectionTitle"
+                  value={sectionTitle}
+                  onChange={(e) => setSectionTitle(e.target.value)}
+                  placeholder="Enter section title"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -322,13 +323,13 @@ const ProjectSidebar = () => {
             {projectsSection?.sectionDescription && (
               <div className="space-y-2">
                 <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea 
-                  id="sectionDescription" 
-                  value={sectionDescription} 
-                  onChange={(e) => setSectionDescription(e.target.value)} 
-                  placeholder="Enter section description" 
+                <Textarea
+                  id="sectionDescription"
+                  value={sectionDescription}
+                  onChange={(e) => setSectionDescription(e.target.value)}
+                  placeholder="Enter section description"
                   className="resize-none h-20"
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -338,10 +339,10 @@ const ProjectSidebar = () => {
             )}
 
             {hasHeaderChanges && (
-              <Button 
+              <Button
                 onClick={handleSaveHeader}
                 className="w-full"
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.primary,
                   color: ColorTheme.textPrimary,
                   boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -353,43 +354,43 @@ const ProjectSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="projectName" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Project Name</Label>
-              <Input 
-                id="projectName" 
-                value={currentProject.projectName || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, projectName: e.target.value})} 
-                placeholder="Enter project name" 
-                style={{ 
+              <Input
+                id="projectName"
+                value={currentProject.projectName || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, projectName: e.target.value })}
+                placeholder="Enter project name"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
                 }}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="projectTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Project Title</Label>
-              <Input 
-                id="projectTitle" 
-                value={currentProject.projectTitle || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, projectTitle: e.target.value})} 
-                placeholder="Project title" 
-                style={{ 
+              <Input
+                id="projectTitle"
+                value={currentProject.projectTitle || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, projectTitle: e.target.value })}
+                placeholder="Project title"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
                 }}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="projectDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Project Description</Label>
-              <Textarea 
-                id="projectDescription" 
-                value={currentProject.projectDescription || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, projectDescription: e.target.value})} 
-                placeholder="Enter project description" 
+              <Textarea
+                id="projectDescription"
+                value={currentProject.projectDescription || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, projectDescription: e.target.value })}
+                placeholder="Enter project description"
                 className="resize-none h-32"
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -399,13 +400,13 @@ const ProjectSidebar = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Project Image</Label>
-              
+
               <div className="mt-1 flex flex-col items-center">
                 {currentProject.projectImage ? (
                   <div className="relative w-full">
-                    <img 
-                      src={currentProject.projectImage} 
-                      alt="Project Preview" 
+                    <img
+                      src={currentProject.projectImage}
+                      alt="Project Preview"
                       className="w-full h-48 object-cover rounded-md"
                     />
                     <Button
@@ -413,7 +414,7 @@ const ProjectSidebar = () => {
                       variant="ghost"
                       size="sm"
                       onClick={removeImage}
-                      style={{ 
+                      style={{
                         backgroundColor: ColorTheme.bgCard,
                         color: ColorTheme.textPrimary
                       }}
@@ -424,7 +425,7 @@ const ProjectSidebar = () => {
                 ) : (
                   <label className="w-full cursor-pointer">
                     <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center h-48 transition-colors"
-                      style={{ 
+                      style={{
                         borderColor: ColorTheme.borderLight,
                         color: ColorTheme.textSecondary
                       }}
@@ -443,17 +444,17 @@ const ProjectSidebar = () => {
                   </label>
                 )}
               </div>
-              
+
               {!isUploaded && !currentProject.projectImage && (
                 <div className="mt-2">
                   <Label htmlFor="projectImageUrl" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Or paste image URL</Label>
-                  <Input 
-                    id="projectImageUrl" 
-                    value={currentProject.projectImage || ""} 
-                    onChange={(e) => setCurrentProject({...currentProject, projectImage: e.target.value})} 
-                    placeholder="Enter image URL" 
+                  <Input
+                    id="projectImageUrl"
+                    value={currentProject.projectImage || ""}
+                    onChange={(e) => setCurrentProject({ ...currentProject, projectImage: e.target.value })}
+                    placeholder="Enter image URL"
                     className="mt-1"
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight,
                       color: ColorTheme.textPrimary
@@ -466,12 +467,12 @@ const ProjectSidebar = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Tech Stack</Label>
               <div className='flex items-center justify-between gap-4 mb-4'>
-                <Input 
+                <Input
                   type='text'
                   value={techSearchValue}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTechSearch(e.target.value)}
                   placeholder='Search Technologies...'
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -484,9 +485,9 @@ const ProjectSidebar = () => {
                     }
                   }}
                 />
-                <Button 
+                <Button
                   onClick={addCustomTech}
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.primary,
                     color: ColorTheme.textPrimary,
                     boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -495,17 +496,17 @@ const ProjectSidebar = () => {
                   Add
                 </Button>
               </div>
-              
+
               {techSuggestions.length > 0 ? (
                 <div className='mb-6'>
                   <h3 className='text-sm font-medium mb-2' style={{ color: ColorTheme.textPrimary }}>Suggestions</h3>
                   <div>
                     {techSuggestions.map((item: Technology) => (
-                      <div 
+                      <div
                         onClick={() => addTechToProject(item)}
                         key={item.name}
                         className='flex px-4 mt-2 rounded-lg items-center justify-between gap-4 py-2 cursor-pointer transition-colors'
-                        style={{ 
+                        style={{
                           backgroundColor: ColorTheme.bgCard,
                           borderColor: ColorTheme.borderLight,
                           color: ColorTheme.textPrimary
@@ -520,7 +521,7 @@ const ProjectSidebar = () => {
               ) : (
                 hasSearched && (
                   <div className='rounded-lg p-4 text-center mb-6'
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight
                     }}
@@ -530,16 +531,16 @@ const ProjectSidebar = () => {
                   </div>
                 )
               )}
-              
+
               {currentProject.techStack && currentProject.techStack.length > 0 ? (
                 <div>
                   <h3 className='text-sm font-medium mb-2' style={{ color: ColorTheme.textPrimary }}>Selected Technologies</h3>
                   <div>
                     {currentProject.techStack.map((item: Technology) => (
-                      <div 
+                      <div
                         key={item.name}
                         className='flex px-4 mt-2 rounded-lg items-center justify-between py-2'
-                        style={{ 
+                        style={{
                           backgroundColor: ColorTheme.bgCard,
                           borderColor: ColorTheme.borderLight
                         }}
@@ -548,12 +549,12 @@ const ProjectSidebar = () => {
                           <img src={item.logo} alt={item.name} width={25} height={25} />
                           <span className='text-sm' style={{ color: ColorTheme.textPrimary }}>{item.name}</span>
                         </div>
-                        <Button 
+                        <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeTechItem(item.name)}
                           className='p-1 h-auto'
-                          style={{ 
+                          style={{
                             backgroundColor: 'transparent',
                             color: ColorTheme.textSecondary
                           }}
@@ -566,7 +567,7 @@ const ProjectSidebar = () => {
                 </div>
               ) : (
                 <div className='rounded-lg p-4 text-center mb-2'
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight
                   }}
@@ -578,12 +579,12 @@ const ProjectSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="githubLink" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>GitHub Link</Label>
-              <Input 
-                id="githubLink" 
-                value={currentProject.githubLink || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, githubLink: e.target.value})} 
-                placeholder="Enter GitHub URL" 
-                style={{ 
+              <Input
+                id="githubLink"
+                value={currentProject.githubLink || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, githubLink: e.target.value })}
+                placeholder="Enter GitHub URL"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -593,12 +594,12 @@ const ProjectSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="liveLink" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Live Link</Label>
-              <Input 
-                id="liveLink" 
-                value={currentProject.liveLink || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, liveLink: e.target.value})} 
-                placeholder="Enter live project URL" 
-                style={{ 
+              <Input
+                id="liveLink"
+                value={currentProject.liveLink || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, liveLink: e.target.value })}
+                placeholder="Enter live project URL"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -608,12 +609,12 @@ const ProjectSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="year" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Year</Label>
-              <Input 
-                id="year" 
-                value={currentProject.year || ""} 
-                onChange={(e) => setCurrentProject({...currentProject, year: e.target.value})} 
-                placeholder="Year completed" 
-                style={{ 
+              <Input
+                id="year"
+                value={currentProject.year || ""}
+                onChange={(e) => setCurrentProject({ ...currentProject, year: e.target.value })}
+                placeholder="Year completed"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -621,11 +622,11 @@ const ProjectSidebar = () => {
               />
             </div>
 
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleSaveProject}
               className="w-full"
-              style={{ 
+              style={{
                 backgroundColor: ColorTheme.primary,
                 color: ColorTheme.textPrimary,
                 boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -641,7 +642,7 @@ const ProjectSidebar = () => {
               <div className="space-y-4">
                 {projects.map((project, index) => (
                   <div key={index} className="p-4 rounded-lg border"
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight
                     }}
@@ -652,24 +653,24 @@ const ProjectSidebar = () => {
                         <p className="text-sm mt-1" style={{ color: ColorTheme.textSecondary }}>{project.projectDescription?.substring(0, 20)}...</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => editProject(index)}
-                          style={{ 
+                          style={{
                             backgroundColor: 'transparent',
                             color: ColorTheme.textSecondary
                           }}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => deleteProject(index)}
-                          style={{ 
+                          style={{
                             backgroundColor: 'transparent',
                             color: ColorTheme.textSecondary
                           }}

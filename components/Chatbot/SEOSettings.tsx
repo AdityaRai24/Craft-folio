@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { motion } from "framer-motion";
 import { Search, X, Upload, Trash2 } from "lucide-react";
@@ -52,7 +53,7 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
 
   const handleFaviconUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
-    
+
     const formData = new FormData();
     formData.append("file", event.target.files[0]);
     formData.append(
@@ -98,12 +99,12 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
       console.log("Save already in progress, skipping...");
       return; // Prevent multiple saves
     }
-    
+
     try {
       setIsSaving(true);
       console.log("Starting SEO save process...");
       console.log("SEO data to save:", { seoTitle, seoDescription, faviconUrl });
-      
+
       const result = await updateSection({
         sectionName: "seo",
         portfolioId,

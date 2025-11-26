@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { ArrowDown, ArrowRight, FileText, Globe, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -88,9 +89,8 @@ const ResumeConversionAnimation = () => {
             viewport={{ once: true }}
           >
             <motion.div
-              className={`w-64 h-80 md:w-80 md:h-96 lg:w-[20rem] lg:h-[26rem] rounded-2xl shadow-2xl transform transition-all duration-1000 ${
-                isAnimating ? 'scale-105 rotate-2' : 'hover:scale-105'
-              }`}
+              className={`w-64 h-80 md:w-80 md:h-96 lg:w-[20rem] lg:h-[26rem] rounded-2xl shadow-2xl transform transition-all duration-1000 ${isAnimating ? 'scale-105 rotate-2' : 'hover:scale-105'
+                }`}
               style={{
                 boxShadow: `0 10px 40px rgba(0,0,0,0.5), 0 5px 15px ${greenGlow}`,
               }}
@@ -102,13 +102,13 @@ const ResumeConversionAnimation = () => {
                     <FileText className="w-6 h-6" style={{ color: ColorTheme.primary }} />
                     <span className="font-semibold" style={{ color: ColorTheme.textPrimary }}>Resume.pdf</span>
                   </div>
-                  
+
                   {/* Mock Resume Content */}
                   <div className="space-y-3">
                     <div className="h-4 rounded w-3/4" style={{ backgroundColor: ColorTheme.textPrimary }}></div>
                     <div className="h-2 rounded w-1/2" style={{ backgroundColor: ColorTheme.textSecondary }}></div>
                     <div className="h-2 rounded w-2/3" style={{ backgroundColor: ColorTheme.textSecondary }}></div>
-                    
+
                     <div className="mt-6">
                       <div className="h-3 rounded w-1/3 mb-2" style={{ backgroundColor: ColorTheme.primary }}></div>
                       <div className="space-y-1">
@@ -117,7 +117,7 @@ const ResumeConversionAnimation = () => {
                         <div className="h-2 rounded w-4/5" style={{ backgroundColor: ColorTheme.borderLight }}></div>
                       </div>
                     </div>
-                    
+
                     <div className="mt-6">
                       <div className="h-3 rounded w-1/4 mb-2" style={{ backgroundColor: ColorTheme.primaryDark }}></div>
                       <div className="space-y-1">
@@ -127,7 +127,7 @@ const ResumeConversionAnimation = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Floating Icons */}
                 {isAnimating && (
                   <div className="absolute inset-0 pointer-events-none">
@@ -137,7 +137,7 @@ const ResumeConversionAnimation = () => {
                 )}
               </div>
             </motion.div>
-            
+
             {/* Pulsing Glow Effect */}
             <div className={`absolute inset-0 rounded-2xl opacity-20 animate-pulse ${isAnimating ? 'animate-ping' : ''}`} style={{ backgroundColor: ColorTheme.primaryGlow }}></div>
           </motion.div>
@@ -160,7 +160,7 @@ const ResumeConversionAnimation = () => {
             >
               <ArrowRight className={`w-8 h-8 hidden md:block transition-transform duration-500 ${isAnimating ? 'translate-x-2' : ''}`} />
               <ArrowDown className={`w-8 h-8 block md:hidden transition-transform duration-500 ${isAnimating ? 'translate-x-2' : ''}`} />
-              
+
               {/* Animated Particles */}
               {isAnimating && (
                 <>
@@ -170,12 +170,11 @@ const ResumeConversionAnimation = () => {
                 </>
               )}
             </button>
-            
+
             {/* Conversion Text */}
             <div className="absolute md:-bottom-16 md:left-1/2 transform  w-full mb-7 md:-translate-x-1/2 text-center">
-              <div className={`text-sm font-semibold w-full inline-block transition-all duration-500 ${
-                isAnimating ? 'scale-110' : ''
-              }`} style={{ color: isAnimating ? ColorTheme.primaryGlow : ColorTheme.textMuted }}>
+              <div className={`text-sm font-semibold w-full inline-block transition-all duration-500 ${isAnimating ? 'scale-110' : ''
+                }`} style={{ color: isAnimating ? ColorTheme.primaryGlow : ColorTheme.textMuted }}>
                 {isAnimating ? 'Converting...' : 'Click Here '}
               </div>
             </div>
@@ -189,9 +188,8 @@ const ResumeConversionAnimation = () => {
             viewport={{ once: true }}
           >
             <motion.div
-              className={`w-64 h-80 md:w-80 md:h-96 lg:w-[20rem] lg:h-[26rem] rounded-2xl shadow-2xl transform transition-all duration-1000 ${
-                isAnimating ? 'scale-105 -rotate-2' : 'hover:scale-105'
-              }`}
+              className={`w-64 h-80 md:w-80 md:h-96 lg:w-[20rem] lg:h-[26rem] rounded-2xl shadow-2xl transform transition-all duration-1000 ${isAnimating ? 'scale-105 -rotate-2' : 'hover:scale-105'
+                }`}
               style={{
                 boxShadow: `0 10px 40px rgba(0,0,0,0.5), 0 5px 15px ${greenGlow}`,
               }}
@@ -203,7 +201,7 @@ const ResumeConversionAnimation = () => {
                     <Globe className="w-6 h-6" style={{ color: ColorTheme.primary }} />
                     <span className="font-semibold" style={{ color: ColorTheme.textPrimary }}>Portfolio.web</span>
                   </div>
-                  
+
                   {/* Mock Portfolio Content */}
                   <div className="space-y-4">
                     {/* Hero Section */}
@@ -211,14 +209,14 @@ const ResumeConversionAnimation = () => {
                       <div className="h-3 rounded w-2/3 mb-1" style={{ backgroundColor: ColorTheme.textPrimary }}></div>
                       <div className="h-2 rounded w-1/2" style={{ backgroundColor: ColorTheme.textSecondary }}></div>
                     </div>
-                    
+
                     {/* Skills Section */}
                     <div className="flex gap-2">
                       <div className="rounded-full px-2 py-1" style={{ backgroundColor: `${ColorTheme.primary}40` }}></div>
                       <div className="rounded-full px-2 py-1" style={{ backgroundColor: `${ColorTheme.primaryDark}40` }}></div>
                       <div className="rounded-full px-2 py-1" style={{ backgroundColor: `${ColorTheme.primaryGlow}40` }}></div>
                     </div>
-                    
+
                     {/* Project Cards */}
                     <div className="space-y-2">
                       <div className="rounded-lg p-2" style={{ backgroundColor: ColorTheme.bgCardHover }}>
@@ -232,7 +230,7 @@ const ResumeConversionAnimation = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Interactive Elements */}
                 {isAnimating && (
                   <div className="absolute inset-0 pointer-events-none">
@@ -243,7 +241,7 @@ const ResumeConversionAnimation = () => {
                 )}
               </div>
             </motion.div>
-            
+
             {/* Success Glow */}
             <div className={`absolute inset-0 rounded-2xl opacity-20 ${isAnimating ? 'animate-pulse' : ''}`} style={{ backgroundColor: ColorTheme.primaryGlow }}></div>
           </motion.div>

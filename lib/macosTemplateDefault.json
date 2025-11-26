@@ -1,0 +1,265 @@
+{
+    "portfolioData": [
+        {
+            "type": "hero",
+            "sectionTitle": "Hero Section",
+            "sectionDescription": "Desktop wallpaper and background",
+            "data": {
+                "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=3870",
+                "name": "Your Name",
+                "title": "Full Stack Developer"
+            }
+        },
+        {
+            "type": "userInfo",
+            "sectionTitle": "Contact Information",
+            "sectionDescription": "Personal and professional contact details",
+            "data": {
+                "name": "Your Name",
+                "title": "Full Stack Developer",
+                "email": "your.email@example.com",
+                "github": "https://github.com/yourusername",
+                "linkedin": "https://linkedin.com/in/yourusername",
+                "location": "San Francisco, CA",
+                "shortSummary": "Passionate developer building amazing web experiences",
+                "profileImage": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=400",
+                "resumeLink": "https://example.com/your-resume.pdf"
+            }
+        },
+        {
+            "type": "projects",
+            "sectionTitle": "Featured Projects",
+            "sectionDescription": "Showcase of my recent work and side projects",
+            "data": {
+                "projects": [
+                    {
+                        "projectName": "E-Commerce Platform",
+                        "projectDescription": "A full-featured e-commerce platform built with Next.js, featuring real-time inventory management, secure payments, and an admin dashboard.",
+                        "projectImage": "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800",
+                        "liveLink": "https://example.com/ecommerce",
+                        "githubLink": "https://github.com/yourusername/ecommerce",
+                        "techStack": [
+                            "Next.js",
+                            "TypeScript",
+                            "Stripe",
+                            "PostgreSQL",
+                            "Tailwind CSS"
+                        ]
+                    },
+                    {
+                        "projectName": "AI Chat Assistant",
+                        "projectDescription": "An intelligent chatbot powered by OpenAI's GPT-4, with context-aware responses and custom personality settings.",
+                        "projectImage": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
+                        "liveLink": "https://example.com/ai-chat",
+                        "githubLink": "https://github.com/yourusername/ai-chat",
+                        "techStack": [
+                            "React",
+                            "OpenAI API",
+                            "Node.js",
+                            "MongoDB",
+                            "Socket.io"
+                        ]
+                    },
+                    {
+                        "projectName": "Portfolio Builder",
+                        "projectDescription": "A drag-and-drop portfolio builder with multiple themes, allowing users to create professional portfolios in minutes.",
+                        "projectImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
+                        "liveLink": "https://example.com/portfolio-builder",
+                        "githubLink": "https://github.com/yourusername/portfolio-builder",
+                        "techStack": [
+                            "Vue.js",
+                            "Firebase",
+                            "SCSS",
+                            "Docker"
+                        ]
+                    },
+                    {
+                        "projectName": "Task Management App",
+                        "projectDescription": "A collaborative task management tool with real-time updates, team workspaces, and productivity analytics.",
+                        "projectImage": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800",
+                        "liveLink": "https://example.com/tasks",
+                        "githubLink": "https://github.com/yourusername/tasks",
+                        "techStack": [
+                            "Angular",
+                            "NestJS",
+                            "Redis",
+                            "PostgreSQL",
+                            "WebSockets"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "type": "experience",
+            "sectionTitle": "Work Experience",
+            "sectionDescription": "My professional journey and achievements",
+            "data": {
+                "experiences": [
+                    {
+                        "company": "Tech Innovations Inc.",
+                        "position": "Senior Software Engineer",
+                        "duration": "Jan 2022 - Present",
+                        "description": "Leading development of scalable web applications using modern JavaScript frameworks. Mentoring junior developers and establishing best practices for code quality.",
+                        "location": "San Francisco, CA",
+                        "skills": [
+                            "React",
+                            "Node.js",
+                            "AWS",
+                            "GraphQL",
+                            "Team Leadership"
+                        ]
+                    },
+                    {
+                        "company": "Digital Solutions Corp",
+                        "position": "Full Stack Developer",
+                        "duration": "Jun 2020 - Dec 2021",
+                        "description": "Built and maintained multiple client-facing applications. Implemented CI/CD pipelines and improved deployment efficiency by 40%.",
+                        "location": "Remote",
+                        "skills": [
+                            "Vue.js",
+                            "Python",
+                            "Docker",
+                            "PostgreSQL",
+                            "CI/CD"
+                        ]
+                    },
+                    {
+                        "company": "StartUp Ventures",
+                        "position": "Frontend Developer",
+                        "duration": "Mar 2019 - May 2020",
+                        "description": "Developed responsive web interfaces and mobile-first applications. Collaborated with designers to implement pixel-perfect UIs.",
+                        "location": "New York, NY",
+                        "skills": [
+                            "JavaScript",
+                            "React",
+                            "Redux",
+                            "SASS",
+                            "Responsive Design"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "type": "technologies",
+            "sectionTitle": "Technical Skills",
+            "sectionDescription": "Technologies and tools I work with",
+            "data": {
+                "categories": [
+                    {
+                        "category": "Frontend",
+                        "technologies": [
+                            {
+                                "name": "React",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                                "proficiency": 95
+                            },
+                            {
+                                "name": "Next.js",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+                                "proficiency": 90
+                            },
+                            {
+                                "name": "TypeScript",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+                                "proficiency": 88
+                            },
+                            {
+                                "name": "Tailwind CSS",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg",
+                                "proficiency": 92
+                            }
+                        ]
+                    },
+                    {
+                        "category": "Backend",
+                        "technologies": [
+                            {
+                                "name": "Node.js",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                                "proficiency": 85
+                            },
+                            {
+                                "name": "Python",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                                "proficiency": 80
+                            },
+                            {
+                                "name": "PostgreSQL",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                                "proficiency": 83
+                            },
+                            {
+                                "name": "MongoDB",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+                                "proficiency": 78
+                            }
+                        ]
+                    },
+                    {
+                        "category": "DevOps & Tools",
+                        "technologies": [
+                            {
+                                "name": "Docker",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                                "proficiency": 82
+                            },
+                            {
+                                "name": "AWS",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+                                "proficiency": 75
+                            },
+                            {
+                                "name": "Git",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                                "proficiency": 90
+                            },
+                            {
+                                "name": "VS Code",
+                                "icon": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+                                "proficiency": 95
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "type": "resume",
+            "sectionTitle": "Resume",
+            "sectionDescription": "Download my latest resume",
+            "data": {
+                "resumeLink": "https://example.com/resume.pdf"
+            }
+        },
+        {
+            "type": "safari",
+            "sectionTitle": "Custom Page",
+            "sectionDescription": "Rich text content editable with WYSIWYG editor",
+            "data": {
+                "content": "<div class=\"text-center mb-12\"><h1 class=\"text-4xl font-semibold mb-3\">Welcome to My Portfolio</h1><p class=\"text-lg opacity-80\">A unique macOS-inspired experience</p></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-8\"><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20\"><div class=\"text-4xl mb-4\">💻</div><h3 class=\"text-xl font-semibold mb-2\">Interactive Portfolio</h3><p class=\"text-sm opacity-80\">Explore my work in an immersive macOS experience with windows, dock, and desktop icons.</p></div><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-900/20\"><div class=\"text-4xl mb-4\">🎨</div><h3 class=\"text-xl font-semibold mb-2\">Modern Design</h3><p class=\"text-sm opacity-80\">Built with cutting-edge technologies: Next.js, TypeScript, Tailwind CSS, and Framer Motion.</p></div><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20\"><div class=\"text-4xl mb-4\">⚡</div><h3 class=\"text-xl font-semibold mb-2\">Fully Customizable</h3><p class=\"text-sm opacity-80\">Edit wallpaper, resume, projects, and this content directly through visual editors.</p></div></div><div class=\"p-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mb-8\"><h2 class=\"text-2xl font-semibold mb-4\">About This Template</h2><p class=\"mb-4 opacity-80\">This MacOS-themed portfolio showcases your work in an innovative and interactive way. Navigate through different sections using the dock icons at the bottom:</p><ul class=\"list-disc list-inside space-y-2 opacity-80\"><li><strong>Terminal:</strong> Interactive command-line interface with project info</li><li><strong>Projects:</strong> Browse your portfolio in a Finder-like grid view</li><li><strong>Safari:</strong> This customizable page with rich text content</li><li><strong>Resume:</strong> View and download your PDF resume</li><li><strong>Contact:</strong> Showcase your contact information and social links</li></ul></div><div class=\"p-6 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200 dark:border-blue-800\"><h2 class=\"text-2xl font-semibold mb-3\">🚀 Key Features</h2><ul class=\"space-y-2 opacity-90\"><li>✨ Drag-and-drop windows with minimize/maximize controls</li><li>🎯 Click-and-type WYSIWYG editor for this Safari page</li><li>📄 Upload your resume via Cloudinary integration</li><li>🖼️ Change desktop wallpaper with image upload</li><li>📱 Fully responsive and mobile-friendly</li><li>🌓 Dark mode support throughout</li></ul></div>"
+            }
+        }
+    ],
+    "metadata": {
+        "templateName": "MacOS",
+        "themeName": "dark",
+        "fontName": "Inter",
+        "version": "1.0.0",
+        "features": [
+            "Interactive macOS-style desktop",
+            "Draggable windows with minimize/maximize",
+            "Wallpaper customization with image upload",
+            "Resume viewer with PDF upload",
+            "Safari WYSIWYG editor with image support",
+            "Terminal window with interactive commands",
+            "Projects gallery in Finder style",
+            "Contact information with social links",
+            "Desktop icons for quick access",
+            "Dock with application indicators",
+            "Dark/Light theme support"
+        ],
+        "description": "A fully interactive macOS-inspired portfolio template with editable components, custom wallpaper, resume upload, and rich text content editor."
+    }
+}

@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown, Globe, UserPlus } from "lucide-react";
@@ -70,7 +71,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
   };
 
   const handleDeploy = async () => {
-    if(!user) {
+    if (!user) {
       toast.error("Please sign in to deploy your portfolio");
       return;
     }
@@ -98,7 +99,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
           toast.error("Failed to verify subdomain availability. Please try again.");
           return;
         }
-        
+
         if (result.isPremium) {
           if (result.hasSubdomain) {
             toast.error(`You have reached the maximum limit of 10 subdomains for premium users. Please remove an existing subdomain first.`);
@@ -197,7 +198,7 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         className="relative w-full max-w-md p-6 rounded-xl shadow-xl backdrop-blur-xl"
-        style={{ 
+        style={{
           backgroundColor: "rgba(18, 18, 18, 0.95)",
           border: "1px solid rgba(75, 85, 99, 0.3)",
           boxShadow: "0 25px 50px rgba(0,0,0,0.3), 0 10px 30px rgba(16, 185, 129, 0.15)"
@@ -334,27 +335,27 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
 
             {!isDeployed ? (
               <Tabs defaultValue="slug" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList 
+                <TabsList
                   className="w-full grid grid-cols-3 mb-6 border rounded-lg overflow-hidden"
                   style={{
                     backgroundColor: ColorTheme.bgNav,
                     borderColor: 'rgba(75, 85, 99, 0.3)',
                   }}
                 >
-                  <TabsTrigger 
+                  <TabsTrigger
                     value="slug"
                     className="data-[state=active]:bg-gray-700 rounded-l-lg cursor-pointer"
-                    style={{ 
+                    style={{
                       color: ColorTheme.textPrimary,
                       borderRight: '1px solid rgba(75, 85, 99, 0.3)',
                     }}
                   >
                     Slug Deployment
                   </TabsTrigger>
-                  <TabsTrigger 
+                  <TabsTrigger
                     value="subdomain"
                     className="data-[state=active]:bg-gray-700 cursor-pointer"
-                    style={{ 
+                    style={{
                       color: ColorTheme.textPrimary,
                       borderRight: '1px solid rgba(75, 85, 99, 0.3)',
                     }}
@@ -364,10 +365,10 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                       <Crown className="w-4 h-4 text-yellow-400" />
                     </span>
                   </TabsTrigger>
-                  <TabsTrigger 
+                  <TabsTrigger
                     value="custom"
                     className="data-[state=active]:bg-gray-700 rounded-r-lg cursor-pointer"
-                    style={{ 
+                    style={{
                       color: ColorTheme.textPrimary,
                     }}
                   >
@@ -385,9 +386,9 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                         Choose your portfolio slug
                       </label>
                       <div className="relative border border-[rgba(75,85,99,0.3)] rounded-lg overflow-hidden">
-                        <div 
+                        <div
                           className="absolute left-0 top-0 h-full flex items-center px-4"
-                          style={{ 
+                          style={{
                             color: ColorTheme.primary,
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                           }}
@@ -438,9 +439,9 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                         Choose your subdomain
                       </label>
                       <div className="relative border border-[rgba(75,85,99,0.3)] rounded-lg overflow-hidden">
-                        <div 
+                        <div
                           className="absolute right-0 top-0 h-full flex items-center px-4"
-                          style={{ 
+                          style={{
                             color: ColorTheme.primary,
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                           }}
@@ -542,9 +543,9 @@ const DeployModal = ({ isOpen, onClose, portfolioId, portfolioData, portfolioLin
                       )}
                     </motion.button>
                   ) : (
-                    <div className="mt-6 p-4 rounded-lg border" style={{ 
-                      backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-                      borderColor: 'rgba(16, 185, 129, 0.2)' 
+                    <div className="mt-6 p-4 rounded-lg border" style={{
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      borderColor: 'rgba(16, 185, 129, 0.2)'
                     }}>
                       <div className="flex items-start gap-3">
                         <UserPlus className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
