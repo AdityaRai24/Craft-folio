@@ -10,12 +10,12 @@ import {
   Type,
 } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
-import AlignmentSelector from "./AlignmentSelector";
+import AlignmentSelector from "../Shared/AlignmentSelector";
 import ButtonStyleSelector from "./ButtonStyleSelector";
 import AspectRatioSelector from "./AspectRatioSelector";
-import TechStackStyleSelector from "./TechStackStyleSelector";
-import SliderControl from "./SliderControl";
-import TypographySelector from "./TypographySelector";
+import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
+import SliderControl from "../Shared/SliderControl";
+import TypographySelector from "../Shared/TypographySelector";
 import ImagePositionSelector from "./ImagePositionSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";

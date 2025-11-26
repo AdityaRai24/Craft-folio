@@ -14,12 +14,12 @@ import {
   RectangleVertical, Type
 } from "lucide-react";
 import LayoutSelector from "@/components/VisualEditor/Projects/LayoutSelector";
-import AlignmentSelector from "@/components/VisualEditor/Projects/AlignmentSelector";
+import AlignmentSelector from "@/components/VisualEditor/Shared/AlignmentSelector";
 import ButtonStyleSelector from "@/components/VisualEditor/Projects/ButtonStyleSelector";
 import AspectRatioSelector from "@/components/VisualEditor/Projects/AspectRatioSelector";
-import TechStackStyleSelector from "@/components/VisualEditor/Projects/TechStackStyleSelector";
-import SliderControl from "@/components/VisualEditor/Projects/SliderControl";
-import TypographySelector from "@/components/VisualEditor/Projects/TypographySelector";
+import TechStackStyleSelector from "@/components/VisualEditor/Shared/TechStackStyleSelector";
+import SliderControl from "@/components/VisualEditor/Shared/SliderControl";
+import TypographySelector from "@/components/VisualEditor/Shared/TypographySelector";
 import ImagePositionSelector from "@/components/VisualEditor/Projects/ImagePositionSelector";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useDraggable } from "@/hooks/useDraggable";
@@ -31,7 +31,7 @@ import { RootState } from "@/store/store";
 import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
 import { defaultSimpleWhiteProjectsStyles } from "./defaultStyles/projects";
@@ -165,11 +165,10 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
   };
 
   const getCardClasses = () => {
-    let classes = `${effectiveCustomization.cardBackground} section-card border ${
-      effectiveCustomization.cardBorder
-    }  transition-all duration-${Math.round(
-      effectiveCustomization.animationSpeed * 1000
-    )} cursor-pointer hover:bg-gray-50`;
+    let classes = `${effectiveCustomization.cardBackground} section-card border ${effectiveCustomization.cardBorder
+      }  transition-all duration-${Math.round(
+        effectiveCustomization.animationSpeed * 1000
+      )} cursor-pointer hover:bg-gray-50`;
 
     return classes;
   };
@@ -497,8 +496,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     effectiveCustomization.layout === "grid"
                       ? "flex flex-col items-center"
                       : effectiveCustomization.imagePosition === "right"
-                      ? "flex flex-col md:flex-row-reverse items-center"
-                      : "flex flex-col md:flex-row items-center"
+                        ? "flex flex-col md:flex-row-reverse items-center"
+                        : "flex flex-col md:flex-row items-center"
                   }
                 >
                   {/* Project Image */}
@@ -578,13 +577,12 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     }
                   >
                     <div
-                      className={`flex flex-wrap items-center ${
-                        effectiveCustomization.titleAlignment === "center"
-                          ? "justify-center"
-                          : effectiveCustomization.titleAlignment === "right"
+                      className={`flex flex-wrap items-center ${effectiveCustomization.titleAlignment === "center"
+                        ? "justify-center"
+                        : effectiveCustomization.titleAlignment === "right"
                           ? "justify-end"
                           : "justify-between"
-                      } mb-3`}
+                        } mb-3`}
                     >
                       <h3
                         className={`${getTitleClasses()} ${getTitleAlignment()}`}

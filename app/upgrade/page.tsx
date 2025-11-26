@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
-import MainNavbar from "@/components/MainNavbar";
-import BgShapes from "@/components/BgShapes";
+import MainNavbar from "@/components/Shared/MainNavbar";
+import BgShapes from "@/components/Shared/BgShapes";
 
 const page = () => {
   const router = useRouter();
@@ -114,11 +114,10 @@ const page = () => {
             {features.map((plan, index) => (
               <motion.div
                 key={plan.title}
-                className={`relative rounded-2xl p-8 backdrop-blur-sm border transition-all duration-300 ${
-                  plan.isPopular
+                className={`relative rounded-2xl p-8 backdrop-blur-sm border transition-all duration-300 ${plan.isPopular
                     ? "scale-105 border-primary"
                     : "border-border-light"
-                }`}
+                  }`}
                 style={{
                   backgroundColor: ColorTheme.bgCard,
                 }}
@@ -168,11 +167,10 @@ const page = () => {
                 </ul>
 
                 <motion.button
-                  className={`w-full py-3 rounded-lg font-medium transition-all ${
-                    plan.isCurrent || plan.title === "Premium"
+                  className={`w-full py-3 rounded-lg font-medium transition-all ${plan.isCurrent || plan.title === "Premium"
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:scale-105"
-                  }`}
+                    }`}
                   style={{
                     background: plan.isCurrent || plan.title === "Premium"
                       ? ColorTheme.bgCardHover
@@ -182,8 +180,8 @@ const page = () => {
                   whileHover={
                     !plan.isCurrent && plan.title !== "Premium"
                       ? {
-                          boxShadow: `0 8px 25px ${ColorTheme.primaryGlow}, 0 0 30px ${ColorTheme.primaryGlow}30`,
-                        }
+                        boxShadow: `0 8px 25px ${ColorTheme.primaryGlow}, 0 0 30px ${ColorTheme.primaryGlow}30`,
+                      }
                       : {}
                   }
                   onClick={() => {

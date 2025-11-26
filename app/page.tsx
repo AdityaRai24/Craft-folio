@@ -12,13 +12,13 @@ import {
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import MainNavbar from "@/components/MainNavbar";
+import MainNavbar from "@/components/Shared/MainNavbar";
 // import ArrowLottie from "@/components/ArrowLottie";
 import { ColorTheme } from "@/lib/colorThemes";
-import BgShapes from "@/components/BgShapes";
+import BgShapes from "@/components/Shared/BgShapes";
 import { testimonials, features, benefitsList } from "@/lib/data";
-import ArrowLottie from "@/components/ArrowLottie";
-import ResumeConversionAnimation from "@/components/ResumeConversionAnimation";
+import ArrowLottie from "@/components/Shared/ArrowLottie";
+import ResumeConversionAnimation from "@/components/Shared/ResumeConversionAnimation";
 
 export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
@@ -48,7 +48,7 @@ export default function Page() {
     <div className="relative  scrollbar   custom-scrollbar">
       <BgShapes />
 
-     
+
 
       <MainNavbar />
 

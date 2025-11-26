@@ -7,7 +7,7 @@ import { Label } from '@radix-ui/react-label'
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { Plus, X, Edit, Trash } from 'lucide-react'
+import { Plus, X, Edit, Trash, RotateCcw, EyeOff } from 'lucide-react'
 import { updatePortfolioData } from '@/slices/dataSlice'
 import { useParams } from 'next/navigation'
 import { updateSection } from '@/app/actions/portfolio'
@@ -19,6 +19,8 @@ const TerminalSidebar = () => {
         command: string;
         description: string;
         output: string;
+        isDefault?: boolean;
+        isHidden?: boolean;
     }
 
     const emptyCommand: TerminalCommand = {
@@ -31,20 +33,126 @@ const TerminalSidebar = () => {
     const terminalSection = portfolioData?.find((item: any) => item.type === "terminal");
     const terminalData = terminalSection?.data || {};
 
+    // Data for default command generation
+    const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
+    const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
+    const projectsData = portfolioData?.find((item: any) => item.type === "projects")?.data || [];
+    const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
+    const technologiesData = portfolioData?.find((item: any) => item.type === "technologies")?.data || [];
+
     const [commands, setCommands] = useState<TerminalCommand[]>([]);
     const [currentCommand, setCurrentCommand] = useState<TerminalCommand>(emptyCommand);
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null); // Index in the COMBINED list
 
     const params = useParams();
     const portfolioId = params.portfolioId as string;
 
     const dispatch = useDispatch();
 
+    // Generate default commands
+    const getDefaultCommands = (): TerminalCommand[] => {
+        return [
+            {
+                command: "about",
+                description: "About me",
+                output: `Name: ${heroData.name || "Developer"}\nTitle: ${heroData.title || "Software Developer"}\n${heroData.summary || "Passionate about building amazing software."}`,
+                isDefault: true
+            },
+            {
+                command: "skills",
+                description: "My skills",
+                output: technologiesData.length > 0
+                    ? `Technologies I work with:\n${technologiesData.map((tech: any) => `  • ${tech.name || tech}`).join("\n")}`
+                    : `Technologies I work with:\n  • JavaScript/TypeScript\n  • React/Next.js\n  • Node.js\n  • Python\n  • And more...`,
+                isDefault: true
+            },
+            {
+                command: "contact",
+                description: "Contact information",
+                output: `Get in touch:\n  Email: ${userInfoData.email || "your.email@example.com"}\n  GitHub: ${userInfoData.github || "github.com/username"}\n  LinkedIn: ${userInfoData.linkedin || "linkedin.com/in/username"}`,
+                isDefault: true
+            },
+            {
+                command: "projects",
+                description: "List my projects",
+                output: projectsData.length > 0
+                    ? `My Projects:\n${projectsData.slice(0, 5).map((project: any, idx: number) => `${idx + 1}. ${project.projectName || project.projectTitle || `Project ${idx + 1}`}`).join("\n")}\n\nTotal: ${projectsData.length} projects`
+                    : "No projects found.",
+                isDefault: true
+            },
+            {
+                command: "experience",
+                description: "My work experience",
+                output: experienceData.length > 0
+                    ? `Work Experience:\n${experienceData.slice(0, 5).map((exp: any, idx: number) => `${idx + 1}. ${exp.role || "Role"} at ${exp.companyName || "Company"}`).join("\n")}\n\nTotal: ${experienceData.length} positions`
+                    : "No experience found.",
+                isDefault: true
+            }
+        ];
+    };
+
     useEffect(() => {
-        if (terminalData && terminalData.commands && terminalData.commands.length > 0) {
-            setCommands(terminalData.commands);
+        const defaults = getDefaultCommands();
+        const customCommands = terminalData.commands || [];
+        const hiddenCommands = terminalData.hiddenCommands || [];
+
+        // Merge logic:
+        // 1. Start with defaults
+        // 2. If a custom command exists with same name, it overrides default (replace it)
+        // 3. If a command is in hiddenCommands, mark it as hidden
+
+        const mergedCommands: TerminalCommand[] = [];
+        const processedCommands = new Set<string>();
+
+        // Add defaults (or their overrides)
+        defaults.forEach(def => {
+            const custom = customCommands.find((c: any) => c.command.toLowerCase() === def.command.toLowerCase());
+            const isHidden = hiddenCommands.includes(def.command.toLowerCase());
+
+            if (custom) {
+                mergedCommands.push({ ...custom, isDefault: true, isHidden }); // It's a default that has been overridden
+            } else {
+                mergedCommands.push({ ...def, isHidden });
+            }
+            processedCommands.add(def.command.toLowerCase());
+        });
+
+        // Add remaining custom commands
+        customCommands.forEach((custom: any) => {
+            if (!processedCommands.has(custom.command.toLowerCase())) {
+                mergedCommands.push(custom);
+            }
+        });
+
+        setCommands(mergedCommands);
+    }, [terminalData, portfolioData]); // Re-run when data changes
+
+    const updateDB = async (newCommands: any[], newHiddenCommands: string[]) => {
+        const newData = {
+            ...terminalData,
+            commands: newCommands,
+            hiddenCommands: newHiddenCommands
+        };
+
+        dispatch(updatePortfolioData({
+            sectionType: "terminal",
+            newData: newData,
+            sectionTitle: terminalSection?.sectionTitle || "Terminal",
+            sectionDescription: terminalSection?.sectionDescription || "Custom terminal commands"
+        }));
+
+        const result = await updateSection({
+            portfolioId: portfolioId,
+            sectionName: "terminal",
+            sectionContent: newData,
+            sectionTitle: terminalSection?.sectionTitle || "Terminal",
+            sectionDescription: terminalSection?.sectionDescription || "Custom terminal commands"
+        });
+
+        if (!result.success) {
+            throw new Error("Database update failed");
         }
-    }, [terminalData]);
+    };
 
     const handleSaveCommand = async () => {
         if (!currentCommand.command || !currentCommand.output) {
@@ -52,103 +160,94 @@ const TerminalSidebar = () => {
             return;
         }
 
-        const originalCommands = [...commands];
-
         try {
-            let updatedCommands = [...commands];
-            if (editingIndex !== null) {
-                updatedCommands[editingIndex] = currentCommand;
-                setEditingIndex(null);
+            const customCommands = [...(terminalData.commands || [])];
+            const hiddenCommands = [...(terminalData.hiddenCommands || [])];
+
+            // Check if we are updating an existing custom command or overriding a default
+            const existingIndex = customCommands.findIndex((c: any) => c.command.toLowerCase() === currentCommand.command.toLowerCase());
+
+            if (existingIndex >= 0) {
+                customCommands[existingIndex] = {
+                    command: currentCommand.command,
+                    description: currentCommand.description,
+                    output: currentCommand.output
+                };
             } else {
-                // Check for duplicate command names
-                if (updatedCommands.some(c => c.command.toLowerCase() === currentCommand.command.toLowerCase())) {
-                    toast.error(`Command '${currentCommand.command}' already exists`);
-                    return;
-                }
-                updatedCommands = [...commands, currentCommand];
+                customCommands.push({
+                    command: currentCommand.command,
+                    description: currentCommand.description,
+                    output: currentCommand.output
+                });
             }
 
-            const newData = { ...terminalData, commands: updatedCommands };
-
-            dispatch(updatePortfolioData({
-                sectionType: "terminal",
-                newData: newData,
-                sectionTitle: terminalSection?.sectionTitle || "Terminal",
-                sectionDescription: terminalSection?.sectionDescription || "Custom terminal commands"
-            }));
-
-            const result = await updateSection({
-                portfolioId: portfolioId,
-                sectionName: "terminal",
-                sectionContent: newData,
-                sectionTitle: terminalSection?.sectionTitle || "Terminal",
-                sectionDescription: terminalSection?.sectionDescription || "Custom terminal commands"
-            });
-
-            if (!result.success) {
-                dispatch(updatePortfolioData({
-                    sectionType: "terminal",
-                    newData: { ...terminalData, commands: originalCommands },
-                    sectionTitle: terminalSection?.sectionTitle,
-                    sectionDescription: terminalSection?.sectionDescription
-                }));
-                throw new Error("Database update failed");
+            // If it was hidden, unhide it
+            const hiddenIndex = hiddenCommands.indexOf(currentCommand.command.toLowerCase());
+            if (hiddenIndex >= 0) {
+                hiddenCommands.splice(hiddenIndex, 1);
             }
 
-            setCommands(updatedCommands);
+            await updateDB(customCommands, hiddenCommands);
+
             setCurrentCommand(emptyCommand);
-            toast.success(editingIndex !== null ? 'Command updated!' : 'Command added!');
+            setEditingIndex(null);
+            toast.success('Command saved!');
         } catch (error) {
             console.error(error);
-            setCommands(originalCommands);
-            toast.error("Failed to update command. Changes have been reverted.");
+            toast.error("Failed to save command.");
         }
     }
 
-    const editCommand = (index: number) => {
-        setCurrentCommand(commands[index]);
+    const editCommand = (cmd: TerminalCommand, index: number) => {
+        setCurrentCommand(cmd);
         setEditingIndex(index);
     }
 
-    const deleteCommand = async (index: number) => {
-        const originalCommands = [...commands];
-        const updatedCommands = [...commands];
-        updatedCommands.splice(index, 1);
-
+    const deleteCommand = async (cmd: TerminalCommand) => {
         try {
-            const newData = { ...terminalData, commands: updatedCommands };
+            let customCommands = [...(terminalData.commands || [])];
+            let hiddenCommands = [...(terminalData.hiddenCommands || [])];
 
-            dispatch(updatePortfolioData({
-                sectionType: "terminal",
-                newData: newData,
-                sectionTitle: terminalSection?.sectionTitle,
-                sectionDescription: terminalSection?.sectionDescription
-            }));
-
-            const result = await updateSection({
-                portfolioId: portfolioId,
-                sectionName: "terminal",
-                sectionContent: newData,
-                sectionTitle: terminalSection?.sectionTitle,
-                sectionDescription: terminalSection?.sectionDescription
-            });
-
-            if (!result.success) {
-                dispatch(updatePortfolioData({
-                    sectionType: "terminal",
-                    newData: { ...terminalData, commands: originalCommands },
-                    sectionTitle: terminalSection?.sectionTitle,
-                    sectionDescription: terminalSection?.sectionDescription
-                }));
-                throw new Error("Database update failed");
+            if (cmd.isDefault) {
+                // If it's a default command
+                // 1. Remove any custom override
+                customCommands = customCommands.filter((c: any) => c.command.toLowerCase() !== cmd.command.toLowerCase());
+                // 2. Add to hidden list
+                if (!hiddenCommands.includes(cmd.command.toLowerCase())) {
+                    hiddenCommands.push(cmd.command.toLowerCase());
+                }
+            } else {
+                // Pure custom command - just remove it
+                customCommands = customCommands.filter((c: any) => c.command.toLowerCase() !== cmd.command.toLowerCase());
             }
 
-            setCommands(updatedCommands);
+            await updateDB(customCommands, hiddenCommands);
             toast.success("Command deleted");
         } catch (error) {
             console.error(error);
-            setCommands(originalCommands);
             toast.error("Failed to delete command");
+        }
+    }
+
+    const restoreCommand = async (cmd: TerminalCommand) => {
+        try {
+            let customCommands = [...(terminalData.commands || [])];
+            let hiddenCommands = [...(terminalData.hiddenCommands || [])];
+
+            // Remove from hidden list
+            hiddenCommands = hiddenCommands.filter(c => c !== cmd.command.toLowerCase());
+
+            // Remove custom override if user wants to reset to original default? 
+            // The user might want to just "unhide" the overridden version.
+            // But "Restore" usually implies "Reset to default".
+            // Let's assume Restore = Reset to Default AND Unhide.
+            customCommands = customCommands.filter((c: any) => c.command.toLowerCase() !== cmd.command.toLowerCase());
+
+            await updateDB(customCommands, hiddenCommands);
+            toast.success("Command restored to default");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to restore command");
         }
     }
 
@@ -157,7 +256,7 @@ const TerminalSidebar = () => {
             <Card className="border-gray-700 min-h-screen rounded-none" style={{ backgroundColor: ColorTheme.bgMain }}>
                 <CardHeader>
                     <CardTitle style={{ color: ColorTheme.textPrimary }}>Terminal Commands</CardTitle>
-                    <CardDescription style={{ color: ColorTheme.textSecondary }}>Manage custom terminal commands</CardDescription>
+                    <CardDescription style={{ color: ColorTheme.textSecondary }}>Manage terminal commands. Default commands can be overridden or hidden.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-5">
@@ -168,6 +267,7 @@ const TerminalSidebar = () => {
                                 value={currentCommand.command}
                                 onChange={(e) => setCurrentCommand({ ...currentCommand, command: e.target.value.replace(/\s+/g, '') })}
                                 placeholder="e.g., mycommand"
+                                disabled={editingIndex !== null && currentCommand.isDefault} // Cannot change name of default command when editing
                                 style={{
                                     backgroundColor: ColorTheme.bgCard,
                                     borderColor: ColorTheme.borderLight,
@@ -208,66 +308,109 @@ const TerminalSidebar = () => {
                             />
                         </div>
 
-                        <Button
-                            type="button"
-                            onClick={handleSaveCommand}
-                            className="w-full"
-                            style={{
-                                backgroundColor: ColorTheme.primary,
-                                color: ColorTheme.textPrimary,
-                                boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
-                            }}
-                        >
-                            {editingIndex !== null ? 'Update Command' : 'Add Command'}
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                onClick={handleSaveCommand}
+                                className="flex-1"
+                                style={{
+                                    backgroundColor: ColorTheme.primary,
+                                    color: ColorTheme.textPrimary,
+                                    boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
+                                }}
+                            >
+                                {editingIndex !== null ? 'Update Command' : 'Add Command'}
+                            </Button>
+                            {editingIndex !== null && (
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        setCurrentCommand(emptyCommand);
+                                        setEditingIndex(null);
+                                    }}
+                                    variant="outline"
+                                    style={{
+                                        borderColor: ColorTheme.borderLight,
+                                        color: ColorTheme.textPrimary
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+                        </div>
                     </div>
 
                     {commands.length > 0 && (
                         <div className="mt-8 space-y-4">
-                            <h3 className="text-lg font-medium" style={{ color: ColorTheme.textPrimary }}>Custom Commands</h3>
+                            <h3 className="text-lg font-medium" style={{ color: ColorTheme.textPrimary }}>All Commands</h3>
                             <div className="space-y-4">
                                 {commands.map((cmd, index) => (
-                                    <div key={index} className="p-4 rounded-lg border"
+                                    <div key={index} className={`p-4 rounded-lg border ${cmd.isHidden ? 'opacity-50' : ''}`}
                                         style={{
                                             backgroundColor: ColorTheme.bgCard,
                                             borderColor: ColorTheme.borderLight
                                         }}
                                     >
                                         <div className="flex justify-between items-start">
-                                            <div>
+                                            <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-mono text-sm px-2 py-1 rounded bg-gray-800 text-green-400">{cmd.command}</span>
                                                     <span className="text-sm" style={{ color: ColorTheme.textSecondary }}>- {cmd.description}</span>
+                                                    {cmd.isDefault && <span className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Default</span>}
+                                                    {cmd.isHidden && <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30">Hidden</span>}
                                                 </div>
                                                 <div className="mt-2 text-xs font-mono p-2 rounded bg-black/20 whitespace-pre-wrap" style={{ color: ColorTheme.textMuted }}>
                                                     {cmd.output.substring(0, 50)}{cmd.output.length > 50 ? '...' : ''}
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => editCommand(index)}
-                                                    style={{
-                                                        backgroundColor: 'transparent',
-                                                        color: ColorTheme.textSecondary
-                                                    }}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => deleteCommand(index)}
-                                                    style={{
-                                                        backgroundColor: 'transparent',
-                                                        color: ColorTheme.textSecondary
-                                                    }}
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
+                                            <div className="flex gap-2 ml-2">
+                                                {!cmd.isHidden && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => editCommand(cmd, index)}
+                                                        title="Edit"
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            color: ColorTheme.textSecondary
+                                                        }}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+
+                                                {cmd.isDefault && (cmd.isHidden || terminalData.commands?.some((c: any) => c.command.toLowerCase() === cmd.command.toLowerCase())) ? (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => restoreCommand(cmd)}
+                                                        title="Restore Default"
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            color: ColorTheme.textSecondary
+                                                        }}
+                                                    >
+                                                        <RotateCcw className="h-4 w-4" />
+                                                    </Button>
+                                                ) : null}
+
+                                                {!cmd.isHidden && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => deleteCommand(cmd)}
+                                                        title={cmd.isDefault ? "Hide Command" : "Delete Command"}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            color: ColorTheme.textSecondary
+                                                        }}
+                                                    >
+                                                        {cmd.isDefault ? <EyeOff className="h-4 w-4" /> : <Trash className="h-4 w-4" />}
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -7,7 +7,7 @@ import { RootState } from '@/store/store';
 import { supabase } from '@/lib/supabase-client';
 import { useParams } from 'next/navigation';
 import SectionHeader from './SectionHeader';
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { defaultSimpleWhiteExperienceStyles } from "./defaultStyles/experience";
@@ -52,18 +52,18 @@ const AlignmentSelector: React.FC<{
             key={align}
             onClick={() => onChange(align as any)}
             className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="text-2xl text-white">{icon}</div>
             <div className="space-y-1 w-full">
               <div
                 className={`h-1 bg-gradient-to-r rounded ${align === "left"
-                    ? "mr-auto w-3/4"
-                    : align === "center"
-                      ? "mx-auto w-1/2"
-                      : "ml-auto w-3/4"
+                  ? "mr-auto w-3/4"
+                  : align === "center"
+                    ? "mx-auto w-1/2"
+                    : "ml-auto w-3/4"
                   }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
@@ -71,10 +71,10 @@ const AlignmentSelector: React.FC<{
               ></div>
               <div
                 className={`h-1 bg-gray-400 rounded ${align === "left"
-                    ? "mr-auto w-full"
-                    : align === "center"
-                      ? "mx-auto w-3/4"
-                      : "ml-auto w-full"
+                  ? "mr-auto w-full"
+                  : align === "center"
+                    ? "mx-auto w-3/4"
+                    : "ml-auto w-full"
                   }`}
               ></div>
             </div>
@@ -104,8 +104,8 @@ const SizeSelector: React.FC<{
             key={optionValue}
             onClick={() => onChange(optionValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex justify-center mb-2">
@@ -559,11 +559,11 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
       <style>{customCSS}</style>
 
       <div className={`relative z-10 w-full mx-auto px-4 sm:px-6 lg:px-8 ${effectiveCustomization.maxWidth === "md" ? "max-w-4xl" :
-          effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
-            effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
-              effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
-                effectiveCustomization.maxWidth === "full" ? "max-w-full" :
-                  "max-w-7xl"
+        effectiveCustomization.maxWidth === "lg" ? "max-w-5xl" :
+          effectiveCustomization.maxWidth === "xl" ? "max-w-6xl" :
+            effectiveCustomization.maxWidth === "2xl" ? "max-w-7xl" :
+              effectiveCustomization.maxWidth === "full" ? "max-w-full" :
+                "max-w-7xl"
         }`}>
         <SectionHeader
           sectionName="experience"
@@ -605,8 +605,8 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
 
                   <motion.div className="mb-6">
                     <h3 className={`font-title section-sub-title mb-2 ${effectiveCustomization.roleSize === "sm" ? "text-lg md:text-xl" :
-                        effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
-                          effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
+                      effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
+                        effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
                       } ${effectiveCustomization.roleWeight === "normal" ? "font-normal" :
                         effectiveCustomization.roleWeight === "medium" ? "font-medium" :
                           effectiveCustomization.roleWeight === "semibold" ? "font-semibold" : "font-bold"
@@ -615,8 +615,8 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                       {exp.role}
                     </h3>
                     <p className={`font-title section-sub-title mb-3 ${effectiveCustomization.companyNameSize === "sm" ? "text-base" :
-                        effectiveCustomization.companyNameSize === "md" ? "text-lg" :
-                          effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
+                      effectiveCustomization.companyNameSize === "md" ? "text-lg" :
+                        effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
                       } ${effectiveCustomization.companyNameWeight === "normal" ? "font-normal" :
                         effectiveCustomization.companyNameWeight === "medium" ? "font-medium" :
                           effectiveCustomization.companyNameWeight === "semibold" ? "font-semibold" : "font-bold"
@@ -642,7 +642,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                       <span className="inline-block w-1.5 h-1.5 rounded-full mt-2.5 mr-3 flex-shrink-0" style={{ backgroundColor: textSecondaryColor }} />
                       <div className="flex-1 relative">
                         <p className={`font-sans section-sub-description leading-relaxed font-normal ${effectiveCustomization.descriptionTextSize === "sm" ? "text-sm" :
-                            effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
+                          effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
                           }`}
                           style={{ color: textSecondaryColor }}>
                           {exp.description}
@@ -753,8 +753,8 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                         key={value}
                         onClick={() => updateDraftCustomization("maxWidth", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -877,8 +877,8 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                         key={value}
                         onClick={() => updateDraftCustomization("cardHoverEffect", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.cardHoverEffect ?? customization.cardHoverEffect) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                       >
                         <div className="text-center text-lg text-white mb-1">

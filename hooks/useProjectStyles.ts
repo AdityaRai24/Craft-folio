@@ -1,7 +1,8 @@
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { ProjectsCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
 
-export const useProjectStyles = (customization: ProjectsCustomizationState, titleColor: string) => {
-  
+export const useProjectStyles = (customization: ProjectsCustomizationState, titleColor: string, theme: "light" | "dark" = "light") => {
+  const isDark = theme === "dark";
+
   const getLayoutClasses = () => {
     switch (customization.layout) {
       case "grid":
@@ -16,11 +17,16 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
   };
 
   const getCardClasses = () => {
-    let classes = `${customization.cardBackground}  section-card border ${
-      customization.cardBorder
-    } overflow-hidden transition-all duration-${Math.round(
+    let classes = `section-card border overflow-hidden transition-all duration-${Math.round(
       customization.animationSpeed * 1000
-    )} cursor-pointer hover:bg-zinc-900/80`;
+    )} cursor-pointer `;
+
+    // Background and Border
+    if (isDark) {
+      classes += "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl hover:bg-zinc-900/80";
+    } else {
+      classes += "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg";
+    }
 
     return classes;
   };
@@ -28,6 +34,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
   const getCardStyle = () => ({
     borderRadius: `${customization.cardBorderRadius}px`,
     padding: `${customization.cardPadding * 4}px`,
+    backdropFilter: isDark ? "blur(10px)" : "none",
   });
 
   const getImageStyle = () => {
@@ -62,20 +69,29 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
         ? customization.githubButtonStyle
         : customization.liveButtonStyle;
     let classes =
-      "flex items-center gap-2 px-3 py-1.5 transition-all duration-300 text-sm";
+      "flex items-center gap-2 px-3 py-1.5 transition-all duration-300 text-sm ";
 
-    switch (style) {
-      case "filled":
-        classes += " text-white";
-        break;
-      case "ghost":
-        classes += " bg-transparent hover:bg-gray-800/50";
-        break;
-      case "minimal":
-        classes += " bg-transparent border-0 underline hover:underline";
-        break;
-      default:
-        classes += " bg-transparent border rounded-md hover:text-white";
+    // Base styles based on theme
+    if (style === "default") {
+        if (buttonType === "live") {
+             classes += isDark 
+                ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-sm hover:shadow-md" 
+                : "bg-blue-500 hover:bg-blue-600 text-white border-blue-400 shadow-sm hover:shadow-md";
+        } else {
+             classes += isDark
+                ? "bg-gray-700 hover:bg-gray-600 text-white border-gray-600 shadow-sm hover:shadow-md"
+                : "bg-gray-800 hover:bg-gray-900 text-white border-gray-700 shadow-sm hover:shadow-md";
+        }
+    } else if (style === "filled") {
+      classes += " text-white";
+    } else if (style === "ghost") {
+      classes += isDark ? " bg-transparent hover:bg-gray-800/50 text-white" : " bg-transparent hover:bg-gray-100 text-gray-900";
+    } else if (style === "minimal") {
+      classes += isDark ? " bg-transparent border-0 underline hover:underline text-white" : " bg-transparent border-0 underline hover:underline text-gray-900";
+    }
+
+    if (style !== "default" && style !== "minimal" && style !== "ghost" && style !== "filled") {
+         classes += " bg-transparent border rounded-md hover:text-white";
     }
 
     return classes;
@@ -86,6 +102,13 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       buttonType === "github"
         ? customization.githubButtonStyle
         : customization.liveButtonStyle;
+    
+    // If default, we handle colors in classes
+    if (style === "default") {
+        return {
+            borderRadius: `${customization.buttonBorderRadius}px`,
+        };
+    }
 
     return {
       borderRadius: `${customization.buttonBorderRadius}px`,
@@ -97,20 +120,23 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
   const getTechStackClasses = () => {
     let classes =
-      "px-3 py-1 text-sm font-medium cursor-pointer transition-all duration-300";
+      "px-3 py-1 text-sm font-medium cursor-pointer transition-all duration-300 ";
 
     switch (customization.techStackStyle) {
       case "badges":
-        classes += " bg-gray-800 text-white rounded";
+        classes += isDark ? "bg-gray-800 text-white rounded" : "bg-gray-800 text-white rounded";
         break;
       case "minimal":
-        classes += " text-gray-300 hover:text-white";
+        classes += isDark ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900";
         break;
       case "colorful":
-        classes += " text-white rounded-full border-2";
+        classes += "text-white rounded-full border-2";
         break;
+      case "pills":
       default:
-        classes += " text-white rounded-full border border-gray-700";
+         classes += isDark 
+            ? "bg-gray-700/50 text-gray-300 border border-gray-600/50 hover:bg-gray-700 hover:border-gray-500 rounded-full"
+            : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-full";
     }
 
     return classes;
@@ -142,7 +168,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       bold: "font-bold",
     };
 
-    return `section-sub-title ${sizeMap[customization.titleSize]} ${weightMap[customization.titleWeight]} transition-colors duration-300`;
+    return `section-sub-title ${sizeMap[customization.titleSize]} ${weightMap[customization.titleWeight]} transition-colors duration-300 ${isDark ? "text-white" : "text-gray-900"}`;
   };
 
   const getDescriptionClasses = () => {
@@ -159,7 +185,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       bold: "font-bold",
     };
 
-    return `section-sub-description ${sizeMap[customization.descriptionSize]} ${weightMap[customization.descriptionWeight]}`;
+    return `section-sub-description ${sizeMap[customization.descriptionSize]} ${weightMap[customization.descriptionWeight]} ${isDark ? "text-gray-400" : "text-gray-600"}`;
   };
 
   return {

@@ -12,12 +12,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { motion } from "framer-motion";
-import EditButton from "@/components/EditButton";
+import EditButton from "@/components/Shared/EditButton";
 import toast from "react-hot-toast";
 import { defaultProjectsStyles } from "../NeoSpark/defaultStyles/projects";
 import { ProjectsCustomizationState } from "../NeoSpark/defaultStyles/types";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { ColorTheme } from "@/lib/colorThemes";
 import React from "react";
@@ -157,10 +157,6 @@ const ProjectsGrid = ({
     setProjectsData: setProjectsData,
   });
 
-  console.log(projectsData)
-
-
-
   const {
     getLayoutClasses,
     getLayoutStyle,
@@ -173,9 +169,7 @@ const ProjectsGrid = ({
     getTitleAlignment,
     getTitleClasses,
     getDescriptionClasses
-  } = useProjectStyles(effectiveCustomization, "");
-
-
+  } = useProjectStyles(effectiveCustomization, "", theme);
 
   if (!projectsData || projectsData.length === 0) {
     return (
@@ -210,11 +204,10 @@ const ProjectsGrid = ({
             <EditButton sectionName="projects" />
             <button
               onClick={openVisualEditor}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                
-                `}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
               style={{
                 background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                color: "white"
               }}
             >
               <Settings size={16} />
@@ -235,14 +228,8 @@ const ProjectsGrid = ({
             >
               {/* Project Card */}
               <div
-                className={`${getCardClasses()} ${isDark
-                  ? "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl"
-                  : "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg"
-                  } transition-all duration-300`}
-                style={{
-                  ...getCardStyle(),
-                  backdropFilter: isDark ? "blur(10px)" : "none",
-                }}
+                className={getCardClasses()}
+                style={getCardStyle()}
               >
                 {/* Project Image/Illustration */}
                 <div
@@ -276,20 +263,14 @@ const ProjectsGrid = ({
                 <div className="mt-5">
                   {/* Project Title */}
                   <div className={getTitleAlignment()}>
-                    <h3
-                      className={`${getTitleClasses()} ${isDark ? "text-white" : "text-gray-900"
-                        } font-semibold tracking-tight`}
-                    >
+                    <h3 className={getTitleClasses()}>
                       {project.projectTitle || project.projectName || `Project ${index + 1}`}
                     </h3>
                   </div>
 
                   {/* Project Description */}
                   <div className="relative group/desc mt-2">
-                    <p
-                      className={`${getDescriptionClasses()} ${isDark ? "text-gray-400" : "text-gray-600"
-                        } leading-relaxed`}
-                    >
+                    <p className={getDescriptionClasses()}>
                       {project.projectDescription || "No description available"}
                     </p>
                     <div className="absolute -top-2 -right-2 opacity-0 group-hover/desc:opacity-100 transition-opacity">
@@ -319,10 +300,7 @@ const ProjectsGrid = ({
                       {project.techStack.slice(0, 5).map((tech: any, techIndex: number) => (
                         <div
                           key={techIndex}
-                          className={`${getTechStackClasses()} ${isDark
-                            ? "bg-gray-700/50 text-gray-300 border-gray-600/50 hover:bg-gray-700 hover:border-gray-500"
-                            : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200 hover:border-gray-300"
-                            } transition-all duration-200`}
+                          className={getTechStackClasses()}
                           title={tech.name}
                         >
                           {tech.logo ? (
@@ -333,12 +311,7 @@ const ProjectsGrid = ({
                         </div>
                       ))}
                       {project.techStack.length > 5 && (
-                        <div
-                          className={`${getTechStackClasses()} ${isDark
-                            ? "bg-gray-700/50 text-gray-400 border-gray-600/50"
-                            : "bg-gray-100 text-gray-600 border-gray-200"
-                            }`}
-                        >
+                        <div className={getTechStackClasses()}>
                           <span className="text-xs font-medium">+{project.techStack.length - 5}</span>
                         </div>
                       )}
@@ -359,10 +332,7 @@ const ProjectsGrid = ({
                         href={project.liveLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${getButtonClasses("live")} flex-1 ${isDark
-                          ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500"
-                          : "bg-blue-500 hover:bg-blue-600 text-white border-blue-400"
-                          } shadow-sm hover:shadow-md transition-all duration-200`}
+                        className={getButtonClasses("live")}
                         style={getButtonStyle("live")}
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -375,10 +345,7 @@ const ProjectsGrid = ({
                         href={project.githubLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${getButtonClasses("github")} flex-1 ${isDark
-                          ? "bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
-                          : "bg-gray-800 hover:bg-gray-900 text-white border-gray-700"
-                          } shadow-sm hover:shadow-md transition-all duration-200`}
+                        className={getButtonClasses("github")}
                         style={getButtonStyle("github")}
                         onClick={(e) => e.stopPropagation()}
                       >

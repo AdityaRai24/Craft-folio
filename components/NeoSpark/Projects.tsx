@@ -19,7 +19,7 @@ import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
 import { defaultProjectsStyles } from "./defaultStyles/projects";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { Project, Technology, ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
@@ -278,8 +278,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                       effectiveCustomization.layout === "grid"
                         ? "flex flex-col items-center"
                         : effectiveCustomization.imagePosition === "right"
-                        ? "flex flex-col md:flex-row-reverse items-center"
-                        : "flex flex-col md:flex-row items-center"
+                          ? "flex flex-col md:flex-row-reverse items-center"
+                          : "flex flex-col md:flex-row items-center"
                     }
                   >
                     {/* Project Image */}
@@ -349,13 +349,12 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                       }
                     >
                       <div
-                        className={`flex flex-wrap items-center ${
-                          effectiveCustomization.titleAlignment === "center"
+                        className={`flex flex-wrap items-center ${effectiveCustomization.titleAlignment === "center"
                             ? "justify-center"
                             : effectiveCustomization.titleAlignment === "right"
-                            ? "justify-end"
-                            : "justify-between"
-                        } mb-3`}
+                              ? "justify-end"
+                              : "justify-between"
+                          } mb-3`}
                       >
                         <h3
                           className={`${getTitleClasses()} ${getTitleAlignment()}`}
@@ -395,13 +394,12 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                           Tech Stack
                         </h4>
                         <div
-                          className={`flex flex-wrap gap-2 ${
-                            effectiveCustomization.titleAlignment === "center"
+                          className={`flex flex-wrap gap-2 ${effectiveCustomization.titleAlignment === "center"
                               ? "justify-center"
                               : effectiveCustomization.titleAlignment === "right"
-                              ? "justify-end"
-                              : ""
-                          }`}
+                                ? "justify-end"
+                                : ""
+                            }`}
                         >
                           {project?.techStack?.map((tech: Technology, idx: number) => (
                             <motion.span

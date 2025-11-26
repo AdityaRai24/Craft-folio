@@ -22,7 +22,7 @@ import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 
 
 const Projects = ({ currentTheme, portfolioId }: any) => {

@@ -26,12 +26,12 @@ import { motion } from "framer-motion";
 import { fontClassMap } from "@/lib/font";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import PortfolioNotFound from "@/components/PortfolioNotFound";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import PortfolioNotFound from "@/components/Shared/PortfolioNotFound";
+import LoadingSpinner from "@/components/Shared/LoadingSpinner";
 import { CheckCircle, Layout, Palette } from "lucide-react";
 import Head from "next/head";
 import { useUser } from "@clerk/nextjs";
-import GuestWarningModal from "@/components/GuestWarningModal";
+import GuestWarningModal from "@/components/Modals/GuestWarningModal";
 
 const Page = () => {
   const dispatch = useDispatch();

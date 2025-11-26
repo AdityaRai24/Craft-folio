@@ -5,7 +5,7 @@ import { Download, Edit2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useUser } from "@clerk/nextjs";
-import { shouldShowEditButtons } from "@/components/EditButton";
+import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ResumeVisualEditor } from "@/components/VisualEditor/Resume/ResumeVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
 

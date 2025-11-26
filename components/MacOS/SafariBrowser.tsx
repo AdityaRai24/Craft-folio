@@ -6,7 +6,7 @@ import { Search, RefreshCw, Home, Star, Share2, ArrowLeft, ArrowRight, Edit2 } f
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useUser } from "@clerk/nextjs";
-import { shouldShowEditButtons } from "@/components/EditButton";
+import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import SafariEditor from "./SafariEditor";
 import { updatePortfolioData } from "@/slices/dataSlice";
 import { updateSection } from "@/app/actions/portfolio";

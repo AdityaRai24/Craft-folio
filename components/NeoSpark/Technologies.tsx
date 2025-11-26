@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
 import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
-import EditButton from "@/components/EditButton";
+import EditButton from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
 
 interface Technology {

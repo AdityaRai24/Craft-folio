@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { Edit2 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { shouldShowEditButtons } from "@/components/EditButton";
+import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { setCurrentEdit } from "@/slices/editModeSlice";
 import { ColorTheme } from "@/lib/colorThemes";
 
@@ -106,6 +106,13 @@ ${summary}`;
   if (terminalData.commands) {
     terminalData.commands.forEach((cmd: any) => {
       commands[cmd.command.toLowerCase()] = () => cmd.output;
+    });
+  }
+
+  // Remove hidden commands
+  if (terminalData.hiddenCommands) {
+    terminalData.hiddenCommands.forEach((cmd: string) => {
+      delete commands[cmd.toLowerCase()];
     });
   }
 

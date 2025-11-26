@@ -24,7 +24,7 @@ import {
   updateSection
 } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 
 
 interface Technology {

@@ -9,7 +9,7 @@ import { RootState } from "@/store/store";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
-import EditButton from '@/components/EditButton';
+import EditButton from '@/components/Shared/EditButton';
 
 const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle, portfolioId }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,7 +41,7 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
       const userInfoData = portfolioData.find(
         (section: any) => section.type === "userInfo"
       )?.data;
-      
+
       if (heroSectionData) {
         setHeroData(heroSectionData);
       }
@@ -125,9 +125,8 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
 
   return (
     <motion.div
-      className={`flex items-center justify-between mx-auto z-50 rounded-lg border transition-all duration-300 ${
-        scrolled ? "w-[95%] sm:w-4/5 border-gray-300/20 text-white backdrop-blur-xl bg-black/30" : "w-full backdrop-blur-sm bg-black/10"
-      }`}
+      className={`flex items-center justify-between mx-auto z-50 rounded-lg border transition-all duration-300 ${scrolled ? "w-[95%] sm:w-4/5 border-gray-300/20 text-white backdrop-blur-xl bg-black/30" : "w-full backdrop-blur-sm bg-black/10"
+        }`}
       layout
       transition={spring}
       style={{
@@ -187,7 +186,7 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
             transition={spring}
             className="flex items-center justify-center gap-4 md:gap-8"
           >
-              <EditButton sectionName="contact" divStyles="hidden md:block relative top-0 right-0" styles="" />
+            <EditButton sectionName="contact" divStyles="hidden md:block relative top-0 right-0" styles="" />
 
             <motion.div
               layout

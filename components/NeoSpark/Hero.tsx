@@ -16,12 +16,12 @@ import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
-import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
 
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { defaultHeroStyles } from "./defaultStyles/hero";
 import { CustomizationState } from "./defaultStyles/types";
 import { useUser } from '@clerk/nextjs';
@@ -48,11 +48,10 @@ const AlignmentSelector: React.FC<{
           <div
             key={align}
             onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
-              value === align
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${value === align
                 ? "border-white bg-zinc-700 shadow-lg"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
-            }`}
+              }`}
           >
             <div className="text-2xl text-white">{icon}</div>
             <div className="relative w-full h-8 flex items-center justify-center">
@@ -60,13 +59,12 @@ const AlignmentSelector: React.FC<{
               <div className="w-full h-1 bg-gray-600 rounded-full"></div>
               {/* Alignment indicator */}
               <div
-                className={`absolute h-2 w-2 rounded-full transition-all duration-300 shadow-lg ${
-                  align === "left"
+                className={`absolute h-2 w-2 rounded-full transition-all duration-300 shadow-lg ${align === "left"
                     ? "left-0"
                     : align === "center"
-                    ? "left-1/2 transform -translate-x-1/2"
-                    : "right-0"
-                }`}
+                      ? "left-1/2 transform -translate-x-1/2"
+                      : "right-0"
+                  }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                   boxShadow: `0 0 8px ${ColorTheme.primary}40`,
@@ -112,11 +110,10 @@ const VerticalAlignmentSelector: React.FC<{
           <div
             key={align}
             onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
-              value === align
+            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${value === align
                 ? "border-white bg-zinc-700 shadow-lg"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
-            }`}
+              }`}
           >
             <div className="text-2xl text-white">{icon}</div>
             <div className="relative w-full h-12 flex items-center justify-center">
@@ -124,13 +121,12 @@ const VerticalAlignmentSelector: React.FC<{
               <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
               {/* Alignment indicator */}
               <div
-                className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
-                  align === "top"
+                className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${align === "top"
                     ? "top-0"
                     : align === "center"
-                    ? "top-1/2 transform -translate-y-1/2"
-                    : "bottom-0"
-                }`}
+                      ? "top-1/2 transform -translate-y-1/2"
+                      : "bottom-0"
+                  }`}
                 style={{
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                   boxShadow: `0 0 8px ${ColorTheme.primary}40`,
@@ -171,11 +167,10 @@ const SizeSelector: React.FC<{
           <div
             key={optionValue}
             onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div className="flex justify-center mb-2">
               <div
@@ -210,11 +205,10 @@ const ButtonStyleSelector: React.FC<{
           <div
             key={optionValue}
             onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div className="flex justify-center mb-2">
               <div
@@ -320,39 +314,39 @@ const BackgroundThemeSelector: React.FC<{
     value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots";
     label: string;
   }> = [
-    {
-      value: "noise-pattern",
-      label: "Noise Pattern",
-    },
-    {
-      value: "diagonal-lines",
-      label: "Diagonal Lines",
-    },
-    {
-      value: "magenta-orb-grid",
-      label: "Magenta Orb Grid",
-    },
-    {
-      value: "black-grid-dots",
-      label: "Black Grid Dots",
-    },
-    {
-      value: "pearl-mist",
-      label: "Pearl Mist",
-    },
-    {
-      value: "aurora-midnight",
-      label: "Aurora Midnight",
-    },
-    {
-      value: "crimson-shadow",
-      label: "Crimson Shadow",
-    },
-    {
-      value: "ocean-abyss",
-      label: "Ocean Abyss",
-    },
-  ];
+      {
+        value: "noise-pattern",
+        label: "Noise Pattern",
+      },
+      {
+        value: "diagonal-lines",
+        label: "Diagonal Lines",
+      },
+      {
+        value: "magenta-orb-grid",
+        label: "Magenta Orb Grid",
+      },
+      {
+        value: "black-grid-dots",
+        label: "Black Grid Dots",
+      },
+      {
+        value: "pearl-mist",
+        label: "Pearl Mist",
+      },
+      {
+        value: "aurora-midnight",
+        label: "Aurora Midnight",
+      },
+      {
+        value: "crimson-shadow",
+        label: "Crimson Shadow",
+      },
+      {
+        value: "ocean-abyss",
+        label: "Ocean Abyss",
+      },
+    ];
 
   return (
     <div>
@@ -364,11 +358,10 @@ const BackgroundThemeSelector: React.FC<{
           <div
             key={themeValue}
             onClick={() => onChange(themeValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === themeValue
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === themeValue
                 ? "border-white bg-zinc-700"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
           >
             <div
               className="w-full h-20 rounded mb-2"
@@ -417,7 +410,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
       const data = await response.json();
       const enhancedDescription = data.response || data.content || data.result;
-      
+
       return enhancedDescription;
     } catch (error) {
       console.error('Magic Write API error:', error);
@@ -433,7 +426,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         summary: newDescription
       };
       setHeroData(updatedHeroData);
-      
+
       // Save to database
       const result = await updateSection({
         sectionName: "hero",
@@ -442,7 +435,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         sectionTitle: "Hero",
         sectionDescription: "Hero section"
       });
-      
+
       if (result.success) {
         toast.success("Hero description enhanced and saved successfully!");
       } else {
@@ -514,7 +507,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   // When opening the editor, copy customization to draft
   const openVisualEditor = () => {
-   
+
     setDraftCustomization({ ...customization });
     setVisualEditorOpen(true);
   };
@@ -528,7 +521,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   // When 'Done' is clicked, save draft to DB and update main state
   const saveDraftCustomization = async () => {
     if (!draftCustomization) return;
-   
+
     setCustomization(draftCustomization);
     setVisualEditorOpen(false);
     try {
@@ -641,11 +634,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       full: "w-full",
     };
 
-    let classes = `relative flex-1 flex pt-8 flex-col px-4 sm:px-6 md:px-8 ${
-      alignmentMap[effectiveCustomization.contentAlignment]
-    } ${verticalMap[effectiveCustomization.verticalAlignment]} ${
-      maxWidthMap[effectiveCustomization.maxWidth]
-    } mx-auto space-y-4 sm:space-y-6`;
+    let classes = `relative flex-1 flex pt-8 flex-col px-4 sm:px-6 md:px-8 ${alignmentMap[effectiveCustomization.contentAlignment]
+      } ${verticalMap[effectiveCustomization.verticalAlignment]} ${maxWidthMap[effectiveCustomization.maxWidth]
+      } mx-auto space-y-4 sm:space-y-6`;
 
     return classes;
   };
@@ -680,11 +671,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       wide: "tracking-wide",
     };
 
-    return `section-title ${sizeMap[effectiveCustomization.titleSize]} ${
-      weightMap[effectiveCustomization.titleWeight]
-    } ${lineHeightMap[effectiveCustomization.titleLineHeight]} ${
-      letterSpacingMap[effectiveCustomization.titleLetterSpacing]
-    }`;
+    return `section-title ${sizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]
+      } ${lineHeightMap[effectiveCustomization.titleLineHeight]} ${letterSpacingMap[effectiveCustomization.titleLetterSpacing]
+      }`;
   };
 
   const getDescriptionClasses = () => {
@@ -709,11 +698,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       full: "max-w-full",
     };
 
-    return `section-description ${
-      sizeMap[effectiveCustomization.descriptionSize]
-    } ${weightMap[effectiveCustomization.descriptionWeight]} ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${
-      effectiveCustomization.contentAlignment === "center" ? "mx-auto" : ""
-    }`;
+    return `section-description ${sizeMap[effectiveCustomization.descriptionSize]
+      } ${weightMap[effectiveCustomization.descriptionWeight]} ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${effectiveCustomization.contentAlignment === "center" ? "mx-auto" : ""
+      }`;
   };
 
   const getBadgeClasses = () => {
@@ -742,11 +729,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
     return {
       container: `${layoutMap[effectiveCustomization.buttonLayout]} mt-8`,
-      button: `flex btn-primary items-center gap-2 ${
-        sizeMap[effectiveCustomization.buttonSize]
-      } ${
-        styleMap[effectiveCustomization.buttonStyle]
-      } cursor-pointer transition-all duration-300`,
+      button: `flex btn-primary items-center gap-2 ${sizeMap[effectiveCustomization.buttonSize]
+        } ${styleMap[effectiveCustomization.buttonStyle]
+        } cursor-pointer transition-all duration-300`,
     };
   };
 
@@ -775,7 +760,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const updateCustomization = async (key: keyof CustomizationState, value: any) => {
     const newCustomization = { ...customization, [key]: value };
     setCustomization(newCustomization);
-    
+
     // Save to database
     try {
       const result = await saveComponentCustomization({
@@ -783,7 +768,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         componentType: "hero",
         settings: newCustomization,
       });
-      
+
       if (!result.success) {
         toast.error("Failed to save customization");
       }
@@ -1015,13 +1000,13 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       <div className="absolute inset-0 z-0" style={getBackgroundStyle()} />
       {/* Fade effect at bottom to smooth transition */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-10"></div>
-              <div
-          className={getContainerClasses()}
-          style={{
-            paddingLeft: `${effectiveCustomization.containerPadding}px`,
-            paddingRight: `${effectiveCustomization.containerPadding}px`,
-          }}
-        >
+      <div
+        className={getContainerClasses()}
+        style={{
+          paddingLeft: `${effectiveCustomization.containerPadding}px`,
+          paddingRight: `${effectiveCustomization.containerPadding}px`,
+        }}
+      >
         <style>{customCSS}</style>
 
         {/* Badge */}
@@ -1050,7 +1035,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             </span>
           </motion.div>
         )}
-        
+
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
           {shouldShowButton && (
@@ -1064,7 +1049,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             </button>
           )}
         </div>
-        
+
         {/* Title */}
         <motion.h1
           initial={animationVariants.hidden}
@@ -1186,7 +1171,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             <p>Scroll to explore</p>
             {(() => {
               const style = effectiveCustomization.scrollIndicatorStyle?.toLowerCase();
-             
+
               return null;
             })()}
             {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "line") && (
@@ -1236,15 +1221,15 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
         {/* Floating Visual Editor Window */}
         {visualEditorOpen && (
-                  <div
-          ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-          }}
-        >
+          <div
+            ref={dragRef}
+            className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+            style={{
+              left: `${windowPosition.x}px`,
+              top: `${windowPosition.y}px`,
+              cursor: isDragging ? "grabbing" : "grab",
+            }}
+          >
             {/* Header */}
             <div
               className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
@@ -1315,11 +1300,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         <div
                           key={value}
                           onClick={() => updateDraftCustomization("maxWidth", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.maxWidth ?? customization.maxWidth) === value
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
+                            }`}
                         >
                           <div className="flex flex-col items-center gap-2">
                             <div className="w-full  block mx-auto">
@@ -1420,11 +1404,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             onClick={() =>
                               updateDraftCustomization("titleWeight", value)
                             }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleWeight ?? customization.titleWeight) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="flex justify-center mb-2">
                               <div
@@ -1462,11 +1445,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             onClick={() =>
                               updateDraftCustomization("titleLineHeight", value)
                             }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleLineHeight ?? customization.titleLineHeight) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleLineHeight ?? customization.titleLineHeight) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="flex justify-center mb-2">
                               <div
@@ -1510,11 +1492,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             onClick={() =>
                               updateDraftCustomization("titleLetterSpacing", value)
                             }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleLetterSpacing ?? customization.titleLetterSpacing) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleLetterSpacing ?? customization.titleLetterSpacing) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="flex justify-center mb-2">
                               <div
@@ -1564,11 +1545,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             onClick={() =>
                               updateDraftCustomization("descriptionWeight", value)
                             }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="flex justify-center mb-2">
                               <div
@@ -1603,11 +1583,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                             onClick={() =>
                               updateDraftCustomization("descriptionMaxWidth", value)
                             }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.descriptionMaxWidth ?? customization.descriptionMaxWidth) === value
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionMaxWidth ?? customization.descriptionMaxWidth) === value
                                 ? "border-white bg-zinc-700"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
+                              }`}
                           >
                             <div className="flex flex-col items-center gap-2">
                               <div className="w-full block mx-auto">
@@ -1647,11 +1626,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           onClick={() =>
                             updateDraftCustomization("buttonLayout", value)
                           }
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.buttonLayout ?? customization.buttonLayout) === value
+                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.buttonLayout ?? customization.buttonLayout) === value
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
+                            }`}
                         >
                           <div className="text-center text-lg text-white mb-1">
                             {icon}
@@ -1717,11 +1695,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                               !(draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
                             )
                           }
-                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
+                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
                               ? "border-white bg-zinc-700"
                               : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
+                            }`}
                         >
                           <div className="text-center text-lg text-white mb-1">
                             {icon}
@@ -1761,13 +1738,12 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                                   value
                                 )
                               }
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value
+                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value
                                   ? "border-white bg-zinc-700"
                                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
+                                }`}
                             >
-                              
+
                               <div className="text-center text-lg text-white mb-1">
                                 {icon}
                               </div>

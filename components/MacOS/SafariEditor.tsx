@@ -6,7 +6,6 @@ import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { X, Save } from "lucide-react";
-import { useTheme } from "next-themes"; // Or use the passed isDark prop
 
 interface SafariEditorProps {
     initialContent: string;

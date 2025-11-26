@@ -23,7 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
-import EditButton from "@/components/EditButton";
+import EditButton from "@/components/Shared/EditButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { HeaderComponent } from "./Components";
 import { toast } from "react-hot-toast";
@@ -34,7 +34,7 @@ import {
   deleteComponentCustomization,
   updateSection,
 } from "@/app/actions/portfolio";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 
 // Helper function to convert hex to rgba

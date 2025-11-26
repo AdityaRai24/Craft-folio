@@ -35,7 +35,7 @@ import SEOSettings from "./SEOSettings";
 import ChatInterface from "./ChatInterface";
 import SettingsMenu from "./SettingsMenu";
 import GuestWarning from "./GuestWarning";
-import DeployModal from "../DeployModal";
+import DeployModal from "@/components/Modals/DeployModal";
 
 const PortfolioChatbot = ({
   portfolioData,
@@ -305,12 +305,12 @@ const PortfolioChatbot = ({
       });
       return;
     }
-    
+
     try {
       setIsProcessing(true);
       console.log("Original sections:", sections);
       console.log("Reordered sections:", reorderedSections);
-      
+
       const sectionOrder: any = [];
       portfolioData.map((item: any) => sectionOrder.push(item.type));
       const updatedOrder: any = [];
@@ -329,7 +329,7 @@ const PortfolioChatbot = ({
         }
       });
       console.log("Updated order:", updatedOrder);
-      
+
       const finalSections: any = [];
       updatedOrder.forEach((item: any) => {
         const found = portfolioData.find((it: any) => it.type === item);
@@ -501,7 +501,7 @@ const PortfolioChatbot = ({
       });
       return;
     }
-    
+
     // Call the save function from SEOSettings component
     console.log("handleSaveSEO called, seoSettingsRef:", seoSettingsRef.current);
     if (seoSettingsRef.current) {
@@ -512,8 +512,8 @@ const PortfolioChatbot = ({
         // Close the chatbot after successful save
         setShowSEOSettings(false);
         handleChatClose();
-    } catch (error) {
-      console.error("Error saving SEO settings:", error);
+      } catch (error) {
+        console.error("Error saving SEO settings:", error);
       }
     } else {
       console.error("seoSettingsRef is not available");
@@ -560,7 +560,7 @@ const PortfolioChatbot = ({
   const handleShare = (platform: string) => {
     const url = `https://craft-folio-three.vercel.app/p/${portfolioLink}`;
     const text = "Check out my portfolio!";
-    
+
     switch (platform) {
       case "twitter":
         window.open(
@@ -637,7 +637,7 @@ const PortfolioChatbot = ({
             }}
           >
             {(portfolioUserId === "guest" && !isLoaded) ||
-            (portfolioUserId === "guest" && isLoaded && !user) ? (
+              (portfolioUserId === "guest" && isLoaded && !user) ? (
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -654,7 +654,7 @@ const PortfolioChatbot = ({
                   ⚠️ You are in guest mode. Sign up to save your portfolio and
                   unlock all features including the AI chatbot, theme
                   customization, and more.{" "}
-                  <SignInButton 
+                  <SignInButton
                     mode="modal"
                     fallbackRedirectUrl={pathname}
                     signUpFallbackRedirectUrl={pathname}
@@ -675,11 +675,11 @@ const PortfolioChatbot = ({
             >
               <AnimatePresence>
                 {showThemeOptions ||
-                showFontOptions ||
-                showHelpPanel ||
-                showSectionReorder ||
-                showSEOSettings ||
-                showAdvanced ? (
+                  showFontOptions ||
+                  showHelpPanel ||
+                  showSectionReorder ||
+                  showSEOSettings ||
+                  showAdvanced ? (
                   <motion.div
                     key="options-panel"
                     variants={panelVariants}
@@ -699,7 +699,7 @@ const PortfolioChatbot = ({
                         style={{ color: themeColors.textPrimary }}
                       >
                         <X size={18}
-                        className="cursor-pointer" />
+                          className="cursor-pointer" />
                       </motion.button>
                     </div>
 
@@ -768,7 +768,7 @@ const PortfolioChatbot = ({
               </AnimatePresence>
             </div>
 
-           
+
 
 
 
@@ -862,42 +862,42 @@ const PortfolioChatbot = ({
                 }}
               >
                 <div className="flex gap-2">
-                <Button
+                  <Button
                     onClick={resetSectionOrder}
                     className="flex-1 font-medium py-2 px-4 rounded-lg transition-colors"
-                  style={{
+                    style={{
                       backgroundColor: themeColors.bgCard,
-                    color: themeColors.textPrimary,
+                      color: themeColors.textPrimary,
                       borderColor: themeColors.borderLight,
-                  }}
-                >
+                    }}
+                  >
                     Reset Order
-                </Button>
+                  </Button>
                   <Button
                     onClick={handleSectionReorder}
                     disabled={isProcessing}
                     className="flex-1 font-medium py-2 px-4 rounded-lg transition-colors"
-                              style={{
+                    style={{
                       backgroundColor: isProcessing
-                          ? themeColors.bgCard
-                          : themeColors.primary,
-                                color: themeColors.textPrimary,
+                        ? themeColors.bgCard
+                        : themeColors.primary,
+                      color: themeColors.textPrimary,
                       boxShadow: !isProcessing
-                          ? `0 4px 14px ${themeColors.primaryGlow}`
-                          : "none",
+                        ? `0 4px 14px ${themeColors.primaryGlow}`
+                        : "none",
                     }}
                   >
                     Apply New Order
                   </Button>
-                        </div>
+                </div>
               </motion.div>
-                    )}
+            )}
             <GuestWarning user={user} themeColors={themeColors} />
           </motion.div>
         )}
       </AnimatePresence>
 
-                      {!isOpen && (
+      {!isOpen && (
         <SettingsMenu
           isMenuExpanded={isMenuExpanded}
           setIsMenuExpanded={setIsMenuExpanded}
@@ -910,7 +910,7 @@ const PortfolioChatbot = ({
           onShowDeploy={handleShowDeploy}
           onShowSEOSettings={handleShowSEOSettings}
         />
-                )}
+      )}
 
       {/* Deploy Modal */}
       <DeployModal

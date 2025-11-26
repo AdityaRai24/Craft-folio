@@ -6,7 +6,7 @@ import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, ExternalLink, Settings } from "lucide-react";
-import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";

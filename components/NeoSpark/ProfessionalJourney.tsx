@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { ColorTheme } from "@/lib/colorThemes";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import {
   RotateCcw,
   Grid3X3,
@@ -49,8 +49,8 @@ const TechStackStyleSelector: React.FC<{
             key={style}
             onClick={() => onChange(style as any)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === style
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex flex-wrap gap-1 justify-center mb-2">
@@ -58,12 +58,12 @@ const TechStackStyleSelector: React.FC<{
                 <span
                   key={i}
                   className={`text-xs px-2 py-1 ${style === "pills"
-                      ? "rounded-full border border-gray-500 text-white"
-                      : style === "badges"
-                        ? "rounded bg-gray-600 text-white"
-                        : style === "minimal"
-                          ? "text-gray-300"
-                          : "rounded-full border-2 text-white"
+                    ? "rounded-full border border-gray-500 text-white"
+                    : style === "badges"
+                      ? "rounded bg-gray-600 text-white"
+                      : style === "minimal"
+                        ? "text-gray-300"
+                        : "rounded-full border-2 text-white"
                     }`}
                   style={
                     style === "colorful"
@@ -753,10 +753,10 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                     <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400">
                       <span
                         className={`truncate max-w-[60vw] sm:max-w-none ${effectiveCustomization.companySize === "lg"
-                            ? "text-lg"
-                            : effectiveCustomization.companySize === "md"
-                              ? "text-base"
-                              : "text-sm"
+                          ? "text-lg"
+                          : effectiveCustomization.companySize === "md"
+                            ? "text-base"
+                            : "text-sm"
                           }`}
                       >
                         <Building className="inline h-4 w-4 mr-1" />
@@ -766,8 +766,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       {(draftCustomization?.locationBadge ?? customization.locationBadge) && experience.location && (
                         <span
                           className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${(draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? "border"
-                              : ""
+                            ? "border"
+                            : ""
                             }`}
                           style={{
                             backgroundColor:
@@ -794,8 +794,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       {(draftCustomization?.dateBadge ?? customization.dateBadge) && (
                         <span
                           className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${(draftCustomization?.badgeStyle ?? customization.badgeStyle) === "outlined"
-                              ? "border"
-                              : ""
+                            ? "border"
+                            : ""
                             }`}
                           style={{
                             backgroundColor:
@@ -865,8 +865,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                                   }
                                   alt={tech.name}
                                   className={`${(draftCustomization?.techStackSize ?? customization.techStackSize) === "lg"
-                                      ? "h-5 w-5"
-                                      : "h-4 w-4"
+                                    ? "h-5 w-5"
+                                    : "h-4 w-4"
                                     } inline-block mr-1`}
                                 />
                               )}
@@ -917,8 +917,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
                 className={`flex-1 py-3 px-3 text-sm capitalize transition-colors ${activeTab === tab
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white hover:bg-zinc-800"
                   }`}
                 style={
                   activeTab === tab
@@ -964,8 +964,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                         key={value}
                         onClick={() => updateDraftCustomization("maxWidth", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.maxWidth ?? customization.maxWidth) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                       >
                         <div className="flex flex-col items-center gap-2">
@@ -1026,8 +1026,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             key={value}
                             onClick={() => updateDraftCustomization("dotSize", value)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.dotSize ?? customization.dotSize) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="text-center text-lg text-white mb-1">{icon}</div>
@@ -1050,8 +1050,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                             key={value}
                             onClick={() => updateDraftCustomization("dotStyle", value)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.dotStyle ?? customization.dotStyle) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                              ? "border-white bg-zinc-700"
+                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                               }`}
                           >
                             <div className="text-center text-lg text-white mb-1">{icon}</div>
@@ -1085,8 +1085,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                         key={value}
                         onClick={() => updateDraftCustomization("cardStyle", value)}
                         className={`py-2 px-3 text-sm rounded transition-colors ${(draftCustomization?.cardStyle ?? customization.cardStyle) === value
-                            ? "text-white"
-                            : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
+                          ? "text-white"
+                          : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
                           }`}
                         style={(draftCustomization?.cardStyle ?? customization.cardStyle) === value ? {
                           background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
@@ -1155,8 +1155,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                               key={value}
                               onClick={() => updateDraftCustomization("titleSize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleSize ?? customization.titleSize) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
                             >
                               <div className="flex justify-center mb-2">
@@ -1188,8 +1188,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                               key={value}
                               onClick={() => updateDraftCustomization("titleWeight", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
                             >
                               <div className="flex justify-center mb-2">
@@ -1223,8 +1223,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                               key={value}
                               onClick={() => updateDraftCustomization("companySize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.companySize ?? customization.companySize) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
                             >
                               <div className="flex justify-center mb-2">
@@ -1256,8 +1256,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                               key={value}
                               onClick={() => updateDraftCustomization("descriptionSize", value)}
                               className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.descriptionSize ?? customization.descriptionSize) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
                             >
                               <div className="flex justify-center mb-2">
@@ -1314,8 +1314,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                                 key={value}
                                 onClick={() => updateDraftCustomization("techStackSize", value)}
                                 className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.techStackSize ?? customization.techStackSize) === value
-                                    ? "border-white bg-zinc-700"
-                                    : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                  ? "border-white bg-zinc-700"
+                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                   }`}
                               >
                                 <div className="flex justify-center mb-2">

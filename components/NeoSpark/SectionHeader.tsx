@@ -1,21 +1,21 @@
 import React from "react";
-import EditButton, { shouldShowEditButtons } from "../EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useUser } from '@clerk/nextjs';
 
-const SectionHeader = ({ 
-  sectionName, 
-  sectionTitle, 
-  sectionDescription, 
+const SectionHeader = ({
+  sectionName,
+  sectionTitle,
+  sectionDescription,
   titleColor,
-  onVisualEditorOpen 
-}: { 
-  sectionName: string, 
-  sectionTitle: string, 
-  sectionDescription: string, 
+  onVisualEditorOpen
+}: {
+  sectionName: string,
+  sectionTitle: string,
+  sectionDescription: string,
   titleColor: string,
   onVisualEditorOpen?: () => void
 }) => {
@@ -36,7 +36,7 @@ const SectionHeader = ({
         <p className="text-base sm:text-lg md:text-xl  section-description text-gray-300 text-center mb-8 sm:mb-12 md:mb-16">
           {sectionDescription}
         </p>
-        
+
         {/* Consistent Button Layout */}
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20">
           <div className="flex items-center justify-center gap-1 sm:gap-2">

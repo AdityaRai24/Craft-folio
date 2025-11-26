@@ -7,13 +7,13 @@ import { createPortfolio, fetchThemesApi } from "../actions/portfolio";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { motion } from "framer-motion";
-import ThemeCard from "@/components/ThemeCard";
+import ThemeCard from "@/components/Shared/ThemeCard";
 import { ColorTheme } from "@/lib/colorThemes";
 import { fadeIn, staggerContainer } from "@/lib/animations";
-import CreateMethodModal from "@/components/CreateMethodModal";
-import LoadingSpinner, { LoadingMessage } from "@/components/LoadingSpinner";
-import MainNavbar from "@/components/MainNavbar";
-import BgShapes from "@/components/BgShapes";
+import CreateMethodModal from "@/components/Modals/CreateMethodModal";
+import LoadingSpinner, { LoadingMessage } from "@/components/Shared/LoadingSpinner";
+import MainNavbar from "@/components/Shared/MainNavbar";
+import BgShapes from "@/components/Shared/BgShapes";
 import { Palette, Layout, CheckCircle } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
@@ -50,10 +50,10 @@ const PortfolioThemePage = () => {
   const fetchThemes = async () => {
     setIsLoadingThemes(true);
     setError(null);
-    
+
     try {
       const response = await fetchThemesApi();
-      
+
       if (response.success) {
         setThemes(response.data);
       } else {
@@ -90,19 +90,19 @@ const PortfolioThemePage = () => {
         const themeName = themes.find(
           (theme: any) => theme.id === selectedTheme
         )?.name;
-        
+
         if (!themeName) {
           toast.error("Invalid template");
           return;
         }
-        
+
         const result = await createPortfolio(
           isSignedIn ? user.id : "guest",
           themeName,
           creationMethod,
           customBodyResume
         );
-        
+
         if (result.success) {
           const url = `/p/${result?.data?.id}`;
           if (!isSignedIn) {

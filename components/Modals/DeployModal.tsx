@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Rocket, Loader2, CheckCircle, Share2, Twitter, Linkedin, Facebook, Link2, Crown, Globe, UserPlus } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from "@clerk/nextjs";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import { newPortfolioData } from "@/slices/dataSlice";
 import { updatePortfolio, deployPortfolio, checkUserSubdomain } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import Confetti from "react-confetti";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { SignInButton } from "@clerk/nextjs";
 

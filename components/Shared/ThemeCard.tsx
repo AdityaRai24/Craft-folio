@@ -6,7 +6,7 @@ import { ColorTheme } from '@/lib/colorThemes';
 import { CheckCircle, GripHorizontalIcon, MousePointer2, ChevronLeft, ChevronRight, ChevronDown, Star, Sparkles, Palette, Zap } from 'lucide-react';
 import { fadeInScale } from '@/lib/animations';
 import { useRouter } from 'next/navigation';
-import CardImageModal from './CardImageModal';
+import CardImageModal from '@/components/Modals/CardImageModal';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 

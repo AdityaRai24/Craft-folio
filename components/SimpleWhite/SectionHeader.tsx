@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings } from "lucide-react";
-import EditButton, { shouldShowEditButtons } from '@/components/EditButton';
-import MagicWrite from "@/components/MagicWrite";
+import EditButton, { shouldShowEditButtons } from '@/components/Shared/EditButton';
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -88,7 +88,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
     <div className={headerClasses.container}>
       <div className="flex justify-between items-start mb-4 sm:mb-6">
         <div className="flex-1">
-          <h2 
+          <h2
             className={headerClasses.title}
             style={{ color: textPrimaryColor }}
           >
@@ -96,19 +96,19 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           </h2>
           {descriptionVisible && (
             <div className="relative">
-              <p 
+              <p
                 className={headerClasses.description}
                 style={{ color: textSecondaryColor }}
               >
                 {description}
               </p>
-              
+
             </div>
           )}
         </div>
-        
+
         <div className="flex absolute gap-2 sm:gap-3 right-2 sm:right-0 top-2 sm:top-0">
-          <EditButton 
+          <EditButton
             sectionName={sectionName}
             styles="text-xs px-2 sm:px-3 py-1"
           />
@@ -118,11 +118,11 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
               className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
               style={{
                 background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-              }}  
+              }}
             >
               <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Visual Editor</span>
-               
+
             </button>
           )}
         </div>

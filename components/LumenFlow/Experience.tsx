@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
-import EditButton from '@/components/EditButton';
+import EditButton from '@/components/Shared/EditButton';
 import {
   Briefcase,
   MapPin,
@@ -31,7 +31,7 @@ import { motion } from "framer-motion";
 import { Switch } from "@/components/ui/switch";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
+import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface Technology {
@@ -56,30 +56,30 @@ interface CustomizationState {
   cardPadding: number;
   cardSpacing: number;
   containerWidth: "full" | "narrow" | "wide";
-  
+
   // Typography
   titleSize: "sm" | "md" | "lg" | "xl";
   titleWeight: "normal" | "medium" | "semibold" | "bold";
   descriptionSize: "xs" | "sm" | "md" | "lg";
   textAlignment: "left" | "center" | "right";
-  
+
   // Visual Effects
   hoverEffects: boolean;
   glowEffect: boolean;
   borderGlow: boolean;
   backgroundOpacity: number;
   borderWidth: number;
-  
+
   // Animations
   animationStyle: "scale" | "slide" | "rotate" | "bounce" | "none";
   animationSpeed: number;
   staggerDelay: number;
-  
+
   // Tech Stack Display
   techStackVisible: boolean;
   techStackStyle: "pills" | "badges" | "minimal" | "colorful";
   techStackSize: "sm" | "md" | "lg";
-  
+
   // Timeline Elements
   timelineStyle: "line" | "dots" | "gradient" | "minimal";
   timelinePosition: "left" | "center" | "alternating";
@@ -87,12 +87,12 @@ interface CustomizationState {
   timelineColor: string;
   dotSize: "sm" | "md" | "lg";
   dotStyle: "circle" | "square" | "diamond" | "hexagon";
-  
+
   // Badges & Tags
   locationBadge: boolean;
   dateBadge: boolean;
   badgeStyle: "default" | "minimal" | "outlined" | "glow";
-  
+
   // Side Accent
   sideAccent: boolean;
   sideAccentWidth: number;
@@ -108,13 +108,13 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"layout" | "styling">("layout");
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  
+
   // Dragging state for floating window
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
   const dragRef = useRef<HTMLDivElement>(null);
-  
+
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const experienceSection = portfolioData?.find(
@@ -146,7 +146,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
       const data = await response.json();
       const enhancedDescription = data.response || data.content || data.result;
-      
+
       return enhancedDescription;
     } catch (error) {
       console.error('Magic Write API error:', error);
@@ -161,28 +161,28 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
       description: newDescription
     };
     setExperienceData(updatedExperience);
-          try {
-        const result = await updateSection({
-          sectionName: "experience",
-          portfolioId,
-          sectionContent: updatedExperience,
-          sectionTitle: "Experience",
-          sectionDescription: "Experience section"
-        });
-        if (result.success) {
-          toast.success("Experience description enhanced and saved successfully!");
-        } else {
-          toast.error("Failed to save changes to database");
-        }
-      } catch (error) {
-        console.error("Error saving experience description:", error);
+    try {
+      const result = await updateSection({
+        sectionName: "experience",
+        portfolioId,
+        sectionContent: updatedExperience,
+        sectionTitle: "Experience",
+        sectionDescription: "Experience section"
+      });
+      if (result.success) {
+        toast.success("Experience description enhanced and saved successfully!");
+      } else {
         toast.error("Failed to save changes to database");
       }
+    } catch (error) {
+      console.error("Error saving experience description:", error);
+      toast.error("Failed to save changes to database");
+    }
   };
 
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
-  
+
   // Get theme colors for LumenFlow
   const titleColor = theme === "light" ? "#f97316" : "#f97316"; // Orange color for LumenFlow
 
@@ -410,11 +410,10 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
             <div
               key={style.value}
               onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${
-                value === style.value
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+                }`}
             >
               <div className="space-y-2">
                 <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
@@ -452,32 +451,29 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
             <div
               key={align}
               onClick={() => onChange(align as any)}
-              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                value === align
+              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+                }`}
             >
               <div className="text-2xl text-white">{icon}</div>
               <div className="space-y-1 w-full">
                 <div
-                  className={`h-1 rounded ${
-                    align === "left"
+                  className={`h-1 rounded ${align === "left"
                       ? "mr-auto w-3/4"
                       : align === "center"
-                      ? "mx-auto w-1/2"
-                      : "ml-auto w-3/4"
-                  }`}
+                        ? "mx-auto w-1/2"
+                        : "ml-auto w-3/4"
+                    }`}
                   style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
                 ></div>
                 <div
-                  className={`h-1 bg-gray-400 rounded ${
-                    align === "left"
+                  className={`h-1 bg-gray-400 rounded ${align === "left"
                       ? "mr-auto w-full"
                       : align === "center"
-                      ? "mx-auto w-3/4"
-                      : "ml-auto w-full"
-                  }`}
+                        ? "mx-auto w-3/4"
+                        : "ml-auto w-full"
+                    }`}
                 ></div>
               </div>
               <div className="text-xs text-white">{label}</div>
@@ -509,31 +505,29 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
             <div
               key={style}
               onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${
-                value === style
+              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${value === style
                   ? "border-white bg-zinc-700"
                   : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
+                }`}
             >
               <div className="flex flex-wrap gap-1 justify-center mb-2">
                 {["React", "TS"].map((tech, i) => (
                   <span
                     key={i}
-                    className={`text-xs px-2 py-1 ${
-                      style === "pills"
+                    className={`text-xs px-2 py-1 ${style === "pills"
                         ? "rounded-full border border-gray-500 text-white"
                         : style === "badges"
-                        ? "rounded bg-gray-600 text-white"
-                        : style === "minimal"
-                        ? "text-gray-300"
-                        : "rounded-full border-2 text-white"
-                    }`}
+                          ? "rounded bg-gray-600 text-white"
+                          : style === "minimal"
+                            ? "text-gray-300"
+                            : "rounded-full border-2 text-white"
+                      }`}
                     style={
                       style === "colorful"
                         ? {
-                            borderColor: ColorTheme.primary,
-                            backgroundColor: `${ColorTheme.primary}20`,
-                          }
+                          borderColor: ColorTheme.primary,
+                          backgroundColor: `${ColorTheme.primary}20`,
+                        }
                         : {}
                     }
                   >
@@ -615,7 +609,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
   }
 
   return (
-            <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+    <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
       {/* Header Section */}
       <HeaderComponent
         currentTheme={currentTheme}
@@ -629,7 +623,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
 
       {/* Experience Timeline */}
-      <div 
+      <div
         className="space-y-8"
         style={{ gap: `${effectiveCustomization.cardSpacing}px` }}
       >
@@ -641,37 +635,36 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
             onMouseLeave={() => setHoveredExperience(null)}
           >
             {/* Background Glow Effect */}
-            <div className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" style={{ 
+            <div className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" style={{
               background: theme === "light"
                 ? "linear-gradient(to right, rgba(249,115,22,0.1), rgba(234,88,12,0.1))"
-                : themeClasses.gradientHover 
+                : themeClasses.gradientHover
             }}></div>
 
             {/* Main Card */}
-            <div 
-              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${
-                effectiveCustomization.cardLayout === "default"
+            <div
+              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${effectiveCustomization.cardLayout === "default"
                   ? theme === "light"
                     ? "bg-white border border-gray-200 shadow-sm"
                     : "bg-zinc-800 border border-zinc-700"
                   : effectiveCustomization.cardLayout === "minimal"
-                  ? "bg-transparent border-0"
-                  : effectiveCustomization.cardLayout === "glassmorphism"
-                  ? theme === "light"
-                    ? "bg-white/50 backdrop-blur-sm border border-white/20"
-                    : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
-                  : effectiveCustomization.cardLayout === "neon"
-                  ? theme === "light"
-                    ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
-                    : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
-                  : effectiveCustomization.cardLayout === "gradient"
-                  ? theme === "light"
-                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
-                    : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
-                  : theme === "light"
-                    ? "bg-white border border-gray-200 shadow-sm"
-                    : "bg-zinc-800 border border-zinc-700"
-              }`}
+                    ? "bg-transparent border-0"
+                    : effectiveCustomization.cardLayout === "glassmorphism"
+                      ? theme === "light"
+                        ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                        : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                      : effectiveCustomization.cardLayout === "neon"
+                        ? theme === "light"
+                          ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                          : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                        : effectiveCustomization.cardLayout === "gradient"
+                          ? theme === "light"
+                            ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                            : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                          : theme === "light"
+                            ? "bg-white border border-gray-200 shadow-sm"
+                            : "bg-zinc-800 border border-zinc-700"
+                }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
@@ -680,35 +673,32 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                 filter: effectiveCustomization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
               }}
             >
-                              {/* Experience Content */}
-                <div className="space-y-4 flex-grow">
-                  {/* Header Section */}
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 rounded-full" style={{ 
-                        background: theme === "light"
-                          ? "linear-gradient(to right, rgba(249,115,22,0.8), rgba(234,88,12,0.8))"
-                          : themeClasses.gradientPrimary 
-                      }}></div>
-                      <h3 className={`text-xl font-bold transition-colors duration-300 ${
-                        theme === "light" ? "text-gray-900" : themeClasses.textPrimary
-                      } ${
-                        effectiveCustomization.textAlignment === "center" 
-                          ? "text-center" 
-                          : effectiveCustomization.textAlignment === "right" 
-                          ? "text-right" 
+              {/* Experience Content */}
+              <div className="space-y-4 flex-grow">
+                {/* Header Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full" style={{
+                      background: theme === "light"
+                        ? "linear-gradient(to right, rgba(249,115,22,0.8), rgba(234,88,12,0.8))"
+                        : themeClasses.gradientPrimary
+                    }}></div>
+                    <h3 className={`text-xl font-bold transition-colors duration-300 ${theme === "light" ? "text-gray-900" : themeClasses.textPrimary
+                      } ${effectiveCustomization.textAlignment === "center"
+                        ? "text-center"
+                        : effectiveCustomization.textAlignment === "right"
+                          ? "text-right"
                           : "text-left"
                       }`}>
-                        {exp.role}
-                      </h3>
-                    </div>
+                      {exp.role}
+                    </h3>
                   </div>
+                </div>
 
                 {/* Description */}
                 <div className="space-y-2 relative">
-                  <p className={`text-sm leading-relaxed ${
-                    theme === "light" ? "text-gray-600" : themeClasses.textSecondary
-                  }`}>
+                  <p className={`text-sm leading-relaxed ${theme === "light" ? "text-gray-600" : themeClasses.textSecondary
+                    }`}>
                     {exp.description}
                   </p>
                   {/* Magic Write Button */}
@@ -732,9 +722,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <Star size={14} className="text-orange-400" />
-                      <span className={`text-xs font-medium uppercase tracking-wide ${
-                        theme === "light" ? "text-gray-500" : "text-gray-400"
-                      }`}>
+                      <span className={`text-xs font-medium uppercase tracking-wide ${theme === "light" ? "text-gray-500" : "text-gray-400"
+                        }`}>
                         Tech Stack
                       </span>
                     </div>
@@ -742,25 +731,23 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                       {exp.techStack.map((tech, techIndex) => (
                         <span
                           key={techIndex}
-                          className={`px-2 py-1 text-xs font-medium transition-all duration-300 ${
-                            effectiveCustomization.techStackStyle === "pills"
+                          className={`px-2 py-1 text-xs font-medium transition-all duration-300 ${effectiveCustomization.techStackStyle === "pills"
                               ? "rounded-full border"
                               : effectiveCustomization.techStackStyle === "badges"
-                              ? "rounded bg-gray-600 text-white"
-                              : effectiveCustomization.techStackStyle === "minimal"
-                              ? "text-gray-300"
-                              : "rounded-full border-2"
-                          } ${
-                            theme === "light"
+                                ? "rounded bg-gray-600 text-white"
+                                : effectiveCustomization.techStackStyle === "minimal"
+                                  ? "text-gray-300"
+                                  : "rounded-full border-2"
+                            } ${theme === "light"
                               ? "border-gray-200 hover:border-orange-400/50 text-gray-600"
                               : "border-gray-700 hover:border-orange-400/50 text-gray-400"
-                          }`}
+                            }`}
                           style={
                             effectiveCustomization.techStackStyle === "colorful"
                               ? {
-                                  borderColor: titleColor,
-                                  backgroundColor: `${titleColor}20`,
-                                }
+                                borderColor: titleColor,
+                                backgroundColor: `${titleColor}20`,
+                              }
                               : {}
                           }
                         >
@@ -772,16 +759,14 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                 )}
 
                 {/* Bottom Section */}
-                <div className={`flex items-center justify-between pt-4 mt-auto border-t ${
-                  theme === "light" ? "border-gray-200/50" : "border-gray-700/50"
-                }`}>
+                <div className={`flex items-center justify-between pt-4 mt-auto border-t ${theme === "light" ? "border-gray-200/50" : "border-gray-700/50"
+                  }`}>
                   <div className="flex items-center space-x-3">
                     {effectiveCustomization.locationBadge && (
                       <div className="flex items-center space-x-1">
                         <MapPin size={14} className="text-orange-400" />
-                        <span className={`text-sm ${
-                          theme === "light" ? "text-gray-600" : themeClasses.textSecondary
-                        }`}>
+                        <span className={`text-sm ${theme === "light" ? "text-gray-600" : themeClasses.textSecondary
+                          }`}>
                           {exp.location}
                         </span>
                       </div>
@@ -789,9 +774,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                     {effectiveCustomization.dateBadge && (
                       <div className="flex items-center space-x-1">
                         <Calendar size={14} className="text-orange-400" />
-                        <span className={`text-sm ${
-                          theme === "light" ? "text-gray-600" : themeClasses.textSecondary
-                        }`}>
+                        <span className={`text-sm ${theme === "light" ? "text-gray-600" : themeClasses.textSecondary
+                          }`}>
                           {exp.startDate} - {exp.endDate}
                         </span>
                       </div>
@@ -800,11 +784,10 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
                   {/* View More Arrow */}
                   <div
-                    className={`transition-all duration-300 ${
-                      hoveredExperience === index
+                    className={`transition-all duration-300 ${hoveredExperience === index
                         ? "opacity-100 translate-x-0"
                         : "opacity-0 translate-x-2"
-                    }`}
+                      }`}
                   >
                     <ArrowUpRight size={18} className="text-orange-400" />
                   </div>
@@ -813,13 +796,13 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
               {/* Side Accent Line */}
               {effectiveCustomization.sideAccent && (
-                <div 
-                  className="absolute left-0 top-0 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-                  style={{ 
+                <div
+                  className="absolute left-0 top-0 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
                     width: `${effectiveCustomization.sideAccentWidth}px`,
                     background: theme === "light"
                       ? "linear-gradient(to bottom, rgba(249,115,22,0.8), rgba(234,88,12,0.8))"
-                      : themeClasses.gradientPrimary 
+                      : themeClasses.gradientPrimary
                   }}
                 ></div>
               )}
@@ -850,7 +833,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
       {visualEditorOpen && (
         <div
           ref={dragRef}
-                        className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+          className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
           style={{
             left: `${windowPosition.x}px`,
             top: `${windowPosition.y}px`,
@@ -877,11 +860,10 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${
-                  activeTab === tab
+                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
                     ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                }`}
+                  }`}
                 style={activeTab === tab ? {
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 } : {}}
