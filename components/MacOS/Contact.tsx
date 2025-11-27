@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { ContactCustomizationState } from "@/types/contact/portfolio";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
+import { ColorTheme } from "@/lib/colorThemes";
 import { useMacOSTheme } from "./ThemeContext";
 
 const Contact = ({
@@ -191,11 +192,7 @@ const Contact = ({
 
   return (
     <div
-      className={`w-full h-full overflow-y-auto relative ${font || ""}`}
-      style={{
-        backgroundColor: currentTheme.background.primary,
-        color: currentTheme.text.primary,
-      }}
+      className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#1a1a1a] text-white" : "bg-gray-50 text-gray-900"} ${font || ""}`}
     >
       <div className={`mx-auto p-8 ${effectiveCustomization.containerWidth === "narrow" ? "max-w-4xl" :
         effectiveCustomization.containerWidth === "wide" ? "max-w-5xl" :
@@ -205,26 +202,13 @@ const Contact = ({
         {/* Header with Edit and Visual Editor buttons */}
         {showEdit && (
           <div className="flex justify-between items-start md:items-center mb-8 flex-col md:flex-row gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight`} style={{ color: currentTheme.text.primary }}>
-                Contact
-              </h1>
-              <p className={`text-sm md:text-base`} style={{ color: currentTheme.text.secondary }}>
-                Get in touch with me
-              </p>
-            </motion.div>
-
             <div className="flex gap-2.5">
               <EditButton sectionName="contact" />
               <button
                 onClick={openVisualEditor}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-white`}
                 style={{
-                  background: currentTheme.gradients.primary,
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
                 }}
               >
                 <Settings size={16} />
@@ -240,10 +224,10 @@ const Contact = ({
           className="text-center mb-12"
           style={{ textAlign: effectiveCustomization.textAlignment }}
         >
-          <h1 className={`text-4xl font-semibold mb-3`} style={{ color: currentTheme.text.primary }}>
+          <h1 className={`text-4xl font-semibold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
             Get In Touch
           </h1>
-          <p className={`text-lg`} style={{ color: currentTheme.text.secondary }}>
+          <p className={`text-lg ${isDark ? "text-gray-400" : "text-gray-600"}`}>
             Let's connect and build something amazing
           </p>
         </motion.div>
@@ -273,8 +257,6 @@ const Contact = ({
                   style={{
                     borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                     padding: `${effectiveCustomization.cardPadding * 4}px`,
-                    background: currentTheme.background.secondary,
-                    border: `1px solid ${currentTheme.states.muted}`,
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -292,14 +274,14 @@ const Contact = ({
                   </div>
 
                   {effectiveCustomization.showLabels && (
-                    <span className="text-xl font-bold relative z-10" style={{ color: currentTheme.text.primary }}>
+                    <span className={`text-xl font-bold relative z-10 ${isDark ? "text-white" : "text-gray-900"}`}>
                       {link.name}
                     </span>
                   )}
 
                   {effectiveCustomization.openInNewTab && link.url?.startsWith("http") && (
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink size={16} style={{ color: currentTheme.text.secondary }} />
+                      <ExternalLink size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
                     </div>
                   )}
                 </motion.a>
@@ -308,45 +290,43 @@ const Contact = ({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className={`w-24 h-24 rounded-xl flex items-center justify-center mb-6`} style={{ background: currentTheme.background.secondary }}>
-              <Mail size={40} style={{ color: currentTheme.text.secondary }} />
+            <div className={`w-24 h-24 rounded-xl flex items-center justify-center mb-6 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+              <Mail size={40} className={isDark ? "text-gray-400" : "text-gray-500"} />
             </div>
-            <p className={`text-lg font-medium`} style={{ color: currentTheme.text.primary }}>
+            <p className={`text-lg font-medium ${isDark ? "text-white" : "text-gray-900"}`}>
               No contact information available
             </p>
-            <p className={`text-sm mt-2`} style={{ color: currentTheme.text.secondary }}>
+            <p className={`text-sm mt-2 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
               Add your contact details to get started
             </p>
           </div>
-        )}
+        )
+        }
 
-        {userInfoData.email && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-center"
-          >
-            <p className={`text-sm mb-3`} style={{ color: currentTheme.text.secondary }}>
-              Or reach me directly at
-            </p>
-            <a
-              href={`mailto:${userInfoData.email}`}
-              className={`inline-block text-lg font-medium transition-colors px-6 py-3 rounded-xl border`}
-              style={{
-                color: currentTheme.text.primary,
-                background: currentTheme.background.secondary,
-                borderColor: currentTheme.states.muted,
-              }}
+        {
+          userInfoData.email && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-center"
             >
-              {userInfoData.email}
-            </a>
-          </motion.div>
-        )}
-      </div>
+              <p className={`text-sm mb-3 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                Or reach me directly at
+              </p>
+              <a
+                href={`mailto:${userInfoData.email}`}
+                className={`inline-block text-lg font-medium transition-colors px-6 py-3 rounded-xl border ${isDark ? "text-white bg-gray-800 border-gray-700 hover:bg-gray-700" : "text-gray-900 bg-white border-gray-200 hover:bg-gray-50"}`}
+              >
+                {userInfoData.email}
+              </a>
+            </motion.div>
+          )
+        }
+      </div >
 
       {/* Contact Visual Editor */}
-      <ContactVisualEditor
+      < ContactVisualEditor
         isOpen={visualEditorOpen}
         onClose={() => setVisualEditorOpen(false)}
         customization={customization}
@@ -356,10 +336,8 @@ const Contact = ({
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor={currentTheme.primary}
-        primaryDarkColor={currentTheme.primaryHover}
       />
-    </div>
+    </div >
   );
 };
 

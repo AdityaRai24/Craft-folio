@@ -18,6 +18,7 @@ import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ExperienceCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
+import { ColorTheme } from "@/lib/colorThemes";
 
 interface ExperienceVisualEditorProps {
     isOpen: boolean;
@@ -43,8 +44,8 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
     onReset,
     activeTab,
     onTabChange,
-    primaryColor = "#f97316",
-    primaryDarkColor = "#ea580c",
+    primaryColor = ColorTheme.primary,
+    primaryDarkColor = ColorTheme.primaryDark,
 }) => {
     const { isDragging, position: windowPosition, dragRef, handleMouseDown } = useDraggable();
 

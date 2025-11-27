@@ -12,10 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { motion } from "framer-motion";
-import EditButton from "@/components/Shared/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
+import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { defaultProjectsStyles } from "../NeoSpark/defaultStyles/projects";
-import { ProjectsCustomizationState } from "../NeoSpark/defaultStyles/types";
+import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
@@ -54,6 +55,9 @@ const ProjectsGrid = ({
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
   const isDark = theme === "dark";
+  const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { user, isLoaded } = useUser();
+  const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   useEffect(() => {
     if (portfolioData) {
@@ -190,12 +194,10 @@ const ProjectsGrid = ({
     );
   }
 
+
   return (
     <div
-      className={`w-full h-full overflow-y-auto relative ${font || ""}`}
-      style={{
-        backgroundColor: currentTheme.background.primary,
-      }}
+      className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#1a1a1a]" : "bg-gray-50"} ${font || ""}`}
     >
       <div className="max-w-7xl mx-auto p-6 md:p-8">
         {/* Header */}
@@ -205,28 +207,29 @@ const ProjectsGrid = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight`} style={{ color: currentTheme.text.primary }}>
+            <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}>
               Projects
             </h1>
-            <p className={`text-sm md:text-base`} style={{ color: currentTheme.text.secondary }}>
+            <p className={`text-sm md:text-base ${isDark ? "text-gray-400" : "text-gray-600"}`}>
               A collection of my recent work
             </p>
           </motion.div>
 
-          <div className="flex gap-2.5">
-            <EditButton sectionName="projects" />
-            <button
-              onClick={openVisualEditor}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200`}
-              style={{
-                background: currentTheme.gradients.primary,
-                color: "white"
-              }}
-            >
-              <Settings size={16} />
-              <span>Customize</span>
-            </button>
-          </div>
+          {showEdit && (
+            <div className="flex gap-2.5">
+              <EditButton sectionName="projects" />
+              <button
+                onClick={openVisualEditor}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-white`}
+                style={{
+                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                }}
+              >
+                <Settings size={16} />
+                <span>Visual Editor</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Projects Grid */}
@@ -244,8 +247,6 @@ const ProjectsGrid = ({
                 className={getCardClasses()}
                 style={{
                   ...getCardStyle(),
-                  backgroundColor: currentTheme.background.secondary,
-                  borderColor: currentTheme.states.muted,
                 }}
               >
                 {/* Project Image/Illustration */}
@@ -253,7 +254,6 @@ const ProjectsGrid = ({
                   className={`relative overflow-hidden`}
                   style={{
                     ...getImageStyle(),
-                    backgroundColor: currentTheme.background.primary,
                   }}
                 >
                   {project.projectImage ? (
@@ -280,14 +280,14 @@ const ProjectsGrid = ({
                 <div className="mt-5">
                   {/* Project Title */}
                   <div className={getTitleAlignment()}>
-                    <h3 className={getTitleClasses()} style={{ color: currentTheme.text.primary }}>
+                    <h3 className={getTitleClasses()}>
                       {project.projectTitle || project.projectName || `Project ${index + 1}`}
                     </h3>
                   </div>
 
                   {/* Project Description */}
                   <div className="relative group/desc mt-2">
-                    <p className={getDescriptionClasses()} style={{ color: currentTheme.text.secondary }}>
+                    <p className={getDescriptionClasses()}>
                       {project.projectDescription || "No description available"}
                     </p>
                     <div className="absolute -top-2 -right-2 opacity-0 group-hover/desc:opacity-100 transition-opacity">
@@ -325,11 +325,7 @@ const ProjectsGrid = ({
                             borderColor: currentTheme.states.muted,
                           }}
                         >
-                          {tech.logo ? (
-                            <img src={tech.logo} alt={tech.name} className="w-4 h-4 object-contain" />
-                          ) : (
-                            <span className="text-xs font-medium">{tech.name}</span>
-                          )}
+                          <span className="text-xs font-medium">{tech}</span>
                         </div>
                       ))}
                       {project.techStack.length > 5 && (
@@ -407,8 +403,6 @@ const ProjectsGrid = ({
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor={currentTheme.primary}
-        primaryDarkColor={currentTheme.primaryHover}
       />
     </div>
   );

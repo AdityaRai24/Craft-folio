@@ -323,6 +323,7 @@ const Desktop: React.FC<DesktopProps> = ({
     return item?.label || id;
   };
 
+
   return (
     <MacOSThemeProvider currentPortTheme={currentPortTheme}>
       <DesktopContent
@@ -479,7 +480,7 @@ const DesktopContent = ({
             initialWallpaper={backgroundImage}
             onClose={() => setShowWallpaperEditor(false)}
             portfolioId={portfolioId!}
-            currentTheme={currentPortTheme || "dark"}
+            currentTheme={theme}
           />
         )}
       </AnimatePresence>
@@ -633,7 +634,10 @@ const DesktopContent = ({
       {/* Improved macOS Dock */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-auto">
         <div
-          className="flex items-end h-16 gap-3 px-4 pb-2 bg-black/30  border border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl"
+          className={`flex items-end h-16 gap-3 px-4 pb-2 border backdrop-blur-2xl rounded-2xl shadow-2xl ${isDark
+            ? "bg-black/30 border-white/10"
+            : "bg-white/40 border-gray-300/20"
+            }`}
           onMouseMove={(e) => mouseX.set(e.pageX)}
           onMouseLeave={() => mouseX.set(null)}
         >

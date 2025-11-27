@@ -1,4 +1,4 @@
-import { ProjectsCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
+import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 
 export const useProjectStyles = (customization: ProjectsCustomizationState, titleColor: string, theme: "light" | "dark" = "light") => {
   const isDark = theme === "dark";
@@ -25,16 +25,19 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     if (isDark) {
       classes += "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl hover:bg-zinc-900/80";
     } else {
-      classes += "bg-white border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-lg";
+      // Light mode: clean white cards with elegant shadows
+      classes += "bg-white border-gray-200 hover:border-gray-300 shadow-md hover:shadow-xl";
     }
 
     return classes;
   };
 
-  const getCardStyle = () => ({
+  const getCardStyle = (isHovered: boolean = false) => ({
     borderRadius: `${customization.cardBorderRadius}px`,
     padding: `${customization.cardPadding * 4}px`,
     backdropFilter: isDark ? "blur(10px)" : "none",
+    transform: customization.hoverEffects && isHovered ? "translateY(-4px)" : "none",
+    filter: customization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
   });
 
   const getImageStyle = () => {

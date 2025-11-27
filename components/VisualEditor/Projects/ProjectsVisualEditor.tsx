@@ -19,6 +19,7 @@ import TypographySelector from "../Shared/TypographySelector";
 import ImagePositionSelector from "./ImagePositionSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { ColorTheme } from "@/lib/colorThemes";
 
 interface ProjectsVisualEditorProps {
   isOpen: boolean;
@@ -44,8 +45,8 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
   onReset,
   activeTab,
   onTabChange,
-  primaryColor = "#3b82f6",
-  primaryDarkColor = "#2563eb",
+  primaryColor = ColorTheme.primary,
+  primaryDarkColor = ColorTheme.primaryDark,
 }) => {
   const { isDragging, position: windowPosition, dragRef, handleMouseDown } = useDraggable();
 

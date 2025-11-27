@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { updatePortfolioData } from "@/slices/dataSlice";
 import { updateSection } from "@/app/actions/portfolio";
+import { ColorTheme } from "@/lib/colorThemes";
 
 interface WallpaperVisualEditorProps {
     initialWallpaper: string;

@@ -106,19 +106,11 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
 
   return (
     <div
-      className={`w-full h-full flex flex-col ${font || ""}`}
-      style={{
-        backgroundColor: currentTheme.background.primary,
-        color: currentTheme.text.primary,
-      }}
+      className={`w-full h-full flex flex-col ${font || ""} ${isDark ? "bg-[#1a1a1a] text-white" : "bg-white text-gray-900"}`}
     >
       {/* Safari Toolbar */}
       <div
-        className={`border-b px-4 py-2.5 flex items-center gap-3`}
-        style={{
-          backgroundColor: currentTheme.background.secondary,
-          borderColor: currentTheme.states.muted,
-        }}
+        className={`border-b px-4 py-2.5 flex items-center gap-3 ${isDark ? "bg-[#2a2a2a] border-gray-700" : "bg-gray-100 border-gray-200"}`}
       >
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -126,42 +118,34 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
         </div>
         <div className="flex items-center gap-2 flex-1 ml-2">
-          <button className="p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowLeft size={16} style={{ color: currentTheme.text.secondary }} />
+          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
+            <ArrowLeft size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
           </button>
-          <button className="p-1.5 hover:bg-gray-200 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowRight size={16} style={{ color: currentTheme.text.secondary }} />
+          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
+            <ArrowRight size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
           </button>
-          <button className="p-1.5 hover:bg-gray-200 rounded transition-colors">
-            <Home size={16} style={{ color: currentTheme.text.secondary }} />
+          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">
+            <Home size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
           </button>
           <button
-            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
             onClick={() => setIsLoading(true)}
           >
             <RefreshCw
               size={16}
-              className={`${isLoading ? 'animate-spin' : ''}`}
-              style={{ color: currentTheme.text.secondary }}
+              className={`${isLoading ? 'animate-spin' : ''} ${isDark ? "text-gray-400" : "text-gray-500"}`}
             />
           </button>
           <form onSubmit={handleNavigate} className="flex-1 flex items-center max-w-2xl">
             <div
-              className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow`}
-              style={{
-                backgroundColor: currentTheme.background.primary,
-                borderColor: currentTheme.states.muted,
-              }}
+              className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow ${isDark ? "bg-[#1a1a1a] border-gray-700" : "bg-white border-gray-300"}`}
             >
-              <Search size={14} style={{ color: currentTheme.text.secondary, flexShrink: 0 }} />
+              <Search size={14} className={isDark ? "text-gray-400" : "text-gray-500"} style={{ flexShrink: 0 }} />
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className={`flex-1 bg-transparent border-none outline-none text-sm`}
-                style={{
-                  color: currentTheme.text.primary,
-                }}
+                className={`flex-1 bg-transparent border-none outline-none text-sm ${isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"}`}
                 placeholder="Search or enter website name"
               />
             </div>
@@ -170,8 +154,7 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
           {showEdit && !isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className={`backdrop-blur flex flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 items-center justify-center gap-3 bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium `}
-
+              className={`backdrop-blur cursor-pointer flex flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 items-center justify-center gap-3 bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium `}
               title="Edit Content"
             >
               <Edit2 size={14} />
@@ -183,7 +166,7 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
       </div>
 
       {/* Browser Content */}
-      <div className={`flex-1 overflow-hidden`} style={{ backgroundColor: currentTheme.background.primary }}>
+      <div className={`flex-1 overflow-hidden ${isDark ? "bg-[#1a1a1a]" : "bg-white"}`}>
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <motion.div
@@ -241,6 +224,7 @@ const ReadOnlyContent = ({ content, isDark }: { content: string; isDark: boolean
       editor={editor}
       editable={false}
       theme={isDark ? "dark" : "light"}
+      className="bg-transparent"
     />
   );
 };

@@ -1,10 +1,10 @@
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 
 export const defaultProjectsStyles: ProjectsCustomizationState = {
-  layout: "single",
-  gridColumns: 3,
-  cardSpacing: 8,
-  cardBorderRadius: 8,
+  layout: "grid",
+  gridColumns: 2,
+  cardSpacing: 24,
+  cardBorderRadius: 12,
   imageBorderRadius: 8,
   cardBackground: "bg-stone-800/30",
   cardBorder: "border-gray-700",
@@ -16,9 +16,11 @@ export const defaultProjectsStyles: ProjectsCustomizationState = {
   techStackStyle: "pills",
   animationSpeed: 0.3,
   titleAlignment: "left",
-  cardPadding: 4,
+  cardPadding: 6,
   imageOverlay: true,
   imagePosition: "left",
+  hoverEffects: true,
+  glowEffect: true,
   
   // Typography
   titleSize: "md",

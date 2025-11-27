@@ -194,20 +194,13 @@ ${summary}`;
 
   return (
     <div
-      className={`w-full h-full flex flex-col font-mono text-sm relative ${font || ""}`}
-      style={{
-        backgroundColor: currentTheme.background.primary,
-        color: currentTheme.text.primary,
-      }}
+      className={`w-full h-full flex flex-col font-mono text-sm relative ${font || ""} ${isDark ? "bg-[#1a1a1a] text-white" : "bg-white text-gray-900"}`}
     >
       {showEdit && !isEditing && (
         <div className="absolute top-4 right-4 z-10">
           <button
             onClick={() => dispatch(setCurrentEdit("terminal"))}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 text-white`}
-            style={{
-              background: currentTheme.gradients.primary,
-            }}
+            className={`flex items-center cursor-pointer justify-center gap-3 rounded-lg border-dashed backdrop-blur bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium`}
             title="Edit Commands"
           >
             <Edit2 size={14} />
@@ -220,7 +213,7 @@ ${summary}`;
         className="flex-1 overflow-y-auto p-5 space-y-1"
         style={{
           scrollbarWidth: "thin",
-          scrollbarColor: `${currentTheme.states.muted} transparent`,
+          scrollbarColor: isDark ? "#4b5563 transparent" : "#d1d5db transparent",
           fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace"
         }}
       >
@@ -234,10 +227,10 @@ ${summary}`;
               className="whitespace-pre-wrap break-words leading-relaxed"
               style={{
                 color: isCommand
-                  ? currentTheme.primary
+                  ? (isDark ? "#4ade80" : "#16a34a") // Green for commands
                   : isError
                     ? "#f48771"
-                    : currentTheme.text.primary
+                    : (isDark ? "#e5e7eb" : "#1f2937") // Standard text color
               }}
             >
               {isCommand ? highlightCommand(line) : line}
@@ -245,17 +238,15 @@ ${summary}`;
           );
         })}
         <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-1">
-          <span style={{ color: currentTheme.primary }} className="font-semibold">$</span>
+          <span style={{ color: isDark ? "#4ade80" : "#16a34a" }} className="font-semibold">$</span>
           <input
             ref={inputRef}
             type="text"
             value={currentCommand}
             onChange={(e) => setCurrentCommand(e.target.value)}
-            className={`flex-1 bg-transparent border-none outline-none`}
+            className={`flex-1 bg-transparent border-none outline-none ${isDark ? "text-white caret-white" : "text-gray-900 caret-gray-900"}`}
             style={{
               fontFamily: "inherit",
-              caretColor: currentTheme.primary,
-              color: currentTheme.text.primary,
             }}
             autoFocus
             autoComplete="off"

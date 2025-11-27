@@ -8,15 +8,15 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     
     // Layout based classes
     if (customization.cardLayout === "default") {
-       classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-sm";
+       classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
     } else if (customization.cardLayout === "minimal") {
        classes += "bg-transparent border-0";
     } else if (customization.cardLayout === "glassmorphism") {
-       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/50 backdrop-blur-sm border border-white/20";
+       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
     } else if (customization.cardLayout === "neon") {
-       classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20";
+       classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
     } else if (customization.cardLayout === "gradient") {
-       classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200";
+       classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
     }
 
     return classes;
@@ -68,9 +68,9 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
       classes += "rounded-full border ";
       classes += isDark ? "border-gray-700 text-gray-300" : "border-gray-200 text-gray-600";
     } else if (customization.techStackStyle === "badges") {
-      classes += "rounded bg-gray-600 text-white";
+      classes += isDark ? "rounded bg-gray-700 text-white" : "rounded bg-gray-200 text-gray-800";
     } else if (customization.techStackStyle === "minimal") {
-      classes += "text-gray-400";
+      classes += isDark ? "text-gray-400" : "text-gray-600";
     } else if (customization.techStackStyle === "colorful") {
       classes += "rounded-full border-2";
     }

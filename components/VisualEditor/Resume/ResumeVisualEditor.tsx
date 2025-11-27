@@ -123,7 +123,7 @@ export const ResumeVisualEditor: React.FC<ResumeVisualEditorProps> = ({
                     className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
                     onMouseDown={handleMouseDown}
                 >
-                    <h3 className="text-lg font-bold text-white">Edit Resume</h3>
+                    <h3 className="text-lg font-bold text-white">Edit</h3>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-white transition-colors p-1"

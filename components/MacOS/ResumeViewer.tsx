@@ -8,6 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ResumeVisualEditor } from "@/components/VisualEditor/Resume/ResumeVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
+import { useMacOSTheme } from "./ThemeContext";
 
 const ResumeViewer = ({
   theme = "light",
@@ -29,6 +30,7 @@ const ResumeViewer = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const { currentTheme } = useMacOSTheme();
 
   const handleDownload = async () => {
     if (!resumePath) return;
@@ -74,13 +76,11 @@ const ResumeViewer = ({
         {showEdit && (
           <button
             onClick={() => setIsEditorOpen(true)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-white shadow-sm hover:shadow-md`}
-            style={{
-              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-            }}
+            className={`flex items-center cursor-pointer justify-center gap-3 rounded-lg border-dashed backdrop-blur bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium`}
+
           >
             <Edit2 size={16} />
-            <span>Edit Resume</span>
+            <span>Edit</span>
           </button>
         )}
 
@@ -88,13 +88,10 @@ const ResumeViewer = ({
           <button
             onClick={handleDownload}
             disabled={isDownloading}
-            className={`
-              ${isDark
-                ? "bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200 hover:text-white"
-                : "bg-white hover:bg-gray-50 border-gray-300 text-gray-700 hover:text-gray-900"
-              } 
-              border rounded-lg px-4 py-2 shadow-sm transition-all flex items-center gap-2 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed
-            `}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-white`}
+            style={{
+              background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+            }}
             title="Download Resume"
           >
             <Download size={18} className={isDownloading ? "animate-bounce" : ""} />

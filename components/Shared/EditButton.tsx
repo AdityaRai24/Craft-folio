@@ -41,7 +41,7 @@ const EditButton = ({
       {shouldShowButton && (
         <Button
           onClick={handleSectionEdit}
-          className={`backdrop-blur bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium ${styles || ''}`}
+          className={`backdrop-blur cursor-pointer bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium ${styles || ''}`}
         >
           {currentlyEditing === sectionName ? "Cancel" : <>✏️ Edit</>}
         </Button>

@@ -33,8 +33,10 @@ export interface ProjectsCustomizationState {
   cardPadding: number;
   imageOverlay: boolean;
   imagePosition: "left" | "right";
+  hoverEffects: boolean;
+  glowEffect: boolean;
   
-  // Typography
+  //Typography
   titleSize: "sm" | "md" | "lg" | "xl";
   titleWeight: "normal" | "medium" | "semibold" | "bold";
   descriptionSize: "sm" | "md" | "lg";
