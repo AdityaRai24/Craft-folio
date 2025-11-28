@@ -325,8 +325,6 @@ const PortfolioChatbot = ({
 
     try {
       setIsProcessing(true);
-      console.log("Original sections:", sections);
-      console.log("Reordered sections:", reorderedSections);
 
       const sectionOrder: any = [];
       portfolioData.map((item: any) => sectionOrder.push(item.type));
@@ -345,7 +343,6 @@ const PortfolioChatbot = ({
           idx++;
         }
       });
-      console.log("Updated order:", updatedOrder);
 
       const finalSections: any = [];
       updatedOrder.forEach((item: any) => {
@@ -357,7 +354,6 @@ const PortfolioChatbot = ({
           return;
         }
       });
-      console.log("Final sections:", finalSections);
 
       await updatePortfolio({
         portfolioId: portfolioId,
@@ -520,12 +516,9 @@ const PortfolioChatbot = ({
     }
 
     // Call the save function from SEOSettings component
-    console.log("handleSaveSEO called, seoSettingsRef:", seoSettingsRef.current);
     if (seoSettingsRef.current) {
       try {
-        console.log("Calling SEO save function...");
         await seoSettingsRef.current.handleSaveSEOSettings();
-        console.log("SEO save completed, closing chatbot...");
         // Close the chatbot after successful save
         setShowSEOSettings(false);
         handleChatClose();

@@ -373,11 +373,9 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("education update detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status education: ${status}`);
       });
 
     return () => {

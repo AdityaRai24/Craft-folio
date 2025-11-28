@@ -620,11 +620,9 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("Portfolio update detected!");
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status: ${status}`);
       });
 
     return () => {

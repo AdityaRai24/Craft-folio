@@ -635,11 +635,9 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("project experience detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status experience: ${status}`);
       });
 
     return () => {

@@ -34,9 +34,14 @@ const TerminalSidebar = () => {
     const terminalData = terminalSection?.data || {};
 
     // Data for default command generation
+    // Data for default command generation
     const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
     const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
-    const projectsData = portfolioData?.find((item: any) => item.type === "projects")?.data || [];
+
+    // Fix: Correctly extract projects array whether it's direct or wrapped in an object
+    const projectsSection = portfolioData?.find((item: any) => item.type === "projects")?.data;
+    const projectsData = Array.isArray(projectsSection) ? projectsSection : (projectsSection?.projects || []);
+
     const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
     const technologiesData = portfolioData?.find((item: any) => item.type === "technologies")?.data || [];
 
@@ -49,8 +54,64 @@ const TerminalSidebar = () => {
 
     const dispatch = useDispatch();
 
+    // Helper to extract skill name
+    const getSkillName = (skill: any) => {
+        if (typeof skill === 'string') return skill;
+        return skill.name || "";
+    };
+
     // Generate default commands
     const getDefaultCommands = (): TerminalCommand[] => {
+        // Generate skills output
+        const getSkillsOutput = () => {
+            const allSkills = new Set<string>();
+
+            // 1. Add skills from Technologies section
+            if (technologiesData) {
+                if (technologiesData.categories) {
+                    technologiesData.categories.forEach((cat: any) => {
+                        if (cat.technologies) {
+                            cat.technologies.forEach((t: any) => allSkills.add(getSkillName(t)));
+                        }
+                    });
+                } else if (Array.isArray(technologiesData)) {
+                    technologiesData.forEach((t: any) => allSkills.add(getSkillName(t)));
+                }
+            }
+
+            // 2. Add skills from Projects
+            if (projectsData && Array.isArray(projectsData)) {
+                projectsData.forEach((project: any) => {
+                    if (project.techStack && Array.isArray(project.techStack)) {
+                        project.techStack.forEach((t: any) => allSkills.add(getSkillName(t)));
+                    }
+                });
+            }
+
+            // 3. Add skills from Experience
+            if (experienceData && Array.isArray(experienceData)) {
+                experienceData.forEach((exp: any) => {
+                    if (exp.techStack && Array.isArray(exp.techStack)) {
+                        exp.techStack.forEach((t: any) => allSkills.add(getSkillName(t)));
+                    }
+                });
+            }
+
+            const uniqueSkills = Array.from(allSkills).filter(Boolean).sort();
+
+            if (uniqueSkills.length > 0) {
+                const skillList = uniqueSkills.map(s => `  • ${s}`).join("\n");
+                return `Technologies I work with (aggregated from all sections):\n${skillList}`;
+            }
+
+            return `Technologies I work with:
+  • JavaScript/TypeScript
+  • React/Next.js
+  • Node.js
+  • Python
+  • And more...`;
+        };
+
         return [
             {
                 command: "about",
@@ -61,9 +122,7 @@ const TerminalSidebar = () => {
             {
                 command: "skills",
                 description: "My skills",
-                output: technologiesData.length > 0
-                    ? `Technologies I work with:\n${technologiesData.map((tech: any) => `  • ${tech.name || tech}`).join("\n")}`
-                    : `Technologies I work with:\n  • JavaScript/TypeScript\n  • React/Next.js\n  • Node.js\n  • Python\n  • And more...`,
+                output: getSkillsOutput(),
                 isDefault: true
             },
             {
@@ -76,7 +135,11 @@ const TerminalSidebar = () => {
                 command: "projects",
                 description: "List my projects",
                 output: projectsData.length > 0
-                    ? `My Projects:\n${projectsData.slice(0, 5).map((project: any, idx: number) => `${idx + 1}. ${project.projectName || project.projectTitle || `Project ${idx + 1}`}`).join("\n")}\n\nTotal: ${projectsData.length} projects`
+                    ? `My Projects:\n${projectsData.slice(0, 5).map((project: any, idx: number) => {
+                        const title = project.projectName || project.projectTitle || `Project ${idx + 1}`;
+                        const desc = project.projectDescription ? `\n    ${project.projectDescription}` : "";
+                        return `${idx + 1}. ${title}${desc}`;
+                    }).join("\n\n")}\n\nTotal: ${projectsData.length} projects`
                     : "No projects found.",
                 isDefault: true
             },
@@ -84,7 +147,12 @@ const TerminalSidebar = () => {
                 command: "experience",
                 description: "My work experience",
                 output: experienceData.length > 0
-                    ? `Work Experience:\n${experienceData.slice(0, 5).map((exp: any, idx: number) => `${idx + 1}. ${exp.role || "Role"} at ${exp.companyName || "Company"}`).join("\n")}\n\nTotal: ${experienceData.length} positions`
+                    ? `Work Experience:\n${experienceData.slice(0, 5).map((exp: any, idx: number) => {
+                        const role = exp.role || "Role";
+                        const company = exp.companyName || "Company";
+                        const desc = exp.description ? `\n    ${exp.description}` : "";
+                        return `${idx + 1}. ${role} at ${company}${desc}`;
+                    }).join("\n\n")}\n\nTotal: ${experienceData.length} positions`
                     : "No experience found.",
                 isDefault: true
             }

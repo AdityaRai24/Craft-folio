@@ -113,7 +113,6 @@ const Page = () => {
         if (customizationsResult.success) {
           // Store customizations in Redux
           dispatch(setComponentCustomizations(customizationsResult.data || {}));
-          console.log("Loaded component customizations:", customizationsResult.data);
         }
 
         // Mark data as loaded only after both fetches complete

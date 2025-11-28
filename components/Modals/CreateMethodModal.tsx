@@ -1,6 +1,6 @@
 "use client";
-import { motion } from "framer-motion";
-import { FileText, PlusCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, PlusCircle, ArrowRight, ArrowLeft, Upload, Sparkles, Check, Wand2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -277,13 +277,14 @@ const CreateMethodModal = ({
 
   const ColorTheme = {
     primary: "#10b981",
-    primaryDark: "#047857",
-    primaryGlow: "rgba(16, 185, 129, 0.15)",
-    bgCard: "rgba(28, 28, 30, 0.9)",
-    borderLight: "rgba(75, 85, 99, 0.3)",
-    textPrimary: "#f3f4f6",
-    textSecondary: "#d1d5db",
-    textMuted: "#9ca3af",
+    primaryDark: "#059669",
+    primaryGlow: "rgba(16, 185, 129, 0.25)",
+    bgCard: "rgba(24, 24, 27, 0.8)",
+    bgCardHover: "rgba(39, 39, 42, 0.8)",
+    borderLight: "rgba(255, 255, 255, 0.1)",
+    textPrimary: "#ffffff",
+    textSecondary: "#a1a1aa",
+    textMuted: "#71717a",
   };
 
   return (
@@ -299,15 +300,11 @@ const CreateMethodModal = ({
         }}
       >
         <DialogContent
-          className="backdrop-blur-xl rounded-xl w-full max-w-[98vw] sm:max-w-4xl p-2 sm:p-6 md:p-12 h-[95vh] sm:h-auto flex flex-col"
+          className="backdrop-blur-2xl rounded-2xl w-full max-w-[98vw] sm:max-w-4xl p-0 h-[95vh] sm:h-auto flex flex-col overflow-hidden border-none shadow-2xl"
           style={{
-            backgroundColor: "rgba(18, 18, 18, 0.95)",
-            border: "1px solid rgba(75, 85, 99, 0.3)",
-            color: "#f3f4f6",
-            boxShadow:
-              "0 25px 50px rgba(0,0,0,0.3), 0 10px 30px rgba(16, 185, 129, 0.15)",
+            background: "linear-gradient(145deg, rgba(20, 20, 22, 0.95), rgba(10, 10, 12, 0.98))",
+            boxShadow: "0 0 50px rgba(0,0,0,0.5), 0 0 20px rgba(16, 185, 129, 0.1)",
             maxHeight: "95vh",
-            overflow: "hidden",
           }}
         >
           {confettiActive && (
@@ -333,667 +330,328 @@ const CreateMethodModal = ({
                 tweenDuration={10000}
                 initialVelocityY={10}
                 colors={[
-                  "#f44336",
-                  "#e91e63",
-                  "#9c27b0",
-                  "#673ab7",
-                  "#3f51b5",
-                  "#2196f3",
-                  "#03a9f4",
-                  "#00bcd4",
-                  "#009688",
-                  "#4CAF50",
-                  "#8BC34A",
-                  "#FFEB3B",
-                  "#FFC107",
-                  "#FF9800",
-                  "#FF5722",
+                  "#10b981", "#34d399", "#6ee7b7", "#059669", "#047857",
+                  "#f59e0b", "#fbbf24", "#fcd34d",
                 ]}
               />
             </div>
           )}
-          {!showResumeImport ? (
-            <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-4 sm:px-0 sm:py-0">
-              <DialogHeader className="mb-4">
-                <DialogTitle className="text-2xl sm:text-3xl text-center md:text-4xl font-bold">
-                  How would you like to build your{" "}
-                  <span
-                    style={{
-                      background: `linear-gradient(to right, #10b981, #047857)`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    portfolio
-                  </span>
-                  ?
-                </DialogTitle>
-                <p className="text-center text-gray-400 mt-2 text-base sm:text-lg">
-                  Choose the method that works best for you to get started
-                  quickly
-                </p>
-              </DialogHeader>
 
-              <motion.div
-                className="flex flex-col gap-6 mt-6 md:flex-row md:gap-6"
-                style={{ maxHeight: "calc(90vh - 200px)" }}
-                initial="hidden"
-                animate="visible"
-                variants={staggerContainer}
-              >
-                {/* From scratch option */}
-                <motion.div
-                  className="flex-1 p-4 sm:p-5 rounded-xl cursor-pointer border transition-all flex flex-col items-center text-center mb-2 md:mb-0"
-                  variants={fadeInScale}
-                  style={{
-                    backgroundColor:
-                      creationMethod === "scratch"
-                        ? "rgba(16, 185, 129, 0.12)"
-                        : "rgba(28, 28, 30, 0.8)",
-                    borderColor:
-                      creationMethod === "scratch"
-                        ? "#10b981"
-                        : "rgba(75, 85, 99, 0.3)",
-                    boxShadow:
-                      creationMethod === "scratch"
-                        ? "0 4px 12px rgba(16, 185, 129, 0.15)"
-                        : "none",
-                  }}
-                  whileHover={{
-                    borderColor: "#10b981",
-                    boxShadow: "0 6px 16px rgba(16, 185, 129, 0.2)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleMethodSelect("scratch")}
-                >
-                  <div
-                    className="p-3 rounded-full mb-4"
-                    style={{
-                      background:
-                        creationMethod === "scratch"
-                          ? "#10b981"
-                          : "rgba(38, 38, 42, 0.8)",
-                    }}
-                  >
-                    <PlusCircle
-                      className="h-7 w-7"
-                      style={{
-                        color:
-                          creationMethod === "scratch" ? "#000" : "#f3f4f6",
-                      }}
-                    />
-                  </div>
-                  <h3
-                    className="text-lg sm:text-xl font-semibold"
-                    style={{ color: "#f3f4f6" }}
-                  >
-                    Edit a Pre-filled Template
-                  </h3>
-                  <p className="text-gray-400 text-sm sm:text-base mt-2">
-                    Start with a pre-filled template featuring dummy data that
-                    you can easily edit. Perfect for building your portfolio
-                    step by step while maintaining full control over the content{" "}
-                  </p>
-                </motion.div>
-
-                {/* Import from resume option */}
-                <motion.div
-                  className="flex-1 p-4 sm:p-5 rounded-xl cursor-pointer border transition-all flex flex-col items-center text-center"
-                  variants={fadeInScale}
-                  style={{
-                    backgroundColor:
-                      creationMethod === "import"
-                        ? "rgba(16, 185, 129, 0.12)"
-                        : "rgba(28, 28, 30, 0.8)",
-                    borderColor:
-                      creationMethod === "import"
-                        ? "#10b981"
-                        : "rgba(75, 85, 99, 0.3)",
-                    boxShadow:
-                      creationMethod === "import"
-                        ? "0 4px 12px rgba(16, 185, 129, 0.15)"
-                        : "none",
-                  }}
-                  whileHover={{
-                    borderColor: "#10b981",
-                    boxShadow: "0 6px 16px rgba(16, 185, 129, 0.2)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleMethodSelect("import")}
-                >
-                  <div
-                    className="p-3 rounded-full mb-4"
-                    style={{
-                      background:
-                        creationMethod === "import"
-                          ? "#10b981"
-                          : "rgba(38, 38, 42, 0.8)",
-                    }}
-                  >
-                    <FileText
-                      className="h-7 w-7"
-                      style={{
-                        color: creationMethod === "import" ? "#000" : "#f3f4f6",
-                      }}
-                    />
-                  </div>
-                  <h3
-                    className="text-lg sm:text-xl font-semibold"
-                    style={{ color: "#f3f4f6" }}
-                  >
-                    Import from Resume
-                  </h3>
-                  <p className="text-gray-400 text-sm sm:text-base mt-2">
-                    Upload your existing resume and we'll automatically populate
-                    your portfolio. Save time by importing your skills,
-                    experience, projects and education.
-                  </p>
-                </motion.div>
-              </motion.div>
-
-              <motion.div
-                className="flex flex-col sm:flex-row justify-center mt-8 gap-3 sm:gap-0"
-                style={{ maxHeight: "100px" }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                {creationMethod && (
-                  <motion.button
-                    className="w-full sm:w-auto px-8 py-3 rounded-lg font-medium text-lg group transition-all flex items-center  justify-center"
-                    style={{
-                      background: "#10b981",
-                      color: "#000",
-                      boxShadow: "0 6px 20px rgba(16, 185, 129, 0.15)",
-                      cursor: !isCreating ? "pointer" : "not-allowed",
-                      opacity: isCreating ? 0.7 : 1,
-                    }}
-                    whileHover={{
-                      boxShadow: !isCreating
-                        ? "0 8px 24px rgba(16, 185, 129, 0.2)"
-                        : "none",
-                    }}
-                    whileTap={{ scale: !isCreating ? 0.97 : 1 }}
-                    onClick={handleButtonClick}
-                    disabled={isCreating}
-                  >
-                    {isCreating ? (
-                      <>
-                        <svg
-                          className="animate-spin h-5 w-5 mr-2"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        <span>Creating...</span>
-                      </>
-                    ) : (
-                      <div className="flex items-center">
-                        <span>
-                          {creationMethod === "scratch"
-                            ? "Start Building"
-                            : "Import Resume"}
-                        </span>
-                        <ArrowRight className="ml-2 h-5 w-5 group-hover:ml-5 transition-all duration-300 ease" />
-                      </div>
-                    )}
-                  </motion.button>
-                )}
-              </motion.div>
+          <div className="relative flex-1 flex flex-col p-6 sm:p-10 overflow-y-auto custom-scrollbar">
+            {/* Background Elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+              <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-emerald-500/5 blur-[100px]" />
+              <div className="absolute top-[40%] -left-[10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 blur-[100px]" />
             </div>
-          ) : (
-            <div className="py-4 relative flex-1 overflow-y-auto overflow-x-hidden">
-              {/* Back button */}
-              <motion.button
-                className="absolute top-0 left-0 flex items-center text-gray-400 hover:text-white transition-colors"
-                onClick={handleBackButton}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                disabled={processingResume || isLoading}
-                style={{
-                  cursor:
-                    processingResume || isLoading ? "not-allowed" : "pointer",
-                  opacity: processingResume || isLoading ? 0.5 : 1,
-                }}
-              >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to options
-              </motion.button>
 
-              {/* Background decoration */}
-              <motion.div
-                className="absolute bottom-0 right-0 w-1/2 h-1/2 rounded-full opacity-10 -z-10"
-                style={{
-                  background: `radial-gradient(circle, ${ColorTheme.primary}, transparent 70%)`,
-                }}
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.1, 0.15, 0.1],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-              />
-
-              <div className="mt-10">
+            <AnimatePresence mode="wait">
+              {!showResumeImport ? (
                 <motion.div
-                  className="text-center mb-12"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
+                  key="selection"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="relative z-10 flex flex-col h-full"
                 >
-                  <motion.span
-                    className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
-                    style={{
-                      color: ColorTheme.primary,
-                      backgroundColor: ColorTheme.primaryGlow,
-                    }}
-                  >
-                    Revolutionary Feature
-                  </motion.span>
+                  <DialogHeader className="mb-8 text-center space-y-4">
+                    <DialogTitle className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+                      How would you like to build your{" "}
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">
+                        portfolio
+                      </span>
+                      ?
+                    </DialogTitle>
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+                      Choose the method that works best for you to get started quickly
+                    </p>
+                  </DialogHeader>
 
-                  <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                    The{" "}
-                    <span
-                      style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                      }}
-                    >
-                      Magic
-                    </span>{" "}
-                    of Resume Import
-                  </h2>
-                  <p
-                    className=" max-w-3xl mx-auto"
-                    style={{ color: ColorTheme.textSecondary }}
-                  >
-                    Transform your existing resume into a stunning portfolio
-                    website with just one click
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  className="max-w-lg mx-auto"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                  {/* Import Demo */}
                   <motion.div
-                    className="rounded-xl overflow-hidden p-8"
-                    style={{
-                      backgroundColor: ColorTheme.bgCard,
-                      borderColor: ColorTheme.borderLight,
-                      backdropFilter: "blur(16px)",
-                      boxShadow: `0 10px 30px rgba(0,0,0,0.3), 0 6px 12px ${ColorTheme.primaryGlow}`,
-                    }}
-                    whileHover={{
-                      boxShadow: `0 15px 40px rgba(0,0,0,0.4), 0 8px 20px ${ColorTheme.primaryGlow}`,
-                    }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto w-full"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
                   >
-                    <div className="text-center mb-4">
-                      <div className="relative">
+                    {/* From scratch option */}
+                    <motion.div
+                      className={`relative group p-1 rounded-2xl transition-all duration-300 ${creationMethod === "scratch" ? "ring-2 ring-emerald-500/50" : "hover:ring-1 hover:ring-gray-700"
+                        }`}
+                      variants={fadeInScale}
+                      onClick={() => handleMethodSelect("scratch")}
+                    >
+                      <div className={`h-full p-6 sm:p-8 rounded-xl cursor-pointer transition-all duration-300 flex flex-col items-center text-center border ${creationMethod === "scratch"
+                        ? "bg-emerald-900/10 border-emerald-500/30"
+                        : "bg-zinc-900/50 border-white/5 hover:bg-zinc-800/50 hover:border-white/10"
+                        }`}>
+                        <div className={`p-4 rounded-full mb-6 transition-all duration-300 ${creationMethod === "scratch"
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : "bg-zinc-800 text-gray-400 group-hover:bg-zinc-700 group-hover:text-gray-200"
+                          }`}>
+                          <PlusCircle className="h-8 w-8" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-white mb-3">
+                          Edit a Pre-filled Template
+                        </h3>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          Start with a pre-filled template featuring dummy data that
+                          you can easily edit. Perfect for building your portfolio
+                          step by step.
+                        </p>
+                      </div>
+                    </motion.div>
+
+                    {/* Import from resume option */}
+                    <motion.div
+                      className={`relative group p-1 rounded-2xl transition-all duration-300 ${creationMethod === "import" ? "ring-2 ring-emerald-500/50" : "hover:ring-1 hover:ring-gray-700"
+                        }`}
+                      variants={fadeInScale}
+                      onClick={() => handleMethodSelect("import")}
+                    >
+                      {/* Badge */}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
+                        <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-emerald-500/20 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" /> Recommended
+                        </span>
+                      </div>
+
+                      <div className={`h-full p-6 sm:p-8 rounded-xl cursor-pointer transition-all duration-300 flex flex-col items-center text-center border ${creationMethod === "import"
+                        ? "bg-emerald-900/10 border-emerald-500/30"
+                        : "bg-zinc-900/50 border-white/5 hover:bg-zinc-800/50 hover:border-white/10"
+                        }`}>
+                        <div className={`p-4 rounded-full mb-6 transition-all duration-300 ${creationMethod === "import"
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : "bg-zinc-800 text-gray-400 group-hover:bg-zinc-700 group-hover:text-gray-200"
+                          }`}>
+                          <Wand2 className="h-8 w-8" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-white mb-3">
+                          Import from Resume
+                        </h3>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          Upload your existing resume and we'll automatically populate
+                          your portfolio. The fastest way to get your site live.
+                        </p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    className="mt-10 flex justify-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    <motion.button
+                      className={`
+                        relative px-8 py-4 rounded-xl cursor-pointer font-bold text-lg flex items-center gap-3 transition-all duration-300
+                        ${creationMethod
+                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02]"
+                          : "bg-zinc-800 text-zinc-500 cursor-not-allowed"}
+                      `}
+                      onClick={handleButtonClick}
+                      disabled={!creationMethod || isCreating}
+                      whileTap={creationMethod ? { scale: 0.98 } : {}}
+                    >
+                      {isCreating ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Creating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {creationMethod === "scratch" ? "Start Building" : "Import Resume"}
+                          </span>
+                          <ArrowRight className={`w-5 h-5 transition-transform duration-300 ${creationMethod ? "group-hover:translate-x-1" : ""}`} />
+                        </>
+                      )}
+                    </motion.button>
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="import"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="relative z-10 flex flex-col h-full"
+                >
+                  {/* Back button */}
+                  <button
+                    className="absolute top-0 left-0 flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
+                    onClick={handleBackButton}
+                    disabled={processingResume || isLoading}
+                  >
+                    <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                      <ArrowLeft className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-medium">Back</span>
+                  </button>
+
+                  <div className="mt-12 flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full">
+                    <motion.div
+                      className="text-center mb-10"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <motion.div
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-6 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>AI-Powered Import</span>
+                      </motion.div>
+
+                      <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+                        The <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-600">Magic</span> of Resume Import
+                      </h2>
+                      <p className="text-gray-400 text-lg">
+                        Transform your existing resume into a stunning portfolio website with just one click
+                      </p>
+                    </motion.div>
+
+                    <motion.div
+                      className="w-full"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <div className="bg-zinc-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
                         {!resumeUploaded ? (
-                          <motion.div
-                            className="border-2 border-dashed rounded-lg p-8 transition-colors cursor-pointer"
-                            style={{
-                              borderColor: ColorTheme.borderLight,
-                              pointerEvents: uploadingResume ? "none" : "auto",
-                              opacity: uploadingResume ? 0.7 : 1,
-                            }}
-                            whileHover={{
-                              borderColor: uploadingResume
-                                ? ColorTheme.borderLight
-                                : ColorTheme.primary,
-                              backgroundColor: uploadingResume
-                                ? "transparent"
-                                : "rgba(16, 185, 129, 0.05)",
-                            }}
-                            animate={uploadingResume ? {} : pulseAnimation}
-                          >
+                          <div className="relative">
                             <input
                               type="file"
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              accept=".pdf"
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                               onChange={handleResumeUpload}
                               disabled={uploadingResume}
                             />
-                            {uploadingResume ? (
-                              <div
-                                className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4"
-                                style={{
-                                  borderColor: ColorTheme.primary,
-                                  borderTopColor: "transparent",
-                                }}
-                              ></div>
-                            ) : (
-                              <svg
-                                className="w-12 h-12 mx-auto mb-4"
-                                style={{ color: ColorTheme.textMuted }}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                />
-                              </svg>
-                            )}
-                            <p style={{ color: ColorTheme.textSecondary }}>
-                              {uploadingResume
-                                ? "Uploading..."
-                                : "Drag & drop your resume here or click to browse"}
-                            </p>
-                            <p
-                              style={{ color: ColorTheme.textMuted }}
-                              className="text-sm mt-2"
-                            >
-                              Supports only PDF.
-                            </p>
-                          </motion.div>
+                            <div className={`
+                              border-2 border-dashed rounded-xl p-10 transition-all duration-300 flex flex-col items-center justify-center
+                              ${uploadingResume
+                                ? "border-emerald-500/30 bg-emerald-500/5"
+                                : "border-zinc-700 hover:border-emerald-500/50 hover:bg-zinc-800/50"}
+                            `}>
+                              {uploadingResume ? (
+                                <div className="w-16 h-16 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin mb-4" />
+                              ) : (
+                                <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                                  <Upload className="w-8 h-8 text-gray-400 group-hover:text-emerald-400 transition-colors" />
+                                </div>
+                              )}
+                              <p className="text-lg font-medium text-white mb-2">
+                                {uploadingResume ? "Uploading..." : "Drop your resume here"}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                Supports PDF files up to 10MB
+                              </p>
+                            </div>
+                          </div>
                         ) : (
-                          <div
-                            className="rounded-lg p-6"
-                            style={{ backgroundColor: "rgba(28, 28, 30, 0.9)" }}
-                          >
+                          <div className="space-y-6">
                             {isLoading ? (
-                              <div className="text-center">
-                                {/* Progress Bar Section */}
-                                <div className="w-full h-5 bg-gray-800 rounded-full overflow-hidden mb-6 p-0.5">
-                                  <motion.div
-                                    className="h-full rounded-full"
-                                    style={{
-                                      background: `linear-gradient(to right, ${ColorTheme.primaryDark}, ${ColorTheme.primary})`,
-                                      boxShadow: `0 0 8px ${ColorTheme.primary}80`,
-                                      width: `${progressValue}%`,
-                                    }}
-                                    initial={{ width: "0%" }}
-                                    animate={{ width: `${progressValue}%` }}
-                                    transition={{ duration: 0.5 }}
-                                  />
+                              <div className="text-center space-y-6">
+                                {/* Progress Bar */}
+                                <div className="relative pt-4">
+                                  <div className="flex justify-between text-xs font-medium text-gray-400 mb-2">
+                                    <span>Processing...</span>
+                                    <span className="text-emerald-400">{Math.round(progressValue)}%</span>
+                                  </div>
+                                  <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
+                                    <motion.div
+                                      className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 relative"
+                                      initial={{ width: "0%" }}
+                                      animate={{ width: `${progressValue}%` }}
+                                    >
+                                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                                    </motion.div>
+                                  </div>
                                 </div>
 
                                 {/* Loading Message */}
-                                <motion.div
-                                  key={loadingMessages[currentMessage]}
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -10 }}
-                                  transition={{ duration: 0.5 }}
-                                  className="min-h-12 flex items-center justify-center"
-                                >
-                                  <p
-                                    style={{ color: ColorTheme.primary }}
-                                    className="text-lg font-medium mb-4"
-                                  >
-                                    {loadingMessages[currentMessage]}
-                                  </p>
-                                </motion.div>
-
-                                {/* Progress Percentage */}
-                                <p
-                                  className="text-xs mb-6"
-                                  style={{ color: ColorTheme.textMuted }}
-                                >
-                                  <span
-                                    className="font-medium"
-                                    style={{ color: ColorTheme.primary }}
-                                  >
-                                    {Math.round(progressValue)}%
-                                  </span>{" "}
-                                  complete
-                                </p>
-
-                                {/* Portfolio Fact */}
-                                <motion.div
-                                  className="bg-gray-800/50 backdrop-blur-sm p-4 rounded-lg mt-4 border border-gray-700"
-                                  initial={{ opacity: 0, scale: 0.95 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  exit={{ opacity: 0, scale: 0.95 }}
-                                  key={portfolioFacts[currentFact]}
-                                  transition={{ duration: 0.5 }}
-                                >
-                                  <p
-                                    className="text-sm"
-                                    style={{ color: ColorTheme.textSecondary }}
-                                  >
-                                    <span
-                                      className="block font-semibold mb-2 text-xs"
-                                      style={{ color: ColorTheme.primary }}
+                                <div className="h-12 flex items-center justify-center">
+                                  <AnimatePresence mode="wait">
+                                    <motion.p
+                                      key={loadingMessages[currentMessage]}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      exit={{ opacity: 0, y: -10 }}
+                                      className="text-emerald-400 font-medium"
                                     >
-                                      DID YOU KNOW?
-                                    </span>
-                                    {portfolioFacts[currentFact]}
-                                  </p>
-                                </motion.div>
+                                      {loadingMessages[currentMessage]}
+                                    </motion.p>
+                                  </AnimatePresence>
+                                </div>
+
+                                {/* Fact Card */}
+                                <div className="bg-zinc-800/50 rounded-xl p-4 border border-white/5 text-left">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Sparkles className="w-4 h-4 text-yellow-500" />
+                                    <span className="text-xs font-bold text-yellow-500 uppercase tracking-wider">Did you know?</span>
+                                  </div>
+                                  <AnimatePresence mode="wait">
+                                    <motion.p
+                                      key={portfolioFacts[currentFact]}
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                      className="text-sm text-gray-300 leading-relaxed"
+                                    >
+                                      {portfolioFacts[currentFact]}
+                                    </motion.p>
+                                  </AnimatePresence>
+                                </div>
                               </div>
                             ) : showPreview ? (
-                              <div className="text-center">
+                              <div className="text-center py-6">
                                 <motion.div
-                                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                                  style={{
-                                    backgroundColor: `${ColorTheme.primary}20`,
-                                  }}
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  transition={{ type: "spring", duration: 0.6 }}
+                                  className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30"
                                 >
-                                  <svg
-                                    className="w-8 h-8"
-                                    style={{ color: ColorTheme.primary }}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
+                                  <Check className="w-10 h-10 text-white" />
                                 </motion.div>
-                                <p
-                                  style={{ color: ColorTheme.textSecondary }}
-                                  className="mb-4"
-                                >
-                                  Your portfolio is ready!
+                                <h3 className="text-2xl font-bold text-white mb-2">Portfolio Ready!</h3>
+                                <p className="text-gray-400 mb-8">
+                                  We've successfully extracted your details and built your site.
                                 </p>
-                                <motion.div
-                                  className="flex justify-center gap-4"
-                                  initial={{ y: 20, opacity: 0 }}
-                                  animate={{ y: 0, opacity: 1 }}
-                                  transition={{ delay: 0.4 }}
+                                <motion.button
+                                  className="px-8 py-3 cursor-pointer bg-white text-black font-bold rounded-xl hover:scale-105 transition-transform shadow-xl"
+                                  onClick={() => handleCreatePortfolio(customBodyResume)}
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
                                 >
-                                  <motion.button
-                                    className="px-4 py-2 cursor-pointer rounded-lg"
-                                    style={{
-                                      backgroundColor: ColorTheme.primary,
-                                      color: "#000",
-                                      boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                                    }}
-                                    whileHover={{
-                                      boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                                    }}
-                                    onClick={() =>
-                                      handleCreatePortfolio(customBodyResume)
-                                    }
-                                  >
-                                    View Portfolio
-                                  </motion.button>
-                                </motion.div>
+                                  View My Portfolio
+                                </motion.button>
                               </div>
                             ) : (
-                              <div className="text-center">
-                                <motion.div
-                                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                                  style={{
-                                    backgroundColor: `${ColorTheme.primary}20`,
-                                  }}
-                                >
-                                  <svg
-                                    className="w-8 h-8"
-                                    style={{ color: ColorTheme.primary }}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                  </svg>
-                                </motion.div>
-                                <p style={{ color: ColorTheme.textSecondary }}>
-                                  Resume uploaded successfully!
+                              <div className="text-center py-4">
+                                <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                  <FileText className="w-8 h-8 text-emerald-500" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Resume Uploaded</h3>
+                                <p className="text-gray-400 mb-6">
+                                  Ready to process your resume and build your portfolio?
                                 </p>
-                                <p
-                                  style={{ color: ColorTheme.textMuted }}
-                                  className="text-sm mt-2 mb-4"
-                                >
-                                  Click the button below to create your
-                                  portfolio
-                                </p>
-
                                 <motion.button
-                                  className="px-4 py-2 cursor-pointer rounded-lg"
-                                  style={{
-                                    backgroundColor: ColorTheme.primary,
-                                    color: "#000",
-                                    boxShadow: `0 4px 10px ${ColorTheme.primaryGlow}`,
-                                  }}
-                                  whileHover={{
-                                    boxShadow: `0 6px 14px ${ColorTheme.primaryGlow}`,
-                                  }}
+                                  className="w-full py-4 cursor-pointer bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                                   onClick={extractDetails}
-                                  disabled={isLoading}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
                                 >
-                                  {isLoading ? (
-                                    <div className="flex items-center">
-                                      <svg
-                                        className="animate-spin h-4 w-4 mr-2"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <circle
-                                          className="opacity-25"
-                                          cx="12"
-                                          cy="12"
-                                          r="10"
-                                          stroke="currentColor"
-                                          strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                          className="opacity-75"
-                                          fill="currentColor"
-                                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                      </svg>
-                                      Processing...
-                                    </div>
-                                  ) : (
-                                    "Process Resume"
-                                  )}
+                                  <Wand2 className="w-5 h-5" />
+                                  Process Resume
                                 </motion.button>
                               </div>
                             )}
                           </div>
                         )}
                       </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Create Portfolio Button */}
-                  {!resumeUploaded && !uploadingResume && (
-                    <motion.div
-                      className="mt-8 flex justify-center"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <motion.button
-                        className="inline-flex items-center cursor-pointer group gap-2 px-6 py-3 rounded-lg font-medium transition-all"
-                        style={{
-                          background: `linear-gradient(to right, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                          color: "#000",
-                          boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`,
-                          opacity: isLoading ? 0.7 : 1,
-                          cursor: isLoading ? "not-allowed" : "pointer",
-                        }}
-                        whileHover={{
-                          boxShadow: isLoading
-                            ? `0 4px 14px ${ColorTheme.primaryGlow}`
-                            : `0 6px 20px ${ColorTheme.primaryGlow}`,
-                        }}
-                        onClick={() => {
-                          toast.error("Please upload a resume first");
-                        }}
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <svg
-                              className="animate-spin h-5 w-5 mr-2"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              ></path>
-                            </svg>
-                            <span>Creating Portfolio...</span>
-                          </>
-                        ) : (
-                          <>
-                            Create Portfolio
-                            <ArrowRight className="h-5 w-5 ml-2 group-hover:ml-5 transition-all duration-300 ease" />
-                          </>
-                        )}
-                      </motion.button>
                     </motion.div>
-                  )}
+                  </div>
                 </motion.div>
-              </div>
-            </div>
-          )}
+              )}
+            </AnimatePresence>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

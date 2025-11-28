@@ -183,7 +183,7 @@ const Contact = ({
     {
       name: "Email",
       icon: Mail,
-      url: userInfoData.email ? `mailto:${userInfoData.email}` : null,
+      url: userInfoData.email ? `mailto:${typeof userInfoData.email === 'string' ? userInfoData.email : (userInfoData.email?.email || userInfoData.email?.value || "")}` : null,
       color: isDark ? "from-red-600 to-red-700" : "from-red-500 to-red-600",
       hoverColor: isDark ? "hover:from-red-500 hover:to-red-600" : "hover:from-red-400 hover:to-red-500",
       iconBg: isDark ? "bg-red-600" : "bg-red-500",
@@ -315,10 +315,10 @@ const Contact = ({
                 Or reach me directly at
               </p>
               <a
-                href={`mailto:${userInfoData.email}`}
+                href={`mailto:${typeof userInfoData.email === 'string' ? userInfoData.email : (userInfoData.email?.email || userInfoData.email?.value || "")}`}
                 className={`inline-block text-lg font-medium transition-colors px-6 py-3 rounded-xl border ${isDark ? "text-white bg-gray-800 border-gray-700 hover:bg-gray-700" : "text-gray-900 bg-white border-gray-200 hover:bg-gray-50"}`}
               >
-                {userInfoData.email}
+                {typeof userInfoData.email === 'string' ? userInfoData.email : (userInfoData.email?.email || userInfoData.email?.value || "")}
               </a>
             </motion.div>
           )

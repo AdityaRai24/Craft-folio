@@ -47,7 +47,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { portfolioData } = await req.json();
-    console.log("Received portfolio data:", portfolioData);
 
     // Validate API key
     if (!process.env.GEMINI_API_KEY) {
@@ -80,12 +79,10 @@ Respond ONLY with valid JSON in this exact format (no additional text, no markdo
   "seoDescription": "Compelling description that includes key skills and value proposition for better search visibility."
 }`;
 
-    console.log("Sending prompt to Gemini");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
 
-    console.log("Raw response from Gemini:", text);
 
     // Clean the response text
     text = text.trim();
@@ -106,7 +103,6 @@ Respond ONLY with valid JSON in this exact format (no additional text, no markdo
       text = jsonMatch[0];
     }
 
-    console.log("Cleaned response:", text);
 
     let seoData;
     try {
@@ -148,7 +144,6 @@ Respond ONLY with valid JSON in this exact format (no additional text, no markdo
       seoData.seoDescription = seoData.seoDescription.substring(0, 157) + "...";
     }
 
-    console.log("Final SEO data:", seoData);
     return NextResponse.json(seoData);
   } catch (error) {
     console.error("Error in SEO generation:", error);

@@ -105,7 +105,6 @@ const TopBar = ({
   // --- Handlers ---
   const handleResume = () => {
     // Add your resume logic here (e.g., window.open('/resume.pdf'))
-    console.log("Resume clicked");
     setActiveMenu(null);
   };
 

@@ -25,6 +25,6 @@ export const defaultProjectsStyles: ProjectsCustomizationState = {
   // Typography
   titleSize: "md",
   titleWeight: "semibold",
-  descriptionSize: "md",
+  descriptionSize: "xs",
   descriptionWeight: "normal",
 };

@@ -3,7 +3,6 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import { techList } from "@/lib/techlist";
 import { themeContent } from "@/lib/themeContent";
 import { prompts } from "@/lib/prompts";
-import { templateConfig } from "@/lib/templateConfig";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({
@@ -263,7 +262,6 @@ export async function POST(req: Request) {
 
     const parsedText = parsingResponse.response.text();
 
-
     // Clean and validate JSON
     let resumeData;
     try {
@@ -285,9 +283,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const config = templateConfig[finalTheme] || templateConfig["NeoSpark"]; // Fallback
-    const themePrompts = config.features;
-
+    const themePrompts = prompts[finalTheme];
     let titleInfo;
     let summaryInfo;
     let shortSummaryInfo;
@@ -300,7 +296,7 @@ export async function POST(req: Request) {
       template: any,
       data: any,
       temperature: number = 0.7,
-      maxTokens: number = 500
+      maxTokens: number = 1024
     ) {
       try {
         const prompt = await template.format(data);
@@ -334,7 +330,7 @@ export async function POST(req: Request) {
         titleGeneratorTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
-        500
+        1024
       );
 
       // Provide fallback if generation failed
@@ -349,7 +345,7 @@ export async function POST(req: Request) {
         onlyTitleTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
-        300
+        1024
       );
 
       if (!titleInfo) {
@@ -360,12 +356,12 @@ export async function POST(req: Request) {
     }
 
     // Generate summary lines
-    if (themePrompts?.summary) {
+    if (themePrompts?.summaryPrompt) {
       summaryInfo = await safeAIGeneration(
         summaryGeneratorTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
-        500
+        1024
       );
 
       if (!summaryInfo) {
@@ -380,12 +376,12 @@ export async function POST(req: Request) {
     }
 
     // Generate short summary
-    if (themePrompts?.shortSummary) {
+    if (themePrompts?.shortSummaryPrompt) {
       shortSummaryInfo = await safeAIGeneration(
         shortSummaryTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
-        300
+        1024
       );
 
       if (!shortSummaryInfo) {
@@ -396,12 +392,12 @@ export async function POST(req: Request) {
     }
 
     // Generate long summary
-    if (themePrompts?.longSummary || config.features.safari) { // Safari needs long summary context usually
+    if (themePrompts?.longSummaryPrompt) {
       longSummaryInfo = await safeAIGeneration(
         longSummaryTemplate,
         { resume_data: JSON.stringify(resumeData) },
         0.7,
-        800
+        2048
       );
 
       if (!longSummaryInfo) {
@@ -410,6 +406,61 @@ export async function POST(req: Request) {
           longSummary: `I'm a passionate developer with experience in ${skills}. I focus on creating intuitive user experiences and building scalable solutions. My journey in tech has been driven by continuous learning and adapting to new technologies. I believe in the power of technology to solve real-world problems and am always excited to take on new challenges.`
         };
       }
+    }
+
+    // Generate Safari Content (Only for MacOS)
+    // Check if theme is MacOS (assuming "MacOS" or similar key in prompts)
+    // Or check if themePrompts has specific flag, but here we check if it's MacOS theme
+    const isMacOS = finalTheme === "MacOS" || finalTheme === "Sonoma" || finalTheme === "Ventura" || finalTheme === "Monterey";
+
+    if (isMacOS) {
+      safariContent = await safeAIGeneration(
+        safariContentTemplate,
+        { resume_data: JSON.stringify(resumeData) },
+        0.7,
+        4096
+      );
+    }
+
+    // Upload Resume to Cloudinary (Only for MacOS)
+    let resumeUrl = "";
+    if (isMacOS && base64) {
+      try {
+        const formData = new FormData();
+        formData.append("file", base64);
+        formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string);
+
+        const uploadResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          resumeUrl = uploadData.secure_url;
+
+          // Add resume link to personal info
+          if (!resumeData.personalInfo) resumeData.personalInfo = {};
+          resumeData.personalInfo.resumeLink = resumeUrl;
+        } else {
+          console.error("Failed to upload resume to Cloudinary");
+        }
+      } catch (error) {
+        console.error("Error uploading resume to Cloudinary:", error);
+      }
+    }
+
+    // Categorize skills
+    if (resumeData.skills && resumeData.skills.length > 0) {
+      categorizedSkills = await safeAIGeneration(
+        categorizationTemplate,
+        { skills: JSON.stringify(resumeData.skills) },
+        0.3,
+        2048
+      );
     }
 
     // Process and map tech stack with techList
@@ -422,7 +473,7 @@ export async function POST(req: Request) {
       summaryInfo,
       shortSummaryInfo,
       longSummaryInfo,
-      config,
+      themePrompts,
       categorizedSkills,
       safariContent
     );
@@ -611,12 +662,11 @@ function convertToPortfolioFormat(
   summaryInfo: any,
   shortSummaryInfo: any,
   longSummaryInfo: any,
-  config: any,
-  categorizedSkills: any,
-  safariContent: any
+  themePrompts: any,
+  categorizedSkills?: any,
+  safariContent?: any
 ) {
   const sections = [];
-  const themePrompts = config.features;
 
   sections.push({
     type: "theme",
@@ -634,9 +684,9 @@ function convertToPortfolioFormat(
       name: resumeData.personalInfo.name || "Alex Morgan",
     };
 
-    // Add profile image only if enabled
-    if (themePrompts.profileImage) {
-      userInfoData.profileImage = config.defaults.userInfo?.profileImage || "https://placehold.co/400x400?text=Profile+Image";
+    // Add profile image only for LumenFlow template
+    if (finalTheme === "LumenFlow") {
+      userInfoData.profileImage = "https://placehold.co/400x400?text=Profile+Image";
     }
 
     // Add title/role to userInfo
@@ -677,7 +727,6 @@ function convertToPortfolioFormat(
   let heroData: any = {
     name: name,
     summary: summaryLines,
-    ...config.defaults.hero // Merge defaults like wallpaper
   };
 
   // Add title based on template configuration
@@ -689,7 +738,7 @@ function convertToPortfolioFormat(
   }
 
   // Add short summary if template needs it
-  if (themePrompts?.shortSummary) {
+  if (themePrompts?.shortSummaryPrompt) {
     let shortSummary =
       "I build exceptional and accessible digital experiences for the web."; // Default fallback
     if (shortSummaryInfo && shortSummaryInfo.shortSummary) {
@@ -704,7 +753,7 @@ function convertToPortfolioFormat(
   }
 
   // Add long summary if template needs it
-  if (themePrompts?.longSummary) {
+  if (themePrompts?.longSummaryPrompt) {
     let longSummary =
       "I'm a passionate Full Stack Developer with 4+ years of experience building modern web applications. I specialize in React, Node.js, and cloud technologies, with a strong focus on creating intuitive user experiences and scalable backend systems. My journey in tech started during my Computer Science studies, and I've been continuously learning and adapting to new technologies ever since. When I'm not coding, you'll find me contributing to open-source projects, writing technical blogs, or exploring the latest in AI and machine learning. I believe in the power of technology to solve real-world problems and am always excited to take on new challenges that push the boundaries of what's possible on the web.";
     if (longSummaryInfo && longSummaryInfo.longSummary) {
@@ -715,7 +764,7 @@ function convertToPortfolioFormat(
 
   // Add badge only if template has badge enabled
   if (themePrompts?.badge) {
-    heroData.badge = config.defaults.hero?.badge || {
+    heroData.badge = {
       texts: [
         "Open to work",
         "Available for freelance",
@@ -728,7 +777,7 @@ function convertToPortfolioFormat(
 
   // Add actions only if template has actions enabled
   if (themePrompts?.actions) {
-    heroData.actions = config.defaults.hero?.actions || [
+    heroData.actions = [
       {
         type: "button",
         label: "View Projects",
@@ -789,27 +838,39 @@ function convertToPortfolioFormat(
   }
 
   // Technologies Section
-  if (config.structure.technologies === "categorized" && categorizedSkills?.categories) {
-    // Map logos to categorized skills
-    const categories = categorizedSkills.categories.map((cat: any) => ({
-      ...cat,
-      technologies: cat.technologies.map((tech: any) => {
-        const matched = techList.find((t: any) => t.name.toLowerCase() === tech.name.toLowerCase()) ||
-          techList.find((t: any) => t.name.toLowerCase().includes(tech.name.toLowerCase()));
-        return {
-          name: tech.name,
-          proficiency: tech.proficiency || 85,
-          icon: matched?.logo || "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" // Fallback icon
-        };
-      })
-    }));
+  if (resumeData.skills && resumeData.skills.length > 0) {
+    let techStack = resumeData.skills;
 
-    sections.push({
-      type: "technologies",
-      data: { categories }
-    });
-  } else if (resumeData.skills && resumeData.skills.length > 0) {
-    const techStack = resumeData.skills;
+    // If categorized skills are available, use them
+    if (categorizedSkills && categorizedSkills.categories) {
+      // Merge categorized skills with logos from techList
+      const categories = categorizedSkills.categories.map((cat: any) => ({
+        ...cat,
+        technologies: cat.technologies.map((tech: any) => {
+          // Find logo for this tech
+          const matchedTech = techList.find((t: any) =>
+            t.name.toLowerCase() === tech.name.toLowerCase() ||
+            t.name.toLowerCase().includes(tech.name.toLowerCase()) ||
+            tech.name.toLowerCase().includes(t.name.toLowerCase())
+          );
+          return {
+            ...tech,
+            icon: matchedTech ? matchedTech.logo : "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg"
+          };
+        })
+      }));
+
+      // Add categories to techStack object for MacOS theme
+      // For other themes, we might just want the flat list, but MacOS uses categories
+      // We can attach it to the data object
+      techStack = {
+        ...techStack, // Keep array properties if any
+        categories: categories
+      };
+
+      // Also ensure the flat list has logos
+      techStack = Object.assign(techStack, resumeData.skills);
+    }
 
     sections.push({
       type: "technologies",
@@ -825,12 +886,22 @@ function convertToPortfolioFormat(
     });
   }
 
-  // Safari Section (MacOS specific)
-  if (themePrompts.safari && safariContent?.content) {
+  // Safari Section (MacOS only)
+  if (safariContent && safariContent.content) {
     sections.push({
       type: "safari",
       data: {
         content: safariContent.content
+      }
+    });
+  }
+
+  // Resume Section (MacOS only)
+  if (resumeData.personalInfo && resumeData.personalInfo.resumeLink) {
+    sections.push({
+      type: "resume",
+      data: {
+        resumeLink: resumeData.personalInfo.resumeLink
       }
     });
   }

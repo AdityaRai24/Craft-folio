@@ -35,6 +35,7 @@
     "array-move": "^4.0.0",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
     "compress-base64": "^7.0.10",
     "framer-motion": "^12.7.4",

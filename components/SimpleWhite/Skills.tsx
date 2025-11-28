@@ -237,11 +237,9 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
           filter: `id=eq.${portfolioId}`
         },
         (payload) => {
-          // console.log('Technologies update detected!', payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status for technologies: ${status}`);
       });
 
     return () => {

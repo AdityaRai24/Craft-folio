@@ -126,7 +126,6 @@ export async function POST(req: NextRequest) {
     });
 
     const sections = portfolioData.map((item : any) => item.type);
-    console.log(sections)
     // Schema for the complete response
     const outputSchema = z.object({
       changes: z
@@ -247,7 +246,6 @@ export async function POST(req: NextRequest) {
     const start = Date.now();
     const response = await model.generateContent(finalPrompt);
     const endLLM = Date.now();
-    console.log("LLM call duration:", endLLM - start, "ms");
     const responseText = response.response.text();
 
     // Parse the response with robust error handling
@@ -330,8 +328,6 @@ export async function POST(req: NextRequest) {
       });
     }
     const endParsing = Date.now();
-    console.log("Parsing duration:", endParsing - endLLM, "ms");
-    console.log("Total duration (LLM + parsing):", endParsing - start, "ms");
 
     // Filter out invalid changes
     const validChanges = parsedOutput.changes.filter(

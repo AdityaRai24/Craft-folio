@@ -379,11 +379,9 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("experience update detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status experience: ${status}`);
       });
 
     return () => {
@@ -411,8 +409,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
               key={style.value}
               onClick={() => onChange(style.value as any)}
               className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                 }`}
             >
               <div className="space-y-2">
@@ -452,27 +450,27 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
               key={align}
               onClick={() => onChange(align as any)}
               className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                 }`}
             >
               <div className="text-2xl text-white">{icon}</div>
               <div className="space-y-1 w-full">
                 <div
                   className={`h-1 rounded ${align === "left"
-                      ? "mr-auto w-3/4"
-                      : align === "center"
-                        ? "mx-auto w-1/2"
-                        : "ml-auto w-3/4"
+                    ? "mr-auto w-3/4"
+                    : align === "center"
+                      ? "mx-auto w-1/2"
+                      : "ml-auto w-3/4"
                     }`}
                   style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
                 ></div>
                 <div
                   className={`h-1 bg-gray-400 rounded ${align === "left"
-                      ? "mr-auto w-full"
-                      : align === "center"
-                        ? "mx-auto w-3/4"
-                        : "ml-auto w-full"
+                    ? "mr-auto w-full"
+                    : align === "center"
+                      ? "mx-auto w-3/4"
+                      : "ml-auto w-full"
                     }`}
                 ></div>
               </div>
@@ -506,8 +504,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
               key={style}
               onClick={() => onChange(style as any)}
               className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${value === style
-                  ? "border-white bg-zinc-700"
-                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                ? "border-white bg-zinc-700"
+                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                 }`}
             >
               <div className="flex flex-wrap gap-1 justify-center mb-2">
@@ -515,12 +513,12 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                   <span
                     key={i}
                     className={`text-xs px-2 py-1 ${style === "pills"
-                        ? "rounded-full border border-gray-500 text-white"
-                        : style === "badges"
-                          ? "rounded bg-gray-600 text-white"
-                          : style === "minimal"
-                            ? "text-gray-300"
-                            : "rounded-full border-2 text-white"
+                      ? "rounded-full border border-gray-500 text-white"
+                      : style === "badges"
+                        ? "rounded bg-gray-600 text-white"
+                        : style === "minimal"
+                          ? "text-gray-300"
+                          : "rounded-full border-2 text-white"
                       }`}
                     style={
                       style === "colorful"
@@ -644,26 +642,26 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
             {/* Main Card */}
             <div
               className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${effectiveCustomization.cardLayout === "default"
-                  ? theme === "light"
-                    ? "bg-white border border-gray-200 shadow-sm"
-                    : "bg-zinc-800 border border-zinc-700"
-                  : effectiveCustomization.cardLayout === "minimal"
-                    ? "bg-transparent border-0"
-                    : effectiveCustomization.cardLayout === "glassmorphism"
+                ? theme === "light"
+                  ? "bg-white border border-gray-200 shadow-sm"
+                  : "bg-zinc-800 border border-zinc-700"
+                : effectiveCustomization.cardLayout === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardLayout === "glassmorphism"
+                    ? theme === "light"
+                      ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                      : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                    : effectiveCustomization.cardLayout === "neon"
                       ? theme === "light"
-                        ? "bg-white/50 backdrop-blur-sm border border-white/20"
-                        : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
-                      : effectiveCustomization.cardLayout === "neon"
+                        ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                        : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                      : effectiveCustomization.cardLayout === "gradient"
                         ? theme === "light"
-                          ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
-                          : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
-                        : effectiveCustomization.cardLayout === "gradient"
-                          ? theme === "light"
-                            ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
-                            : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
-                          : theme === "light"
-                            ? "bg-white border border-gray-200 shadow-sm"
-                            : "bg-zinc-800 border border-zinc-700"
+                          ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                          : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                        : theme === "light"
+                          ? "bg-white border border-gray-200 shadow-sm"
+                          : "bg-zinc-800 border border-zinc-700"
                 }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
@@ -732,12 +730,12 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                         <span
                           key={techIndex}
                           className={`px-2 py-1 text-xs font-medium transition-all duration-300 ${effectiveCustomization.techStackStyle === "pills"
-                              ? "rounded-full border"
-                              : effectiveCustomization.techStackStyle === "badges"
-                                ? "rounded bg-gray-600 text-white"
-                                : effectiveCustomization.techStackStyle === "minimal"
-                                  ? "text-gray-300"
-                                  : "rounded-full border-2"
+                            ? "rounded-full border"
+                            : effectiveCustomization.techStackStyle === "badges"
+                              ? "rounded bg-gray-600 text-white"
+                              : effectiveCustomization.techStackStyle === "minimal"
+                                ? "text-gray-300"
+                                : "rounded-full border-2"
                             } ${theme === "light"
                               ? "border-gray-200 hover:border-orange-400/50 text-gray-600"
                               : "border-gray-700 hover:border-orange-400/50 text-gray-400"
@@ -785,8 +783,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                   {/* View More Arrow */}
                   <div
                     className={`transition-all duration-300 ${hoveredExperience === index
-                        ? "opacity-100 translate-x-0"
-                        : "opacity-0 translate-x-2"
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 translate-x-2"
                       }`}
                   >
                     <ArrowUpRight size={18} className="text-orange-400" />
@@ -861,8 +859,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
                 className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white hover:bg-zinc-800"
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white hover:bg-zinc-800"
                   }`}
                 style={activeTab === tab ? {
                   background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,

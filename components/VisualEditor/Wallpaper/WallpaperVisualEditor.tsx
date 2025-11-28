@@ -16,13 +16,20 @@ interface WallpaperVisualEditorProps {
     currentTheme: string;
 }
 
+const defaultWallpapers = [
+    "https://512pixels.net/wp-content/uploads/2025/08/26-Tahoe-Beach-Dawn-thumb.jpeg",
+    "https://512pixels.net/wp-content/uploads/2025/08/26-Tahoe-Beach-Night-thumb.jpeg",
+    "https://512pixels.net/downloads/macos-wallpapers-6k/15-Sequoia-Sunrise.png",
+    "https://512pixels.net/wp-content/uploads/2025/06/11-0-Day-thumbnail.jpg"
+];
+
 const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
     initialWallpaper,
     onClose,
     portfolioId,
     currentTheme,
 }) => {
-    const [wallpaperUrl, setWallpaperUrl] = useState(initialWallpaper);
+    const [wallpaperUrl, setWallpaperUrl] = useState(initialWallpaper || defaultWallpapers[0]);
     const [isUploading, setIsUploading] = useState(false);
     const dispatch = useDispatch();
     const { position, dragRef, handleMouseDown } = useDraggable({
@@ -140,7 +147,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
                 {/* Preview */}
                 <div className="space-y-2">
                     <label
@@ -164,6 +171,34 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                                 <ImageIcon size={32} />
                             </div>
                         )}
+                    </div>
+                </div>
+
+                {/* Default Wallpapers */}
+                <div className="space-y-2">
+                    <label
+                        className={`text-xs font-medium uppercase tracking-wider ${isDark ? "text-gray-400" : "text-gray-500"
+                            }`}
+                    >
+                        Default Options
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                        {defaultWallpapers.map((url, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setWallpaperUrl(url)}
+                                className={`relative aspect-video rounded-md overflow-hidden border-2 transition-all ${wallpaperUrl === url
+                                        ? "border-emerald-500 ring-2 ring-emerald-500/20"
+                                        : isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-300"
+                                    }`}
+                            >
+                                <img
+                                    src={url}
+                                    alt={`Default ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                />
+                            </button>
+                        ))}
                     </div>
                 </div>
 

@@ -160,9 +160,9 @@ export const templateConfig: any = {
       actions: false,
       titlePrefixSuffix: false,
       summary: false,
-      title: true,
+      title: false,
       shortSummary: true,
-      longSummary: false, // Used for Safari content generation
+      longSummary: true, // Used for Safari content generation
       safari: true,
       wallpaper: true,
     },

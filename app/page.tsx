@@ -441,65 +441,34 @@ export default function Page() {
       <section className="main-bg-noise pt-16 px-4 pb-20 md:pb-28 relative overflow-hidden">
         <motion.div
           className="relative w-full max-w-7xl mx-auto rounded-xl overflow-hidden"
-          style={{
-            boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 10px 25px rgba(22, 189, 156, 0.4)`,
-          }}
+
           variants={fadeInScale}
         >
-          <div
-            className="p-2"
-            style={{ backgroundColor: "rgba(28, 28, 30, 0.9)" }}
-          >
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+
+          <section className="py-20 px-4 relative">
+            <div className="max-w-6xl mx-auto">
+              <motion.div
+                className="relative rounded-2xl overflow-hidden border border-white/10 bg-zinc-900/50 backdrop-blur-xl shadow-2xl"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/10 via-transparent to-blue-500/10 pointer-events-none" />
+
+                {/* Window Controls */}
+                <div className="h-12 border-b border-white/10 flex items-center px-4 gap-2 bg-black/20">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                </div>
+
+                <div className="p-8 md:p-12">
+                  <ResumeConversionAnimation />
+                </div>
+              </motion.div>
             </div>
-          </div>
-
-          <div className="md:p-6">
-            <ResumeConversionAnimation />
-
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              {[
-                {
-                  icon: "⚡",
-                  title: "Lightning Fast",
-                  description: "Transform your resume in seconds",
-                },
-                {
-                  icon: "🎨",
-                  title: "Beautiful Design",
-                  description: "Professional templates that stand out",
-                },
-                {
-                  icon: "🔄",
-                  title: "Easy Customization",
-                  description: "Modify any element to match your style",
-                },
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  className="p-4 rounded-lg text-center"
-                  style={{ backgroundColor: "rgba(28, 28, 30, 0.7)" }}
-                  whileHover={{
-                    y: -5,
-                    backgroundColor: "rgba(38, 38, 42, 0.8)",
-                  }}
-                >
-                  <div className="text-3xl mb-2">{feature.icon}</div>
-                  <h4 className="font-semibold mb-1">{feature.title}</h4>
-                  <p className="text-sm text-gray-400">{feature.description}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
+          </section>
         </motion.div>
         {/* Subtle wave decoration */}
         <div className="absolute bottom-0 left-0 w-full">

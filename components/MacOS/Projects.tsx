@@ -195,6 +195,7 @@ const ProjectsGrid = ({
   }
 
 
+
   return (
     <div
       className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#1a1a1a]" : "bg-gray-50"} ${font || ""}`}
@@ -318,14 +319,14 @@ const ProjectsGrid = ({
                         <div
                           key={techIndex}
                           className={getTechStackClasses()}
-                          title={tech.name}
+                          title={typeof tech === 'object' ? tech.name : tech}
                           style={{
                             backgroundColor: currentTheme.background.primary,
                             color: currentTheme.text.secondary,
                             borderColor: currentTheme.states.muted,
                           }}
                         >
-                          <span className="text-xs font-medium">{tech}</span>
+                          <span className="text-xs font-medium">{typeof tech === 'object' ? tech.name : tech}</span>
                         </div>
                       ))}
                       {project.techStack.length > 5 && (

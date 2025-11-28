@@ -79,7 +79,6 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
       }
 
       const data = await response.json();
-      console.log("Favicon uploaded successfully:", data.secure_url);
       setFaviconUrl(data.secure_url);
       toast.success("Favicon uploaded successfully!", { id: "faviconUpload" });
     } catch (error) {
@@ -96,14 +95,11 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
 
   const handleSaveSEOSettings = async () => {
     if (isSaving) {
-      console.log("Save already in progress, skipping...");
       return; // Prevent multiple saves
     }
 
     try {
       setIsSaving(true);
-      console.log("Starting SEO save process...");
-      console.log("SEO data to save:", { seoTitle, seoDescription, faviconUrl });
 
       const result = await updateSection({
         sectionName: "seo",
@@ -117,10 +113,8 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
         sectionDescription: "SEO settings for your portfolio",
       });
 
-      console.log("Save result:", result);
 
       if (result.success) {
-        console.log("SEO settings saved successfully!");
         toast.success("SEO settings saved successfully! Refresh to see changes.");
         // Don't call onSave() here - let the parent handle it
       } else {
@@ -132,7 +126,6 @@ const SEOSettings = forwardRef<{ handleSaveSEOSettings: () => void }, SEOSetting
       toast.error("Failed to save SEO settings");
     } finally {
       setIsSaving(false);
-      console.log("Save process completed");
     }
   };
 

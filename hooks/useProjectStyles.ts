@@ -158,10 +158,11 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
   const getTitleClasses = () => {
     const sizeMap = {
-      sm: "text-lg md:text-xl",
-      md: "text-xl md:text-2xl",
-      lg: "text-2xl md:text-3xl",
-      xl: "text-3xl md:text-4xl",
+      xs: "text-xs",
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
+      xl: "text-xl",
     };
 
     const weightMap = {
@@ -176,9 +177,11 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
   const getDescriptionClasses = () => {
     const sizeMap = {
+      xs : "text-xs",
       sm: "text-sm",
       md: "text-base",
       lg: "text-lg",
+      xl: "text-xl",
     };
 
     const weightMap = {

@@ -37,8 +37,8 @@ export interface ProjectsCustomizationState {
   glowEffect: boolean;
   
   //Typography
-  titleSize: "sm" | "md" | "lg" | "xl";
+  titleSize: "xs" | "sm" | "md" | "lg" | "xl";
   titleWeight: "normal" | "medium" | "semibold" | "bold";
-  descriptionSize: "sm" | "md" | "lg";
+  descriptionSize: "xs" | "sm" | "md" | "lg";
   descriptionWeight: "normal" | "medium" | "semibold" | "bold";
 }

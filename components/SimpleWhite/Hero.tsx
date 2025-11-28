@@ -46,26 +46,26 @@ const AlignmentSelector: React.FC<{
             key={align}
             onClick={() => onChange(align as any)}
             className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="text-2xl text-white">{icon}</div>
             <div className="space-y-1 w-full">
               <div
                 className={`h-1 bg-gradient-to-r rounded ${align === "left"
-                    ? "mr-auto w-3/4"
-                    : align === "center"
-                      ? "mx-auto w-1/2"
-                      : "ml-auto w-3/4"
+                  ? "mr-auto w-3/4"
+                  : align === "center"
+                    ? "mx-auto w-1/2"
+                    : "ml-auto w-3/4"
                   }`}
               ></div>
               <div
                 className={`h-1 bg-gray-400 rounded ${align === "left"
-                    ? "mr-auto w-full"
-                    : align === "center"
-                      ? "mx-auto w-3/4"
-                      : "ml-auto w-full"
+                  ? "mr-auto w-full"
+                  : align === "center"
+                    ? "mx-auto w-3/4"
+                    : "ml-auto w-full"
                   }`}
               ></div>
             </div>
@@ -95,8 +95,8 @@ const SizeSelector: React.FC<{
             key={optionValue}
             onClick={() => onChange(optionValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex justify-center mb-2">
@@ -133,8 +133,8 @@ const StyleSelector: React.FC<{
             key={optionValue}
             onClick={() => onChange(optionValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div className="flex justify-center mb-2">
@@ -242,8 +242,8 @@ const BackgroundThemeSelector: React.FC<{
             key={themeValue}
             onClick={() => onChange(themeValue)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === themeValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
           >
             <div
@@ -757,11 +757,9 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("Portfolio update detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status: ${status}`);
       });
 
     return () => {
@@ -1198,8 +1196,8 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         key={value}
                         onClick={() => updateDraftCustomization("titleWeight", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                       >
                         <div className="flex justify-center mb-2">
@@ -1270,8 +1268,8 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                         key={value}
                         onClick={() => updateDraftCustomization("resumeButtonSize", value)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.resumeButtonSize ?? customization.resumeButtonSize) === value
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                          ? "border-white bg-zinc-700"
+                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                           }`}
                       >
                         <div className="flex justify-center mb-2">

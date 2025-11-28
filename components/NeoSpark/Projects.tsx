@@ -191,11 +191,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("project update detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status project: ${status}`);
       });
 
     return () => {
@@ -350,10 +348,10 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                     >
                       <div
                         className={`flex flex-wrap items-center ${effectiveCustomization.titleAlignment === "center"
-                            ? "justify-center"
-                            : effectiveCustomization.titleAlignment === "right"
-                              ? "justify-end"
-                              : "justify-between"
+                          ? "justify-center"
+                          : effectiveCustomization.titleAlignment === "right"
+                            ? "justify-end"
+                            : "justify-between"
                           } mb-3`}
                       >
                         <h3
@@ -395,10 +393,10 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                         </h4>
                         <div
                           className={`flex flex-wrap gap-2 ${effectiveCustomization.titleAlignment === "center"
-                              ? "justify-center"
-                              : effectiveCustomization.titleAlignment === "right"
-                                ? "justify-end"
-                                : ""
+                            ? "justify-center"
+                            : effectiveCustomization.titleAlignment === "right"
+                              ? "justify-end"
+                              : ""
                             }`}
                         >
                           {project?.techStack?.map((tech: Technology, idx: number) => (

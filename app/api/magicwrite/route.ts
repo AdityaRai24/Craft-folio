@@ -86,12 +86,10 @@ IMPORTANT: Your response should be a direct enhancement of the original content 
 
 ENHANCED CONTENT:`;
 
-    console.log("Sending prompt to Gemini for content enhancement");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let text = response.text();
 
-    console.log("Raw response from Gemini:", text);
 
     text = text.trim();
 
@@ -106,7 +104,6 @@ ENHANCED CONTENT:`;
     // Remove any leading/trailing whitespace again
     text = text.trim();
 
-    console.log("Cleaned enhanced content:", text);
 
     // Validate the response
     if (!text || text.length < 10) {
@@ -114,7 +111,6 @@ ENHANCED CONTENT:`;
     }
 
     // Print to server console for debugging
-    console.log('Magic Write Enhanced Content:', text);
 
     return NextResponse.json({ result: text });
   } catch (error) {

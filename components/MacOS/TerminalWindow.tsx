@@ -13,7 +13,11 @@ const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
-  const projectsData = portfolioData?.find((item: any) => item.type === "projects")?.data || [];
+
+  // Fix: Correctly extract projects array whether it's direct or wrapped in an object
+  const projectsSection = portfolioData?.find((item: any) => item.type === "projects")?.data;
+  const projectsData = Array.isArray(projectsSection) ? projectsSection : (projectsSection?.projects || []);
+
   const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
   const technologiesData = portfolioData?.find((item: any) => item.type === "technologies")?.data || [];
   const terminalData = portfolioData?.find((item: any) => item.type === "terminal")?.data || {};
@@ -35,6 +39,12 @@ const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light
   const terminalRef = useRef<HTMLDivElement>(null);
 
   const isDark = theme === "dark";
+
+  // Helper to extract skill name
+  const getSkillName = (skill: any) => {
+    if (typeof skill === 'string') return skill;
+    return skill.name || "";
+  };
 
   // Keep only key commands
   const commands: Record<string, (args?: string) => string> = {
@@ -61,10 +71,46 @@ Title: ${title}
 ${summary}`;
     },
     skills: () => {
-      if (technologiesData && technologiesData.length > 0) {
-        const techList = technologiesData.map((tech: any) => `  • ${tech.name || tech}`).join("\n");
-        return `Technologies I work with:\n${techList}`;
+      const allSkills = new Set<string>();
+
+      // 1. Add skills from Technologies section
+      if (technologiesData) {
+        if (technologiesData.categories) {
+          technologiesData.categories.forEach((cat: any) => {
+            if (cat.technologies) {
+              cat.technologies.forEach((t: any) => allSkills.add(getSkillName(t)));
+            }
+          });
+        } else if (Array.isArray(technologiesData)) {
+          technologiesData.forEach((t: any) => allSkills.add(getSkillName(t)));
+        }
       }
+
+      // 2. Add skills from Projects
+      if (projectsData && Array.isArray(projectsData)) {
+        projectsData.forEach((project: any) => {
+          if (project.techStack && Array.isArray(project.techStack)) {
+            project.techStack.forEach((t: any) => allSkills.add(getSkillName(t)));
+          }
+        });
+      }
+
+      // 3. Add skills from Experience
+      if (experienceData && Array.isArray(experienceData)) {
+        experienceData.forEach((exp: any) => {
+          if (exp.techStack && Array.isArray(exp.techStack)) {
+            exp.techStack.forEach((t: any) => allSkills.add(getSkillName(t)));
+          }
+        });
+      }
+
+      const uniqueSkills = Array.from(allSkills).filter(Boolean).sort();
+
+      if (uniqueSkills.length > 0) {
+        const skillList = uniqueSkills.map(s => `  • ${s}`).join("\n");
+        return `Technologies I work with (aggregated from all sections):\n${skillList}`;
+      }
+
       return `Technologies I work with:
   • JavaScript/TypeScript
   • React/Next.js
@@ -85,8 +131,12 @@ ${summary}`;
       if (projectsData && projectsData.length > 0) {
         const projectList = projectsData
           .slice(0, 5)
-          .map((project: any, idx: number) => `${idx + 1}. ${project.projectName || project.projectTitle || `Project ${idx + 1}`}`)
-          .join("\n");
+          .map((project: any, idx: number) => {
+            const title = project.projectName || project.projectTitle || `Project ${idx + 1}`;
+            const desc = project.projectDescription ? `\n    ${project.projectDescription}` : "";
+            return `${idx + 1}. ${title}${desc}`;
+          })
+          .join("\n\n");
         return `My Projects:\n${projectList}\n\nTotal: ${projectsData.length} projects`;
       }
       return "No projects found.";
@@ -95,8 +145,13 @@ ${summary}`;
       if (experienceData && experienceData.length > 0) {
         const expList = experienceData
           .slice(0, 5)
-          .map((exp: any, idx: number) => `${idx + 1}. ${exp.role || "Role"} at ${exp.companyName || "Company"}`)
-          .join("\n");
+          .map((exp: any, idx: number) => {
+            const role = exp.role || "Role";
+            const company = exp.companyName || "Company";
+            const desc = exp.description ? `\n    ${exp.description}` : "";
+            return `${idx + 1}. ${role} at ${company}${desc}`;
+          })
+          .join("\n\n");
         return `Work Experience:\n${expList}\n\nTotal: ${experienceData.length} positions`;
       }
       return "No experience found.";

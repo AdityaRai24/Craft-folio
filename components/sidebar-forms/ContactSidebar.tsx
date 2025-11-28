@@ -52,7 +52,6 @@ const ContactSidebar = () => {
   );
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
 
-  console.log(portfolioData)
 
   const emptyContent: ContentType = {
     github: "",
@@ -70,7 +69,6 @@ const ContactSidebar = () => {
   const [originalContent, setOriginalContent] = useState({});
   const [isUploaded, setIsUploaded] = useState(false);
   const [isProfileImageUploaded, setIsProfileImageUploaded] = useState(false);
-  console.log(content, contactData)
 
   useEffect(() => {
     if (contactData && Object.keys(contactData).length > 0) {
