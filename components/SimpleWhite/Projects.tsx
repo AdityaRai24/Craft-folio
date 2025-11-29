@@ -34,7 +34,7 @@ import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
-import { defaultProjectsStyles } from "../NeoSpark/defaultStyles/projects";
+import { defaultProjectsStyles } from "@/types/projects/portfolio";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { useProjectStyles } from "@/hooks/useProjectStyles";

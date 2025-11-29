@@ -18,8 +18,7 @@ import {
 import { motion } from "framer-motion";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
 import { Experience, Technology } from "@/types/experience/shared";
-import { defaultExperienceStyles } from "./defaultStyles/experience";
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { ExperienceCustomizationState, defaultExperienceStyles } from "@/types/experience/portfolio";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 
 const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) => {

@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from "react";
 import {
   Github,
@@ -17,10 +16,9 @@ import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
-import { defaultProjectsStyles } from "./defaultStyles/projects";
+import { ProjectsCustomizationState, defaultProjectsStyles, Project, Technology } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
-import { Project, Technology, ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 

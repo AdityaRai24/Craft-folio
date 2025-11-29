@@ -13,7 +13,7 @@ import { ExperienceCustomizationState } from "@/types/experience/portfolio";
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultExperienceStyles } from "../NeoSpark/defaultStyles/experience";
+import { defaultExperienceStyles } from "@/types/experience/portfolio";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 
 const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {

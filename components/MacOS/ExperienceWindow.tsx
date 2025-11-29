@@ -8,7 +8,7 @@ import { Briefcase, Calendar, MapPin, Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultExperienceStyles } from "@/components/NeoSpark/defaultStyles/experience";
+import { defaultExperienceStyles } from "@/types/experience/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import toast from "react-hot-toast";
