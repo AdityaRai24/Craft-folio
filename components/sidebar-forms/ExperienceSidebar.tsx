@@ -1,35 +1,23 @@
 "use client";
-import { RootState } from '@/store/store'
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Label } from '../ui/label'
-import { Textarea } from '../ui/textarea'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { Plus, X, Edit, Trash, Check } from 'lucide-react'
-import { updatePortfolioData } from '@/slices/dataSlice'
-import { useParams } from 'next/navigation'
-import { updateSection } from '@/app/actions/portfolio'
-import toast from 'react-hot-toast'
-import { techList } from '@/lib/techlist'
-import { ColorTheme } from '@/lib/colorThemes'
+import { RootState } from '@/store/store';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Plus, X, Edit, Trash } from 'lucide-react';
+import { updatePortfolioData } from '@/slices/dataSlice';
+import { useParams } from 'next/navigation';
+import { updateSection } from '@/app/actions/portfolio';
+import toast from 'react-hot-toast';
+import { techList } from '@/lib/techlist';
+import { ColorTheme } from '@/lib/colorThemes';
+import { Experience, Technology } from '@/types/experience/shared';
 
 const ExperienceSidebar = () => {
-  interface Technology {
-    name: string;
-    logo: string;
-  }
 
-  interface Experience {
-    role?: string;
-    companyName?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string;
-    techStack?: Technology[];
-  }
 
   const emptyExperience: Experience = {
     role: "",

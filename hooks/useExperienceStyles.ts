@@ -1,22 +1,23 @@
-import { ExperienceCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
+import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { getVariantByName } from "@/lib/animationVariants";
 
 export const useExperienceStyles = (customization: ExperienceCustomizationState, theme: "light" | "dark", primaryColor: string) => {
   const isDark = theme === "dark";
 
   const getCardClasses = () => {
-    let classes = `relative transition-all duration-${Math.round(customization.animationSpeed / 100)} transform h-full flex flex-col `;
-    
+    let classes = `relative transition-all  transform h-full flex flex-col `;
+
     // Layout based classes
     if (customization.cardLayout === "default") {
-       classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
+      classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
     } else if (customization.cardLayout === "minimal") {
-       classes += "bg-transparent border-0";
+      classes += "bg-transparent border-0";
     } else if (customization.cardLayout === "glassmorphism") {
-       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
+      classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
     } else if (customization.cardLayout === "neon") {
-       classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
+      classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
     } else if (customization.cardLayout === "gradient") {
-       classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
+      classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
     }
 
     return classes;
@@ -36,14 +37,17 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
       md: "text-xl",
       lg: "text-2xl",
       xl: "text-3xl",
+      "2xl": "text-4xl",
+      "3xl": "text-5xl",
     };
     const weightMap = {
       normal: "font-normal",
       medium: "font-medium",
       semibold: "font-semibold",
       bold: "font-bold",
+      extrabold: "font-extrabold",
     };
-    
+
     let alignClass = "text-left";
     if (customization.textAlignment === "center") alignClass = "text-center";
     if (customization.textAlignment === "right") alignClass = "text-right";
@@ -63,7 +67,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
 
   const getTechStackClasses = () => {
     let classes = "px-2 py-1 text-xs font-medium transition-all duration-300 ";
-    
+
     if (customization.techStackStyle === "pills") {
       classes += "rounded-full border ";
       classes += isDark ? "border-gray-700 text-gray-300" : "border-gray-200 text-gray-600";
@@ -74,19 +78,81 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     } else if (customization.techStackStyle === "colorful") {
       classes += "rounded-full border-2";
     }
-    
+
     return classes;
   };
 
   const getTechStackStyle = () => {
-     if (customization.techStackStyle === "colorful") {
-         return {
-             borderColor: primaryColor,
-             backgroundColor: `${primaryColor}20`,
-             color: isDark ? "white" : "black"
-         };
-     }
-     return {};
+    if (customization.techStackStyle === "colorful") {
+      return {
+        borderColor: primaryColor,
+        backgroundColor: `${primaryColor}20`,
+        color: isDark ? "white" : "black"
+      };
+    }
+    return {};
+  };
+
+  const getContainerClasses = () => {
+    const widthMap = {
+      narrow: "max-w-4xl",
+      wide: "max-w-6xl",
+      full: "max-w-7xl",
+    };
+    // Default to 'full' if undefined
+    const width = customization.containerWidth || "full";
+    return `${widthMap[width as keyof typeof widthMap]} mx-auto space-y-10`;
+  };
+
+  const getTimelineStyles = () => {
+    const dotSizeMap = {
+      sm: "w-2 h-2",
+      md: "w-3 h-3",
+      lg: "w-4 h-4",
+    };
+
+    const dotStyleMap = {
+      circle: "rounded-full",
+      square: "rounded-none",
+      diamond: "rotate-45",
+      hexagon: "rounded-none",
+    };
+
+    return {
+      dot: `${dotSizeMap[customization.dotSize]} ${dotStyleMap[customization.dotStyle]}`,
+      line: `bg-opacity-30`,
+      lineStyle: {
+        backgroundColor: primaryColor,
+        width: `${customization.timelineWidth}px`,
+        opacity: 0.3,
+      },
+      dotStyle: {
+        backgroundColor: primaryColor,
+        zIndex: 10,
+        ...(customization.dotStyle === "hexagon" && {
+          clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+        }),
+      },
+    };
+  };
+
+  const getAnimationVariants = () => {
+    // Use shared animation variants from lib/animationVariants
+    return getVariantByName(customization.animationStyle);
+  };
+
+  const getBadgeClasses = () => {
+    return `px-2 sm:px-3 py-1 text-xs sm:text-sm ${customization.badgeStyle === "outlined" ? "border" : ""}`;
+  };
+
+  const getBadgeStyle = () => {
+    return {
+      backgroundColor: customization.badgeStyle === "outlined" ? "transparent" : `${primaryColor}20`,
+      color: primaryColor,
+      borderRadius: "20px",
+      border: customization.badgeStyle === "outlined" ? `1px solid ${primaryColor}` : "none",
+      boxShadow: customization.badgeStyle === "glow" ? `0 0 10px ${primaryColor}30` : "none",
+    };
   };
 
   return {
@@ -95,6 +161,11 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     getTitleClasses,
     getDescriptionClasses,
     getTechStackClasses,
-    getTechStackStyle
+    getTechStackStyle,
+    getContainerClasses,
+    getTimelineStyles,
+    getAnimationVariants,
+    getBadgeClasses,
+    getBadgeStyle
   };
 };

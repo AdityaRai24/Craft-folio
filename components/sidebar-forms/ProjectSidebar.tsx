@@ -1,36 +1,24 @@
 "use client";
-import { RootState } from '@/store/store'
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Label } from '@radix-ui/react-label'
-import { Textarea } from '../ui/textarea'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { Plus, X, Edit, Trash, Upload, Cloud, Check } from 'lucide-react'
-import { updatePortfolioData } from '@/slices/dataSlice'
-import { useParams } from 'next/navigation'
-import { updateSection } from '@/app/actions/portfolio'
-import toast from 'react-hot-toast'
-import { techList } from '@/lib/techlist'
-import { ColorTheme } from '@/lib/colorThemes'
+import { RootState } from '@/store/store';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Label } from '@radix-ui/react-label';
+import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { X, Edit, Trash, Cloud } from 'lucide-react';
+import { updatePortfolioData } from '@/slices/dataSlice';
+import { useParams } from 'next/navigation';
+import { updateSection } from '@/app/actions/portfolio';
+import toast from 'react-hot-toast';
+import { techList } from '@/lib/techlist';
+import { ColorTheme } from '@/lib/colorThemes';
+import { Project } from '@/types/projects/portfolio';
+import { Technology } from '@/types/projects/portfolio';
 
 const ProjectSidebar = () => {
-  interface Technology {
-    name: string;
-    logo: string;
-  }
 
-  interface Project {
-    projectTitle?: string;
-    projectName?: string;
-    projectDescription?: string;
-    projectImage?: string;
-    techStack?: Technology[];
-    githubLink?: string;
-    liveLink?: string;
-    year?: string;
-  }
 
   const emptyProject: Project = {
     projectName: "",

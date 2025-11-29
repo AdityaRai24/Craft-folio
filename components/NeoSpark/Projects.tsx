@@ -23,7 +23,6 @@ import MagicWrite from "@/components/Shared/MagicWrite";
 import { Project, Technology, ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
-import { getProjectVariants } from "@/lib/animations";
 
 
 const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
@@ -158,7 +157,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
     getTechStackClasses,
     getTitleAlignment,
     getTitleClasses,
-    getDescriptionClasses
+    getDescriptionClasses,
+    getAnimationVariants
   } = useProjectStyles(effectiveCustomization, titleColor, "dark");
 
   const { handleMagicWrite, handleDescriptionUpdate } = useProjectActions({
@@ -225,7 +225,8 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
     }
   }, [isLoading]);
 
-  const { container: containerVariants, project: projectVariants, image: imageVariants } = getProjectVariants(effectiveCustomization.animationSpeed);
+  const animationVariants = getAnimationVariants();
+  const projectVariants = animationVariants;
 
   if (isLoading) {
     return (
@@ -260,7 +261,6 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
           <motion.div
             className={getLayoutClasses()}
             style={getLayoutStyle()}
-            variants={containerVariants}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
@@ -296,7 +296,6 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                           style={getImageStyle()}
                           initial="rest"
                           whileHover="hover"
-                          variants={imageVariants}
                         />
                         {effectiveCustomization.imageOverlay && (
                           <motion.div

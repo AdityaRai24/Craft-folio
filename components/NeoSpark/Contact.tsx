@@ -20,7 +20,7 @@ import { ColorTheme } from "@/lib/colorThemes";
 import SectionHeader from "./SectionHeader";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import { ContactCustomizationState } from "@/types/contact/portfolio";
+import { ContactCustomizationState, defaultContactStyles } from "@/types/contact/portfolio";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 
 
@@ -54,30 +54,7 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
 
   // Default styles for Contact
-  const defaultContactStyles: ContactCustomizationState = {
-    layout: "grid",
-    gridColumns: 2,
-    cardLayout: "stacked",
-    cardSize: "default",
-    cardStyle: "default",
-    cardBorderRadius: 8,
-    cardPadding: 8,
-    cardSpacing: 36,
-    containerWidth: "wide",
-    iconSize: 32,
-    iconStyle: "outline",
-    showLabels: true,
-    showDescriptions: true,
-    textAlignment: "left",
-    animationStyle: "scale",
-    animationSpeed: 300,
-    staggerDelay: 200,
-    hoverEffects: true,
-    backgroundOpacity: 60,
-    borderWidth: 1,
-    copyToClipboard: false,
-    openInNewTab: true,
-  };
+
 
   // Comprehensive customization state
   const [customization, setCustomization] = useState<ContactCustomizationState>(defaultContactStyles);

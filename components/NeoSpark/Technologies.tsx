@@ -7,42 +7,11 @@ import Marquee from "react-fast-marquee";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import SectionHeader from "./SectionHeader";
+import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 
-interface Technology {
-  name: string;
-  logo: string;
-}
-
-const defaultTechnologiesStyles: TechnologiesCustomizationState = {
-  layout: "marquee",
-  gridColumns: 4,
-  gap: 24,
-  containerWidth: "xl",
-  cardStyle: "glassmorphism",
-  cardBorderRadius: 12,
-  cardPadding: 20,
-  cardShadow: "medium",
-  borderWidth: 1,
-  backgroundOpacity: 10,
-  showIcons: true,
-  iconSize: 40,
-  showLabels: true,
-  labelPosition: "bottom",
-  labelSize: "sm",
-  labelWeight: "medium",
-  textAlignment: "center",
-  animationStyle: "fade",
-  animationSpeed: 300,
-  staggerAnimation: true,
-  hoverEffects: true,
-  cardHoverEffect: "glow",
-  marqueeDirection: "left",
-  marqueeSpeed: 40,
-  pauseOnHover: true,
-};
 
 const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, currentPortTheme: string }) => {
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
@@ -140,36 +109,13 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
     }
   };
 
-  const getCardClasses = () => {
-    const styleMap: Record<string, string> = {
-      minimal: "bg-transparent",
-      elevated: "bg-zinc-800 shadow-xl",
-      outlined: "border border-zinc-700 bg-transparent",
-      filled: "bg-zinc-800",
-      glassmorphism: "bg-white/5 backdrop-blur-md border border-white/10",
-      neon: "bg-black border border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.3)]",
-      gradient: "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700",
-      default: "bg-zinc-900 border border-zinc-800",
-    };
+  const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
+    effectiveCustomization,
+    titleColor,
+    "dark"
+  );
 
-    return `flex flex-col items-center justify-center transition-all duration-300 ${styleMap[effectiveCustomization.cardStyle]}`;
-  };
-
-  const getLabelClasses = () => {
-    const sizeMap: Record<string, string> = {
-      xs: "text-xs",
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-    };
-    const weightMap: Record<string, string> = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-    return `${sizeMap[effectiveCustomization.labelSize]} ${weightMap[effectiveCustomization.labelWeight]} text-gray-300 mt-3 text-center`;
-  };
+  const animationVariants = getAnimationVariants();
 
   const TechnologyCard = ({ tech }: { tech: Technology }) => (
     <motion.div

@@ -1,4 +1,4 @@
-import { ExperienceCustomizationState } from "./types";
+import { ExperienceCustomizationState } from "@/types/experience/portfolio";
 
 export const defaultExperienceStyles: ExperienceCustomizationState = {
   cardLayout: "default",
@@ -30,7 +30,44 @@ export const defaultExperienceStyles: ExperienceCustomizationState = {
   locationBadge: true,
   dateBadge: true,
   badgeStyle: "default",
+
+  // Side Accent
   sideAccent: true,
   sideAccentWidth: 4,
-  sideAccentColor: "#f97316",
+  sideAccentColor: "primary",
+
+  // Missing properties added during unification
+  maxWidth: "full",
+  containerPadding: 4,
+  backgroundColor: "transparent",
+  cardBackground: "glass",
+  cardBorderColor: "gray-200",
+  cardBorderStyle: "none",
+  cardShadow: "none",
+  titleColor: "primary",
+  titleAlignment: "left",
+  descriptionColor: "text-secondary",
+  descriptionVisible: true,
+  headerVisible: true,
+  companyNameSize: "lg",
+  companyNameWeight: "bold",
+  companyNameColor: "text-primary",
+  roleSize: "md",
+  roleWeight: "medium",
+  roleColor: "text-secondary",
+  dateFormat: "month-year",
+  dateColor: "text-tertiary",
+  locationVisible: true,
+  locationColor: "text-tertiary",
+  descriptionTextSize: "sm",
+  descriptionTextColor: "text-secondary",
+  hoverScale: false,
+  hoverShadow: false,
+  cardHoverEffect: "none",
+  staggerAnimation: true,
+  entranceAnimation: "slideIn",
+  alternatingLayout: false,
+  techStackLimit: 10,
+  techStackColor: "gray",
+  techStackShowIcons: true,
 };

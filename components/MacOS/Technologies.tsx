@@ -7,46 +7,15 @@ import Marquee from "react-fast-marquee";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
 import { useMacOSTheme } from "./ThemeContext";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useUser } from "@clerk/nextjs";
+import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 
-interface Technology {
-    name: string;
-    logo: string;
-}
-
-const defaultTechnologiesStyles: TechnologiesCustomizationState = {
-    layout: "grid",
-    gridColumns: 4,
-    gap: 24,
-    containerWidth: "xl",
-    cardStyle: "glassmorphism",
-    cardBorderRadius: 12,
-    cardPadding: 20,
-    cardShadow: "medium",
-    borderWidth: 1,
-    backgroundOpacity: 10,
-    showIcons: true,
-    iconSize: 40,
-    showLabels: true,
-    labelPosition: "bottom",
-    labelSize: "sm",
-    labelWeight: "medium",
-    textAlignment: "center",
-    animationStyle: "fade",
-    animationSpeed: 300,
-    staggerAnimation: true,
-    hoverEffects: true,
-    cardHoverEffect: "glow",
-    marqueeDirection: "left",
-    marqueeSpeed: 40,
-    pauseOnHover: true,
-};
 
 const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
     const dispatch = useDispatch();
@@ -165,26 +134,13 @@ const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
         }
     };
 
-    const getCardClasses = () => {
-        // We override some styles to match MacOS theme if needed, or use the customization
-        return `flex flex-col items-center justify-center transition-all duration-300 relative overflow-hidden`;
-    };
+    const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
+        effectiveCustomization,
+        currentTheme.primary,
+        theme
+    );
 
-    const getLabelClasses = () => {
-        const sizeMap: Record<string, string> = {
-            xs: "text-xs",
-            sm: "text-sm",
-            md: "text-base",
-            lg: "text-lg",
-        };
-        const weightMap: Record<string, string> = {
-            normal: "font-normal",
-            medium: "font-medium",
-            semibold: "font-semibold",
-            bold: "font-bold",
-        };
-        return `${sizeMap[effectiveCustomization.labelSize]} ${weightMap[effectiveCustomization.labelWeight]} mt-3 text-center transition-colors duration-300`;
-    };
+    const animationVariants = getAnimationVariants();
 
     const TechnologyCard = ({ tech }: { tech: Technology }) => (
         <motion.div

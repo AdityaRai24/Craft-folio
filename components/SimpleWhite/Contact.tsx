@@ -6,7 +6,7 @@ import { RootState } from '@/store/store';
 import { setComponentCustomizations } from '@/slices/dataSlice';
 import { supabase } from '@/lib/supabase-client';
 import { ColorTheme } from '@/lib/colorThemes';
-import { ContactCustomizationState } from '@/types/contact/portfolio';
+import { ContactCustomizationState, defaultContactStyles } from '@/types/contact/portfolio';
 import { ContactVisualEditor } from '@/components/VisualEditor/Contact/ContactVisualEditor';
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from '@/app/actions/portfolio';
 import toast from 'react-hot-toast';
@@ -26,31 +26,7 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
     const [visualEditorOpen, setVisualEditorOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"layout" | "styling">("layout");
 
-    // Default customization
-    const defaultContactStyles: ContactCustomizationState = {
-        layout: "grid",
-        gridColumns: 3,
-        cardLayout: "stacked",
-        cardSize: "default",
-        cardStyle: "default",
-        cardBorderRadius: 8,
-        cardPadding: 8,
-        cardSpacing: 24,
-        containerWidth: "wide",
-        iconSize: 24,
-        iconStyle: "outline",
-        showLabels: true,
-        showDescriptions: false,
-        textAlignment: "left",
-        animationStyle: "none",
-        animationSpeed: 300,
-        staggerDelay: 100,
-        hoverEffects: true,
-        backgroundOpacity: 100,
-        borderWidth: 1,
-        copyToClipboard: false,
-        openInNewTab: true,
-    };
+
 
     const [customization, setCustomization] = useState<ContactCustomizationState>(defaultContactStyles);
     const [draftCustomization, setDraftCustomization] = useState<ContactCustomizationState | null>(null);

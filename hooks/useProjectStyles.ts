@@ -1,4 +1,5 @@
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { getVariantByName } from "@/lib/animationVariants";
 
 export const useProjectStyles = (customization: ProjectsCustomizationState, titleColor: string, theme: "light" | "dark" = "light") => {
   const isDark = theme === "dark";
@@ -30,8 +31,8 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
         classes += "bg-white/10 backdrop-blur-md border-white/20 shadow-lg";
         break;
       case "neon":
-        classes += isDark 
-          ? "bg-black border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)]" 
+        classes += isDark
+          ? "bg-black border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)]"
           : "bg-white border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]";
         break;
       case "gradient":
@@ -110,15 +111,15 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
     // Base styles based on theme
     if (style === "default") {
-        if (buttonType === "live") {
-             classes += isDark 
-                ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-sm hover:shadow-md" 
-                : "bg-blue-500 hover:bg-blue-600 text-white border-blue-400 shadow-sm hover:shadow-md";
-        } else {
-             classes += isDark
-                ? "bg-gray-700 hover:bg-gray-600 text-white border-gray-600 shadow-sm hover:shadow-md"
-                : "bg-gray-800 hover:bg-gray-900 text-white border-gray-700 shadow-sm hover:shadow-md";
-        }
+      if (buttonType === "live") {
+        classes += isDark
+          ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-sm hover:shadow-md"
+          : "bg-blue-500 hover:bg-blue-600 text-white border-blue-400 shadow-sm hover:shadow-md";
+      } else {
+        classes += isDark
+          ? "bg-gray-700 hover:bg-gray-600 text-white border-gray-600 shadow-sm hover:shadow-md"
+          : "bg-gray-800 hover:bg-gray-900 text-white border-gray-700 shadow-sm hover:shadow-md";
+      }
     } else if (style === "filled") {
       classes += " text-white";
     } else if (style === "ghost") {
@@ -128,7 +129,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     }
 
     if (style !== "default" && style !== "minimal" && style !== "ghost" && style !== "filled") {
-         classes += " bg-transparent border rounded-md hover:text-white";
+      classes += " bg-transparent border rounded-md hover:text-white";
     }
 
     return classes;
@@ -139,12 +140,12 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       buttonType === "github"
         ? customization.githubButtonStyle
         : customization.liveButtonStyle;
-    
+
     // If default, we handle colors in classes
     if (style === "default") {
-        return {
-            borderRadius: `${customization.buttonBorderRadius}px`,
-        };
+      return {
+        borderRadius: `${customization.buttonBorderRadius}px`,
+      };
     }
 
     return {
@@ -171,9 +172,9 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
         break;
       case "pills":
       default:
-         classes += isDark 
-            ? "bg-gray-700/50 text-gray-300 border border-gray-600/50 hover:bg-gray-700 hover:border-gray-500 rounded-full"
-            : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-full";
+        classes += isDark
+          ? "bg-gray-700/50 text-gray-300 border border-gray-600/50 hover:bg-gray-700 hover:border-gray-500 rounded-full"
+          : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-full";
     }
 
     return classes;
@@ -211,7 +212,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
   const getDescriptionClasses = () => {
     const sizeMap = {
-      xs : "text-xs",
+      xs: "text-xs",
       sm: "text-sm",
       md: "text-base",
       lg: "text-lg",
@@ -228,6 +229,11 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     return `section-sub-description ${sizeMap[customization.descriptionSize]} ${weightMap[customization.descriptionWeight]} ${isDark ? "text-gray-400" : "text-gray-600"}`;
   };
 
+  const getAnimationVariants = () => {
+    // Use shared animation variants from lib/animationVariants
+    return getVariantByName(customization.animationStyle || "scale");
+  };
+
   return {
     getLayoutClasses,
     getLayoutStyle,
@@ -239,6 +245,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     getTechStackClasses,
     getTitleAlignment,
     getTitleClasses,
-    getDescriptionClasses
+    getDescriptionClasses,
+    getAnimationVariants
   };
 };

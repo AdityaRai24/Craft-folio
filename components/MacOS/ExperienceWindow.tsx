@@ -8,7 +8,6 @@ import { Briefcase, Calendar, MapPin, Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { ExperienceCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
 import { defaultExperienceStyles } from "@/components/NeoSpark/defaultStyles/experience";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import { setComponentCustomizations } from "@/slices/dataSlice";
@@ -16,6 +15,7 @@ import toast from "react-hot-toast";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useMacOSTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";
+import { ExperienceCustomizationState } from "@/types/experience/portfolio";
 
 const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
     const isDark = theme === "dark";
@@ -41,7 +41,8 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
         getTitleClasses,
         getDescriptionClasses,
         getTechStackClasses,
-        getTechStackStyle
+        getTechStackStyle,
+        getAnimationVariants
     } = useExperienceStyles(effectiveCustomization, theme, currentTheme.primary);
 
     const { portfolioUserId } = useSelector((state: RootState) => state.data);
@@ -169,82 +170,87 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
 
                     {experienceData.length > 0 ? (
                         <div className={`space-y-8 relative ${effectiveCustomization.timelineStyle !== "minimal" ? "before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent" : ""}`}>
-                            {experienceData.map((exp: any, index: number) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * (effectiveCustomization.staggerDelay / 1000) }}
-                                    className={`relative flex items-center justify-between md:justify-normal ${effectiveCustomization.timelinePosition === "alternating" ? "md:odd:flex-row-reverse" : ""} group is-active`}
-                                    onMouseEnter={() => setHoveredIndex(index)}
-                                    onMouseLeave={() => setHoveredIndex(null)}
-                                >
-                                    {/* Timeline Icon */}
-                                    {effectiveCustomization.timelineStyle !== "minimal" && (
-                                        <div className={`flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-emerald-500 text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 ${effectiveCustomization.timelinePosition === "alternating" ? "md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" : "md:-translate-x-1/2"}`}>
-                                            <Briefcase size={18} />
-                                        </div>
-                                    )}
-
-                                    {/* Card */}
-                                    <div
-                                        className={`w-[calc(100%-4rem)] ${effectiveCustomization.timelinePosition === "alternating" ? "md:w-[calc(50%-2.5rem)]" : "md:w-full md:ml-12"} ${getCardClasses()}`}
-                                        style={{
-                                            ...getCardStyle(hoveredIndex === index),
-                                        }}
+                            {experienceData.map((exp: any, index: number) => {
+                                const animationVariants = getAnimationVariants();
+                                return (
+                                    <motion.div
+                                        key={index}
+                                        variants={animationVariants}
+                                        initial="hidden"
+                                        whileInView="visible"
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * (effectiveCustomization.staggerDelay / 1000) }}
+                                        className={`relative flex items-center justify-between md:justify-normal ${effectiveCustomization.timelinePosition === "alternating" ? "md:odd:flex-row-reverse" : ""} group is-active`}
+                                        onMouseEnter={() => setHoveredIndex(index)}
+                                        onMouseLeave={() => setHoveredIndex(null)}
                                     >
-                                        <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2 mb-4">
-                                            <div className={effectiveCustomization.textAlignment === "center" ? "text-center w-full" : effectiveCustomization.textAlignment === "right" ? "text-right w-full" : ""}>
-                                                <h3 className={getTitleClasses()}>
-                                                    {exp.role}
-                                                </h3>
-                                                <div className={`font-medium`} style={{ color: currentTheme.primary }}>
-                                                    {exp.companyName}
-                                                </div>
+                                        {/* Timeline Icon */}
+                                        {effectiveCustomization.timelineStyle !== "minimal" && (
+                                            <div className={`flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-emerald-500 text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 ${effectiveCustomization.timelinePosition === "alternating" ? "md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" : "md:-translate-x-1/2"}`}>
+                                                <Briefcase size={18} />
                                             </div>
-                                            {(effectiveCustomization.dateBadge || effectiveCustomization.locationBadge) && (
-                                                <div className={`flex flex-col ${effectiveCustomization.textAlignment === "right" ? "items-end" : effectiveCustomization.textAlignment === "center" ? "items-center" : "items-start sm:items-end"} gap-1 text-xs font-medium`} style={{ color: currentTheme.text.secondary }}>
-                                                    {effectiveCustomization.dateBadge && (
-                                                        <span className="flex items-center gap-1">
-                                                            <Calendar size={12} />
-                                                            {exp.startDate} - {exp.endDate}
+                                        )}
+
+                                        {/* Card */}
+                                        <div
+                                            className={`w-[calc(100%-4rem)] ${effectiveCustomization.timelinePosition === "alternating" ? "md:w-[calc(50%-2.5rem)]" : "md:w-full md:ml-12"} ${getCardClasses()}`}
+                                            style={{
+                                                ...getCardStyle(hoveredIndex === index),
+                                            }}
+                                        >
+                                            <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-2 mb-4">
+                                                <div className={effectiveCustomization.textAlignment === "center" ? "text-center w-full" : effectiveCustomization.textAlignment === "right" ? "text-right w-full" : ""}>
+                                                    <h3 className={getTitleClasses()}>
+                                                        {exp.role}
+                                                    </h3>
+                                                    <div className={`font-medium`} style={{ color: currentTheme.primary }}>
+                                                        {exp.companyName}
+                                                    </div>
+                                                </div>
+                                                {(effectiveCustomization.dateBadge || effectiveCustomization.locationBadge) && (
+                                                    <div className={`flex flex-col ${effectiveCustomization.textAlignment === "right" ? "items-end" : effectiveCustomization.textAlignment === "center" ? "items-center" : "items-start sm:items-end"} gap-1 text-xs font-medium`} style={{ color: currentTheme.text.secondary }}>
+                                                        {effectiveCustomization.dateBadge && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Calendar size={12} />
+                                                                {exp.startDate} - {exp.endDate}
+                                                            </span>
+                                                        )}
+                                                        {effectiveCustomization.locationBadge && (
+                                                            <span className="flex items-center gap-1">
+                                                                <MapPin size={12} />
+                                                                {exp.location}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <p className={getDescriptionClasses()}>
+                                                {exp.description}
+                                            </p>
+
+                                            {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
+                                                <div className={`flex flex-wrap gap-2 mt-4 pt-4 border-t ${effectiveCustomization.textAlignment === "center" ? "justify-center" : effectiveCustomization.textAlignment === "right" ? "justify-end" : ""}`} style={{ borderColor: currentTheme.states.muted }}>
+                                                    {exp.techStack.map((tech: any, idx: number) => (
+                                                        <span
+                                                            key={idx}
+                                                            className={getTechStackClasses()}
+                                                            style={{
+                                                                ...getTechStackStyle(),
+                                                                backgroundColor: currentTheme.background.primary,
+                                                                color: currentTheme.text.secondary,
+                                                                borderColor: currentTheme.states.muted,
+                                                            }}
+                                                        >
+                                                            {typeof tech === 'string' ? tech : tech.name}
                                                         </span>
-                                                    )}
-                                                    {effectiveCustomization.locationBadge && (
-                                                        <span className="flex items-center gap-1">
-                                                            <MapPin size={12} />
-                                                            {exp.location}
-                                                        </span>
-                                                    )}
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>
-
-                                        <p className={getDescriptionClasses()}>
-                                            {exp.description}
-                                        </p>
-
-                                        {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
-                                            <div className={`flex flex-wrap gap-2 mt-4 pt-4 border-t ${effectiveCustomization.textAlignment === "center" ? "justify-center" : effectiveCustomization.textAlignment === "right" ? "justify-end" : ""}`} style={{ borderColor: currentTheme.states.muted }}>
-                                                {exp.techStack.map((tech: any, idx: number) => (
-                                                    <span
-                                                        key={idx}
-                                                        className={getTechStackClasses()}
-                                                        style={{
-                                                            ...getTechStackStyle(),
-                                                            backgroundColor: currentTheme.background.primary,
-                                                            color: currentTheme.text.secondary,
-                                                            borderColor: currentTheme.states.muted,
-                                                        }}
-                                                    >
-                                                        {typeof tech === 'string' ? tech : tech.name}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            ))}
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className="text-center py-20">

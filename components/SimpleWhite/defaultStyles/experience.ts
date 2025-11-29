@@ -5,14 +5,14 @@ export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizat
   layout: "cards",
   containerPadding: 16,
   maxWidth: "xl",
-  
+
   // Background & Theme
   backgroundColor: "white",
   cardBackground: "glass",
   cardBorderStyle: "subtle",
   cardShadow: "light",
   cardBorderRadius: "lg",
-  
+
   // Header Section
   headerVisible: true,
   titleSize: "xl",
@@ -22,9 +22,7 @@ export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizat
   descriptionSize: "lg",
   descriptionColor: "gray-600",
   descriptionVisible: true,
-  
 
-  
   // Experience Cards
   companyNameSize: "lg",
   companyNameWeight: "medium",
@@ -38,20 +36,20 @@ export const defaultSimpleWhiteExperienceStyles: SimpleWhiteExperienceCustomizat
   locationColor: "gray-500",
   descriptionTextSize: "md",
   descriptionTextColor: "gray-700",
-  
+
   // Tech Stack
   techStackVisible: true,
   techStackStyle: "badges",
   techStackLimit: 5,
   techStackColor: "gray",
   techStackShowIcons: true,
-  
+
   // Hover Effects
   hoverEffects: true,
   hoverScale: false,
   hoverShadow: true,
   cardHoverEffect: "lift",
-  
+
   // Animations
   animationSpeed: "normal",
   staggerAnimation: true,

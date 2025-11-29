@@ -10,12 +10,11 @@ import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButto
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { ContactCustomizationState } from "@/types/contact/portfolio";
+import { ContactCustomizationState, defaultContactStyles } from '@/types/contact/portfolio';
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useMacOSTheme } from "./ThemeContext";
-
 const Contact = ({
   currentPortTheme,
   customCSS,
@@ -48,31 +47,7 @@ const Contact = ({
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"layout" | "styling">("layout");
 
-  // Default customization
-  const defaultContactStyles: ContactCustomizationState = {
-    layout: "grid",
-    gridColumns: 3,
-    cardLayout: "stacked",
-    cardSize: "default",
-    cardStyle: "default",
-    cardBorderRadius: 16,
-    cardPadding: 8,
-    cardSpacing: 24,
-    containerWidth: "wide",
-    iconSize: 32,
-    iconStyle: "filled",
-    showLabels: true,
-    showDescriptions: false,
-    textAlignment: "center",
-    animationStyle: "scale",
-    animationSpeed: 300,
-    staggerDelay: 100,
-    hoverEffects: true,
-    backgroundOpacity: 100,
-    borderWidth: 0,
-    copyToClipboard: false,
-    openInNewTab: true,
-  };
+
 
   const [customization, setCustomization] = useState<ContactCustomizationState>(defaultContactStyles);
   const [draftCustomization, setDraftCustomization] = useState<ContactCustomizationState | null>(null);

@@ -3,27 +3,29 @@
 import React from "react";
 import {
     Palette,
-    Layout, RotateCcw,
+    Layout,
+    RotateCcw,
     X,
     Type,
-    Clock
+    Clock,
+    Eye,
 } from "lucide-react";
-import CardLayoutSelector from "./CardLayoutSelector";
-import TimelineSelector from "./TimelineSelector";
-import SideAccentSelector from "./SideAccentSelector";
+import CardLayoutSelector from "../Experience/CardLayoutSelector";
+import SideAccentSelector from "../Experience/SideAccentSelector";
 import AlignmentSelector from "../Shared/AlignmentSelector";
-import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { EducationCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
 import { ColorTheme } from "@/lib/colorThemes";
-interface ExperienceVisualEditorProps {
+import { Switch } from "@/components/ui/switch";
+
+interface EducationVisualEditorProps {
     isOpen: boolean;
     onClose: () => void;
-    customization: ExperienceCustomizationState;
-    draftCustomization: ExperienceCustomizationState | null;
-    onUpdateDraft: (key: keyof ExperienceCustomizationState, value: any) => void;
+    customization: EducationCustomizationState;
+    draftCustomization: EducationCustomizationState | null;
+    onUpdateDraft: (key: keyof EducationCustomizationState, value: any) => void;
     onSave: () => void;
     onReset: () => void;
     activeTab: "layout" | "typography" | "styling" | "timing";
@@ -32,7 +34,7 @@ interface ExperienceVisualEditorProps {
     primaryDarkColor?: string;
 }
 
-const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
+const EducationVisualEditor: React.FC<EducationVisualEditorProps> = ({
     isOpen,
     onClose,
     customization,
@@ -108,8 +110,8 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                     {activeTab === "layout" && (
                         <>
                             <CardLayoutSelector
-                                value={(draftCustomization?.cardLayout ?? customization.cardLayout) as any}
-                                onChange={value => onUpdateDraft("cardLayout", value)}
+                                value={draftCustomization?.cardStyle ?? customization.cardStyle}
+                                onChange={value => onUpdateDraft("cardStyle", value)}
                             />
 
                             <SliderControl
@@ -126,12 +128,39 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 onChange={value => onUpdateDraft("textAlignment", value)}
                             />
 
-                            <TimelineSelector
-                                styleValue={draftCustomization?.timelineStyle ?? customization.timelineStyle}
-                                onStyleChange={value => onUpdateDraft("timelineStyle", value)}
-                                positionValue={draftCustomization?.timelinePosition ?? customization.timelinePosition}
-                                onPositionChange={value => onUpdateDraft("timelinePosition", value)}
-                            />
+                            <div className="space-y-3 pt-4 border-t border-zinc-700">
+                                <h4 className="text-sm font-medium text-white flex items-center gap-2">
+                                    <Eye className="h-4 w-4" /> Visibility
+                                </h4>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-300">Institution</span>
+                                    <Switch
+                                        checked={draftCustomization?.showInstitution ?? customization.showInstitution}
+                                        onCheckedChange={checked => onUpdateDraft("showInstitution", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-300">Dates</span>
+                                    <Switch
+                                        checked={draftCustomization?.showDates ?? customization.showDates}
+                                        onCheckedChange={checked => onUpdateDraft("showDates", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-300">Location</span>
+                                    <Switch
+                                        checked={draftCustomization?.showLocation ?? customization.showLocation}
+                                        onCheckedChange={checked => onUpdateDraft("showLocation", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-300">Description</span>
+                                    <Switch
+                                        checked={draftCustomization?.showDescription ?? customization.showDescription}
+                                        onCheckedChange={checked => onUpdateDraft("showDescription", checked)}
+                                    />
+                                </div>
+                            </div>
                         </>
                     )}
 
@@ -162,36 +191,19 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                     { value: "bold", label: "Bold", preview: "font-bold" },
                                 ]}
                             />
-
-                            <div className="border-t border-zinc-700 pt-4 space-y-4">
-                                <TypographySelector
-                                    label="Description Size"
-                                    value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
-                                    onChange={value => onUpdateDraft("descriptionSize", value)}
-                                    type="size"
-                                    options={[
-                                        { value: "xs", label: "Tiny", preview: "0.75rem" },
-                                        { value: "sm", label: "Small", preview: "0.875rem" },
-                                        { value: "md", label: "Medium", preview: "1rem" },
-                                        { value: "lg", label: "Large", preview: "1.125rem" },
-                                    ]}
-                                />
-                            </div>
                         </div>
                     )}
 
                     {activeTab === "styling" && (
                         <>
-                            {typeof (draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) === 'number' && (
-                                <SliderControl
-                                    label="Card Border Radius"
-                                    value={(draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) as number}
-                                    onChange={value => onUpdateDraft("cardBorderRadius", value)}
-                                    min={0}
-                                    max={32}
-                                    step={2}
-                                />
-                            )}
+                            <SliderControl
+                                label="Card Border Radius"
+                                value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
+                                onChange={value => onUpdateDraft("cardBorderRadius", value)}
+                                min={0}
+                                max={32}
+                                step={2}
+                            />
 
                             <SliderControl
                                 label="Card Padding"
@@ -211,34 +223,51 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 step={1}
                             />
 
-                            <TechStackStyleSelector
-                                value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
-                                onChange={value => onUpdateDraft("techStackStyle", value)}
-                            />
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-300">Hover Effects</span>
+                                <Switch
+                                    checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
+                                    onCheckedChange={checked => onUpdateDraft("hoverEffects", checked)}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-300">Glow Effect</span>
+                                <Switch
+                                    checked={draftCustomization?.glowEffect ?? customization.glowEffect}
+                                    onCheckedChange={checked => onUpdateDraft("glowEffect", checked)}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-300">Card Shadow</span>
+                                <Switch
+                                    checked={draftCustomization?.cardShadow ?? customization.cardShadow}
+                                    onCheckedChange={checked => onUpdateDraft("cardShadow", checked)}
+                                />
+                            </div>
 
                             <SideAccentSelector
-                                isVisible={draftCustomization?.sideAccent ?? customization.sideAccent}
-                                onVisibilityChange={value => onUpdateDraft("sideAccent", value)}
-                                width={draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth}
-                                onWidthChange={value => onUpdateDraft("sideAccentWidth", value)}
-                                color={draftCustomization?.sideAccentColor ?? customization.sideAccentColor}
-                                onColorChange={value => onUpdateDraft("sideAccentColor", value)}
+                                isVisible={draftCustomization?.accentLine ?? customization.accentLine}
+                                onVisibilityChange={value => onUpdateDraft("accentLine", value)}
+                                width={draftCustomization?.accentLineWidth ?? customization.accentLineWidth}
+                                onWidthChange={value => onUpdateDraft("accentLineWidth", value)}
+                                color={draftCustomization?.accentLineColor ?? customization.accentLineColor}
+                                onColorChange={value => onUpdateDraft("accentLineColor", value)}
                             />
                         </>
                     )}
 
                     {activeTab === "timing" && (
                         <>
-                            {typeof (draftCustomization?.animationSpeed ?? customization.animationSpeed) === 'number' && (
-                                <SliderControl
-                                    label="Animation Speed"
-                                    value={(draftCustomization?.animationSpeed ?? customization.animationSpeed) as number}
-                                    onChange={value => onUpdateDraft("animationSpeed", value)}
-                                    min={100}
-                                    max={1000}
-                                    step={50}
-                                />
-                            )}
+                            <SliderControl
+                                label="Animation Speed"
+                                value={draftCustomization?.animationSpeed ?? customization.animationSpeed}
+                                onChange={value => onUpdateDraft("animationSpeed", value)}
+                                min={100}
+                                max={1000}
+                                step={50}
+                            />
                             <SliderControl
                                 label="Stagger Delay"
                                 value={draftCustomization?.staggerDelay ?? customization.staggerDelay}
@@ -283,4 +312,4 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
     );
 };
 
-export default ExperienceVisualEditor;
+export default EducationVisualEditor;

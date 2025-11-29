@@ -34,9 +34,10 @@ import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
-import { defaultSimpleWhiteProjectsStyles } from "./defaultStyles/projects";
-import { SimpleWhiteProjectsCustomizationState } from "./defaultStyles/types";
+import { defaultProjectsStyles } from "../NeoSpark/defaultStyles/projects";
+import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
+import { useProjectStyles } from "@/hooks/useProjectStyles";
 
 
 
@@ -56,9 +57,9 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     "layout" | "typography" | "styling" | "timing"
   >("layout");
   // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<SimpleWhiteProjectsCustomizationState>(defaultSimpleWhiteProjectsStyles);
+  const [customization, setCustomization] = useState<ProjectsCustomizationState>(defaultProjectsStyles);
   // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<SimpleWhiteProjectsCustomizationState | null>(null);
+  const [draftCustomization, setDraftCustomization] = useState<ProjectsCustomizationState | null>(null);
 
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
@@ -85,12 +86,12 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
           componentType: "projects",
         });
         if (result.success && result.data) {
-          setCustomization(result.data as unknown as SimpleWhiteProjectsCustomizationState);
+          setCustomization(result.data as unknown as ProjectsCustomizationState);
         } else {
-          setCustomization(defaultSimpleWhiteProjectsStyles);
+          setCustomization(defaultProjectsStyles);
         }
       } catch (error) {
-        setCustomization(defaultSimpleWhiteProjectsStyles);
+        setCustomization(defaultProjectsStyles);
       }
     };
     if (portfolioId) loadCustomizations();
@@ -103,7 +104,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
   };
 
   // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof SimpleWhiteProjectsCustomizationState, value: any) => {
+  const updateDraftCustomization = (key: keyof ProjectsCustomizationState, value: any) => {
     if (!draftCustomization) return;
     setDraftCustomization({ ...draftCustomization, [key]: value });
   };
@@ -132,8 +133,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
         portfolioId,
         componentType: "projects",
       });
-      setCustomization(defaultSimpleWhiteProjectsStyles);
-      setDraftCustomization(defaultSimpleWhiteProjectsStyles);
+      setCustomization(defaultProjectsStyles);
+      setDraftCustomization(defaultProjectsStyles);
       setVisualEditorOpen(false);
       toast.success("Customization reset successfully");
     } catch (error) {
@@ -148,192 +149,33 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     setProjectsData: setProjects,
   });
 
+  // Theme color variables
+  const primaryColor = theme?.colors?.primary || "#2563EB";
+  const primaryHoverColor = theme?.colors?.primaryHover || "#1D4ED8";
+  const accentColor = theme?.colors?.accent || "#3B82F6";
+  const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
+  const textSecondaryColor = theme?.colors?.text?.secondary || "#6B7280";
+  const backgroundPrimaryColor = theme?.colors?.background?.primary || "#FFFFFF";
+  const backgroundSecondaryColor = theme?.colors?.background?.secondary || "#F8FAFC";
+  const mutedColor = theme?.colors?.states?.muted || "rgba(59, 130, 246, 0.1)";
 
+  // Use shared styling hook
+  const {
+    getLayoutClasses,
+    getLayoutStyle,
+    getCardClasses,
+    getCardStyle,
+    getImageStyle,
+    getButtonClasses,
+    getButtonStyle,
+    getTechStackClasses,
+    getTitleAlignment,
+    getTitleClasses,
+    getDescriptionClasses,
+    getAnimationVariants
+  } = useProjectStyles(effectiveCustomization, primaryColor, "light");
 
-  // Helper functions for styling based on customization
-  const getLayoutClasses = () => {
-    if (effectiveCustomization.layout === "grid") {
-      return `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing}`;
-    }
-    return "space-y-8";
-  };
-
-  const getLayoutStyle = () => {
-    return {
-      gap: `${effectiveCustomization.cardSpacing * 4}px`,
-    };
-  };
-
-  const getCardClasses = () => {
-    let classes = `${effectiveCustomization.cardBackground} section-card border ${effectiveCustomization.cardBorder
-      }  transition-all duration-${Math.round(
-        effectiveCustomization.animationSpeed * 1000
-      )} cursor-pointer hover:bg-gray-50`;
-
-    return classes;
-  };
-
-  const getCardStyle = () => ({
-    borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
-    padding: `${effectiveCustomization.cardPadding * 4}px`,
-  });
-
-  const getImageStyle = () => {
-    let aspectRatio = "auto";
-
-    switch (effectiveCustomization.imageAspectRatio) {
-      case "square":
-        aspectRatio = "1 / 1";
-        break;
-      case "wide":
-        aspectRatio = "16 / 9";
-        break;
-      case "tall":
-        aspectRatio = "3 / 4";
-        break;
-    }
-
-    return {
-      borderRadius: `${effectiveCustomization.imageBorderRadius}px`,
-      height:
-        effectiveCustomization.imageAspectRatio === "auto"
-          ? `${effectiveCustomization.imageHeight}px`
-          : "auto",
-      aspectRatio:
-        effectiveCustomization.imageAspectRatio !== "auto" ? aspectRatio : undefined,
-    };
-  };
-
-  const getButtonClasses = (buttonType: "github" | "live") => {
-    const style =
-      buttonType === "github"
-        ? effectiveCustomization.githubButtonStyle
-        : effectiveCustomization.liveButtonStyle;
-    let classes =
-      "flex items-center gap-2 px-3 py-1.5 transition-all duration-300 text-sm";
-
-    switch (style) {
-      case "filled":
-        classes += " text-white";
-        break;
-      case "ghost":
-        classes += " bg-transparent hover:bg-gray-100";
-        break;
-      case "minimal":
-        classes += " bg-transparent border-0 underline hover:underline";
-        break;
-      default:
-        classes += " bg-transparent border rounded-md hover:text-gray-700";
-    }
-
-    return classes;
-  };
-
-  const getButtonStyle = (buttonType: "github" | "live") => {
-    const style =
-      buttonType === "github"
-        ? effectiveCustomization.githubButtonStyle
-        : effectiveCustomization.liveButtonStyle;
-
-    return {
-      borderRadius: `${effectiveCustomization.buttonBorderRadius}px`,
-      borderColor: style !== "minimal" ? textSecondaryColor : "transparent",
-      color: style === "filled" ? "white" : textPrimaryColor,
-      backgroundColor: style === "filled" ? primaryColor : "transparent",
-    };
-  };
-
-  const getTechStackClasses = () => {
-    let classes =
-      "px-3 py-1 text-sm font-medium cursor-pointer transition-all duration-300";
-
-    switch (effectiveCustomization.techStackStyle) {
-      case "badges":
-        classes += " rounded";
-        break;
-      case "minimal":
-        classes += "";
-        break;
-      case "colorful":
-        classes += " text-white rounded-full border-2";
-        break;
-      default:
-        classes += " rounded-full border";
-    }
-
-    return classes;
-  };
-
-  const getTechStackStyle = () => {
-    switch (effectiveCustomization.techStackStyle) {
-      case "badges":
-        return {
-          backgroundColor: backgroundSecondaryColor,
-          color: textPrimaryColor,
-        };
-      case "minimal":
-        return {
-          color: textSecondaryColor,
-        };
-      case "colorful":
-        return {
-          backgroundColor: primaryColor,
-          color: "white",
-          borderColor: primaryColor,
-        };
-      default:
-        return {
-          color: textSecondaryColor,
-          borderColor: `${textSecondaryColor}30`,
-        };
-    }
-  };
-
-  const getTitleAlignment = () => {
-    switch (effectiveCustomization.titleAlignment) {
-      case "center":
-        return "text-center";
-      case "right":
-        return "text-right";
-      default:
-        return "text-left";
-    }
-  };
-
-  const getTitleClasses = () => {
-    const sizeMap = {
-      sm: "text-lg md:text-xl",
-      md: "text-xl md:text-2xl",
-      lg: "text-2xl md:text-3xl",
-      xl: "text-3xl md:text-4xl",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-
-    return `section-sub-title ${sizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]} transition-colors duration-300`;
-  };
-
-  const getDescriptionClasses = () => {
-    const sizeMap = {
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-
-    return `section-sub-description ${sizeMap[effectiveCustomization.descriptionSize]} ${weightMap[effectiveCustomization.descriptionWeight]}`;
-  };
+  const animationVariants = getAnimationVariants();
 
   useEffect(() => {
     if (portfolioData) {
@@ -413,16 +255,6 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     );
   }
 
-  // Theme color variables
-  const primaryColor = theme?.colors?.primary || "#2563EB";
-  const primaryHoverColor = theme?.colors?.primaryHover || "#1D4ED8";
-  const accentColor = theme?.colors?.accent || "#3B82F6";
-  const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
-  const textSecondaryColor = theme?.colors?.text?.secondary || "#6B7280";
-  const backgroundPrimaryColor = theme?.colors?.background?.primary || "#FFFFFF";
-  const backgroundSecondaryColor = theme?.colors?.background?.secondary || "#F8FAFC";
-  const mutedColor = theme?.colors?.states?.muted || "rgba(59, 130, 246, 0.1)";
-
   return (
     <section
       id="projects"
@@ -454,14 +286,14 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
       <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
         <SectionHeader
           sectionName="projects"
-          headerVisible={effectiveCustomization.headerVisible}
-          titleSize={effectiveCustomization.titleSize}
+          headerVisible={effectiveCustomization.headerVisible ?? true}
+          titleSize={effectiveCustomization.titleSize as "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"}
           titleWeight={effectiveCustomization.titleWeight}
-          titleColor={effectiveCustomization.titleColor}
+          titleColor={effectiveCustomization.titleColor ?? "gray-900"}
           titleAlignment={effectiveCustomization.titleAlignment}
-          descriptionSize={effectiveCustomization.descriptionSize}
-          descriptionColor={effectiveCustomization.descriptionColor}
-          descriptionVisible={effectiveCustomization.descriptionVisible}
+          descriptionSize={effectiveCustomization.descriptionSize as "sm" | "md" | "lg"}
+          descriptionColor={effectiveCustomization.descriptionColor ?? "gray-600"}
+          descriptionVisible={effectiveCustomization.descriptionVisible ?? true}
           title={portfolioData?.find((section: any) => section.type === "projects")?.sectionTitle || "My Projects"}
           description={portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that I have worked on."}
           onVisualEditorClick={openVisualEditor}
@@ -627,7 +459,11 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                             <motion.span
                               key={tagIndex}
                               className={getTechStackClasses()}
-                              style={getTechStackStyle()}
+                              style={{
+                                backgroundColor: backgroundSecondaryColor,
+                                color: textPrimaryColor,
+                                borderColor: `${textSecondaryColor}30`,
+                              }}
                               whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
                               whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
                             >

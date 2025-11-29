@@ -1,3 +1,9 @@
+export interface Technology {
+  name: string;
+  logo: string;
+  icon?: string;
+}
+
 export interface TechnologiesCustomizationState {
   // Layout
   layout: "grid" | "marquee" | "carousel";
@@ -12,7 +18,7 @@ export interface TechnologiesCustomizationState {
   cardShadow: "none" | "light" | "medium" | "heavy";
   borderWidth: number;
   backgroundOpacity: number;
-  
+
   // Icon & Typography
   showIcons: boolean;
   iconSize: number;
@@ -28,9 +34,37 @@ export interface TechnologiesCustomizationState {
   staggerAnimation: boolean;
   hoverEffects: boolean;
   cardHoverEffect: "lift" | "glow" | "scale" | "rotate" | "none";
-  
+
   // Marquee specific
   marqueeDirection: "left" | "right";
   marqueeSpeed: number;
   pauseOnHover: boolean;
 }
+
+export const defaultTechnologiesStyles: TechnologiesCustomizationState = {
+  layout: "grid",
+  gridColumns: 4,
+  gap: 24,
+  containerWidth: "xl",
+  cardStyle: "default",
+  cardBorderRadius: 12,
+  cardPadding: 20,
+  cardShadow: "medium",
+  borderWidth: 1,
+  backgroundOpacity: 10,
+  showIcons: true,
+  iconSize: 40,
+  showLabels: true,
+  labelPosition: "bottom",
+  labelSize: "sm",
+  labelWeight: "medium",
+  textAlignment: "center",
+  animationStyle: "fade",
+  animationSpeed: 300,
+  staggerAnimation: true,
+  hoverEffects: true,
+  cardHoverEffect: "lift",
+  marqueeDirection: "left",
+  marqueeSpeed: 50,
+  pauseOnHover: true,
+};

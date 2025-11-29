@@ -175,8 +175,11 @@ const ProjectsGrid = ({
     getTechStackClasses,
     getTitleAlignment,
     getTitleClasses,
-    getDescriptionClasses
+    getDescriptionClasses,
+    getAnimationVariants
   } = useProjectStyles(effectiveCustomization, "", theme);
+
+  const animationVariants = getAnimationVariants();
 
   if (!projectsData || projectsData.length === 0) {
     return (
@@ -238,9 +241,11 @@ const ProjectsGrid = ({
           {projectsData.map((project: any, index: number) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
+              variants={animationVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.05 }}
               className="group"
             >
               {/* Project Card */}

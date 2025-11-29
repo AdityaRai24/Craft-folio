@@ -1,119 +1,129 @@
-"use client"
-import React, { useEffect, useState, useRef } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
-import EditButton from '@/components/Shared/EditButton';
 import {
   Briefcase,
   MapPin,
   Calendar,
-  Code2,
   Star,
   ArrowUpRight,
-  Settings,
-  Palette,
-  Move,
-  Grid3X3,
-  RotateCcw,
-  X,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Sparkles,
-  Send,
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
-import { motion } from "framer-motion";
-import { Switch } from "@/components/ui/switch";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
+import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
+import { ExperienceCustomizationState } from "@/types/experience/portfolio";
 
-interface Technology {
-  name: string;
-  logo: string;
-}
-
-interface Experience {
-  role: string;
-  companyName: string;
-  location: string;
-  startDate: string;
-  endDate: string;
-  description: string;
-  techStack: Technology[];
-}
-
-interface CustomizationState {
-  // Layout & Structure
-  cardLayout: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
-  cardBorderRadius: number;
-  cardPadding: number;
-  cardSpacing: number;
-  containerWidth: "full" | "narrow" | "wide";
-
-  // Typography
-  titleSize: "sm" | "md" | "lg" | "xl";
-  titleWeight: "normal" | "medium" | "semibold" | "bold";
-  descriptionSize: "xs" | "sm" | "md" | "lg";
-  textAlignment: "left" | "center" | "right";
-
-  // Visual Effects
-  hoverEffects: boolean;
-  glowEffect: boolean;
-  borderGlow: boolean;
-  backgroundOpacity: number;
-  borderWidth: number;
-
-  // Animations
-  animationStyle: "scale" | "slide" | "rotate" | "bounce" | "none";
-  animationSpeed: number;
-  staggerDelay: number;
-
-  // Tech Stack Display
-  techStackVisible: boolean;
-  techStackStyle: "pills" | "badges" | "minimal" | "colorful";
-  techStackSize: "sm" | "md" | "lg";
-
-  // Timeline Elements
-  timelineStyle: "line" | "dots" | "gradient" | "minimal";
-  timelinePosition: "left" | "center" | "alternating";
-  timelineWidth: number;
-  timelineColor: string;
-  dotSize: "sm" | "md" | "lg";
-  dotStyle: "circle" | "square" | "diamond" | "hexagon";
-
-  // Badges & Tags
-  locationBadge: boolean;
-  dateBadge: boolean;
-  badgeStyle: "default" | "minimal" | "outlined" | "glow";
-
-  // Side Accent
-  sideAccent: boolean;
-  sideAccentWidth: number;
-  sideAccentColor: string;
-}
+import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
 
 const Experience = ({ currentTheme, portfolioId }: any) => {
-  const [experienceData, setExperienceData] = useState<Experience[]>([]);
+  const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredExperience, setHoveredExperience] = useState<number | null>(
     null
   );
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"layout" | "styling">("layout");
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
 
-  // Dragging state for floating window
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
-  const dragRef = useRef<HTMLDivElement>(null);
+  // Default styles for Experience
+  const defaultExperienceStyles: ExperienceCustomizationState = {
+    // Layout & Structure
+    cardLayout: "default",
+    cardBorderRadius: 12,
+    cardPadding: 24,
+    cardSpacing: 32,
+    containerWidth: "wide",
+    maxWidth: "full",
+    containerPadding: 8,
+    backgroundColor: "transparent",
+
+    // Typography
+    titleSize: "lg",
+    titleWeight: "bold",
+    descriptionSize: "md",
+    textAlignment: "left",
+    roleSize: "xl",
+    roleWeight: "bold",
+    roleColor: "primary",
+    companyNameSize: "lg",
+    companyNameWeight: "medium",
+    companyNameColor: "gray-700",
+    dateColor: "gray-500",
+    descriptionColor: "gray-600",
+
+    // Visual Effects
+    hoverEffects: true,
+    glowEffect: false,
+    borderGlow: false,
+    backgroundOpacity: 10,
+    borderWidth: 1,
+    cardBackground: "transparent",
+    cardBorderColor: "gray-200",
+    cardShadow: "none",
+
+    // Animations
+    animationStyle: "scale",
+    animationSpeed: 300,
+    staggerDelay: 100,
+
+    // Tech Stack Display
+    techStackVisible: true,
+    techStackStyle: "pills",
+    techStackSize: "sm",
+
+    // Timeline Elements
+    timelineStyle: "line",
+    timelinePosition: "left",
+    timelineWidth: 2,
+    timelineColor: "primary",
+    dotSize: "md",
+    dotStyle: "circle",
+
+    // Badges & Tags
+    locationBadge: true,
+    dateBadge: true,
+    badgeStyle: "default",
+
+    // Date Formatting
+    dateFormat: "full-date",
+
+    // Layout Options
+    alternatingLayout: false,
+
+    // Side Accent
+    sideAccent: false,
+    sideAccentColor: "primary",
+    sideAccentWidth: 4,
+
+    // Missing Properties
+    cardBorderStyle: "none",
+    titleColor: "gray-900",
+    titleAlignment: "left",
+    descriptionVisible: true,
+    headerVisible: true,
+    locationVisible: true,
+    locationColor: "gray-500",
+    descriptionTextSize: "md",
+    descriptionTextColor: "gray-600",
+    hoverScale: true,
+    hoverShadow: true,
+    cardHoverEffect: "lift",
+    staggerAnimation: true,
+    entranceAnimation: "fadeUp",
+    techStackLimit: 5,
+    techStackColor: "gray",
+    techStackShowIcons: true,
+  };
+
+  const [customization, setCustomization] = useState<ExperienceCustomizationState>(defaultExperienceStyles);
+  const [draftCustomization, setDraftCustomization] = useState<ExperienceCustomizationState | null>(null);
 
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
@@ -183,49 +193,6 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
 
-  // Get theme colors for LumenFlow
-  const titleColor = theme === "light" ? "#f97316" : "#f97316"; // Orange color for LumenFlow
-
-  // Default styles for Experience (current LumenFlow style)
-  const defaultExperienceStyles: CustomizationState = {
-    cardLayout: "default",
-    cardBorderRadius: 16,
-    cardPadding: 24,
-    cardSpacing: 32,
-    containerWidth: "full",
-    titleSize: "lg",
-    titleWeight: "bold",
-    descriptionSize: "sm",
-    textAlignment: "left",
-    hoverEffects: true,
-    glowEffect: true,
-    borderGlow: false,
-    backgroundOpacity: 0,
-    borderWidth: 1,
-    animationStyle: "scale",
-    animationSpeed: 500,
-    staggerDelay: 200,
-    techStackVisible: true,
-    techStackStyle: "pills",
-    techStackSize: "sm",
-    timelineStyle: "line",
-    timelinePosition: "left",
-    timelineWidth: 2,
-    timelineColor: "#f97316",
-    dotSize: "md",
-    dotStyle: "circle",
-    locationBadge: true,
-    dateBadge: true,
-    badgeStyle: "default",
-    sideAccent: true,
-    sideAccentWidth: 4,
-    sideAccentColor: "#f97316",
-  };
-
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<CustomizationState>(defaultExperienceStyles);
-  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
-
   // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
   const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
@@ -235,7 +202,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
       try {
         // First check if customizations exist in Redux state
         if (componentCustomizations && componentCustomizations["experience"]) {
-          setCustomization(componentCustomizations["experience"] as CustomizationState);
+          setCustomization(componentCustomizations["experience"] as ExperienceCustomizationState);
         } else {
           // Fallback to database
           const result = await getComponentCustomization({
@@ -281,7 +248,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     setVisualEditorOpen(true);
   };
 
-  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
+  const updateDraftCustomization = (key: keyof ExperienceCustomizationState, value: any) => {
     if (!draftCustomization) return;
     setDraftCustomization({ ...draftCustomization, [key]: value });
   };
@@ -330,43 +297,6 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     }
   };
 
-  // Dragging functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (dragRef.current) {
-      const rect = dragRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-      setIsDragging(true);
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setWindowPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
   useEffect(() => {
     const subscription = supabase
       .channel(`portfolio-exp-${portfolioId}`)
@@ -389,209 +319,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     };
   }, [portfolioId]);
 
-  // Visual Editor Components
-  const CardLayoutSelector: React.FC<{
-    value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
-    onChange: (value: "default" | "minimal" | "glassmorphism" | "neon" | "gradient") => void;
-  }> = ({ value, onChange }) => {
-    return (
-      <div>
-        <label className="block text-white text-left font-medium mb-3">Card Style</label>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
-            { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
-            { value: "glassmorphism", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
-            { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
-            { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
-          ].map((style) => (
-            <div
-              key={style.value}
-              onClick={() => onChange(style.value as any)}
-              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                }`}
-            >
-              <div className="space-y-2">
-                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
-                  <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
-                  <div className="w-6 h-2 bg-zinc-500 rounded"></div>
-                </div>
-              </div>
-              <div className="text-center text-sm text-white mt-2">
-                {style.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const AlignmentSelector: React.FC<{
-    value: "left" | "center" | "right";
-    onChange: (value: "left" | "center" | "right") => void;
-  }> = ({ value, onChange }) => {
-    const alignments = [
-      { value: "left", icon: "←", label: "Left" },
-      { value: "center", icon: "↔", label: "Center" },
-      { value: "right", icon: "→", label: "Right" },
-    ];
-
-    return (
-      <div>
-        <label className="block text-white text-left font-medium mb-3">
-          Title Alignment
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {alignments.map(({ value: align, icon, label }) => (
-            <div
-              key={align}
-              onClick={() => onChange(align as any)}
-              className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === align
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                }`}
-            >
-              <div className="text-2xl text-white">{icon}</div>
-              <div className="space-y-1 w-full">
-                <div
-                  className={`h-1 rounded ${align === "left"
-                    ? "mr-auto w-3/4"
-                    : align === "center"
-                      ? "mx-auto w-1/2"
-                      : "ml-auto w-3/4"
-                    }`}
-                  style={{ background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
-                ></div>
-                <div
-                  className={`h-1 bg-gray-400 rounded ${align === "left"
-                    ? "mr-auto w-full"
-                    : align === "center"
-                      ? "mx-auto w-3/4"
-                      : "ml-auto w-full"
-                    }`}
-                ></div>
-              </div>
-              <div className="text-xs text-white">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const TechStackStyleSelector: React.FC<{
-    value: "pills" | "badges" | "minimal" | "colorful";
-    onChange: (value: "pills" | "badges" | "minimal" | "colorful") => void;
-  }> = ({ value, onChange }) => {
-    const styles = [
-      { value: "pills", label: "Pills" },
-      { value: "badges", label: "Badges" },
-      { value: "minimal", label: "Minimal" },
-      { value: "colorful", label: "Colorful" },
-    ];
-
-    return (
-      <div>
-        <label className="block text-white font-medium mb-3">
-          Tech Stack Style
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          {styles.map(({ value: style, label }) => (
-            <div
-              key={style}
-              onClick={() => onChange(style as any)}
-              className={`cursor-pointer p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 ${value === style
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                }`}
-            >
-              <div className="flex flex-wrap gap-1 justify-center mb-2">
-                {["React", "TS"].map((tech, i) => (
-                  <span
-                    key={i}
-                    className={`text-xs px-2 py-1 ${style === "pills"
-                      ? "rounded-full border border-gray-500 text-white"
-                      : style === "badges"
-                        ? "rounded bg-gray-600 text-white"
-                        : style === "minimal"
-                          ? "text-gray-300"
-                          : "rounded-full border-2 text-white"
-                      }`}
-                    style={
-                      style === "colorful"
-                        ? {
-                          borderColor: ColorTheme.primary,
-                          backgroundColor: `${ColorTheme.primary}20`,
-                        }
-                        : {}
-                    }
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-              <div className="text-center text-xs text-white">{label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const SpacingSelector: React.FC<{
-    value: number;
-    onChange: (value: number) => void;
-    label: string;
-    min: number;
-    max: number;
-    step: number;
-  }> = ({ value, onChange, label, min, max, step }) => {
-    return (
-      <div>
-        <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-          {label}: {value}px
-        </label>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-          style={{
-            background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100))}%, #3f3f46 100%)`
-          }}
-        />
-        <style jsx>{`
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-            border: none;
-            z-index: 10;
-            position: relative;
-          }
-          .slider::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-            border: none;
-            z-index: 10;
-            position: relative;
-          }
-        `}</style>
-      </div>
-    );
-  };
+  const titleColor = theme === "light" ? "#f97316" : "#f97316";
 
   if (isLoading) {
     return (
@@ -618,8 +346,6 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
         visualEditorOpen={visualEditorOpen}
       />
 
-
-
       {/* Experience Timeline */}
       <div
         className="space-y-8"
@@ -641,7 +367,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
             {/* Main Card */}
             <div
-              className={`relative transition-all duration-${effectiveCustomization.animationSpeed / 100} transform h-full flex flex-col ${effectiveCustomization.cardLayout === "default"
+              className={`relative transition-all duration-${(typeof effectiveCustomization.animationSpeed === 'number' ? effectiveCustomization.animationSpeed : 500) / 100} transform h-full flex flex-col ${effectiveCustomization.cardLayout === "default"
                 ? theme === "light"
                   ? "bg-white border border-gray-200 shadow-sm"
                   : "bg-zinc-800 border border-zinc-700"
@@ -726,7 +452,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {exp.techStack.map((tech, techIndex) => (
+                      {exp.techStack?.map((tech: Technology, techIndex: number) => (
                         <span
                           key={techIndex}
                           className={`px-2 py-1 text-xs font-medium transition-all duration-300 ${effectiveCustomization.techStackStyle === "pills"
@@ -827,287 +553,19 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
         </div>
       )}
 
-      {/* Floating Visual Editor Window */}
-      {visualEditorOpen && (
-        <div
-          ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-[70] rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-          }}
-        >
-          {/* Header */}
-          <div
-            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
-            onMouseDown={handleMouseDown}
-          >
-            <h3 className="text-base sm:text-lg font-bold text-white">Experience Settings</h3>
-            <button
-              onClick={() => setVisualEditorOpen(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1"
-            >
-              <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="flex border-b border-zinc-700">
-            {["layout", "styling"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
-                  ? "text-white"
-                  : "text-gray-400 hover:text-white hover:bg-zinc-800"
-                  }`}
-                style={activeTab === tab ? {
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                } : {}}
-              >
-                {tab === "layout" && (
-                  <Grid3X3 className="h-3 w-3 mx-auto mb-1" />
-                )}
-                {tab === "styling" && (
-                  <Palette className="h-3 w-3 mx-auto mb-1" />
-                )}
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-96">
-            {activeTab === "layout" && (
-              <>
-                <CardLayoutSelector
-                  value={draftCustomization?.cardLayout ?? customization.cardLayout}
-                  onChange={(value) =>
-                    updateDraftCustomization("cardLayout", value)
-                  }
-                />
-
-                <AlignmentSelector
-                  value={draftCustomization?.textAlignment ?? customization.textAlignment}
-                  onChange={(value) =>
-                    updateDraftCustomization("textAlignment", value)
-                  }
-                />
-
-                <SpacingSelector
-                  value={draftCustomization?.cardSpacing ?? customization.cardSpacing}
-                  onChange={(value) =>
-                    updateDraftCustomization("cardSpacing", value)
-                  }
-                  label="Card Spacing"
-                  min={8}
-                  max={48}
-                  step={4}
-                />
-
-                <SpacingSelector
-                  value={draftCustomization?.cardPadding ?? customization.cardPadding}
-                  onChange={(value) =>
-                    updateDraftCustomization("cardPadding", value)
-                  }
-                  label="Card Padding"
-                  min={8}
-                  max={32}
-                  step={2}
-                />
-              </>
-            )}
-
-            {activeTab === "styling" && (
-              <>
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Border Radius: {draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}px
-                  </label>
-                  <input
-                    type="range"
-                    min={0}
-                    max={32}
-                    value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
-                    onChange={(e) =>
-                      updateDraftCustomization("cardBorderRadius", Number(e.target.value))
-                    }
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                    style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 32) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius) / 32) * 100))}%, #3f3f46 100%)`
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-white font-medium mb-2">
-                    Border Width: {draftCustomization?.borderWidth ?? customization.borderWidth}px
-                  </label>
-                  <input
-                    type="range"
-                    min={0}
-                    max={4}
-                    value={draftCustomization?.borderWidth ?? customization.borderWidth}
-                    onChange={(e) =>
-                      updateDraftCustomization("borderWidth", Number(e.target.value))
-                    }
-                    className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                    style={{
-                      background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.borderWidth ?? customization.borderWidth) / 4) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.borderWidth ?? customization.borderWidth) / 4) * 100))}%, #3f3f46 100%)`
-                    }}
-                  />
-                </div>
-
-                <TechStackStyleSelector
-                  value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
-                  onChange={(value) =>
-                    updateDraftCustomization("techStackStyle", value)
-                  }
-                />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Hover Effects</span>
-                  <Switch
-                    checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("hoverEffects", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Glow Effect</span>
-                  <Switch
-                    checked={draftCustomization?.glowEffect ?? customization.glowEffect}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("glowEffect", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Show Tech Stack</span>
-                  <Switch
-                    checked={draftCustomization?.techStackVisible ?? customization.techStackVisible}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("techStackVisible", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Show Location</span>
-                  <Switch
-                    checked={draftCustomization?.locationBadge ?? customization.locationBadge}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("locationBadge", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Show Date Range</span>
-                  <Switch
-                    checked={draftCustomization?.dateBadge ?? customization.dateBadge}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("dateBadge", checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium">Side Accent</span>
-                  <Switch
-                    checked={draftCustomization?.sideAccent ?? customization.sideAccent}
-                    onCheckedChange={(checked) =>
-                      updateDraftCustomization("sideAccent", checked)
-                    }
-                  />
-                </div>
-
-                {(draftCustomization?.sideAccent ?? customization.sideAccent) && (
-                  <div>
-                    <label className="block text-white font-medium mb-2">
-                      Side Accent Width: {draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth}px
-                    </label>
-                    <input
-                      type="range"
-                      min={1}
-                      max={8}
-                      value={draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth}
-                      onChange={(e) =>
-                        updateDraftCustomization("sideAccentWidth", Number(e.target.value))
-                      }
-                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                      style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, (((draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth) - 1) / 7) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, (((draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth) - 1) / 7) * 100))}%, #3f3f46 100%)`
-                      }}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-zinc-700 p-3 sm:p-4 bg-zinc-800">
-            <div className="flex gap-2">
-              <button
-                onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Reset
-              </button>
-              <button
-                onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Overlay for floating window */}
-      {visualEditorOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40"
-          onClick={() => setVisualEditorOpen(false)}
-        />
-      )}
-
-      {/* Custom CSS for sliders */}
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: ${ColorTheme.primary};
-          cursor: pointer;
-          border: none;
-          z-index: 10;
-          position: relative;
-        }
-        .slider::-moz-range-thumb {
-          height: 16px;
-          width: 16px;
-          border-radius: 50%;
-          background: ${ColorTheme.primary};
-          cursor: pointer;
-          border: none;
-          z-index: 10;
-          position: relative;
-        }
-      `}</style>
-
-
+      <ExperienceVisualEditor
+        isOpen={visualEditorOpen}
+        onClose={() => setVisualEditorOpen(false)}
+        customization={customization}
+        draftCustomization={draftCustomization}
+        onUpdateDraft={updateDraftCustomization}
+        onSave={saveDraftCustomization}
+        onReset={resetCustomization}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        primaryColor={titleColor}
+        primaryDarkColor={titleColor}
+      />
     </div>
   );
 };

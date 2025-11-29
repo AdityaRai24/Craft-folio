@@ -9,41 +9,10 @@ import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
+import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 
-interface TechnologyType {
-  name: string;
-  logo: string;
-}
-
-const defaultTechnologiesStyles: TechnologiesCustomizationState = {
-  layout: "grid",
-  gridColumns: 4,
-  gap: 24,
-  containerWidth: "xl",
-  cardStyle: "minimal",
-  cardBorderRadius: 8,
-  cardPadding: 16,
-  cardShadow: "none",
-  borderWidth: 1,
-  backgroundOpacity: 100,
-  showIcons: true,
-  iconSize: 48,
-  showLabels: true,
-  labelPosition: "bottom",
-  labelSize: "md",
-  labelWeight: "medium",
-  textAlignment: "center",
-  animationStyle: "fade",
-  animationSpeed: 300,
-  staggerAnimation: true,
-  hoverEffects: true,
-  cardHoverEffect: "lift",
-  marqueeDirection: "left",
-  marqueeSpeed: 50,
-  pauseOnHover: true,
-};
 
 const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const dispatch = useDispatch();
@@ -59,7 +28,7 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
   const backgroundSecondaryColor = theme?.colors?.background?.secondary || ColorTheme.bgCard;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [technologiesData, setTechnologiesData] = useState<TechnologyType[]>([]);
+  const [technologiesData, setTechnologiesData] = useState<Technology[]>([]);
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
 
   // Main customization state (from DB or default)
@@ -141,76 +110,16 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
   };
 
   // Helper functions for styling based on customization
-  const getSectionClasses = () => {
-    return `py-20 bg-white`; // Simplified for now, can be expanded
-  };
+  const {
+    getSectionClasses,
+    getGridClasses,
+    getCardClasses,
+    getIconClasses,
+    getLabelClasses,
+    getAnimationVariants
+  } = useTechnologiesStyles(effectiveCustomization, primaryColor, "light");
 
-  const getGridClasses = () => {
-    const columnsMap: Record<number, string> = {
-      2: "grid-cols-2",
-      3: "grid-cols-2 sm:grid-cols-3",
-      4: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
-      5: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5",
-      6: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6",
-      8: "grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8",
-    };
-
-    const maxWidthMap: Record<string, string> = {
-      sm: "max-w-3xl",
-      md: "max-w-4xl",
-      lg: "max-w-5xl",
-      xl: "max-w-6xl",
-      "2xl": "max-w-7xl",
-      full: "w-full",
-    };
-
-    return `grid ${columnsMap[effectiveCustomization.gridColumns] || "grid-cols-4"} ${maxWidthMap[effectiveCustomization.containerWidth]} mx-auto`;
-  };
-
-  const getCardClasses = () => {
-    const styleMap: Record<string, string> = {
-      minimal: "bg-transparent",
-      elevated: `bg-[${backgroundPrimaryColor}] shadow-md`,
-      outlined: `border border-[${textSecondaryColor}]/30 bg-transparent`,
-      filled: `bg-[${backgroundSecondaryColor}]`,
-      glassmorphism: "bg-white/10 backdrop-blur-sm border border-white/20",
-      neon: "bg-black border border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]",
-      gradient: "bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20",
-      default: "bg-white border border-gray-200",
-    };
-
-    const hoverMap: Record<string, string> = {
-      lift: "hover:shadow-lg hover:-translate-y-1",
-      glow: `hover:shadow-lg hover:shadow-[${primaryColor}]/20`,
-      scale: "hover:scale-105",
-      rotate: "hover:rotate-3",
-      none: "",
-    };
-
-    return `flex flex-col cursor-pointer items-center transition-all duration-300 ${styleMap[effectiveCustomization.cardStyle]} ${effectiveCustomization.hoverEffects ? hoverMap[effectiveCustomization.cardHoverEffect] : ""}`;
-  };
-
-  const getIconClasses = () => {
-    return `flex items-center justify-center rounded-lg mb-3`;
-  };
-
-  const getLabelClasses = () => {
-    const sizeMap: Record<string, string> = {
-      xs: "text-xs",
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-    };
-
-    const weightMap: Record<string, string> = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-
-    return `${weightMap[effectiveCustomization.labelWeight]} ${sizeMap[effectiveCustomization.labelSize]} text-center`;
-  };
+  const animationVariants = getAnimationVariants();
 
   useEffect(() => {
     if (portfolioData) {
