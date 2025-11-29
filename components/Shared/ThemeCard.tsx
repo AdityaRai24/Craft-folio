@@ -211,8 +211,8 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             className={`
               flex-1 flex cursor-pointer items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all
               ${selectedTheme === theme.id
-                ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20'
-                : 'bg-white text-black hover:bg-gray-100'}
+                ? 'bg-transparent text-emerald-500 border border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                : 'bg-emerald-500 text-black hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'}
             `}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

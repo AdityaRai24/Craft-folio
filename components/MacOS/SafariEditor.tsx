@@ -12,6 +12,7 @@ interface SafariEditorProps {
     onSave: (content: string) => void;
     onCancel: () => void;
     isDark: boolean;
+    font?: string;
 }
 
 const SafariEditor: React.FC<SafariEditorProps> = ({
@@ -19,6 +20,7 @@ const SafariEditor: React.FC<SafariEditorProps> = ({
     onSave,
     onCancel,
     isDark,
+    font,
 }) => {
     // Create the editor instance
     const editor = useCreateBlockNote();
@@ -48,7 +50,7 @@ const SafariEditor: React.FC<SafariEditorProps> = ({
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className={`flex flex-col h-full ${font || ""}`}>
             {/* Toolbar / Header */}
             <div className={`flex justify-between items-center p-2 border-b ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"}`}>
                 <span className={`text-sm font-medium ml-2 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
@@ -81,7 +83,8 @@ const SafariEditor: React.FC<SafariEditorProps> = ({
                     <BlockNoteView
                         editor={editor}
                         theme={isDark ? "dark" : "light"}
-                        className="min-h-[300px]"
+                        className={`min-h-[300px] ${font || ""}`}
+
                     />
                 </div>
             </div>

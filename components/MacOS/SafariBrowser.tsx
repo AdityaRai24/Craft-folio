@@ -182,15 +182,16 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
             onSave={handleSave}
             onCancel={() => setIsEditing(false)}
             isDark={isDark}
+            font={font}
           />
         ) : (
           <div className="h-full overflow-y-auto">
             <div className="p-8 max-w-5xl mx-auto">
               {safariData.content ? (
-                <ReadOnlyContent content={safariData.content} isDark={isDark} />
+                <ReadOnlyContent content={safariData.content} isDark={isDark} font={font} />
               ) : (
                 <div
-                  className={`prose max-w-none ${isDark ? "prose-invert prose-headings:text-white prose-p:text-gray-300 text-gray-300" : "prose-headings:text-gray-900 prose-p:text-gray-900 text-gray-900"} prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-blue-500 hover:prose-a:text-blue-600`}
+                  className={`prose max-w-none ${font || ""} ${isDark ? "prose-invert prose-headings:text-white prose-p:text-gray-300 text-gray-300" : "prose-headings:text-gray-900 prose-p:text-gray-900 text-gray-900"} prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-a:text-blue-500 hover:prose-a:text-blue-600`}
                   dangerouslySetInnerHTML={{ __html: defaultContent }}
                 />
               )}
@@ -202,7 +203,7 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
   );
 };
 
-const ReadOnlyContent = ({ content, isDark }: { content: string; isDark: boolean }) => {
+const ReadOnlyContent = ({ content, isDark, font }: { content: string; isDark: boolean; font?: string }) => {
   const editor = useCreateBlockNote();
   const [loading, setLoading] = useState(true);
 
@@ -224,7 +225,7 @@ const ReadOnlyContent = ({ content, isDark }: { content: string; isDark: boolean
       editor={editor}
       editable={false}
       theme={isDark ? "dark" : "light"}
-      className="bg-transparent"
+      className={`bg-transparent ${font || ""}`}
     />
   );
 };

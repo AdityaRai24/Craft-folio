@@ -268,6 +268,20 @@ const CreateMethodModal = ({
   useEffect(() => {
     if (!isModalOpen) {
       toast.dismiss();
+      // Reset all state when modal closes
+      setShowResumeImport(false);
+      setResumeUploaded(false);
+      setShowPreview(false);
+      setUploadingResume(false);
+      setBase64Data("");
+      setIsLoading(false);
+      setProcessingResume(false);
+      setCustomBodyResume(null);
+      setProgressValue(0);
+      setCurrentFact(0);
+      setCurrentMessage(0);
+      setConfettiActive(false);
+      setConfettiOpacity(1);
     }
 
     return () => {

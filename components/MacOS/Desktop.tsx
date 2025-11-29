@@ -11,7 +11,7 @@ import {
   useTransform,
   MotionValue,
 } from "framer-motion";
-import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail, Image as ImageIcon } from "lucide-react";
+import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail, Image as ImageIcon, Cpu, X } from "lucide-react";
 import TopBar from "./TopBar";
 import ProjectsGrid from "./Projects";
 import TerminalWindow from "./TerminalWindow";
@@ -19,6 +19,7 @@ import ResumeViewer from "./ResumeViewer";
 import Contact from "./Contact";
 import SafariBrowser from "./SafariBrowser";
 import ExperienceWindow from "./ExperienceWindow";
+import Technologies from "./Technologies";
 import WallpaperVisualEditor from "@/components/VisualEditor/Wallpaper/WallpaperVisualEditor";
 import { MacOSThemeProvider, useMacOSTheme } from "./ThemeContext";
 import Preview from "./icons/preview.svg";
@@ -56,8 +57,15 @@ const Desktop: React.FC<DesktopProps> = ({
   const heroData =
     portfolioData?.find((item: any) => item.type === "hero")?.data || {};
 
+  const themeWallpapers: Record<string, string> = {
+    Sonoma: "https://4kwallpapers.com/images/wallpapers/macos-sonoma-5120x2880-12164.jpg",
+    Ventura: "https://4kwallpapers.com/images/wallpapers/macos-ventura-5120x2880-8998.jpg",
+    Monterey: "https://4kwallpapers.com/images/wallpapers/macos-monterey-stock-purple-dark-mode-layers-5k-5120x2880-5898.jpg",
+  };
+
   const backgroundImage =
     heroData.image ||
+    (currentPortTheme && themeWallpapers[currentPortTheme]) ||
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80";
 
   const [windows, setWindows] = useState<Record<string, WindowState>>({
@@ -115,6 +123,15 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 150, y: 150 },
       size: { width: 850, height: 650 },
     },
+    skills: {
+      id: "skills",
+      isOpen: false,
+      isMinimized: false,
+      isFullscreen: false,
+      zIndex: 0,
+      position: { x: 250, y: 250 },
+      size: { width: 900, height: 600 },
+    },
   });
 
   const [nextZIndex, setNextZIndex] = useState(2);
@@ -128,6 +145,7 @@ const Desktop: React.FC<DesktopProps> = ({
   const dockConfig: Record<string, any> = {
     projects: { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
     experience: { id: "experience", icon: "https://cdn-icons-png.flaticon.com/512/3281/3281289.png", label: "Experience", component: ExperienceWindow },
+    skills: { id: "skills", icon: Cpu, label: "Skills", component: Technologies },
     terminal: { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
     resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
@@ -388,6 +406,23 @@ const DesktopContent = ({
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
 
+  const hasOpenWindows = Object.values(windows).some((win: any) => win.isOpen);
+
+  const closeAllWindows = () => {
+    setWindows((prev: any) => {
+      const newWindows = { ...prev };
+      Object.keys(newWindows).forEach((key) => {
+        newWindows[key] = {
+          ...newWindows[key],
+          isOpen: false,
+          isMinimized: false,
+          isFullscreen: false,
+        };
+      });
+      return newWindows;
+    });
+  };
+
   const handleMouseMove = (e: MouseEvent) => {
     if (draggingWindow) {
       const win = windows[draggingWindow];
@@ -412,7 +447,8 @@ const DesktopContent = ({
       newX = Math.max(-win.size.width + minVisibleHeight, Math.min(newX, maxX));
 
       // Clamp Y position (account for topbar)
-      newY = Math.max(topBarHeight - win.size.height + minVisibleHeight, Math.min(newY, maxY));
+      // Prevent going above topbar (28px)
+      newY = Math.max(topBarHeight, Math.min(newY, maxY));
 
       setWindows((prev: any) => ({
         ...prev,
@@ -604,7 +640,7 @@ const DesktopContent = ({
                     }}
                   >
                     {WindowComponent ? (
-                      id === "terminal" || id === "resume" || id === "safari" || id === "experience" ? (
+                      id === "terminal" || id === "resume" || id === "safari" || id === "experience" || id === "skills" ? (
                         <WindowComponent
                           theme={theme}
                           portfolioId={portfolioId}
@@ -630,9 +666,9 @@ const DesktopContent = ({
           })}
         </AnimatePresence>
       </div>
-
-      {/* Improved macOS Dock */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-auto">
+      {/* Improved macOS Dock Container */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4">
+        {/* Dock */}
         <div
           className={`flex items-end h-16 gap-3 px-4 pb-2 border backdrop-blur-2xl rounded-2xl shadow-2xl ${isDark
             ? "bg-black/30 border-white/10"
@@ -663,9 +699,47 @@ const DesktopContent = ({
               />
             );
           })}
+
+          {/* Close All Button */}
+          <AnimatePresence>
+            {hasOpenWindows && (
+              <motion.div
+                initial={{ width: 0, opacity: 0, scale: 0 }}
+                animate={{ width: "auto", opacity: 1, scale: 1 }}
+                exit={{ width: 0, opacity: 0, scale: 0 }}
+                className="flex items-center ml-2 pl-2 border-l border-white/10"
+              >
+                <motion.button
+                  onClick={closeAllWindows}
+                  className={`
+                    group relative flex items-center justify-center
+                    w-12 h-12 rounded-xl
+                    transition-all duration-300
+                    hover:scale-110 active:scale-95
+                    ${isDark ? "bg-red-500/20 hover:bg-red-500/30" : "bg-red-500/10 hover:bg-red-500/20"}
+                  `}
+                  title="Close All Windows"
+                  whileHover={{ y: -5 }}
+                >
+                  <X size={20} className={isDark ? "text-red-400" : "text-red-600"} />
+
+                  {/* Tooltip */}
+                  <span className={`
+                    absolute -top-10 left-1/2 -translate-x-1/2
+                    px-2 py-1 rounded text-xs font-medium
+                    opacity-0 group-hover:opacity-100 transition-opacity
+                    pointer-events-none whitespace-nowrap
+                    ${isDark ? "bg-gray-800 text-white" : "bg-white text-gray-900 shadow-lg"}
+                  `}>
+                    Close All
+                  </span>
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
@@ -785,11 +859,19 @@ const DockIcon = ({
         `}
         whileTap={{ scale: 0.9 }}
       >
-        <img
-          src={item.icon.src || item.icon}
-          alt={item.label}
-          className={`${isActive ? "text-white" : "text-white/80"}`}
-        />
+        {typeof item.icon === 'string' || item.icon.src ? (
+          <img
+            src={item.icon.src || item.icon}
+            alt={item.label}
+            className={`${isActive ? "text-white" : "text-white/80"}`}
+          />
+        ) : (
+          <item.icon
+            size={40}
+            className={`${isActive ? "text-white" : "text-white/80"} drop-shadow-lg`}
+            strokeWidth={1.5}
+          />
+        )}
       </motion.div>
 
       {/* Active Dot Indicator */}

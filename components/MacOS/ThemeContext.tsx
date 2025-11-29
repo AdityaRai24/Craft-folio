@@ -73,9 +73,9 @@ export function MacOSThemeProvider({
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("macos-theme") as "light" | "dark";
-      return savedTheme || "light";
+      return savedTheme || "dark";
     }
-    return "light";
+    return "dark";
   });
 
   const [currentTheme, setCurrentTheme] = useState<MacOSThemeColors>(defaultTheme);

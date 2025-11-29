@@ -170,7 +170,7 @@ const Contact = ({
       url: userInfoData.github,
       color: isDark ? "from-gray-800 to-gray-900" : "from-gray-900 to-gray-800",
       hoverColor: isDark ? "hover:from-gray-700 hover:to-gray-800" : "hover:from-gray-800 hover:to-gray-700",
-      iconBg: isDark ? "bg-gray-700" : "bg-gray-800",
+      iconBg: currentTheme.primary,
     },
     {
       name: "LinkedIn",
@@ -178,7 +178,7 @@ const Contact = ({
       url: userInfoData.linkedin,
       color: isDark ? "from-blue-700 to-blue-800" : "from-blue-600 to-blue-700",
       hoverColor: isDark ? "hover:from-blue-600 hover:to-blue-700" : "hover:from-blue-500 hover:to-blue-600",
-      iconBg: isDark ? "bg-blue-600" : "bg-blue-500",
+      iconBg: currentTheme.primary,
     },
     {
       name: "Email",
@@ -186,9 +186,18 @@ const Contact = ({
       url: userInfoData.email ? `mailto:${typeof userInfoData.email === 'string' ? userInfoData.email : (userInfoData.email?.email || userInfoData.email?.value || "")}` : null,
       color: isDark ? "from-red-600 to-red-700" : "from-red-500 to-red-600",
       hoverColor: isDark ? "hover:from-red-500 hover:to-red-600" : "hover:from-red-400 hover:to-red-500",
-      iconBg: isDark ? "bg-red-600" : "bg-red-500",
+      iconBg: currentTheme.primary,
     },
-  ].filter((link) => link.url);
+  ].filter(Boolean); // Keep all defined links, don't filter by url existence
+
+  const handleLinkClick = (e: React.MouseEvent, url: string | null | undefined, name: string) => {
+    if (!url) {
+      e.preventDefault();
+      toast.error(`${name} link not provided`);
+    }
+  };
+
+  console.log(currentTheme)
 
   return (
     <div
@@ -242,18 +251,21 @@ const Contact = ({
           >
             {socialLinks.map((link, index) => {
               const Icon = link.icon;
+              const hasUrl = !!link.url;
+
               return (
                 <motion.a
                   key={index}
                   href={link.url || "#"}
-                  target={effectiveCustomization.openInNewTab && link.url?.startsWith("http") ? "_blank" : undefined}
-                  rel={effectiveCustomization.openInNewTab && link.url?.startsWith("http") ? "noopener noreferrer" : undefined}
+                  onClick={(e) => handleLinkClick(e, link.url, link.name)}
+                  target={effectiveCustomization.openInNewTab && hasUrl && link.url?.startsWith("http") ? "_blank" : undefined}
+                  rel={effectiveCustomization.openInNewTab && hasUrl && link.url?.startsWith("http") ? "noopener noreferrer" : undefined}
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05, y: -8 } : {}}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: effectiveCustomization.animationSpeed / 1000, delay: index * (effectiveCustomization.staggerDelay / 1000) }}
-                  className={`rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center gap-6 group relative overflow-hidden`}
+                  className={`rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col items-center gap-6 group relative overflow-hidden ${!hasUrl ? "opacity-70 grayscale" : ""}`}
                   style={{
                     borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                     padding: `${effectiveCustomization.cardPadding * 4}px`,
@@ -267,7 +279,7 @@ const Contact = ({
                       width: `${effectiveCustomization.iconSize * 2.5}px`,
                       height: `${effectiveCustomization.iconSize * 2.5}px`,
                       borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
-                      background: currentTheme.primary,
+                      background: `${currentTheme.primary}`,
                     }}
                   >
                     <Icon size={effectiveCustomization.iconSize} className="text-white" />
@@ -279,7 +291,7 @@ const Contact = ({
                     </span>
                   )}
 
-                  {effectiveCustomization.openInNewTab && link.url?.startsWith("http") && (
+                  {effectiveCustomization.openInNewTab && hasUrl && link.url?.startsWith("http") && (
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                       <ExternalLink size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
                     </div>

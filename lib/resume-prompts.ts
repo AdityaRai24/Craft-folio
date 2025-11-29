@@ -1,15 +1,11 @@
 import { PromptTemplate } from "@langchain/core/prompts";
-import { techList } from "@/lib/techlist";
 
 export const parsingTemplate = PromptTemplate.fromTemplate(`
 You are a professional resume parser. Given an image of a resume, extract the relevant information into a structured JSON format.
 Pay attention to all sections: personal information, summary, experience, education, skills, projects, and certifications.
 For dates, use MM/YYYY format when possible.
 
-For tech stack item refer to the provided tech list. ${techList} This list contains most of the possible tech stacks. 
-If the project uses any of these tech stacks then use the same name and image present in this array else use name present in resume. 
-Handle slightly different names like a resume may contain React and the array may contain React.js so use what is there in the array with its image.
-If image not present use any dummy image.
+For tech stack item, extract the name exactly as it appears in the resume.
 
 For description projects, experience or any other kind of description summarize it in 3-4 lines at max. A user may have explained about the project in 10-12 lines so summarize it in around 3-4 lines.
 
@@ -43,7 +39,7 @@ Use this exact schema:
       "techStack": [
         {{
           "name": string,
-          "logo": string
+          "logo": string (optional)
         }}
       ]
     }}
@@ -61,7 +57,7 @@ Use this exact schema:
   "skills": [
     {{
       "name": string,
-      "logo": string
+      "logo": string (optional)
     }}
   ],
   "projects": [
@@ -74,7 +70,7 @@ Use this exact schema:
       "techStack": [
         {{
           "name": string,
-          "logo": string
+          "logo": string (optional)
         }}
       ]
     }}
@@ -203,11 +199,16 @@ Return ONLY valid JSON in this format:
 export const safariContentTemplate = PromptTemplate.fromTemplate(`
 Generate rich HTML content for a personal portfolio "About Me" page based on the resume data.
 The content should be styled with Tailwind CSS classes.
+IMPORTANT: Write in the FIRST PERSON ("I am...", "My journey...").
+Focus entirely on the candidate's skills, background, experience, and professional identity.
+DO NOT mention "template", "MacOS", "portfolio features", or "interactive elements" unless they are specific skills of the candidate.
+The goal is to create a genuine "About Me" page for the person.
+
 Include:
-1. A welcoming header.
+1. A welcoming header (e.g., "Hi, I'm [Name]").
 2. A grid of 3 cards highlighting key strengths/features (use emojis).
-3. A section describing the person's background.
-4. A "Key Skills" or "Features" section.
+3. A section describing the person's background and journey.
+4. A "Key Skills" or "What I Do" section.
 
 Use the following style for cards: "p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20".
 Use standard Tailwind colors and spacing.
