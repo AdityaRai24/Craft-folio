@@ -51,36 +51,9 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
   const textSecondaryColor = theme?.colors?.text?.secondary || "#6B7280";
 
-  // Authentication check
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
   const { user, isLoaded } = useUser();
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
-
-  // Magic Write functionality
-  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
-    try {
-      const response = await fetch('/api/magicwrite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          context: context || ""
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Magic Write API error');
-      }
-
-      const data = await response.json();
-      return data.enhancedText || context || "";
-    } catch (error) {
-      console.error('Magic Write API error:', error);
-      return context || "";
-    }
-  };
 
   if (!headerVisible) return null;
 

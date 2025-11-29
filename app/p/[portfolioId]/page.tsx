@@ -342,6 +342,9 @@ const Page = () => {
                 <p className="text-xl">Portfolio content not found</p>
               </div>
             )}
+
+            {/* Ensure Contact/Footer is always rendered if supported by template but missing from data */}
+            {allSections && !allSections.includes("contact") && getComponentForSection("contact")}
           </motion.div>
         </div>
 

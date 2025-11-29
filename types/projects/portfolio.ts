@@ -22,6 +22,7 @@ export interface ProjectsCustomizationState {
   imageBorderRadius: number;
   cardBackground: string;
   cardBorder: string;
+  cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient" | "elevated" | "outlined" | "filled";
   imageAspectRatio: "auto" | "square" | "wide" | "tall";
   imageHeight: number;
   githubButtonStyle: "default" | "filled" | "ghost" | "minimal";

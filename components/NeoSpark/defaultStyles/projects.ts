@@ -8,6 +8,7 @@ export const defaultProjectsStyles: ProjectsCustomizationState = {
   imageBorderRadius: 8,
   cardBackground: "bg-stone-800/30",
   cardBorder: "border-gray-700",
+  cardStyle: "default",
   imageAspectRatio: "auto",
   imageHeight: 208,
   githubButtonStyle: "default",

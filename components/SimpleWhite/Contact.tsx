@@ -10,7 +10,7 @@ import { ContactCustomizationState } from '@/types/contact/portfolio';
 import { ContactVisualEditor } from '@/components/VisualEditor/Contact/ContactVisualEditor';
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from '@/app/actions/portfolio';
 import toast from 'react-hot-toast';
-import SectionHeader from '../NeoSpark/SectionHeader';
+import SectionHeader from './SectionHeader';
 
 const Contact = ({ currentPortTheme, portfolioId }: any) => {
     const dispatch = useDispatch();
@@ -189,13 +189,22 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
         <div className="relative">
             <SectionHeader
                 sectionName="contact"
-                sectionTitle="Get in Touch"
-                sectionDescription="Let's connect and discuss your next project"
-                titleColor={textPrimaryColor}
-                onVisualEditorOpen={() => {
+                headerVisible={false}
+                titleSize="3xl"
+                titleWeight="bold"
+                titleColor="black"
+                titleAlignment="center"
+                descriptionSize="lg"
+                descriptionColor="gray-600"
+                descriptionVisible={true}
+                title="Get in Touch"
+                description="Let's connect and discuss your next project"
+                onVisualEditorClick={() => {
                     setDraftCustomization({ ...customization });
                     setVisualEditorOpen(true);
                 }}
+                headerClasses={{ container: "mb-12 text-center relative", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
+                currentPortTheme={currentPortTheme}
             />
 
             <footer

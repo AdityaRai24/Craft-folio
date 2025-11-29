@@ -22,11 +22,45 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     )} cursor-pointer `;
 
     // Background and Border
-    if (isDark) {
-      classes += "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl hover:bg-zinc-900/80";
-    } else {
-      // Light mode: clean white cards with elegant shadows
-      classes += "bg-white border-gray-200 hover:border-gray-300 shadow-md hover:shadow-xl";
+    switch (customization.cardStyle) {
+      case "minimal":
+        classes += "bg-transparent border-transparent";
+        break;
+      case "glassmorphism":
+        classes += "bg-white/10 backdrop-blur-md border-white/20 shadow-lg";
+        break;
+      case "neon":
+        classes += isDark 
+          ? "bg-black border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)]" 
+          : "bg-white border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]";
+        break;
+      case "gradient":
+        classes += isDark
+          ? "bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30 hover:border-blue-500/50"
+          : "bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200 hover:border-blue-300";
+        break;
+      case "elevated":
+        classes += isDark
+          ? "bg-[#2a2a2a] border-[#3a3a3a] shadow-xl hover:shadow-2xl hover:-translate-y-1"
+          : "bg-white border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-1";
+        break;
+      case "outlined":
+        classes += isDark
+          ? "bg-transparent border-2 border-zinc-700 hover:border-zinc-500"
+          : "bg-transparent border-2 border-gray-300 hover:border-gray-400";
+        break;
+      case "filled":
+        classes += isDark
+          ? "bg-zinc-800 border-transparent hover:bg-zinc-700"
+          : "bg-gray-100 border-transparent hover:bg-gray-200";
+        break;
+      case "default":
+      default:
+        if (isDark) {
+          classes += "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl hover:bg-zinc-900/80";
+        } else {
+          classes += "bg-white border-gray-200 hover:border-gray-300 shadow-md hover:shadow-xl";
+        }
     }
 
     return classes;

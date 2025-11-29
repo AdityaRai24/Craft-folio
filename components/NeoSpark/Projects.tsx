@@ -159,7 +159,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
     getTitleAlignment,
     getTitleClasses,
     getDescriptionClasses
-  } = useProjectStyles(effectiveCustomization, titleColor);
+  } = useProjectStyles(effectiveCustomization, titleColor, "dark");
 
   const { handleMagicWrite, handleDescriptionUpdate } = useProjectActions({
     portfolioId,

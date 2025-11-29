@@ -297,7 +297,7 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
           title={portfolioData?.find((section: any) => section.type === "technologies")?.sectionTitle || "Technical Skills"}
           description={portfolioData?.find((section: any) => section.type === "technologies")?.sectionDescription || "A comprehensive list of technologies and tools I work with"}
           onVisualEditorClick={openVisualEditor}
-          headerClasses={{ container: "mb-12 text-center", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
+          headerClasses={{ container: "mb-12 text-center relative", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
           currentPortTheme={currentPortTheme}
         />
 

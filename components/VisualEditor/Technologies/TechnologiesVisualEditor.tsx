@@ -1,10 +1,18 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { X, LayoutGrid, Palette, Type, Move } from "lucide-react";
+
+import React, { useState } from "react";
+import {
+    Palette,
+    Layout,
+    Move,
+    RotateCcw,
+    X,
+    Type,
+} from "lucide-react";
 import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
-import { LayoutSelector } from "./LayoutSelector";
-import { StyleSelector } from "./StyleSelector";
-import { TypographySelector } from "./TypographySelector";
+import { TechnologiesLayoutSelector } from "./TechnologiesLayoutSelector";
+import { TechnologiesStyleSelector } from "./TechnologiesStyleSelector";
+import TypographySelector from "../Shared/TypographySelector";
 import { AnimationSelector } from "./AnimationSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -16,6 +24,8 @@ interface TechnologiesVisualEditorProps {
     updateCustomization: (key: keyof TechnologiesCustomizationState, value: any) => void;
     onSave: () => void;
     onReset: () => void;
+    primaryColor?: string;
+    primaryDarkColor?: string;
 }
 
 export const TechnologiesVisualEditor: React.FC<TechnologiesVisualEditorProps> = ({
@@ -25,118 +35,150 @@ export const TechnologiesVisualEditor: React.FC<TechnologiesVisualEditorProps> =
     updateCustomization,
     onSave,
     onReset,
+    primaryColor = ColorTheme.primary,
+    primaryDarkColor = ColorTheme.primaryDark,
 }) => {
-    const [activeTab, setActiveTab] = useState<"layout" | "style" | "typography" | "animation">("layout");
-    const dragRef = useRef<HTMLDivElement>(null);
-    const { position, handleMouseDown } = useDraggable({ x: 20, y: 80 });
+    const { isDragging, position: windowPosition, dragRef, handleMouseDown } = useDraggable();
+    const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "motion">("layout");
 
     if (!isOpen) return null;
 
-    const tabs = [
-        { id: "layout", label: "Layout", icon: LayoutGrid },
-        { id: "style", label: "Style", icon: Palette },
-        { id: "typography", label: "Text", icon: Type },
-        { id: "animation", label: "Motion", icon: Move },
-    ];
-
     return (
-        <div
-            ref={dragRef}
-            className="fixed z-[9999] w-[360px] bg-zinc-900 rounded-xl shadow-2xl border border-zinc-700 flex flex-col overflow-hidden"
-            style={{
-                left: position.x,
-                top: position.y,
-                maxHeight: "85vh",
-            }}
-        >
-            {/* Header */}
+        <>
+            {/* Floating Visual Editor Window */}
             <div
-                className="flex items-center justify-between px-4 py-3 bg-zinc-800 border-b border-zinc-700 cursor-move"
-                onMouseDown={handleMouseDown}
+                ref={dragRef}
+                className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
+                style={{
+                    left: `${windowPosition.x}px`,
+                    top: `${windowPosition.y}px`,
+                    cursor: isDragging ? "grabbing" : "grab",
+                }}
             >
-                <h3 className="text-white font-semibold text-sm flex items-center gap-2">
-                    <Palette size={16} className="text-green-400" />
-                    Technologies Editor
-                </h3>
-                <button
-                    onClick={onClose}
-                    className="text-zinc-400 hover:text-white transition-colors"
+                {/* Header */}
+                <div
+                    className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
+                    onMouseDown={handleMouseDown}
                 >
-                    <X size={18} />
-                </button>
-            </div>
+                    <h3 className="text-base sm:text-lg font-bold text-white">Technologies Editor</h3>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-white transition-colors p-1"
+                    >
+                        <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </button>
+                </div>
 
-            {/* Tabs */}
-            <div className="flex border-b border-zinc-700 bg-zinc-800/50">
-                {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    return (
+                {/* Tab Navigation */}
+                <div className="flex border-b border-zinc-700">
+                    {["layout", "typography", "styling", "motion"].map((tab) => (
                         <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex-1 flex flex-col items-center justify-center py-3 px-1 transition-all relative ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+                            key={tab}
+                            onClick={() => setActiveTab(tab as any)}
+                            className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
+                                ? "text-white"
+                                : "text-gray-400 hover:text-white hover:bg-zinc-800"
                                 }`}
+                            style={
+                                activeTab === tab
+                                    ? {
+                                        background: `linear-gradient(135deg, ${primaryColor}, ${primaryDarkColor})`,
+                                    }
+                                    : {}
+                            }
                         >
-                            <Icon size={18} className="mb-1" />
-                            <span className="text-[10px] font-medium uppercase tracking-wider">{tab.label}</span>
-                            {isActive && (
-                                <div
-                                    className="absolute bottom-0 left-0 w-full h-0.5"
-                                    style={{ background: `linear-gradient(to right, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }}
-                                />
-                            )}
+                            {tab === "layout" && <Layout className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                            {tab === "typography" && <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                            {tab === "styling" && <Palette className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                            {tab === "motion" && <Move className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />}
+                            <span className="hidden sm:inline">{tab}</span>
+                            <span className="sm:hidden">{tab.charAt(0)}</span>
                         </button>
-                    );
-                })}
+                    ))}
+                </div>
+
+                {/* Tab Content */}
+                <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6 custom-scrollbar">
+                    {activeTab === "layout" && (
+                        <TechnologiesLayoutSelector
+                            customization={customization}
+                            updateCustomization={updateCustomization}
+                        />
+                    )}
+
+                    {activeTab === "typography" && (
+                        <div className="space-y-6">
+                            <TypographySelector
+                                label="Label Size"
+                                value={customization.labelSize}
+                                onChange={value => updateCustomization("labelSize", value)}
+                                type="size"
+                                options={[
+                                    { value: "xs", label: "Extra Small", preview: "0.75rem" },
+                                    { value: "sm", label: "Small", preview: "0.875rem" },
+                                    { value: "md", label: "Medium", preview: "1rem" },
+                                    { value: "lg", label: "Large", preview: "1.125rem" },
+                                ]}
+                            />
+
+                            <TypographySelector
+                                label="Label Weight"
+                                value={customization.labelWeight}
+                                onChange={value => updateCustomization("labelWeight", value)}
+                                type="weight"
+                                options={[
+                                    { value: "normal", label: "Normal", preview: "font-normal" },
+                                    { value: "medium", label: "Medium", preview: "font-medium" },
+                                    { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                    { value: "bold", label: "Bold", preview: "font-bold" },
+                                ]}
+                            />
+                        </div>
+                    )}
+
+                    {activeTab === "styling" && (
+                        <TechnologiesStyleSelector
+                            customization={customization}
+                            updateCustomization={updateCustomization}
+                        />
+                    )}
+
+                    {activeTab === "motion" && (
+                        <AnimationSelector
+                            customization={customization}
+                            updateCustomization={updateCustomization}
+                        />
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
+                    <div className="flex gap-2">
+                        <button
+                            onClick={onReset}
+                            className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                        >
+                            <RotateCcw className="h-3 w-3" />
+                            Reset
+                        </button>
+                        <button
+                            onClick={onSave}
+                            className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
+                            style={{
+                                background: `linear-gradient(135deg, ${primaryColor}, ${primaryDarkColor})`,
+                            }}
+                        >
+                            Done
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
-                {activeTab === "layout" && (
-                    <LayoutSelector
-                        customization={customization}
-                        updateCustomization={updateCustomization}
-                    />
-                )}
-                {activeTab === "style" && (
-                    <StyleSelector
-                        customization={customization}
-                        updateCustomization={updateCustomization}
-                    />
-                )}
-                {activeTab === "typography" && (
-                    <TypographySelector
-                        customization={customization}
-                        updateCustomization={updateCustomization}
-                    />
-                )}
-                {activeTab === "animation" && (
-                    <AnimationSelector
-                        customization={customization}
-                        updateCustomization={updateCustomization}
-                    />
-                )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 border-t border-zinc-700 bg-zinc-800 flex gap-3">
-                <button
-                    onClick={onReset}
-                    className="px-4 py-2 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
-                >
-                    Reset
-                </button>
-                <button
-                    onClick={onSave}
-                    className="flex-1 px-4 py-2 rounded-lg text-xs font-bold text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
-                    style={{
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                    }}
-                >
-                    Save Changes
-                </button>
-            </div>
-        </div>
+            {/* Overlay for floating window */}
+            <div
+                className="fixed inset-0 bg-black/20 z-40"
+                onClick={onClose}
+            />
+        </>
     );
 };

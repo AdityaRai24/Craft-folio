@@ -519,5 +519,14 @@ export function convertToPortfolioFormat(
     });
   }
 
+  // Contact Section
+  sections.push({
+    type: "contact",
+    data: {
+      title: "Get in Touch",
+      description: "Let's connect and discuss your next project"
+    }
+  });
+
   return { sections };
 }

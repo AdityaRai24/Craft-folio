@@ -9,8 +9,7 @@ import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
 import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
-import EditButton from "@/components/Shared/EditButton";
-import { Settings } from "lucide-react";
+import SectionHeader from "./SectionHeader";
 
 interface Technology {
   name: string;
@@ -45,10 +44,19 @@ const defaultTechnologiesStyles: TechnologiesCustomizationState = {
   pauseOnHover: true,
 };
 
-const Technologies = ({ portfolioId }: { portfolioId: string }) => {
+const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, currentPortTheme: string }) => {
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [visualEditorOpen, setVisualEditorOpen] = useState(false);
+
+  // Get theme color
+  const inTheme = portfolioData?.find((item: any) => item.type === "themes");
+  const theme = inTheme?.data?.[currentPortTheme];
+  const titleColor = theme?.colors?.primary || ColorTheme.primary;
+
+  const techSection = portfolioData?.find((item: any) => item.type === "technologies");
+  const sectionTitle = techSection?.sectionTitle || "Technologies";
+  const sectionDescription = techSection?.sectionDescription || "Tools and technologies I use to bring ideas to life.";
 
   // Main customization state (from DB or default)
   const [customization, setCustomization] = useState<TechnologiesCustomizationState>(defaultTechnologiesStyles);
@@ -201,26 +209,13 @@ const Technologies = ({ portfolioId }: { portfolioId: string }) => {
       <div className="absolute inset-0 bg-zinc-950" />
 
       <div className={`container mx-auto px-4 relative z-10 max-w-${effectiveCustomization.containerWidth}`}>
-        <div className="flex items-center justify-between mb-16">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Technologies
-            </h2>
-            <p className="text-zinc-400 max-w-2xl">
-              Tools and technologies I use to bring ideas to life.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <EditButton sectionName="technologies" />
-            <button
-              onClick={openVisualEditor}
-              className="p-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors border border-zinc-700"
-              title="Visual Editor"
-            >
-              <Settings size={18} />
-            </button>
-          </div>
-        </div>
+        <SectionHeader
+          sectionName="technologies"
+          sectionTitle={sectionTitle}
+          sectionDescription={sectionDescription}
+          titleColor={titleColor}
+          onVisualEditorOpen={openVisualEditor}
+        />
 
         {effectiveCustomization.layout === "marquee" ? (
           <div className="relative">

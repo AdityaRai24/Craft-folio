@@ -17,6 +17,7 @@ import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import ImagePositionSelector from "./ImagePositionSelector";
+import CardStyleSelector from "./CardStyleSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -107,7 +108,7 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
         </div>
 
         {/* Tab Content */}
-        <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
+        <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6 custom-scrollbar">
           {activeTab === "layout" && (
             <>
               <LayoutSelector
@@ -199,6 +200,11 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
 
           {activeTab === "styling" && (
             <>
+              <CardStyleSelector
+                value={draftCustomization?.cardStyle ?? customization.cardStyle}
+                onChange={value => onUpdateDraft("cardStyle", value)}
+              />
+
               <SliderControl
                 label="Card Border Radius"
                 value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
