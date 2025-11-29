@@ -11,12 +11,11 @@ import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology }
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import SectionHeader from "./SectionHeader";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
-
+import { useCustomization } from "@/hooks/useCustomization";
 
 const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, currentPortTheme: string }) => {
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
 
   // Get theme color
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
@@ -27,14 +26,6 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
   const sectionTitle = techSection?.sectionTitle || "Technologies";
   const sectionDescription = techSection?.sectionDescription || "Tools and technologies I use to bring ideas to life.";
 
-  // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<TechnologiesCustomizationState>(defaultTechnologiesStyles);
-  // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<TechnologiesCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
   useEffect(() => {
     if (portfolioData) {
       const techSection = portfolioData.find((item: any) => item.type === "technologies");
@@ -44,70 +35,18 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
     }
   }, [portfolioData]);
 
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        if (componentCustomizations && componentCustomizations["technologies"]) {
-          setCustomization(componentCustomizations["technologies"] as unknown as TechnologiesCustomizationState);
-        } else {
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "technologies",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as unknown as TechnologiesCustomizationState);
-          } else {
-            setCustomization(defaultTechnologiesStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultTechnologiesStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations]);
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
 
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  const updateDraftCustomization = (key: keyof TechnologiesCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "technologies",
-        settings: draftCustomization,
-      });
-      if (!result.success) toast.error("Failed to save customization");
-      else toast.success("Customization saved successfully");
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "technologies",
-      });
-      setCustomization(defaultTechnologiesStyles);
-      setDraftCustomization(defaultTechnologiesStyles);
-      setVisualEditorOpen(false);
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
 
   const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
     effectiveCustomization,

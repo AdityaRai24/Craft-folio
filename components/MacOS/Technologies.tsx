@@ -1,23 +1,21 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
+import { defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
 import { useMacOSTheme } from "./ThemeContext";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { useUser } from "@clerk/nextjs";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
+import { useCustomization } from "@/hooks/useCustomization";
 
 
-const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
+const Technologies = ({ portfolioId }: { portfolioId: string }) => {
     const dispatch = useDispatch();
     const { portfolioData, componentCustomizations, portfolioUserId } = useSelector((state: RootState) => state.data);
     const { currentTheme, theme } = useMacOSTheme();
@@ -26,15 +24,18 @@ const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
     const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
     const [technologies, setTechnologies] = useState<Technology[]>([]);
-    const [visualEditorOpen, setVisualEditorOpen] = useState(false);
 
-    // Main customization state (from DB or default)
-    const [customization, setCustomization] = useState<TechnologiesCustomizationState>(defaultTechnologiesStyles);
-    // Local draft state for visual editor
-    const [draftCustomization, setDraftCustomization] = useState<TechnologiesCustomizationState | null>(null);
-
-    // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-    const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+    const {
+        customization,
+        effectiveCustomization,
+        visualEditorOpen,
+        setVisualEditorOpen,
+        openVisualEditor,
+        updateDraftCustomization,
+        saveDraftCustomization,
+        resetCustomization,
+        draftCustomization
+    } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
 
     useEffect(() => {
         if (portfolioData) {
@@ -52,87 +53,7 @@ const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
         }
     }, [portfolioData]);
 
-    useEffect(() => {
-        const loadCustomizations = async () => {
-            if (!portfolioId) return;
-            try {
-                if (componentCustomizations && componentCustomizations["technologies"]) {
-                    setCustomization(componentCustomizations["technologies"] as unknown as TechnologiesCustomizationState);
-                } else {
-                    const result = await getComponentCustomization({
-                        portfolioId,
-                        componentType: "technologies",
-                    });
-                    if (result.success && result.data) {
-                        setCustomization(result.data as unknown as TechnologiesCustomizationState);
-                        dispatch(setComponentCustomizations({
-                            ...componentCustomizations,
-                            technologies: result.data
-                        }));
-                    } else {
-                        setCustomization(defaultTechnologiesStyles);
-                    }
-                }
-            } catch (error) {
-                setCustomization(defaultTechnologiesStyles);
-            }
-        };
-        if (portfolioId) loadCustomizations();
-    }, [portfolioId, componentCustomizations, dispatch]);
 
-    const openVisualEditor = () => {
-        setDraftCustomization({ ...customization });
-        setVisualEditorOpen(true);
-    };
-
-    const updateDraftCustomization = (key: keyof TechnologiesCustomizationState, value: any) => {
-        if (!draftCustomization) return;
-        setDraftCustomization({ ...draftCustomization, [key]: value });
-    };
-
-    const saveDraftCustomization = async () => {
-        if (!draftCustomization) return;
-        if (!portfolioId) return;
-        setCustomization(draftCustomization);
-        setVisualEditorOpen(false);
-        try {
-            const result = await saveComponentCustomization({
-                portfolioId,
-                componentType: "technologies",
-                settings: draftCustomization,
-            });
-            if (result.success) {
-                dispatch(setComponentCustomizations({
-                    ...componentCustomizations,
-                    technologies: draftCustomization
-                }));
-                toast.success("Customization saved successfully");
-            } else {
-                toast.error("Failed to save customization");
-            }
-        } catch (error) {
-            toast.error("Failed to save customization");
-        }
-    };
-
-    const resetCustomization = async () => {
-        if (!portfolioId) return;
-        try {
-            await deleteComponentCustomization({
-                portfolioId,
-                componentType: "technologies",
-            });
-            setCustomization(defaultTechnologiesStyles);
-            setDraftCustomization(defaultTechnologiesStyles);
-            setVisualEditorOpen(false);
-            const updatedCustomizations = { ...componentCustomizations };
-            delete updatedCustomizations["technologies"];
-            dispatch(setComponentCustomizations(updatedCustomizations));
-            toast.success("Customization reset successfully");
-        } catch (error) {
-            toast.error("Failed to reset customization");
-        }
-    };
 
     const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
         effectiveCustomization,
@@ -140,7 +61,6 @@ const Technologies = ({ portfolioId }: { portfolioId?: string }) => {
         theme
     );
 
-    const animationVariants = getAnimationVariants();
 
     const TechnologyCard = ({ tech }: { tech: Technology }) => (
         <motion.div

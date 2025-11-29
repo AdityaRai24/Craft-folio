@@ -22,8 +22,7 @@ import { getComponentCustomization, saveComponentCustomization, deleteComponentC
 import toast from "react-hot-toast";
 import { ContactCustomizationState, defaultContactStyles } from "@/types/contact/portfolio";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
-
-
+import { useCustomization } from "@/hooks/useCustomization";
 
 
 const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
@@ -44,7 +43,6 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [contactData, setContactData] = useState<any>(null);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "layout" | "styling"
   >("layout");
@@ -53,108 +51,17 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
 
 
-  // Default styles for Contact
-
-
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<ContactCustomizationState>(defaultContactStyles);
-  const [draftCustomization, setDraftCustomization] = useState<ContactCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["contact"]) {
-          setCustomization(componentCustomizations["contact"] as ContactCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "contact",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              contact: result.data
-            }));
-          } else {
-            setCustomization(defaultContactStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultContactStyles);
-      }
-    };
-
-    if (portfolioId) {
-      loadCustomizations();
-    }
-  }, [portfolioId, componentCustomizations, dispatch]);
-
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof ContactCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "contact",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          contact: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "contact",
-      });
-      setCustomization(defaultContactStyles);
-      setDraftCustomization(defaultContactStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["contact"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
-
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("contact", defaultContactStyles, portfolioId);
 
 
   // Copy to clipboard functionality

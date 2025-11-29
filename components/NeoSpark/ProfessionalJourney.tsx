@@ -1,13 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setCurrentEdit } from "@/slices/editModeSlice";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
+import { updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import {
@@ -17,9 +15,11 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { Experience, Technology } from "@/types/experience/shared";
-import { ExperienceCustomizationState, defaultExperienceStyles } from "@/types/experience/portfolio";
+import { Experience } from "@/types/experience/shared";
+import { defaultExperienceStyles } from "@/types/experience/portfolio";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
+import { useCustomization } from "@/hooks/useCustomization";
+import { useMagicWrite } from "@/hooks/useMagicWrite";
 
 const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
@@ -38,168 +38,32 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     experienceSection?.sectionDescription ||
     "Building real-world experience through innovative projects";
 
-  // Magic Write functionality
-  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
-    try {
-      const response = await fetch('/api/magicwrite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: `Enhance this experience description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
-          context: context || "",
-          section: "experience-description"
-        }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to enhance description');
-      }
-
-      const data = await response.json();
-      const enhancedDescription = data.response || data.content || data.result;
-
-      return enhancedDescription;
-    } catch (error) {
-      console.error('Magic Write API error:', error);
-      throw error;
-    }
-  };
-
-  const handleDescriptionUpdate = async (experienceIndex: number, newDescription: string) => {
-    try {
-      const updatedExperience = [...experienceData];
-      updatedExperience[experienceIndex] = {
-        ...updatedExperience[experienceIndex],
-        description: newDescription
-      };
-      setExperienceData(updatedExperience);
-
-      // Save to database
-      const result = await updateSection({
-        sectionName: "experience",
-        portfolioId,
-        sectionContent: updatedExperience,
-        sectionTitle: "Experience",
-        sectionDescription: "Experience section"
-      });
-
-      if (result.success) {
-        toast.success("Experience description enhanced and saved successfully!");
-      } else {
-        toast.error("Failed to save changes to database");
-      }
-    } catch (error) {
-      console.error("Error saving experience description:", error);
-      toast.error("Failed to save changes to database");
-    }
-  };
+  const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
+    portfolioId,
+    sectionName: "experience",
+    sectionTitle: "Experience",
+    sectionDescription: "Experience section"
+  });
 
   const [experienceData, setExperienceData] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "layout" | "typography" | "styling" | "timing"
   >("layout");
 
-  const dispatch = useDispatch();
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<ExperienceCustomizationState>(defaultExperienceStyles);
-  const [draftCustomization, setDraftCustomization] = useState<ExperienceCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["professional-journey"]) {
-          setCustomization(componentCustomizations["professional-journey"] as ExperienceCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "professional-journey",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              "professional-journey": result.data
-            }));
-          } else {
-            setCustomization(defaultExperienceStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultExperienceStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations, dispatch]);
-
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof ExperienceCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "professional-journey",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          "professional-journey": draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "professional-journey",
-      });
-      setCustomization(defaultExperienceStyles);
-      setDraftCustomization(defaultExperienceStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["professional-journey"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("experience", defaultExperienceStyles, portfolioId);
 
   const {
     getContainerClasses,
@@ -398,10 +262,13 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                     {/* Magic Write Button */}
                     <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                       <MagicWrite
-                        onMagicWrite={async (prompt: string, context?: string) => {
-                          const enhancedDescription = await handleMagicWrite(prompt, experience?.description);
-                          handleDescriptionUpdate(index, enhancedDescription);
-                          return enhancedDescription;
+                        onMagicWrite={async (prompt: string) => {
+                          const enhanced = await handleMagicWrite(prompt, experience.description, "experience");
+                          const updated = [...experienceData];
+                          updated[index] = { ...updated[index], description: enhanced };
+                          setExperienceData(updated);
+                          await saveEnhancedContent(updated);
+                          return enhanced;
                         }}
                         placeholder="Enhance this experience description..."
                         buttonText=""

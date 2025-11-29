@@ -12,6 +12,7 @@ import { ColorTheme } from "@/lib/colorThemes";
 import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
+import { useCustomization } from "@/hooks/useCustomization";
 
 
 const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
@@ -29,85 +30,18 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
 
   const [isLoading, setIsLoading] = useState(true);
   const [technologiesData, setTechnologiesData] = useState<Technology[]>([]);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
 
-  // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<TechnologiesCustomizationState>(defaultTechnologiesStyles);
-  // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<TechnologiesCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
-  // Load customizations from database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        if (componentCustomizations && componentCustomizations["skills"]) {
-          setCustomization(componentCustomizations["skills"] as unknown as TechnologiesCustomizationState);
-        } else {
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "skills",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as unknown as TechnologiesCustomizationState);
-          } else {
-            setCustomization(defaultTechnologiesStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultTechnologiesStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations]);
-
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof TechnologiesCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "skills",
-        settings: draftCustomization,
-      });
-      if (!result.success) toast.error("Failed to save customization");
-      else toast.success("Customization saved successfully");
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "skills",
-      });
-      setCustomization(defaultTechnologiesStyles);
-      setDraftCustomization(defaultTechnologiesStyles);
-      setVisualEditorOpen(false);
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
 
   // Helper functions for styling based on customization
   const {

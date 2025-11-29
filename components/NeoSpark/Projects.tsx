@@ -10,18 +10,15 @@ import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVis
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
-import toast from "react-hot-toast";
-import { ProjectsCustomizationState, defaultProjectsStyles, Project, Technology } from "@/types/projects/portfolio";
-import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
+import { defaultProjectsStyles, Project, Technology } from "@/types/projects/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
-
+import { useCustomization } from "@/hooks/useCustomization";
 
 const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [isInView, setIsInView] = useState<boolean>(false);
@@ -30,17 +27,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
 
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "layout" | "typography" | "styling" | "timing"
   >("layout");
-
-  // Use defaultProjectsStyles for initial state
-  const [customization, setCustomization] = useState<ProjectsCustomizationState>(defaultProjectsStyles);
-  const [draftCustomization, setDraftCustomization] = useState<ProjectsCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
@@ -55,95 +44,18 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
     projectsSection?.sectionDescription ||
     "A showcase of my full-stack projects, built using modern web technologies and frameworks.";
 
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["project"]) {
-          setCustomization(componentCustomizations["project"] as ProjectsCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "project",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              project: result.data
-            }));
-          } else {
-            setCustomization(defaultProjectsStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultProjectsStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations, dispatch]);
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("project", defaultProjectsStyles, portfolioId);
 
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof ProjectsCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "project",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          project: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "project",
-      });
-      setCustomization(defaultProjectsStyles);
-      setDraftCustomization(defaultProjectsStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["project"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
-
-  // Helper functions for styling - update all to use effectiveCustomization
   const {
     getLayoutClasses,
     getLayoutStyle,

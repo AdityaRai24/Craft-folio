@@ -38,6 +38,7 @@ import { defaultProjectsStyles } from "@/types/projects/portfolio";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
+import { useCustomization } from "@/hooks/useCustomization";
 
 
 
@@ -52,17 +53,21 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "layout" | "typography" | "styling" | "timing"
   >("layout");
-  // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<ProjectsCustomizationState>(defaultProjectsStyles);
-  // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<ProjectsCustomizationState | null>(null);
 
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("projects", defaultProjectsStyles, portfolioId);
 
   // Load projects data from portfolio
   useEffect(() => {
@@ -77,70 +82,6 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     }
   }, [portfolioData]);
 
-  // Load customizations from database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        const result = await getComponentCustomization({
-          portfolioId,
-          componentType: "projects",
-        });
-        if (result.success && result.data) {
-          setCustomization(result.data as unknown as ProjectsCustomizationState);
-        } else {
-          setCustomization(defaultProjectsStyles);
-        }
-      } catch (error) {
-        setCustomization(defaultProjectsStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId]);
-
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof ProjectsCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "projects",
-        settings: draftCustomization,
-      });
-      if (!result.success) toast.error("Failed to save customization");
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "projects",
-      });
-      setCustomization(defaultProjectsStyles);
-      setDraftCustomization(defaultProjectsStyles);
-      setVisualEditorOpen(false);
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
 
   // Magic Write functionality
   const { handleMagicWrite, handleDescriptionUpdate: handleProjectDescriptionUpdate } = useProjectActions({

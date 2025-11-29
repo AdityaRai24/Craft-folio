@@ -1,26 +1,24 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Settings } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useAnimate } from "framer-motion";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
-import { HeroCustomizationState, defaultHeroStyles } from "@/types/hero/portfolio";
+import { defaultHeroStyles } from "@/types/hero/portfolio";
 import HeroVisualEditor from "@/components/VisualEditor/Hero/HeroVisualEditor";
 import { useUser } from '@clerk/nextjs';
 import { useNeoHeroStyles } from "@/hooks/useNeoHeroStyles";
+import { useCustomization } from "@/hooks/useCustomization";
+import { useMagicWrite } from "@/hooks/useMagicWrite";
 
 const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
-  const dispatch = useDispatch();
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
 
@@ -29,65 +27,12 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const { user, isLoaded } = useUser();
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
-  ;
-
-  // Magic Write functionality
-  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
-    try {
-      const response = await fetch('/api/magicwrite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: `Enhance this hero description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
-          context: context || "",
-          section: "hero-description"
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to enhance description');
-      }
-
-      const data = await response.json();
-      const enhancedDescription = data.response || data.content || data.result;
-
-      return enhancedDescription;
-    } catch (error) {
-      console.error('Magic Write API error:', error);
-      throw error;
-    }
-  };
-
-  const handleDescriptionUpdate = async (newDescription: string) => {
-    try {
-      // Update the hero data with the new description
-      const updatedHeroData = {
-        ...heroData,
-        summary: newDescription
-      };
-      setHeroData(updatedHeroData);
-
-      // Save to database
-      const result = await updateSection({
-        sectionName: "hero",
-        portfolioId,
-        sectionContent: updatedHeroData,
-        sectionTitle: "Hero",
-        sectionDescription: "Hero section"
-      });
-
-      if (result.success) {
-        toast.success("Hero description enhanced and saved successfully!");
-      } else {
-        toast.error("Failed to save changes to database");
-      }
-    } catch (error) {
-      console.error("Error saving hero description:", error);
-      toast.error("Failed to save changes to database");
-    }
-  };
+  const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
+    portfolioId,
+    sectionName: "hero",
+    sectionTitle: "Hero",
+    sectionDescription: "Hero section"
+  });
 
   const [badgeScope, animateBadge] = useAnimate();
   const [titleScope, animateTitle] = useAnimate();
@@ -96,7 +41,6 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [titleIndex, setTitleIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "layout" | "typography" | "buttons" | "effects"
   >("layout");
@@ -106,13 +50,18 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
 
-  // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<HeroCustomizationState>(defaultHeroStyles);
-  // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<HeroCustomizationState | null>(null);
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("hero", defaultHeroStyles, portfolioId);
 
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
   const { getContainerClasses,
     getTitleClasses,
     getDescriptionClasses,
@@ -123,96 +72,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     getBackgroundStyle,
   } = useNeoHeroStyles(effectiveCustomization, theme)
 
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["hero"]) {
-          setCustomization(componentCustomizations["hero"] as HeroCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "hero",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              hero: result.data
-            }));
-          } else {
-            setCustomization(defaultHeroStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultHeroStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations, dispatch]);
 
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof HeroCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "hero",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          hero: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "hero",
-      });
-      setCustomization(defaultHeroStyles);
-      setDraftCustomization(defaultHeroStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["hero"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
 
   const getThemeButtonStyle = (isActive: boolean) => {
     if (isActive) {
@@ -453,10 +313,12 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           {/* Magic Write Button */}
           <div className="absolute hidden md:block -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
             <MagicWrite
-              onMagicWrite={async (prompt: string, context?: string) => {
-                const enhancedDescription = await handleMagicWrite(prompt, heroData.summary);
-                handleDescriptionUpdate(enhancedDescription);
-                return enhancedDescription;
+              onMagicWrite={async (prompt: string) => {
+                const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
+                const updated = { ...heroData, summary: enhanced };
+                setHeroData(updated);
+                await saveEnhancedContent(updated);
+                return enhanced;
               }}
               placeholder="Enhance this hero description..."
               buttonText=""

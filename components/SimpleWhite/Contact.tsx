@@ -3,14 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import { setComponentCustomizations } from '@/slices/dataSlice';
 import { supabase } from '@/lib/supabase-client';
 import { ColorTheme } from '@/lib/colorThemes';
-import { ContactCustomizationState, defaultContactStyles } from '@/types/contact/portfolio';
+import { defaultContactStyles } from '@/types/contact/portfolio';
 import { ContactVisualEditor } from '@/components/VisualEditor/Contact/ContactVisualEditor';
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from '@/app/actions/portfolio';
-import toast from 'react-hot-toast';
 import SectionHeader from './SectionHeader';
+import { useCustomization } from '@/hooks/useCustomization';
 
 const Contact = ({ currentPortTheme, portfolioId }: any) => {
     const dispatch = useDispatch();
@@ -23,13 +21,19 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
     const [userInfo, setUserInfo] = useState<any>(null);
 
     // Visual editor state
-    const [visualEditorOpen, setVisualEditorOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"layout" | "styling">("layout");
 
-
-
-    const [customization, setCustomization] = useState<ContactCustomizationState>(defaultContactStyles);
-    const [draftCustomization, setDraftCustomization] = useState<ContactCustomizationState | null>(null);
+    const {
+        customization,
+        effectiveCustomization,
+        visualEditorOpen,
+        setVisualEditorOpen,
+        openVisualEditor,
+        updateDraftCustomization,
+        saveDraftCustomization,
+        resetCustomization,
+        draftCustomization
+    } = useCustomization("contact", defaultContactStyles, portfolioId);
 
     useEffect(() => {
         if (portfolioData) {
@@ -54,31 +58,6 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
         }
     }, [portfolioData]);
 
-    // Load customizations
-    useEffect(() => {
-        const loadCustomizations = async () => {
-            try {
-                if (componentCustomizations && componentCustomizations["contact"]) {
-                    setCustomization(componentCustomizations["contact"] as unknown as ContactCustomizationState);
-                } else {
-                    const result = await getComponentCustomization({
-                        portfolioId,
-                        componentType: "contact",
-                    });
-                    if (result.success && result.data) {
-                        setCustomization(result.data as unknown as ContactCustomizationState);
-                        dispatch(setComponentCustomizations({ contact: result.data }));
-                    }
-                }
-            } catch (error) {
-                console.error("Error loading customizations:", error);
-            }
-        };
-
-        if (portfolioId) {
-            loadCustomizations();
-        }
-    }, [portfolioId, componentCustomizations, dispatch]);
 
     useEffect(() => {
         if (!portfolioId || isLoading) return;
@@ -103,54 +82,6 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
         };
     }, [portfolioId, isLoading]);
 
-    const updateDraftCustomization = (key: keyof ContactCustomizationState, value: any) => {
-        if (!draftCustomization) return;
-        setDraftCustomization({ ...draftCustomization, [key]: value });
-    };
-
-    const saveDraftCustomization = async () => {
-        if (!draftCustomization || !portfolioId) return;
-
-        try {
-            const result = await saveComponentCustomization({
-                portfolioId,
-                componentType: "contact",
-                settings: draftCustomization,
-            });
-
-            if (result.success) {
-                setCustomization(draftCustomization);
-                dispatch(setComponentCustomizations({ contact: draftCustomization }));
-                setDraftCustomization(null);
-                setVisualEditorOpen(false);
-                toast.success("Contact settings saved!");
-            }
-        } catch (error) {
-            console.error("Error saving customization:", error);
-            toast.error("Failed to save settings");
-        }
-    };
-
-    const resetCustomization = async () => {
-        if (!portfolioId) return;
-
-        try {
-            const result = await deleteComponentCustomization({
-                portfolioId,
-                componentType: "contact",
-            });
-
-            if (result.success) {
-                setCustomization(defaultContactStyles);
-                setDraftCustomization(defaultContactStyles);
-                dispatch(setComponentCustomizations({ contact: null }));
-                toast.success("Reset to default settings!");
-            }
-        } catch (error) {
-            console.error("Error resetting customization:", error);
-            toast.error("Failed to reset settings");
-        }
-    };
 
     // Theme color variables
     const primaryColor = theme?.colors?.primary || ColorTheme.primary;
@@ -159,7 +90,6 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
     const textSecondaryColor = theme?.colors?.text?.secondary || "#6B7280";
     const backgroundPrimaryColor = theme?.colors?.background?.primary || "#FFFFFF";
 
-    const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
 
     return (
         <div className="relative">
@@ -175,10 +105,7 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
                 descriptionVisible={true}
                 title="Get in Touch"
                 description="Let's connect and discuss your next project"
-                onVisualEditorClick={() => {
-                    setDraftCustomization({ ...customization });
-                    setVisualEditorOpen(true);
-                }}
+                onVisualEditorClick={() => openVisualEditor()}
                 headerClasses={{ container: "mb-12 text-center relative", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
                 currentPortTheme={currentPortTheme}
             />

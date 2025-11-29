@@ -1,12 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 // import { usePortfolioConfig } from "../../hooks/usePortfolioConfig.tsx";
 import { FaArrowRight } from "react-icons/fa6";
 
 // @ts-ignore
-import { Link } from 'react-scroll';  // Importing Link component from react-scroll
+import { Link } from 'react-scroll'; // Importing Link component from react-scroll
 
 const menuItems = [
   { title: "About Me", href: "hero" },

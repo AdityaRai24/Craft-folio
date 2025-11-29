@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { Project, ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { defaultProjectsStyles, Project, ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { setComponentCustomizations } from "@/slices/dataSlice";
@@ -23,6 +23,8 @@ import { HeaderComponent } from "./Components";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
+import { useCustomization } from "@/hooks/useCustomization";
+import React from "react";
 
 
 const Projects = ({ currentTheme, portfolioId }: any) => {
@@ -33,7 +35,6 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
   const [expandedDescriptions, setExpandedDescriptions] = useState<{
     [key: number]: boolean;
   }>({});
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
 
   const dispatch = useDispatch();
@@ -58,72 +59,18 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
   // Get theme colors for LumenFlow
   const titleColor = theme === "light" ? "#f97316" : "#f97316"; // Orange color for LumenFlow
 
-  // Default styles for Projects (adapted to ProjectsCustomizationState)
-  const defaultProjectStyles: ProjectsCustomizationState = {
-    layout: "grid",
-    gridColumns: 2,
-    cardSpacing: 24,
-    cardBorderRadius: 16,
-    imageBorderRadius: 12,
-    cardBackground: "transparent",
-    cardBorder: "1px solid rgba(255, 255, 255, 0.1)",
-    imageAspectRatio: "wide",
-    imageHeight: 300,
-    githubButtonStyle: "default",
-    liveButtonStyle: "default",
-    buttonBorderRadius: 8,
-    techStackStyle: "pills",
-    animationSpeed: 500,
-    titleAlignment: "left",
-    cardPadding: 24,
-    imageOverlay: false,
-    imagePosition: "left",
-    titleSize: "lg",
-    titleWeight: "bold",
-    descriptionSize: "sm",
-    descriptionWeight: "normal",
-  };
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("projects", defaultProjectsStyles, portfolioId);
 
-  // Comprehensive customization state
-  const [customization, setCustomization] = useState<ProjectsCustomizationState>(defaultProjectStyles);
-  const [draftCustomization, setDraftCustomization] = useState<ProjectsCustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["projects"]) {
-          setCustomization(componentCustomizations["projects"] as ProjectsCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "projects",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              projects: result.data
-            }));
-          } else {
-            setCustomization(defaultProjectStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultProjectStyles);
-      }
-    };
-
-    if (portfolioId) {
-      loadCustomizations();
-    }
-  }, [portfolioId, componentCustomizations, dispatch]);
 
   useEffect(() => {
     if (portfolioData) {
@@ -159,62 +106,6 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
     };
   }, [portfolioId]);
 
-  // Visual Editor Functions
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  const updateDraftCustomization = (key: keyof ProjectsCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "projects",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          projects: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "projects",
-      });
-      setCustomization(defaultProjectStyles);
-      setDraftCustomization(defaultProjectStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["projects"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
-
-
 
   const toggleDescription = (index: number) => {
     setExpandedDescriptions((prev) => ({
@@ -222,11 +113,6 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
       [index]: !prev[index],
     }));
   };
-
-  // Visual Editor Components
-
-
-
 
 
   const displayedProjects = showAllProjects

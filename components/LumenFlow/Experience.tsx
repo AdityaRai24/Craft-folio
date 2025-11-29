@@ -1,9 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import {
   Briefcase,
@@ -14,14 +12,16 @@ import {
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
+import { updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
-import { ColorTheme } from "@/lib/colorThemes";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { defaultExperienceStyles } from "@/types/experience/portfolio";
 
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
+import { useCustomization } from "@/hooks/useCustomization";
+import { useMagicWrite } from "@/hooks/useMagicWrite";
+import React from "react";
 
 const Experience = ({ currentTheme, portfolioId }: any) => {
   const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
@@ -29,101 +29,26 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
   const [hoveredExperience, setHoveredExperience] = useState<number | null>(
     null
   );
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
 
-  // Default styles for Experience
-  const defaultExperienceStyles: ExperienceCustomizationState = {
-    // Layout & Structure
-    cardLayout: "default",
-    cardBorderRadius: 12,
-    cardPadding: 24,
-    cardSpacing: 32,
-    containerWidth: "wide",
-    maxWidth: "full",
-    containerPadding: 8,
-    backgroundColor: "transparent",
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("experience", defaultExperienceStyles, portfolioId);
 
-    // Typography
-    titleSize: "lg",
-    titleWeight: "bold",
-    descriptionSize: "md",
-    textAlignment: "left",
-    roleSize: "xl",
-    roleWeight: "bold",
-    roleColor: "primary",
-    companyNameSize: "lg",
-    companyNameWeight: "medium",
-    companyNameColor: "gray-700",
-    dateColor: "gray-500",
-    descriptionColor: "gray-600",
-
-    // Visual Effects
-    hoverEffects: true,
-    glowEffect: false,
-    borderGlow: false,
-    backgroundOpacity: 10,
-    borderWidth: 1,
-    cardBackground: "transparent",
-    cardBorderColor: "gray-200",
-    cardShadow: "none",
-
-    // Animations
-    animationStyle: "scale",
-    animationSpeed: 300,
-    staggerDelay: 100,
-
-    // Tech Stack Display
-    techStackVisible: true,
-    techStackStyle: "pills",
-    techStackSize: "sm",
-
-    // Timeline Elements
-    timelineStyle: "line",
-    timelinePosition: "left",
-    timelineWidth: 2,
-    timelineColor: "primary",
-    dotSize: "md",
-    dotStyle: "circle",
-
-    // Badges & Tags
-    locationBadge: true,
-    dateBadge: true,
-    badgeStyle: "default",
-
-    // Date Formatting
-    dateFormat: "full-date",
-
-    // Layout Options
-    alternatingLayout: false,
-
-    // Side Accent
-    sideAccent: false,
-    sideAccentColor: "primary",
-    sideAccentWidth: 4,
-
-    // Missing Properties
-    cardBorderStyle: "none",
-    titleColor: "gray-900",
-    titleAlignment: "left",
-    descriptionVisible: true,
-    headerVisible: true,
-    locationVisible: true,
-    locationColor: "gray-500",
-    descriptionTextSize: "md",
-    descriptionTextColor: "gray-600",
-    hoverScale: true,
-    hoverShadow: true,
-    cardHoverEffect: "lift",
-    staggerAnimation: true,
-    entranceAnimation: "fadeUp",
-    techStackLimit: 5,
-    techStackColor: "gray",
-    techStackShowIcons: true,
-  };
-
-  const [customization, setCustomization] = useState<ExperienceCustomizationState>(defaultExperienceStyles);
-  const [draftCustomization, setDraftCustomization] = useState<ExperienceCustomizationState | null>(null);
+  const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
+    portfolioId,
+    sectionName: "experience",
+    sectionTitle: "Experience",
+    sectionDescription: "Experience section"
+  });
 
   const dispatch = useDispatch();
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
@@ -135,100 +60,10 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     experienceSection?.sectionDescription ||
     "My professional journey through various roles and technologies, showcasing growth, expertise, and the impact I've made in different organizations and projects.";
 
-  // Magic Write functionality
-  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
-    try {
-      const response = await fetch('/api/magicwrite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: `Enhance this experience description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
-          context: context || "",
-          section: "experience-description"
-        }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to enhance description');
-      }
-
-      const data = await response.json();
-      const enhancedDescription = data.response || data.content || data.result;
-
-      return enhancedDescription;
-    } catch (error) {
-      console.error('Magic Write API error:', error);
-      throw error;
-    }
-  };
-
-  const handleDescriptionUpdate = async (experienceIndex: number, newDescription: string) => {
-    const updatedExperience = [...experienceData];
-    updatedExperience[experienceIndex] = {
-      ...updatedExperience[experienceIndex],
-      description: newDescription
-    };
-    setExperienceData(updatedExperience);
-    try {
-      const result = await updateSection({
-        sectionName: "experience",
-        portfolioId,
-        sectionContent: updatedExperience,
-        sectionTitle: "Experience",
-        sectionDescription: "Experience section"
-      });
-      if (result.success) {
-        toast.success("Experience description enhanced and saved successfully!");
-      } else {
-        toast.error("Failed to save changes to database");
-      }
-    } catch (error) {
-      console.error("Error saving experience description:", error);
-      toast.error("Failed to save changes to database");
-    }
-  };
 
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
-
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["experience"]) {
-          setCustomization(componentCustomizations["experience"] as ExperienceCustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "experience",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              experience: result.data
-            }));
-          } else {
-            setCustomization(defaultExperienceStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultExperienceStyles);
-      }
-    };
-
-    if (portfolioId) {
-      loadCustomizations();
-    }
-  }, [portfolioId, componentCustomizations, dispatch]);
 
   useEffect(() => {
     if (portfolioData) {
@@ -241,61 +76,6 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
       }
     }
   }, [portfolioData]);
-
-  // Visual Editor Functions
-  const openVisualEditor = () => {
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  const updateDraftCustomization = (key: keyof ExperienceCustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "experience",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          experience: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "experience",
-      });
-      setCustomization(defaultExperienceStyles);
-      setDraftCustomization(defaultExperienceStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["experience"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
 
   useEffect(() => {
     const subscription = supabase
@@ -428,10 +208,13 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                   {/* Magic Write Button */}
                   <div className="absolute -top-2 -right-2 z-10 hidden md:block">
                     <MagicWrite
-                      onMagicWrite={async (prompt: string, context?: string) => {
-                        const enhancedDescription = await handleMagicWrite(prompt, exp.description);
-                        handleDescriptionUpdate(index, enhancedDescription);
-                        return enhancedDescription;
+                      onMagicWrite={async (prompt: string) => {
+                        const enhanced = await handleMagicWrite(prompt, exp.description, "experience");
+                        const updated = [...experienceData];
+                        updated[index] = { ...updated[index], description: enhanced };
+                        setExperienceData(updated);
+                        await saveEnhancedContent(updated);
+                        return enhanced;
                       }}
                       placeholder="Enhance this experience description..."
                       buttonText=""
