@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase-client";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
 import MagicWrite from "@/components/Shared/MagicWrite";
-import { defaultHeroStyles } from "@/types/hero/portfolio";
+import { defaultNeoSparkHeroStyles } from "@/types/hero/neospark";
 import HeroVisualEditor from "@/components/VisualEditor/Hero/NeoSparkHeroVisualEditor";
 import { useUser } from '@clerk/nextjs';
 import { useNeoHeroStyles } from "@/hooks/useNeoHeroStyles";
@@ -57,7 +57,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("hero", defaultHeroStyles, portfolioId);
+  } = useCustomization("hero", defaultNeoSparkHeroStyles, portfolioId);
 
   const { getContainerClasses,
     getTitleClasses,

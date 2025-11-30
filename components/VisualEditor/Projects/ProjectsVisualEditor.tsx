@@ -17,7 +17,7 @@ import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import ImagePositionSelector from "./ImagePositionSelector";
-import CardStyleSelector from "./CardStyleSelector";
+import CardStyleSelector from "../Shared/CardStyleSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";

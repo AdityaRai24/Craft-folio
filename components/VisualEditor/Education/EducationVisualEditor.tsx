@@ -10,7 +10,6 @@ import {
     Clock,
     Eye,
 } from "lucide-react";
-import CardLayoutSelector from "../Experience/CardLayoutSelector";
 import SideAccentSelector from "../Experience/SideAccentSelector";
 import AlignmentSelector from "../Shared/AlignmentSelector";
 import SliderControl from "../Shared/SliderControl";
@@ -19,6 +18,7 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { EducationCustomizationState } from "@/types/education/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
 import { Switch } from "@/components/ui/switch";
+import CardLayoutSelector from "../Contact/CardLayoutSelector";
 
 interface EducationVisualEditorProps {
     isOpen: boolean;

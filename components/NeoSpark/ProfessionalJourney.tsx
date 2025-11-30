@@ -64,6 +64,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
   const {
     getContainerClasses,
+    getContainerStyle,
     getCardClasses,
     getCardStyle,
     getTitleClasses,
@@ -122,7 +123,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
   return (
     <section
       id="experience"
-      className="py-12 sm:py-16 md:py-24 w-full bg-black overflow-hidden min-h-screen text-white relative"
+      className="py-12 md:py-16 w-full bg-black overflow-hidden text-white relative"
     >
       <style>{customCSS}</style>
       <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
@@ -134,7 +135,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
           onVisualEditorOpen={openVisualEditor}
         />
 
-        <div className={getContainerClasses()}>
+        <div className={getContainerClasses()} style={getContainerStyle()}>
           {experienceData.length === 0 ? (
             <div className="text-center py-8 sm:py-12 text-gray-400">
               No professional experience added yet.
@@ -143,7 +144,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
             experienceData.map((experience, index) => (
               <motion.div
                 key={index}
-                className={`relative mb-8 last:mb-0 ${isAlternating ? "w-full" : ""}`}
+                className={`relative ${isAlternating ? "w-full" : ""}`}
                 variants={animationVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -167,7 +168,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                     style={{
                       ...timelineStyles.lineStyle,
                       top: "3rem",
-                      height: "calc(100% + 2rem)",
+                      height: `calc(100% + ${effectiveCustomization.cardSpacing}px)`,
                     }}
                   ></div>
                 )}

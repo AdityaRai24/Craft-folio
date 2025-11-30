@@ -1,13 +1,16 @@
 import React from "react";
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 
 interface CardStyleSelectorProps {
-    value: ProjectsCustomizationState["cardStyle"];
-    onChange: (value: ProjectsCustomizationState["cardStyle"]) => void;
+    value: string;
+    onChange: (value: any) => void;
+    previewHeight?: string;
 }
 
-const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({ value, onChange }) => {
-
+const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({
+    value,
+    onChange,
+    previewHeight = "h-16"
+}) => {
     return (
         <div>
             <label className="block text-white text-left font-medium mb-3">Card Style</label>
@@ -21,14 +24,14 @@ const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({ value, onChange }
                 ].map((style) => (
                     <div
                         key={style.value}
-                        onClick={() => onChange(style.value as any)}
+                        onClick={() => onChange(style.value)}
                         className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
                             ? "border-white bg-zinc-700"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                     >
                         <div className="space-y-2">
-                            <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                            <div className={`${previewHeight} rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
                                 <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
                                 <div className="w-6 h-2 bg-zinc-500 rounded"></div>
                             </div>

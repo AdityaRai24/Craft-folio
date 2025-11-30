@@ -78,7 +78,7 @@ export const useContactStyles = (
                     " bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20";
                 break;
             case "neon":
-                classes += " bg-black/70 border-2 hover:shadow-lg";
+                classes += " bg-black/70 border shadow-lg hover:shadow-xl";
                 break;
             case "gradient":
                 classes += " bg-gradient-to-br from-zinc-800 to-zinc-900 border-gray-700";
@@ -126,7 +126,8 @@ export const useContactStyles = (
 
         // Border styling
         if (effectiveCustomization.cardStyle === "neon") {
-            style.borderColor = titleColor;
+            style.borderColor = `${titleColor}50`;
+            style.boxShadow = `0 0 20px ${titleColor}20`;
             style.borderWidth = `${effectiveCustomization.borderWidth}px`;
         } else {
             style.borderColor = `${titleColor}30`;

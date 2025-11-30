@@ -42,7 +42,7 @@ export const useTechnologiesStyles = (
                 outlined: "border border-zinc-700 bg-transparent",
                 filled: "bg-zinc-800",
                 glass: "bg-white/5 backdrop-blur-md border border-white/10",
-                neon: "bg-black border border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.3)]",
+                neon: "bg-black border shadow-lg",
                 gradient: "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700",
                 default: "bg-zinc-900 border border-zinc-800",
             }
@@ -92,6 +92,16 @@ export const useTechnologiesStyles = (
             } mt-3 text-center`;
     };
 
+    const getCardStyle = () => {
+        if (customization.cardStyle === "neon") {
+            return {
+                borderColor: `${primaryColor}50`,
+                boxShadow: `0 0 15px ${primaryColor}30`,
+            };
+        }
+        return {};
+    };
+
     const getAnimationVariants = () => {
         // Use shared animation variants from lib/animationVariants
         return getVariantByName(customization.animationStyle || "fade");
@@ -101,6 +111,7 @@ export const useTechnologiesStyles = (
         getSectionClasses,
         getGridClasses,
         getCardClasses,
+        getCardStyle,
         getIconClasses,
         getLabelClasses,
         getAnimationVariants,

@@ -2,8 +2,8 @@ import React from "react";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface CardLayoutSelectorProps {
-    value: "flex" | "stacked";
-    onChange: (value: "flex" | "stacked") => void;
+    value: any;
+    onChange: (value: any) => void;
 }
 
 const CardLayoutSelector: React.FC<CardLayoutSelectorProps> = ({ value, onChange }) => {
@@ -14,8 +14,8 @@ const CardLayoutSelector: React.FC<CardLayoutSelectorProps> = ({ value, onChange
                 <div
                     onClick={() => onChange("stacked")}
                     className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${value === "stacked"
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        ? "border-white bg-zinc-700"
+                        : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                 >
                     <div className="space-y-2">
@@ -31,8 +31,8 @@ const CardLayoutSelector: React.FC<CardLayoutSelectorProps> = ({ value, onChange
                 <div
                     onClick={() => onChange("flex")}
                     className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${value === "flex"
-                            ? "border-white bg-zinc-700"
-                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                        ? "border-white bg-zinc-700"
+                        : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                         }`}
                 >
                     <div className="space-y-2">

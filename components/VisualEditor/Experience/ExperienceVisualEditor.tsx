@@ -8,7 +8,7 @@ import {
     Type,
     Clock
 } from "lucide-react";
-import CardLayoutSelector from "./CardLayoutSelector";
+import CardStyleSelector from "../Shared/CardStyleSelector";
 import TimelineSelector from "./TimelineSelector";
 import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
@@ -16,6 +16,7 @@ import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ExperienceCustomizationState } from "@/types/experience/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
+
 interface ExperienceVisualEditorProps {
     isOpen: boolean;
     onClose: () => void;
@@ -105,9 +106,9 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                 <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
                     {activeTab === "layout" && (
                         <>
-                            <CardLayoutSelector
-                                value={(draftCustomization?.cardLayout ?? customization.cardLayout) as any}
-                                onChange={value => onUpdateDraft("cardLayout", value)}
+                            <CardStyleSelector
+                                value={draftCustomization?.cardLayout ?? customization.cardLayout}
+                                onChange={(value) => onUpdateDraft("cardLayout", value)}
                             />
 
                             <SliderControl
@@ -118,11 +119,6 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 max={64}
                                 step={4}
                             />
-
-                            {/* <AlignmentSelector
-                                value={draftCustomization?.textAlignment ?? customization.textAlignment}
-                                onChange={value => onUpdateDraft("textAlignment", value)}
-                            /> */}
 
                             <TimelineSelector
                                 styleValue={draftCustomization?.timelineStyle ?? customization.timelineStyle}

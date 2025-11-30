@@ -18,7 +18,7 @@ import CardLayoutSelector from "./CardLayoutSelector";
 import WidthSelector from "./WidthSelector";
 import SpacingSelector from "./SpacingSelector";
 import AlignmentSelector from "./AlignmentSelector";
-import ContactCardStyleSelector from "./ContactCardStyleSelector";
+import CardStyleSelector from "../Shared/CardStyleSelector";
 import IconStyleSelector from "./IconStyleSelector";
 import SliderControl from "./SliderControl";
 
@@ -151,9 +151,10 @@ export const ContactVisualEditor: React.FC<ContactVisualEditorProps> = ({
 
                     {activeTab === "styling" && (
                         <>
-                            <ContactCardStyleSelector
+                            <CardStyleSelector
                                 value={draftCustomization?.cardStyle ?? customization.cardStyle}
                                 onChange={(value) => onUpdateDraft("cardStyle", value)}
+                                previewHeight="h-12"
                             />
 
                             <SliderControl
@@ -214,6 +215,45 @@ export const ContactVisualEditor: React.FC<ContactVisualEditorProps> = ({
                                     checked={draftCustomization?.showDescriptions ?? customization.showDescriptions}
                                     onCheckedChange={(checked) => onUpdateDraft("showDescriptions", checked)}
                                 />
+                            </div>
+
+                            <div className="border-t border-zinc-700 pt-4 space-y-4">
+                                <h4 className="text-sm font-semibold text-gray-300">Platform Visibility</h4>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">Email</span>
+                                    <Switch
+                                        checked={draftCustomization?.showEmail ?? customization.showEmail}
+                                        onCheckedChange={(checked) => onUpdateDraft("showEmail", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">LinkedIn</span>
+                                    <Switch
+                                        checked={draftCustomization?.showLinkedin ?? customization.showLinkedin}
+                                        onCheckedChange={(checked) => onUpdateDraft("showLinkedin", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">GitHub</span>
+                                    <Switch
+                                        checked={draftCustomization?.showGithub ?? customization.showGithub}
+                                        onCheckedChange={(checked) => onUpdateDraft("showGithub", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">Phone</span>
+                                    <Switch
+                                        checked={draftCustomization?.showPhone ?? customization.showPhone}
+                                        onCheckedChange={(checked) => onUpdateDraft("showPhone", checked)}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white font-medium">Location</span>
+                                    <Switch
+                                        checked={draftCustomization?.showLocation ?? customization.showLocation}
+                                        onCheckedChange={(checked) => onUpdateDraft("showLocation", checked)}
+                                    />
+                                </div>
                             </div>
                         </>
                     )}

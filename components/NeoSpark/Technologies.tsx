@@ -47,7 +47,7 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
   } = useCustomization("technologies", defaultNeoSparkTechnologiesStyles, portfolioId);
 
 
-  const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
+  const { getCardClasses, getCardStyle, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(
     effectiveCustomization,
     titleColor,
     "dark"
@@ -65,6 +65,7 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
         width: effectiveCustomization.layout === "grid" ? "100%" : "160px",
         height: effectiveCustomization.layout === "grid" ? "auto" : "160px",
         margin: effectiveCustomization.layout === "marquee" ? `0 ${effectiveCustomization.gap / 2}px` : 0,
+        ...getCardStyle(),
       }}
       whileHover={effectiveCustomization.hoverEffects ? {
         y: effectiveCustomization.cardHoverEffect === "lift" ? -5 : 0,
@@ -89,10 +90,11 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
   );
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-zinc-950" />
+    <section
+      className="py-12  md:py-16 w-full bg-black overflow-hidden text-white relative"
+    >      <div className="absolute inset-0 bg-zinc-950" />
 
-      <div className={`container mx-auto px-4 relative z-10 max-w-${effectiveCustomization.containerWidth}`}>
+      <div className="container mx-auto px-4 relative z-10 max-w-6xl">
         <SectionHeader
           sectionName="technologies"
           sectionTitle={sectionTitle}
@@ -100,7 +102,9 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
           titleColor={titleColor}
           onVisualEditorOpen={openVisualEditor}
         />
+      </div>
 
+      <div className={`container mx-auto px-4 relative z-10 max-w-${effectiveCustomization.containerWidth}`}>
         {effectiveCustomization.layout === "marquee" ? (
           <div className="relative">
             <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-zinc-950 to-transparent z-10" />

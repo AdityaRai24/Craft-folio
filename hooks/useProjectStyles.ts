@@ -28,7 +28,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     } else if (customization.cardStyle === "glass") {
       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
     } else if (customization.cardStyle === "neon") {
-      classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
+      classes += isDark ? "bg-zinc-900 border shadow-lg" : "bg-white border shadow-lg";
     } else if (customization.cardStyle === "gradient") {
       classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
     }
@@ -42,6 +42,10 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     backdropFilter: isDark ? "blur(10px)" : "none",
     transform: customization.hoverEffects && isHovered ? "translateY(-4px)" : "none",
     filter: customization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
+    ...(customization.cardStyle === "neon" && {
+      borderColor: `${titleColor}50`,
+      boxShadow: `0 0 20px ${titleColor}20`,
+    }),
   });
 
   const getImageStyle = () => {

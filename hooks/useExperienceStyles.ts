@@ -15,7 +15,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     } else if (customization.cardLayout === "glass") {
       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
     } else if (customization.cardLayout === "neon") {
-      classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
+      classes += isDark ? "bg-zinc-900 border shadow-lg" : "bg-white border shadow-lg";
     } else if (customization.cardLayout === "gradient") {
       classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
     }
@@ -29,6 +29,10 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     borderWidth: customization.cardLayout === "minimal" ? 0 : `${customization.borderWidth}px`,
     transform: customization.hoverEffects && isHovered ? "translateY(-4px)" : "none",
     filter: customization.glowEffect ? `drop-shadow(0 0 20px ${primaryColor}30)` : "none",
+    ...(customization.cardLayout === "neon" && {
+      borderColor: `${primaryColor}50`,
+      boxShadow: `0 0 20px ${primaryColor}20`,
+    }),
   });
 
   const getTitleClasses = () => {
@@ -101,8 +105,12 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     };
     // Default to 'full' if undefined
     const width = customization.containerWidth || "full";
-    return `${widthMap[width as keyof typeof widthMap]} mx-auto space-y-10`;
+    return `${widthMap[width as keyof typeof widthMap]} mx-auto flex flex-col`;
   };
+
+  const getContainerStyle = () => ({
+    gap: `${customization.cardSpacing}px`
+  });
 
   const getTimelineStyles = () => {
     const dotSizeMap = {
@@ -187,6 +195,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     getTechStackClasses,
     getTechStackStyle,
     getContainerClasses,
+    getContainerStyle,
     getTimelineStyles,
     getAnimationVariants,
     getBadgeClasses,

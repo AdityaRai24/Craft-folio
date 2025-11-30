@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Copy,
   Check,
+  ArrowUpRight,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -86,66 +87,73 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const getContactPlatforms = () => {
     const platforms = [];
 
-    if (contactData.email) {
+    // Always add Email
+    if (effectiveCustomization.showEmail) {
       platforms.push({
         key: "email",
         icon: Mail,
         label: "Email",
-        value: contactData.email,
-        href: `mailto:${contactData.email}`,
-        description: contactData.email,
+        value: contactData.email || "hello@example.com",
+        href: `mailto:${contactData.email || "hello@example.com"}`,
+        description: contactData.email || "hello@example.com",
       });
     }
 
-    if (contactData.linkedin) {
+    // Always add LinkedIn
+    if (effectiveCustomization.showLinkedin) {
       platforms.push({
         key: "linkedin",
         icon: Linkedin,
         label: "LinkedIn",
-        value: contactData.linkedin,
-        href: contactData.linkedin,
-        description: contactData.linkedin.includes("/")
-          ? "@" + contactData.linkedin.split("/").filter(Boolean).pop()
-          : contactData.linkedin,
+        value: contactData.linkedin || "https://linkedin.com/in/username",
+        href: contactData.linkedin || "https://linkedin.com/in/username",
+        description: contactData.linkedin
+          ? (contactData.linkedin.includes("/")
+            ? "@" + contactData.linkedin.split("/").filter(Boolean).pop()
+            : "@" + contactData.linkedin)
+          : "@username",
       });
     }
 
-    if (contactData.github) {
+    // Always add GitHub
+    if (effectiveCustomization.showGithub) {
       platforms.push({
         key: "github",
         icon: Github,
         label: "GitHub",
-        value: contactData.github,
-        href: contactData.github,
-        description: contactData.github.includes("/")
-          ? "@" + contactData.github.split("/").filter(Boolean).pop()
-          : contactData.github,
+        value: contactData.github || "https://github.com/username",
+        href: contactData.github || "https://github.com/username",
+        description: contactData.github
+          ? (contactData.github.includes("/")
+            ? "@" + contactData.github.split("/").filter(Boolean).pop()
+            : "@" + contactData.github)
+          : "@username",
       });
     }
 
-    // Add phone if available
-    if (contactData.phone) {
+    // Always add Phone
+    if (effectiveCustomization.showPhone) {
       platforms.push({
         key: "phone",
         icon: Phone,
         label: "Phone",
-        value: contactData.phone,
-        href: `tel:${contactData.phone}`,
-        description: contactData.phone,
+        value: contactData.phone || "+1 (555) 123-4567",
+        href: `tel:${contactData.phone || "+15551234567"}`,
+        description: contactData.phone || "+1 (555) 123-4567",
       });
     }
 
-    // Add location if available
-    if (contactData.location) {
+    // Always add Location
+    if (effectiveCustomization.showLocation) {
       platforms.push({
         key: "location",
         icon: MapPin,
         label: "Location",
-        value: contactData.location,
+        value: contactData.location || "San Francisco, CA",
         href: `https://maps.google.com/?q=${encodeURIComponent(
-          contactData.location
+          contactData.location || "San Francisco, CA"
         )}`,
-        description: contactData.location,
+        description: contactData.location || "San Francisco, CA",
       });
     }
 
@@ -246,6 +254,8 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                 className={getCardClasses(platform.key)}
                 style={getCardStyle(platform.key)}
                 onClick={(e) => {
+                  if (platform.key === "location") return; // Disable click for location
+
                   if (
                     effectiveCustomization.copyToClipboard &&
                     platform.key === "email"
@@ -256,8 +266,9 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     !effectiveCustomization.openInNewTab &&
                     platform.href.startsWith("http")
                   ) {
-                    e.preventDefault();
-                    window.location.href = platform.href;
+                    // This logic seems to be for when openInNewTab is FALSE. 
+                    // But user wants to force open in new tab.
+                    // We will handle the link click in the anchor tag below.
                   }
                 }}
               >
@@ -289,27 +300,9 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     </div>
                     <Copy className="w-4 h-4 mt-2 opacity-50" />
                   </div>
-                ) : (
-                  <motion.a
-                    href={platform.href}
-                    target={
-                      effectiveCustomization.openInNewTab &&
-                        platform.href.startsWith("http")
-                        ? "_blank"
-                        : undefined
-                    }
-                    rel={
-                      effectiveCustomization.openInNewTab &&
-                        platform.href.startsWith("http")
-                        ? "noopener noreferrer"
-                        : undefined
-                    }
-                    className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
-                    whileHover={
-                      effectiveCustomization.hoverEffects ? { scale: 1.02 } : {}
-                    }
-                    whileTap={effectiveCustomization.hoverEffects ? { scale: 0.98 } : {}}
-                  >
+                ) : platform.key === "location" ? (
+                  // Non-clickable Location Card
+                  <div className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full cursor-default`}>
                     <div className={`flex items-center ${effectiveCustomization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"}`}>
                       <platform.icon
                         style={{ ...getIconSize(), color: titleColor }}
@@ -323,10 +316,44 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       {effectiveCustomization.showLabels && (
                         <div className="text-white text-base sm:text-xl font-bold mb-1 sm:mb-2">
                           {platform.label}
-                          {effectiveCustomization.openInNewTab &&
-                            platform.href.startsWith("http") && (
-                              <ExternalLink className="w-3 h-3 ml-1 inline opacity-50" />
-                            )}
+                        </div>
+                      )}
+                      {effectiveCustomization.showDescriptions && (
+                        <p className="text-gray-300 break-all text-xs sm:text-base">
+                          {platform.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  // Clickable Link Card (Email, LinkedIn, GitHub, Phone)
+                  <motion.a
+                    href={platform.href}
+                    target="_blank" // Force new tab as requested
+                    rel="noopener noreferrer"
+                    className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
+                    whileHover={
+                      effectiveCustomization.hoverEffects ? { scale: 1.02 } : {}
+                    }
+                    whileTap={effectiveCustomization.hoverEffects ? { scale: 0.98 } : {}}
+                  >
+                    <div className="absolute top-3 right-3 opacity-50 group-hover:opacity-100 transition-opacity">
+                      <ArrowUpRight className="w-4 h-4" />
+                    </div>
+
+                    <div className={`flex items-center ${effectiveCustomization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"}`}>
+                      <platform.icon
+                        style={{ ...getIconSize(), color: titleColor }}
+                        className={`${effectiveCustomization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${effectiveCustomization.iconStyle === "filled"
+                          ? "fill-current"
+                          : ""
+                          }`}
+                      />
+                    </div>
+                    <div className={`${effectiveCustomization.cardLayout === "flex" ? "flex-1" : ""}`}>
+                      {effectiveCustomization.showLabels && (
+                        <div className="text-white text-base sm:text-xl font-bold mb-1 sm:mb-2">
+                          {platform.label}
                         </div>
                       )}
                       {effectiveCustomization.showDescriptions && (
@@ -341,8 +368,6 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             </motion.div>
           ))}
         </motion.div>
-
-
       </div>
 
       {/* Contact Visual Editor */}
