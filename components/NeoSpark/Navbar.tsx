@@ -2,14 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { GithubIcon, LinkedinIcon, PaperclipIcon, Menu } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import EditButton from '@/components/Shared/EditButton';
+
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultNeoSparkNavbarStyles } from "@/types/navbar/neospark";
 
 const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle, portfolioId }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,6 +20,18 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
   const [heroData, setHeroData] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const { portfolioData } = useSelector((state: RootState) => state.data);
+
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("navbar", defaultNeoSparkNavbarStyles, portfolioId || "");
 
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];

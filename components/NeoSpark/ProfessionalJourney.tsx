@@ -5,8 +5,6 @@ import { RootState } from "@/store/store";
 import { supabase } from "@/lib/supabase-client";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
-import { updateSection } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import {
   MapPin,
@@ -16,15 +14,21 @@ import {
 import { motion } from "framer-motion";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
 import { Experience } from "@/types/experience/shared";
-import { defaultExperienceStyles } from "@/types/experience/portfolio";
+import { defaultNeoSparkExperienceStyles } from "@/types/experience/neospark";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
+import SectionLoading from "../Shared/SectionLoading";
+
+type Tab = "layout" | "typography" | "styling" | "timing";
 
 const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
+  const [experienceData, setExperienceData] = useState<Experience[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>("layout");
 
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -32,12 +36,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
   const experienceSection = portfolioData?.find(
     (item: any) => item.type === "experience"
   );
+
   const sectionTitle =
     experienceSection?.sectionTitle || "Professional Journey";
   const sectionDescription =
     experienceSection?.sectionDescription ||
     "Building real-world experience through innovative projects";
-
 
   const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
     portfolioId,
@@ -45,13 +49,6 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     sectionTitle: "Experience",
     sectionDescription: "Experience section"
   });
-
-  const [experienceData, setExperienceData] = useState<Experience[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "styling" | "timing"
-  >("layout");
-
 
   const {
     customization,
@@ -63,7 +60,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("experience", defaultExperienceStyles, portfolioId);
+  } = useCustomization("experience", defaultNeoSparkExperienceStyles, portfolioId);
 
   const {
     getContainerClasses,
@@ -79,18 +76,6 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
   } = useExperienceStyles(effectiveCustomization, "dark", titleColor);
 
 
-
-  const [isHeadingVisible, setIsHeadingVisible] = useState(false);
-  const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsHeadingVisible(true);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   useEffect(() => {
     if (portfolioData) {
       const experienceSectionData = portfolioData.find(
@@ -103,21 +88,6 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     }
   }, [portfolioData]);
 
-  useEffect(() => {
-    if (experienceData.length > 0) {
-      setVisibleItems(Array(experienceData.length).fill(false));
-
-      experienceData.forEach((_, index) => {
-        setTimeout(() => {
-          setVisibleItems((prev) => {
-            const newState = [...prev];
-            newState[index] = true;
-            return newState;
-          });
-        }, 500 + index * effectiveCustomization.staggerDelay);
-      });
-    }
-  }, [experienceData, effectiveCustomization.staggerDelay]);
 
   useEffect(() => {
     const subscription = supabase
@@ -142,21 +112,11 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
   }, [portfolioId]);
 
 
-  if (isLoading) {
-    return (
-      <section className="py-24 w-full overflow-hidden min-h-screen text-white">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="flex items-center justify-center h-64">
-            Loading...
-          </div>
-        </div>
-      </section>
-    );
-
-  }
-
   const animationVariants = getAnimationVariants();
   const timelineStyles = getTimelineStyles();
+
+  if (isLoading) return <SectionLoading />
+
 
   return (
     <section

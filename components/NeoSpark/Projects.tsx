@@ -8,32 +8,32 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultProjectsStyles, Project, Technology } from "@/types/projects/portfolio";
+import { defaultNeoSparkProjectsStyles } from "@/types/projects/neospark";
+import { Project, Technology } from "@/types/projects/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { useCustomization } from "@/hooks/useCustomization";
+import SectionLoading from "../Shared/SectionLoading";
+
+type Tab = "layout" | "typography" | "styling" | "timing";
 
 const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [isInView, setIsInView] = useState<boolean>(false);
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const dispatch = useDispatch();
-
   const [projectsData, setProjectsData] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "styling" | "timing"
-  >("layout");
+  const [activeTab, setActiveTab] = useState<Tab>("layout");
 
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
-  const theme = inTheme.data[currentPortTheme];
+  const theme = inTheme?.data[currentPortTheme];
   const titleColor = theme.colors.primary;
 
   const projectsSection = portfolioData?.find(
@@ -54,7 +54,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("project", defaultProjectsStyles, portfolioId);
+  } = useCustomization("project", defaultNeoSparkProjectsStyles, portfolioId);
 
   const {
     getLayoutClasses,
@@ -138,17 +138,9 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
   const animationVariants = getAnimationVariants();
   const projectVariants = animationVariants;
 
-  if (isLoading) {
-    return (
-      <section className="py-24 w-full overflow-hidden min-h-screen text-white">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="flex items-center justify-center h-64">
-            Loading...
-          </div>
-        </div>
-      </section>
-    );
-  }
+
+  if (isLoading) return <SectionLoading />
+
 
   return (
     <section

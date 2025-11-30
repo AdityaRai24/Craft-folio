@@ -12,16 +12,14 @@ import {
 } from "lucide-react";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
-import { updateSection } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultExperienceStyles } from "@/types/experience/portfolio";
+import { defaultLumenFlowExperienceStyles } from "@/types/experience/lumenflow";
 
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
-import React from "react";
+import SectionLoading from "../Shared/SectionLoading";
 
 const Experience = ({ currentTheme, portfolioId }: any) => {
   const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
@@ -41,7 +39,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("experience", defaultExperienceStyles, portfolioId);
+  } = useCustomization("experience", defaultLumenFlowExperienceStyles, portfolioId);
 
   const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
     portfolioId,
@@ -50,8 +48,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
     sectionDescription: "Experience section"
   });
 
-  const dispatch = useDispatch();
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const experienceSection = portfolioData?.find(
     (item: any) => item.type === "experience"
   );
@@ -59,8 +56,6 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
   const sectionDescription =
     experienceSection?.sectionDescription ||
     "My professional journey through various roles and technologies, showcasing growth, expertise, and the impact I've made in different organizations and projects.";
-
-
 
   const { theme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
@@ -101,18 +96,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
 
   const titleColor = theme === "light" ? "#f97316" : "#f97316";
 
-  if (isLoading) {
-    return (
-      <div className="space-y-8 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <div className="relative">
-            <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-orange-300 rounded-full animate-ping"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <SectionLoading />
 
   return (
     <div className="space-y-4 md:space-y-6 lg:space-y-12 max-h-screen overflow-y-auto scrollbar-none max-w-7xl mx-auto px-4 md:px-6 lg:px-8">

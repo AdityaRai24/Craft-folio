@@ -8,6 +8,8 @@ import { useUser } from "@clerk/nextjs";
 import { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { setCurrentEdit } from "@/slices/editModeSlice";
 import { useMacOSTheme } from "./ThemeContext";
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultMacOSTerminalStyles } from "@/types/terminal/macos";
 
 const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
   const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
@@ -29,9 +31,20 @@ const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light
   const isEditing = currentlyEditing === "terminal";
   const { currentTheme } = useMacOSTheme();
 
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("terminal", defaultMacOSTerminalStyles, portfolioId || "");
+
   const [commandHistory, setCommandHistory] = useState<string[]>([
-    "Welcome to Terminal",
-    "Type 'help' for available commands",
+    effectiveCustomization.startMessage,
     "",
   ]);
   const [currentCommand, setCurrentCommand] = useState("");
@@ -206,7 +219,7 @@ ${summary}`;
     }
 
     const newHistory = [...commandHistory];
-    newHistory.push(`$ ${cmd}`);
+    newHistory.push(`${effectiveCustomization.promptString} ${cmd}`);
 
     const output = executeCommand(cmd);
     if (output) {
@@ -230,7 +243,7 @@ ${summary}`;
 
   // Extract command keywords for highlighting
   const highlightCommand = (line: string) => {
-    if (!line.startsWith("$ ")) return line;
+    if (!line.startsWith(`${effectiveCustomization.promptString} `)) return line;
 
     const parts = line.split(" ");
     if (parts.length < 2) return line;
@@ -240,7 +253,7 @@ ${summary}`;
 
     return (
       <>
-        <span style={{ color: currentTheme.primary }}>$</span>{" "}
+        <span style={{ color: currentTheme.primary }}>{effectiveCustomization.promptString}</span>{" "}
         <span style={{ color: currentTheme.primaryHover }}>{command}</span>
         {rest && <span> {rest}</span>}
       </>
@@ -269,11 +282,14 @@ ${summary}`;
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: isDark ? "#4b5563 transparent" : "#d1d5db transparent",
-          fontFamily: "'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace"
+          fontFamily: effectiveCustomization.fontFamily,
+          fontSize: `${effectiveCustomization.fontSize}px`,
+          lineHeight: effectiveCustomization.lineHeight,
+          opacity: effectiveCustomization.opacity
         }}
       >
         {commandHistory.map((line, index) => {
-          const isCommand = line.startsWith("$ ");
+          const isCommand = line.startsWith(`${effectiveCustomization.promptString} `);
           const isError = line.includes("Command not found");
 
           return (
@@ -293,7 +309,7 @@ ${summary}`;
           );
         })}
         <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-1">
-          <span style={{ color: isDark ? "#4ade80" : "#16a34a" }} className="font-semibold">$</span>
+          <span style={{ color: isDark ? "#4ade80" : "#16a34a" }} className="font-semibold">{effectiveCustomization.promptString}</span>
           <input
             ref={inputRef}
             type="text"

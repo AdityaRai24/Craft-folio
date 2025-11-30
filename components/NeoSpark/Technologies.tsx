@@ -1,20 +1,19 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
+import { defaultNeoSparkTechnologiesStyles } from "@/types/technologies/neospark";
+import { Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import SectionHeader from "./SectionHeader";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 
 const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, currentPortTheme: string }) => {
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
 
   // Get theme color
@@ -45,7 +44,7 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
+  } = useCustomization("technologies", defaultNeoSparkTechnologiesStyles, portfolioId);
 
 
   const { getCardClasses, getLabelClasses, getAnimationVariants } = useTechnologiesStyles(

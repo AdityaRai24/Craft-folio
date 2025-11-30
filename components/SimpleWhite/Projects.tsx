@@ -34,11 +34,12 @@ import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
 import toast from "react-hot-toast";
-import { defaultProjectsStyles } from "@/types/projects/portfolio";
+import { defaultSimpleWhiteProjectsStyles } from "@/types/projects/simplewhite";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { useCustomization } from "@/hooks/useCustomization";
+import SectionLoading from "../Shared/SectionLoading";
 
 
 
@@ -67,7 +68,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("projects", defaultProjectsStyles, portfolioId);
+  } = useCustomization("projects", defaultSimpleWhiteProjectsStyles, portfolioId);
 
   // Load projects data from portfolio
   useEffect(() => {
@@ -186,15 +187,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     },
   };
 
-  if (isLoading) {
-    return (
-      <section className="py-24 w-full overflow-hidden min-h-screen text-gray-900">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="flex items-center justify-center h-64">Loading...</div>
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <SectionLoading />
+
 
   return (
     <section

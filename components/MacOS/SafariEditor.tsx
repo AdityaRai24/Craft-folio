@@ -6,6 +6,7 @@ import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { X, Save } from "lucide-react";
+import SectionLoading from "../Shared/SectionLoading";
 
 interface SafariEditorProps {
     initialContent: string;
@@ -45,9 +46,7 @@ const SafariEditor: React.FC<SafariEditorProps> = ({
         }
     };
 
-    if (isLoading) {
-        return <div className="p-4">Loading editor...</div>;
-    }
+    if (isLoading) return <SectionLoading />
 
     return (
         <div className={`flex flex-col h-full ${font || ""}`}>

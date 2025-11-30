@@ -9,7 +9,7 @@ import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButto
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { defaultContactStyles } from '@/types/contact/portfolio';
+import { defaultMacOSContactStyles } from '@/types/contact/macos';
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useMacOSTheme } from "./ThemeContext";
@@ -57,7 +57,7 @@ const Contact = ({
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("contact", defaultContactStyles, portfolioId);
+  } = useCustomization("contact", defaultMacOSContactStyles, portfolioId);
 
   const socialLinks = [
     {

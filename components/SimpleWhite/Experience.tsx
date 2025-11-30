@@ -1,43 +1,37 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { supabase } from '@/lib/supabase-client';
 import SectionHeader from './SectionHeader';
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
-import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
+import SimpleWhiteExperienceVisualEditor from "@/components/VisualEditor/Experience/SimpleWhiteExperienceVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultExperienceStyles } from "@/types/experience/portfolio";
+import { defaultSimpleWhiteExperienceStyles } from "@/types/experience/simplewhite";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
+import SectionLoading from "../Shared/SectionLoading";
+
+import { useSimpleWhiteExperienceStyles } from "@/hooks/useSimpleWhiteExperienceStyles";
 
 const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const dispatch = useDispatch();
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
 
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme?.data?.[currentPortTheme];
 
   const primaryColor = theme?.colors?.primary || "blue-600";
   const primaryDarkColor = theme?.colors?.primaryDark || "blue-700";
-  const primaryHoverColor = theme?.colors?.primaryHover || "#1D4ED8";
-  const accentColor = theme?.colors?.accent || "#3B82F6";
   const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
   const textSecondaryColor = theme?.colors?.text?.secondary || "gray-600";
-  const backgroundPrimaryColor = theme?.colors?.backgroundPrimary || "white";
-  const backgroundSecondaryColor = theme?.colors?.backgroundSecondary || "gray-50";
-  const mutedColor = theme?.colors?.states?.muted || "rgba(59, 130, 246, 0.1)";
 
-  const [isHeadingVisible, setIsHeadingVisible] = useState(false);
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
   const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-
 
   const {
     customization,
@@ -49,8 +43,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("experience", defaultExperienceStyles, portfolioId);
-
+  } = useCustomization("experience", defaultSimpleWhiteExperienceStyles, portfolioId);
 
   const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
     portfolioId,
@@ -63,64 +56,11 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
     getAnimationVariants,
   } = useExperienceStyles(effectiveCustomization, "light", primaryColor);
 
-  const alignmentMap = {
-    left: "text-left",
-    center: "text-center",
-    right: "text-right",
-  };
-
-  const titleSizeMap = {
-    sm: "text-2xl md:text-3xl",
-    md: "text-3xl md:text-4xl",
-    lg: "text-4xl md:text-5xl",
-    xl: "text-4xl md:text-5xl",
-    "2xl": "text-5xl md:text-6xl",
-    "3xl": "text-6xl md:text-7xl",
-  };
-
-  const weightMap = {
-    normal: "font-normal",
-    medium: "font-medium",
-    semibold: "font-semibold",
-    bold: "font-bold",
-    extrabold: "font-extrabold",
-  };
-
-  const getHeaderClasses = () => {
-    return {
-      container: `${alignmentMap[effectiveCustomization.titleAlignment]} mb-12 sm:mb-16 md:mb-20`,
-      title: `font-display section-title ${titleSizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]} tracking-tight text-${effectiveCustomization.titleColor} mb-3 sm:mb-4 transition-all duration-700`,
-      description: `font-sans text-base sm:text-lg section-description md:text-xl font-normal text-${effectiveCustomization.descriptionColor} tracking-normal leading-relaxed max-w-2xl ${effectiveCustomization.titleAlignment === "center" ? "mx-auto" : ""} transition-all duration-700`,
-    };
-  }
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.matchMedia("(max-width: 640px)").matches);
-    };
-
-    // Set initial size
-    handleResize();
-
-    // Add event listener
-    window.addEventListener('resize', handleResize);
-
-    // Clean up
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsHeadingVisible(true);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { getHeaderClasses } = useSimpleWhiteExperienceStyles(effectiveCustomization);
 
   useEffect(() => {
     if (portfolioData) {
       const experienceSectionData = portfolioData.find((section: any) => section.type === "experience")?.data;
-      const experienceSection = portfolioData.find((section: any) => section.type === "experience");
       if (experienceSectionData) {
         setExperienceData(experienceSectionData || []);
         setIsLoading(false);
@@ -165,18 +105,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
     }
   }, [portfolioId]);
 
-  if (isLoading) {
-    return (
-      <section
-        id="experience"
-        className="min-h-screen flex items-center justify-center text-black relative overflow-hidden py-20"
-      >
-        <div className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-64">Loading...</div>
-        </div>
-      </section>
-    );
-  }
+  if (isLoading) return <SectionLoading />
 
   const animationVariants = getAnimationVariants();
 
@@ -319,7 +248,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
       </div>
 
       {/* Shared Visual Editor */}
-      <ExperienceVisualEditor
+      <SimpleWhiteExperienceVisualEditor
         isOpen={visualEditorOpen}
         onClose={() => setVisualEditorOpen(false)}
         customization={customization}

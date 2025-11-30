@@ -32,27 +32,4 @@ export interface ContactCustomizationState {
   openInNewTab: boolean;
 }
 
-export const defaultContactStyles: ContactCustomizationState = {
-  layout: "grid",
-  gridColumns: 3,
-  cardLayout: "stacked",
-  cardSize: "default",
-  containerWidth: "wide",
-  cardSpacing: 24,
-  cardStyle: "default",
-  cardBorderRadius: 12,
-  cardPadding: 8,
-  iconSize: 32,
-  iconStyle: "outline",
-  backgroundOpacity: 100,
-  borderWidth: 1,
-  showLabels: true,
-  showDescriptions: false,
-  textAlignment: "center",
-  animationStyle: "scale",
-  animationSpeed: 300,
-  staggerDelay: 100,
-  hoverEffects: true,
-  copyToClipboard: false,
-  openInNewTab: true,
-};
+

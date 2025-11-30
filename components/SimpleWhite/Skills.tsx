@@ -9,10 +9,12 @@ import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState, defaultTechnologiesStyles, Technology } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState, Technology } from "@/types/technologies/portfolio";
+import { defaultSimpleWhiteTechnologiesStyles } from "@/types/technologies/simplewhite";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";
+import SectionLoading from "../Shared/SectionLoading";
 
 
 const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
@@ -41,7 +43,7 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
+  } = useCustomization("technologies", defaultSimpleWhiteTechnologiesStyles, portfolioId);
 
   // Helper functions for styling based on customization
   const {
@@ -118,9 +120,8 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
     },
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isLoading) return <SectionLoading />
+
 
   return (
     <section id="skills" className={getSectionClasses()}>

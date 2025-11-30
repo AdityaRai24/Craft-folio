@@ -8,7 +8,7 @@ import { Briefcase, Calendar, MapPin, Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultExperienceStyles } from "@/types/experience/portfolio";
+import { defaultMacOSExperienceStyles } from "@/types/experience/macos";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useMacOSTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";
@@ -34,7 +34,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("experience", defaultExperienceStyles, portfolioId);
+    } = useCustomization("experience", defaultMacOSExperienceStyles, portfolioId);
 
     const {
         getCardClasses,

@@ -16,6 +16,8 @@ import { useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { useMacOSTheme } from "./ThemeContext";
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultMacOSSafariStyles } from "@/types/safari/macos";
 
 const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
   const isDark = theme === "dark";
@@ -28,9 +30,25 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
   const safariData = portfolioData?.find((item: any) => item.type === "safari")?.data || {};
   const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
-  const [url, setUrl] = useState("craftfolio.dev");
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("safari", defaultMacOSSafariStyles, portfolioId || "");
+
+  const [url, setUrl] = useState(effectiveCustomization.startUrl);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setUrl(effectiveCustomization.startUrl);
+  }, [effectiveCustomization.startUrl]);
 
   // Default welcome content if no data exists
   const defaultContent = `
@@ -112,44 +130,56 @@ const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
       <div
         className={`border-b px-4 py-2.5 flex items-center gap-3 ${isDark ? "bg-[#2a2a2a] border-gray-700" : "bg-gray-100 border-gray-200"}`}
       >
-        <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-        </div>
+        {effectiveCustomization.showTrafficLights && (
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          </div>
+        )}
         <div className="flex items-center gap-2 flex-1 ml-2">
-          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowLeft size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
-          </button>
-          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
-            <ArrowRight size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
-          </button>
-          <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">
-            <Home size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
-          </button>
-          <button
-            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-            onClick={() => setIsLoading(true)}
-          >
-            <RefreshCw
-              size={16}
-              className={`${isLoading ? 'animate-spin' : ''} ${isDark ? "text-gray-400" : "text-gray-500"}`}
-            />
-          </button>
-          <form onSubmit={handleNavigate} className="flex-1 flex items-center max-w-2xl">
-            <div
-              className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow ${isDark ? "bg-[#1a1a1a] border-gray-700" : "bg-white border-gray-300"}`}
+          {effectiveCustomization.showNavigationButtons && (
+            <>
+              <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
+                <ArrowLeft size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
+              </button>
+              <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-30" disabled>
+                <ArrowRight size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
+              </button>
+            </>
+          )}
+          {effectiveCustomization.showHomeButton && (
+            <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">
+              <Home size={16} className={isDark ? "text-gray-400" : "text-gray-500"} />
+            </button>
+          )}
+          {effectiveCustomization.showReloadButton && (
+            <button
+              className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+              onClick={() => setIsLoading(true)}
             >
-              <Search size={14} className={isDark ? "text-gray-400" : "text-gray-500"} style={{ flexShrink: 0 }} />
-              <input
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className={`flex-1 bg-transparent border-none outline-none text-sm ${isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"}`}
-                placeholder="Search or enter website name"
+              <RefreshCw
+                size={16}
+                className={`${isLoading ? 'animate-spin' : ''} ${isDark ? "text-gray-400" : "text-gray-500"}`}
               />
-            </div>
-          </form>
+            </button>
+          )}
+          {effectiveCustomization.showUrlBar && (
+            <form onSubmit={handleNavigate} className="flex-1 flex items-center max-w-2xl">
+              <div
+                className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 flex-1 shadow-sm hover:shadow-md transition-shadow ${isDark ? "bg-[#1a1a1a] border-gray-700" : "bg-white border-gray-300"}`}
+              >
+                <Search size={14} className={isDark ? "text-gray-400" : "text-gray-500"} style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className={`flex-1 bg-transparent border-none outline-none text-sm ${isDark ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"}`}
+                  placeholder="Search or enter website name"
+                />
+              </div>
+            </form>
+          )}
 
           {showEdit && !isEditing && (
             <button

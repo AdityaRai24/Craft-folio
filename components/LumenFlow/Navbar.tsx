@@ -6,18 +6,35 @@ import { getThemeClasses } from "./ThemeContext";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultLumenFlowNavbarStyles } from "@/types/navbar/lumenflow";
+
 const Navbar = ({
   onTabChange,
   activeTab,
   currentTheme,
+  portfolioId,
 }: {
   onTabChange: (tab: string) => void;
   activeTab: string;
   currentTheme: any;
+  portfolioId?: string;
 }) => {
   const { theme, toggleTheme } = useLumenFlowTheme();
   const themeClasses = getThemeClasses(currentTheme);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("navbar", defaultLumenFlowNavbarStyles, portfolioId || "");
 
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const sectionNames: any = [];
@@ -26,7 +43,8 @@ const Navbar = ({
     if (
       item.type === "userInfo" ||
       item.type === "themes" ||
-      item.type === "seo"
+      item.type === "seo" ||
+      item.type === "navbar"
     ) {
       return;
     } else {
@@ -53,8 +71,8 @@ const Navbar = ({
     <>
       <nav
         className={`flex items-center justify-between border backdrop-blur-md rounded-2xl shadow-xl px-4 sm:px-6 lg:px-8 py-2 md:py-4 mx-auto w-full transition-colors duration-300 ${theme === "light"
-            ? "bg-white/80 border-gray-200"
-            : themeClasses.bgSecondary
+          ? "bg-white/80 border-gray-200"
+          : themeClasses.bgSecondary
           }`}
         style={{
           background: theme === "light"
@@ -84,20 +102,20 @@ const Navbar = ({
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`text-base cursor-pointer font-medium transition-all duration-300 relative ${activeTab === tab.id
-                  ? theme === "light"
-                    ? "text-orange-600"
-                    : themeClasses.accent
-                  : theme === "light"
-                    ? "text-gray-700 hover:text-orange-600"
-                    : themeClasses.textSecondary
+                ? theme === "light"
+                  ? "text-orange-600"
+                  : themeClasses.accent
+                : theme === "light"
+                  ? "text-gray-700 hover:text-orange-600"
+                  : themeClasses.textSecondary
                 }`}
             >
               {tab.label}
               {activeTab === tab.id && (
                 <div
                   className={`absolute -bottom-1 left-0 right-0 h-0.5 ${theme === "light"
-                      ? "bg-gradient-to-r from-orange-500 to-orange-600"
-                      : themeClasses.gradientPrimary
+                    ? "bg-gradient-to-r from-orange-500 to-orange-600"
+                    : themeClasses.gradientPrimary
                     } rounded-full`}
                 />
               )}
@@ -111,8 +129,8 @@ const Navbar = ({
           <button
             onClick={toggleTheme}
             className={`p-2 rounded-full transition-colors duration-300 ${theme === "dark"
-                ? "text-gray-300 hover:text-white hover:bg-gray-800"
-                : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
+              ? "text-gray-300 hover:text-white hover:bg-gray-800"
+              : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
               }`}
           >
             {theme === "dark" ? (
@@ -126,8 +144,8 @@ const Navbar = ({
           <button
             onClick={toggleMobileMenu}
             className={`lg:hidden p-2 rounded-full transition-colors duration-300 ${theme === "dark"
-                ? "text-gray-300 hover:text-white hover:bg-gray-800"
-                : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
+              ? "text-gray-300 hover:text-white hover:bg-gray-800"
+              : "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
               }`}
           >
             {isMobileMenuOpen ? (
@@ -143,8 +161,8 @@ const Navbar = ({
       {isMobileMenuOpen && (
         <div
           className={`lg:hidden mt-2 border backdrop-blur-md rounded-2xl shadow-xl mx-auto w-full transition-colors duration-300 ${theme === "light"
-              ? "bg-white/80 border-gray-200"
-              : themeClasses.bgSecondary
+            ? "bg-white/80 border-gray-200"
+            : themeClasses.bgSecondary
             }`}
           style={{
             background: theme === "light"
@@ -158,12 +176,12 @@ const Navbar = ({
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
                 className={`block w-full text-left px-4 py-3 text-base font-medium transition-all duration-300 rounded-lg ${activeTab === tab.id
-                    ? theme === "light"
-                      ? "text-orange-600 bg-orange-50"
-                      : themeClasses.accent
-                    : theme === "light"
-                      ? "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
-                      : themeClasses.textSecondary
+                  ? theme === "light"
+                    ? "text-orange-600 bg-orange-50"
+                    : themeClasses.accent
+                  : theme === "light"
+                    ? "text-gray-700 hover:text-orange-600 hover:bg-orange-50"
+                    : themeClasses.textSecondary
                   }`}
               >
                 {tab.label}

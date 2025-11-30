@@ -5,14 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { supabase } from '@/lib/supabase-client';
 import { ColorTheme } from '@/lib/colorThemes';
-import { defaultContactStyles } from '@/types/contact/portfolio';
+import { defaultSimpleWhiteContactStyles } from '@/types/contact/simplewhite';
 import { ContactVisualEditor } from '@/components/VisualEditor/Contact/ContactVisualEditor';
 import SectionHeader from './SectionHeader';
 import { useCustomization } from '@/hooks/useCustomization';
 
 const Contact = ({ currentPortTheme, portfolioId }: any) => {
-    const dispatch = useDispatch();
-    const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+    const { portfolioData } = useSelector((state: RootState) => state.data);
     const inTheme = portfolioData?.find((item: any) => item.type === "themes");
     const theme = inTheme?.data?.[currentPortTheme];
 
@@ -33,7 +32,7 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("contact", defaultContactStyles, portfolioId);
+    } = useCustomization("contact", defaultSimpleWhiteContactStyles, portfolioId);
 
     useEffect(() => {
         if (portfolioData) {

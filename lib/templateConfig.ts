@@ -120,14 +120,10 @@ export const templateConfig: any = {
     defaults: {},
   },
   LumenFlow: {
-    navbar: LumenFlowNavbar,
+    navbar: null,
     spotlight: false,
     sections: {
       hero: LumenFlowHero,
-      projects: LumenFlowProjects,
-      experience: LumenFlowExperience,
-      education: LumenFlowEducation,
-      technologies: LumenFlowTechnologies,
     },
     features: {
       badge: false,
@@ -150,7 +146,7 @@ export const templateConfig: any = {
     },
   },
   MacOS: {
-    navbar: null, 
+    navbar: null,
     spotlight: false,
     sections: {
       desktop: MacOSDesktop,

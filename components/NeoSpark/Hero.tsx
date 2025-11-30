@@ -15,6 +15,7 @@ import { useUser } from '@clerk/nextjs';
 import { useNeoHeroStyles } from "@/hooks/useNeoHeroStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
+import SectionLoading from "../Shared/SectionLoading";
 
 const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
@@ -36,7 +37,6 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   const [badgeScope, animateBadge] = useAnimate();
   const [titleScope, animateTitle] = useAnimate();
-
   const [badgeIndex, setBadgeIndex] = useState(0);
   const [titleIndex, setTitleIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,10 +45,6 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     "layout" | "typography" | "buttons" | "effects"
   >("layout");
 
-  // Dragging state for floating window
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
 
   const {
     customization,
@@ -70,46 +66,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     getAnimationVariants,
     getTitleStyle,
     getBackgroundStyle,
-  } = useNeoHeroStyles(effectiveCustomization, theme)
-
-
-
-  const getThemeButtonStyle = (isActive: boolean) => {
-    if (isActive) {
-      return {
-        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-        color: "white",
-      };
-    }
-    return {};
-  };
-
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setWindowPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
+    customCssAnimations,
+    getThemeButtonStyle
+  } = useNeoHeroStyles(effectiveCustomization, theme, ColorTheme)
 
   useEffect(() => {
     if (portfolioData) {
@@ -203,7 +162,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   if (isLoading || !heroData) {
     return (
-      <div className="flex items-center justify-center h-64">Loading...</div>
+      <SectionLoading />
     );
   }
 
@@ -218,7 +177,6 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const buttonHoverBgColor = theme.colors.primaryHover;
   const buttonTextColor = theme.colors.text.primary;
   const buttonHoverTextColor = theme.colors.text.secondary;
-  const mutedColor = theme.colors.states.muted;
   const scrollLineColor = theme.colors.background.secondary;
 
   const animationVariants = getAnimationVariants();
@@ -475,79 +433,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         )}
 
         {/* Custom CSS for animations */}
-        <style jsx>{`
-          @keyframes blink {
-            0%,
-            50% {
-              opacity: 1;
-            }
-            51%,
-            100% {
-              opacity: 0.3;
-            }
-          }
-
-          @keyframes pulse {
-            0%,
-            100% {
-              transform: scale(1);
-              opacity: 1;
-            }
-            50% {
-              transform: scale(1.1);
-              opacity: 0.7;
-            }
-          }
-
-          @keyframes bounce {
-            0%,
-            20%,
-            53%,
-            80%,
-            100% {
-              transform: translate3d(0, 0, 0);
-            }
-            40%,
-            43% {
-              transform: translate3d(0, -8px, 0);
-            }
-            70% {
-              transform: translate3d(0, -4px, 0);
-            }
-            90% {
-              transform: translate3d(0, -2px, 0);
-            }
-          }
-
-          @keyframes slide {
-            0% {
-              transform: translateX(-10px);
-              opacity: 0.5;
-            }
-            100% {
-              transform: translateX(0);
-              opacity: 1;
-            }
-          }
-
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-          }
-
-          .slider::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-            border: none;
-          }
-        `}</style>
+        <style jsx>{customCssAnimations()}</style>
       </div>
     </div>
   );

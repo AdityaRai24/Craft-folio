@@ -19,6 +19,7 @@ import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from '@clerk/nextjs';
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
+import SectionLoading from "../Shared/SectionLoading";
 
 
 // Visual Size Selector Component
@@ -580,11 +581,10 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     };
   }, [portfolioId, isLoading]);
 
-  if (isLoading || !heroData) {
-    return (
-      <div className="flex items-center justify-center h-64">Loading...</div>
-    );
-  }
+
+
+  if (isLoading || !heroData) return <SectionLoading />
+
 
 
 

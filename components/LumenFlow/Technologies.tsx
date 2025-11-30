@@ -3,17 +3,16 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
-import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import { HeaderComponent } from "./Components";
 import { useCustomization } from "@/hooks/useCustomization";
-import { Technology, defaultTechnologiesStyles } from "@/types/technologies/portfolio";
-
+import { Technology } from "@/types/technologies/portfolio";
+import { defaultLumenFlowTechnologiesStyles } from "@/types/technologies/lumenflow";
+import LumenFlowTechnologiesVisualEditor from "@/components/VisualEditor/Technologies/LumenFlowTechnologiesVisualEditor";
+import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
+import { ColorTheme } from "@/lib/colorThemes";
 
 const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, currentTheme: string }) => {
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
 
   useEffect(() => {
@@ -35,38 +34,14 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("technologies", defaultTechnologiesStyles, portfolioId);
+  } = useCustomization("technologies", defaultLumenFlowTechnologiesStyles, portfolioId);
 
-  const getCardClasses = () => {
-    const styleMap: Record<string, string> = {
-      minimal: "bg-transparent",
-      elevated: "bg-white shadow-lg dark:bg-zinc-800",
-      outlined: "border border-zinc-200 dark:border-zinc-700 bg-transparent",
-      filled: "bg-zinc-100 dark:bg-zinc-800",
-      glassmorphism: "bg-white/10 backdrop-blur-md border border-white/20",
-      neon: "bg-black border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.3)]",
-      gradient: "bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20",
-      default: "bg-white border border-gray-200 dark:bg-zinc-900 dark:border-zinc-800",
-    };
-
-    return `flex flex-col items-center justify-center transition-all duration-300 ${styleMap[effectiveCustomization.cardStyle]}`;
-  };
-
-  const getLabelClasses = () => {
-    const sizeMap: Record<string, string> = {
-      xs: "text-xs",
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-    };
-    const weightMap: Record<string, string> = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-    return `${sizeMap[effectiveCustomization.labelSize]} ${weightMap[effectiveCustomization.labelWeight]} text-zinc-600 dark:text-zinc-400 mt-4 text-center`;
-  };
+  const {
+    getGridClasses,
+    getCardClasses,
+    getLabelClasses,
+    getAnimationVariants
+  } = useTechnologiesStyles(effectiveCustomization, ColorTheme.primary, currentTheme as "light" | "dark");
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -75,23 +50,6 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
       transition: {
         staggerChildren: 0.1,
       },
-    },
-  };
-
-  const itemVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-      scale: effectiveCustomization.animationStyle === "scale" ? 0.8 : 1
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: effectiveCustomization.animationSpeed / 1000,
-        ease: "easeOut"
-      }
     },
   };
 
@@ -114,9 +72,8 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
         />
 
         <motion.div
-          className="grid mt-16"
+          className={getGridClasses()}
           style={{
-            gridTemplateColumns: `repeat(${effectiveCustomization.gridColumns}, minmax(0, 1fr))`,
             gap: effectiveCustomization.gap
           }}
           variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
@@ -127,7 +84,7 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
           {technologies.map((tech, index) => (
             <motion.div
               key={index}
-              variants={effectiveCustomization.staggerAnimation ? itemVariants : undefined}
+              variants={effectiveCustomization.staggerAnimation ? getAnimationVariants() : undefined}
               className={getCardClasses()}
               style={{
                 borderRadius: effectiveCustomization.cardBorderRadius,
@@ -161,10 +118,10 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
         </motion.div>
       </div>
 
-      <TechnologiesVisualEditor
+      <LumenFlowTechnologiesVisualEditor
         isOpen={visualEditorOpen}
         onClose={() => setVisualEditorOpen(false)}
-        customization={draftCustomization || defaultTechnologiesStyles}
+        customization={draftCustomization || defaultLumenFlowTechnologiesStyles}
         updateCustomization={updateDraftCustomization}
         onSave={saveDraftCustomization}
         onReset={resetCustomization}

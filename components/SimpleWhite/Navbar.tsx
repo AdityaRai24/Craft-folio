@@ -14,8 +14,23 @@ const menuItems = [
   { title: "Experience", href: "experience" },
 ];
 
-const Navbar = ({ currentPortTheme }: any) => {
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultSimpleWhiteNavbarStyles } from "@/types/navbar/simplewhite";
+
+const Navbar = ({ currentPortTheme, portfolioId }: any) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("navbar", defaultSimpleWhiteNavbarStyles, portfolioId || "");
 
   // Theme color variables (if theme is available)
   const primaryColor = "#2563EB"; // Default fallback

@@ -1,6 +1,6 @@
 import { HeroCustomizationState } from "@/types/hero/portfolio";
 
-export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: any) => {
+export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: any, ColorTheme: any) => {
 
     const getContainerClasses = () => {
         const alignmentMap = {
@@ -236,6 +236,91 @@ export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: a
         }
     };
 
+    const customCssAnimations = () => {
+        return `@keyframes blink {
+            0%,
+            50% {
+              opacity: 1;
+            }
+            51%,
+            100% {
+              opacity: 0.3;
+            }
+          }
+
+          @keyframes pulse {
+            0%,
+            100% {
+              transform: scale(1);
+              opacity: 1;
+            }
+            50% {
+              transform: scale(1.1);
+              opacity: 0.7;
+            }
+          }
+
+          @keyframes bounce {
+            0%,
+            20%,
+            53%,
+            80%,
+            100% {
+              transform: translate3d(0, 0, 0);
+            }
+            40%,
+            43% {
+              transform: translate3d(0, -8px, 0);
+            }
+            70% {
+              transform: translate3d(0, -4px, 0);
+            }
+            90% {
+              transform: translate3d(0, -2px, 0);
+            }
+          }
+
+          @keyframes slide {
+            0% {
+              transform: translateX(-10px);
+              opacity: 0.5;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: ${ColorTheme.primary};
+            cursor: pointer;
+          }
+
+          .slider::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: ${ColorTheme.primary};
+            cursor: pointer;
+            border: none;
+          }
+        `
+    }
+
+    const getThemeButtonStyle = (isActive: boolean) => {
+        if (isActive) {
+            return {
+                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                color: "white",
+            };
+        }
+        return {};
+    };
+
     return {
         getContainerClasses,
         getTitleClasses,
@@ -245,6 +330,7 @@ export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: a
         getAnimationVariants,
         getTitleStyle,
         getBackgroundStyle,
-
+        customCssAnimations,
+        getThemeButtonStyle
     }
 }

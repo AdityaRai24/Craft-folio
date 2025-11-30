@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { defaultProjectsStyles } from "@/types/projects/portfolio";
+import { defaultMacOSProjectsStyles } from "@/types/projects/macos";
 import { ProjectsCustomizationState } from "@/types/projects/portfolio";
 import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
@@ -63,7 +63,7 @@ const ProjectsGrid = ({
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("project", defaultProjectsStyles, portfolioId);
+  } = useCustomization("project", defaultMacOSProjectsStyles, portfolioId);
 
   useEffect(() => {
     if (portfolioData) {

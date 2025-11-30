@@ -16,7 +16,7 @@ import AlignmentSelector from "../Shared/AlignmentSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { EducationCustomizationState } from "@/components/NeoSpark/defaultStyles/types";
+import { EducationCustomizationState } from "@/types/education/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
 import { Switch } from "@/components/ui/switch";
 

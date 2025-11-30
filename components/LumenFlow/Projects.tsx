@@ -13,18 +13,16 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { defaultProjectsStyles, Project, ProjectsCustomizationState } from "@/types/projects/portfolio";
-import { useSelector, useDispatch } from "react-redux";
+import { defaultLumenFlowProjectsStyles } from "@/types/projects/lumenflow";
+import { Project } from "@/types/projects/portfolio";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { supabase } from "@/lib/supabase-client";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useCustomization } from "@/hooks/useCustomization";
-import React from "react";
+import SectionLoading from "../Shared/SectionLoading";
 
 
 const Projects = ({ currentTheme, portfolioId }: any) => {
@@ -37,8 +35,7 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
   }>({});
   const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
 
-  const dispatch = useDispatch();
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const projectsSection = portfolioData?.find(
     (item: any) => item.type === "projects"
   );
@@ -69,7 +66,7 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
     saveDraftCustomization,
     resetCustomization,
     draftCustomization
-  } = useCustomization("projects", defaultProjectsStyles, portfolioId);
+  } = useCustomization("projects", defaultLumenFlowProjectsStyles, portfolioId);
 
 
   useEffect(() => {
@@ -121,14 +118,7 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8 overflow-hidden scrollbar-none max-w-7xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <div className="relative">
-            <div className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-orange-300 rounded-full animate-ping"></div>
-          </div>
-        </div>
-      </div>
+      <SectionLoading />
     );
   }
 
@@ -142,8 +132,6 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
         openVisualEditor={openVisualEditor}
         visualEditorOpen={visualEditorOpen}
       />
-
-
 
       {/* Projects Grid */}
       <div
