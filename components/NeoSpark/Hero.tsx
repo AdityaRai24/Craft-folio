@@ -10,12 +10,15 @@ import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButto
 import { ColorTheme } from "@/lib/colorThemes";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { defaultHeroStyles } from "@/types/hero/portfolio";
-import HeroVisualEditor from "@/components/VisualEditor/Hero/HeroVisualEditor";
+import HeroVisualEditor from "@/components/VisualEditor/Hero/NeoSparkHeroVisualEditor";
 import { useUser } from '@clerk/nextjs';
 import { useNeoHeroStyles } from "@/hooks/useNeoHeroStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
 import SectionLoading from "../Shared/SectionLoading";
+
+
+type Tab = "layout" | "typography" | "buttons" | "effects";
 
 const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
@@ -41,9 +44,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [titleIndex, setTitleIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "buttons" | "effects"
-  >("layout");
+  const [activeTab, setActiveTab] = useState<Tab>("layout");
 
 
   const {
@@ -433,7 +434,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         )}
 
         {/* Custom CSS for animations */}
-        <style jsx>{customCssAnimations()}</style>
+        <style>{customCssAnimations()}</style>
       </div>
     </div>
   );

@@ -31,6 +31,7 @@ import { useMagicWrite } from "@/hooks/useMagicWrite";
 import { defaultLumenFlowHeroStyles } from "@/types/hero/lumenflow";
 import LumenFlowHeroVisualEditor from "@/components/VisualEditor/Hero/LumenFlowHeroVisualEditor";
 import { useLumenHeroStyles } from "@/hooks/useLumenHeroStyles";
+import SectionLoading from "../Shared/SectionLoading";
 
 const MobileProfileCard = ({
   heroData,
@@ -574,29 +575,7 @@ const HeroContent = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     }
   };
 
-  if (isLoading || !heroData) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <motion.div
-            className="w-12 h-12 border-4 border-orange-400/20 border-t-orange-400 rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.div
-            className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-orange-300 rounded-full"
-            animate={{ scale: [1, 1.2, 1], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.div>
-      </div>
-    );
-  }
+  if (isLoading || !heroData) return <SectionLoading />
 
   return (
     <motion.div

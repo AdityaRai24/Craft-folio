@@ -1,8 +1,9 @@
+
 "use client";
 
 import { FaGithub, FaLinkedin, FaChevronDown, FaFile } from "react-icons/fa";
 import { MdEmail, MdLocationOn } from "react-icons/md";
-import { Settings, Grid3X3, RotateCcw, Type, Zap, Eye, X } from "lucide-react";
+import { Settings } from "lucide-react";
 import type { NextPage } from "next";
 import AnimatedButton from "./AnimatedButton";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
@@ -20,193 +21,15 @@ import { useUser } from '@clerk/nextjs';
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
 import SectionLoading from "../Shared/SectionLoading";
+import SimpleWhiteHeroVisualEditor from "@/components/VisualEditor/Hero/SimpleWhiteHeroVisualEditor";
+import { useSimpleWhiteHeroStyles } from "@/hooks/useSimpleWhiteHeroStyles";
 
 
-// Visual Size Selector Component
-const SizeSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; size: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, size }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-              ? "border-white bg-zinc-700"
-              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div
-                className="bg-gradient-to-r rounded text-white text-center font-bold"
-                style={{ fontSize: size }}
-              >
-                Aa
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Style Selector Component
-const StyleSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; style: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, style }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === optionValue
-              ? "border-white bg-zinc-700"
-              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div className={`px-3 py-1 text-xs rounded transition-all ${style}`}>
-                Button
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Background Theme Selector Component
-const BackgroundThemeSelector: React.FC<{
-  value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
-  onChange: (value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning") => void;
-}> = ({ value, onChange }) => {
-  const getThemeStyle = (theme: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning") => {
-    switch (theme) {
-      case "diagonal-grid":
-        return {
-          backgroundColor: "#fafafa",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px),
-            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px)
-          `,
-          backgroundSize: "16px 16px",
-        };
-      case "crosshatch":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(22.5deg, transparent, transparent 1px, rgba(75, 85, 99, 0.2) 1px, rgba(75, 85, 99, 0.2) 2px, transparent 2px, transparent 4px),
-            repeating-linear-gradient(67.5deg, transparent, transparent 1px, rgba(107, 114, 128, 0.15) 1px, rgba(107, 114, 128, 0.15) 2px, transparent 2px, transparent 4px),
-            repeating-linear-gradient(112.5deg, transparent, transparent 1px, rgba(55, 65, 81, 0.1) 1px, rgba(55, 65, 81, 0.1) 2px, transparent 2px, transparent 4px),
-            repeating-linear-gradient(157.5deg, transparent, transparent 1px, rgba(31, 41, 55, 0.08) 1px, rgba(31, 41, 55, 0.08) 2px, transparent 2px, transparent 4px)
-          `,
-        };
-      case "circuit-board":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px, transparent 9px, transparent 16px, rgba(75, 85, 99, 0.25) 16px, rgba(75, 85, 99, 0.25) 17px),
-            repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px, transparent 9px, transparent 16px, rgba(75, 85, 99, 0.25) 16px, rgba(75, 85, 99, 0.25) 17px),
-            radial-gradient(circle at 8px 8px, rgba(55, 65, 81, 0.4) 1px, transparent 1px),
-            radial-gradient(circle at 16px 16px, rgba(55, 65, 81, 0.4) 1px, transparent 1px)
-          `,
-          backgroundSize: "16px 16px, 16px 16px, 16px 16px, 16px 16px",
-        };
-      case "zigzag-lightning":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(75, 85, 99, 0.25) 8px, rgba(75, 85, 99, 0.25) 9px),
-            repeating-linear-gradient(90deg, transparent, transparent 12px, rgba(107, 114, 128, 0.2) 12px, rgba(107, 114, 128, 0.2) 13px),
-            repeating-linear-gradient(60deg, transparent, transparent 16px, rgba(55, 65, 81, 0.15) 16px, rgba(55, 65, 81, 0.15) 17px),
-            repeating-linear-gradient(150deg, transparent, transparent 14px, rgba(31, 41, 55, 0.12) 14px, rgba(31, 41, 55, 0.12) 15px)
-          `,
-        };
-      default:
-        return {
-          backgroundColor: "#fafafa",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px),
-            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.3) 0, rgba(255, 0, 100, 0.3) 2px, transparent 2px, transparent 8px)
-          `,
-          backgroundSize: "16px 16px",
-        };
-    }
-  };
-
-  const themes: Array<{
-    value: "diagonal-grid" | "crosshatch" | "circuit-board" | "zigzag-lightning";
-    label: string;
-  }> = [
-      {
-        value: "diagonal-grid",
-        label: "Diagonal Grid",
-      },
-      {
-        value: "crosshatch",
-        label: "Crosshatch",
-      },
-      {
-        value: "circuit-board",
-        label: "Circuit Board",
-      },
-      {
-        value: "zigzag-lightning",
-        label: "Zigzag Lightning",
-      },
-    ];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        Background Theme
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {themes.map(({ value: themeValue, label }) => (
-          <div
-            key={themeValue}
-            onClick={() => onChange(themeValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === themeValue
-              ? "border-white bg-zinc-700"
-              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-              }`}
-          >
-            <div
-              className="w-full h-20 rounded mb-2"
-              style={getThemeStyle(themeValue)}
-            ></div>
-            <div className="text-center text-xs text-white">{label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+type Tab = "layout" | "typography" | "buttons" | "effects";
 
 const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
-  const dispatch = useDispatch();
 
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
 
@@ -216,25 +39,14 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   // Theme colors
-  const primaryColor = theme?.colors?.primary || ColorTheme.primary;
-  const primaryHoverColor = theme?.colors?.primaryHover || ColorTheme.primaryHover;
   const textPrimaryColor = theme?.colors?.text?.primary || ColorTheme.textPrimary;
   const textSecondaryColor = theme?.colors?.text?.secondary || ColorTheme.textSecondary;
-  const backgroundPrimaryColor = theme?.colors?.background?.primary || ColorTheme.bgMain;
-  const backgroundSecondaryColor = theme?.colors?.background?.secondary || ColorTheme.bgCard;
 
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "buttons" | "effects"
-  >("layout");
+  const [activeTab, setActiveTab] = useState<Tab>("layout");
 
-  // Dragging state for floating window
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
-  const dragRef = useRef<HTMLDivElement>(null);
 
   const {
     customization,
@@ -248,266 +60,21 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     draftCustomization
   } = useCustomization("hero", defaultSimpleWhiteHeroStyles, portfolioId);
 
-  // Helper functions for styling based on customization
-  const getContainerClasses = () => {
-    const alignmentMap = {
-      center: "text-center",
-      left: "text-left",
-      right: "text-right",
-    };
 
-    const maxWidthMap = {
-      sm: "max-w-sm",
-      md: "max-w-2xl",
-      lg: "max-w-4xl",
-      xl: "max-w-6xl",
-      "2xl": "max-w-7xl",
-      full: "w-full",
-    };
-
-    return `max-w-[95%] !mt-12 md:mt-0 sm:max-w-[90%] lg:max-w-[90%] xl:max-w-[85%] 2xl:max-w-[80%] mx-auto px-4 pb-4 sm:pb-8 lg:pb-0 sm:px-6 lg:px-8 ${alignmentMap[effectiveCustomization.contentAlignment]
-      } ${maxWidthMap[effectiveCustomization.maxWidth]}`;
-  };
-
-  const getTitleClasses = () => {
-    const sizeMap = {
-      sm: "text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl",
-      md: "text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl",
-      lg: "text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl",
-      xl: "text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl",
-      "2xl": "text-6xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl",
-      "3xl": "text-7xl sm:text-8xl md:text-9xl lg:text-9xl xl:text-10xl",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-      extrabold: "font-extrabold",
-    };
-
-    return `section-title text-left ${sizeMap[effectiveCustomization.titleSize]} ${weightMap[effectiveCustomization.titleWeight]
-      } text-${effectiveCustomization.titleColor} mb-2 sm:mb-3 leading-tight`;
-  };
-
-  const getSubtitleClasses = () => {
-    const sizeMap = {
-      sm: "text-sm sm:text-base md:text-lg lg:text-lg",
-      md: "text-base sm:text-lg md:text-xl lg:text-xl",
-      lg: "text-lg sm:text-xl md:text-2xl lg:text-2xl",
-      xl: "text-xl sm:text-2xl md:text-3xl lg:text-3xl",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-
-    return `section-sub-title text-left ${sizeMap[effectiveCustomization.subtitleSize]} ${weightMap[effectiveCustomization.subtitleWeight]
-      } text-${effectiveCustomization.subtitleColor} mb-3 sm:mb-4`;
-  };
-
-  const getDescriptionClasses = () => {
-    const sizeMap = {
-      sm: "text-sm sm:text-base lg:text-base",
-      md: "text-base sm:text-lg lg:text-lg",
-      lg: "text-lg sm:text-xl lg:text-xl",
-    };
-
-    return `section-description text-left ${sizeMap[effectiveCustomization.descriptionSize]} font-medium text-${effectiveCustomization.descriptionColor} mb-6 sm:mb-8 lg:mb-10`;
-  };
-
-  const getBackgroundStyle = () => {
-    const bgMap = {
-      white: "bg-white",
-      "gray-50": "bg-gray-50",
-      "gray-100": "bg-gray-100",
-    };
-    return bgMap[effectiveCustomization.backgroundColor] || "bg-white";
-  };
-
-  const getBackgroundThemeStyle = () => {
-    switch (effectiveCustomization.backgroundTheme) {
-      case "diagonal-grid":
-        return {
-          backgroundColor: "#fafafa",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px),
-            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px)
-          `,
-          backgroundSize: "40px 40px",
-        };
-      case "crosshatch":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
-            repeating-linear-gradient(67.5deg, transparent, transparent 2px, rgba(107, 114, 128, 0.05) 2px, rgba(107, 114, 128, 0.05) 3px, transparent 3px, transparent 8px),
-            repeating-linear-gradient(112.5deg, transparent, transparent 2px, rgba(55, 65, 81, 0.04) 2px, rgba(55, 65, 81, 0.04) 3px, transparent 3px, transparent 8px),
-            repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
-          `,
-        };
-      case "circuit-board":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
-            repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(75, 85, 99, 0.08) 19px, rgba(75, 85, 99, 0.08) 20px, transparent 20px, transparent 39px, rgba(75, 85, 99, 0.08) 39px, rgba(75, 85, 99, 0.08) 40px),
-            radial-gradient(circle at 20px 20px, rgba(55, 65, 81, 0.12) 2px, transparent 2px),
-            radial-gradient(circle at 40px 40px, rgba(55, 65, 81, 0.12) 2px, transparent 2px)
-          `,
-          backgroundSize: "40px 40px, 40px 40px, 40px 40px, 40px 40px",
-        };
-      case "zigzag-lightning":
-        return {
-          backgroundColor: "#ffffff",
-          backgroundImage: `
-            repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(75, 85, 99, 0.08) 20px, rgba(75, 85, 99, 0.08) 21px),
-            repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(107, 114, 128, 0.06) 30px, rgba(107, 114, 128, 0.06) 31px),
-            repeating-linear-gradient(60deg, transparent, transparent 40px, rgba(55, 65, 81, 0.05) 40px, rgba(55, 65, 81, 0.05) 41px),
-            repeating-linear-gradient(150deg, transparent, transparent 35px, rgba(31, 41, 55, 0.04) 35px, rgba(31, 41, 55, 0.04) 36px)
-          `,
-        };
-      default:
-        return {
-          backgroundColor: "#fafafa",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px),
-            repeating-linear-gradient(-45deg, rgba(255, 0, 100, 0.1) 0, rgba(255, 0, 100, 0.1) 1px, transparent 1px, transparent 20px)
-          `,
-          backgroundSize: "40px 40px",
-        };
-    }
-  };
-
-  const getCardStyle = () => {
-    const styleMap = {
-      solid: `bg-[${backgroundPrimaryColor}]`,
-      gradient: `bg-gradient-to-br from-[${backgroundPrimaryColor}] to-[${backgroundSecondaryColor}]`,
-      transparent: "bg-transparent",
-    };
-
-    const borderMap = {
-      none: "border-transparent",
-      subtle: `border-2 border-[${primaryColor}]/20 hover:border-[${primaryColor}]/40`,
-      bold: `border-4 border-[${primaryColor}]/40 hover:border-[${primaryColor}]/60`,
-    };
-
-    const shadowMap = {
-      none: "",
-      light: "shadow-sm",
-      medium: "shadow-lg",
-      heavy: "shadow-2xl",
-    };
-
-    return `relative ${styleMap[effectiveCustomization.cardBackground]} p-4 sm:p-5 lg:p-6 rounded-lg ${shadowMap[effectiveCustomization.cardShadow]} ${borderMap[effectiveCustomization.cardBorderStyle]} transition-all duration-300`;
-  };
-
-  const getSocialLinksClasses = () => {
-    if (!effectiveCustomization.socialLinksVisible) return "hidden";
-
-    const sizeMap = {
-      sm: "w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14",
-      md: "w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16",
-      lg: "w-14 h-14 sm:w-16 sm:h-16 lg:w-18 lg:h-18",
-    };
-
-    const styleMap = {
-      circular: "rounded-full",
-      square: "rounded-lg",
-      minimal: "rounded-none",
-    };
-
-    const hoverMap = {
-      border: `hover:border-8 hover:border-[${primaryColor}]/30`,
-      scale: "hover:scale-110",
-      glow: `hover:shadow-lg hover:shadow-[${primaryColor}]/20`,
-      none: "",
-    };
-
-    return `duration-200 ease-in border-4 border-transparent ${hoverMap[effectiveCustomization.socialLinksHoverEffect]} ${styleMap[effectiveCustomization.socialLinksStyle]} bg-[${backgroundPrimaryColor}] flex items-center justify-center transition-all ${sizeMap[effectiveCustomization.socialLinksSize]}`;
-  };
-
-  const getResumeButtonStyle = () => {
-    if (!effectiveCustomization.resumeButtonVisible) return "hidden";
-
-    const sizeMap = {
-      sm: "px-4 py-2 text-sm",
-      md: "px-6 py-3 text-base",
-      lg: "px-8 py-4 text-lg",
-    };
-
-    return `${sizeMap[effectiveCustomization.resumeButtonSize]} rounded transition-all duration-300`;
-  };
-
-  const getResumeButtonInlineStyle = () => {
-    const styleMap = {
-      default: {
-        backgroundColor: primaryColor,
-        color: 'white',
-        border: 'none',
-      },
-      animated: {
-        background: `linear-gradient(135deg, ${primaryColor}, ${primaryHoverColor})`,
-        color: 'white',
-        border: 'none',
-      },
-      minimal: {
-        backgroundColor: 'transparent',
-        color: textPrimaryColor,
-        border: `1px solid ${textSecondaryColor}`,
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        color: primaryColor,
-        border: `2px solid ${primaryColor}`,
-      },
-    };
-
-    return styleMap[effectiveCustomization.resumeButtonStyle];
-  };
+  const {
+    getContainerClasses,
+    getTitleClasses,
+    getSubtitleClasses,
+    getDescriptionClasses,
+    getBackgroundStyle,
+    getBackgroundThemeStyle,
+    getCardStyle,
+    getSocialLinksClasses,
+    getResumeButtonStyle,
+    getResumeButtonInlineStyle,
+  } = useSimpleWhiteHeroStyles(customization, theme, ColorTheme);
 
 
-
-  // Dragging functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (dragRef.current) {
-      const rect = dragRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-      setIsDragging(true);
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setWindowPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
 
   const handleResumeDownload = () => {
     if (userInfo?.resumeLink) {
@@ -586,14 +153,10 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   if (isLoading || !heroData) return <SectionLoading />
 
 
-
-
   return (
     <>
       <div id="about" className={`relative simple-white pt-8 sm:pt-12 md:pt-16 lg:pt-20`} style={getBackgroundThemeStyle()}>
         <style>{customCSS}</style>
-
-
 
         <div className="flex h-full pt-16 sm:pt-20 md:pt-24 justify-center items-end mb-16 sm:mb-20 md:mb-24">
           <div className={getContainerClasses()}>
@@ -914,266 +477,22 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent z-10"></div>
       </div>
 
-      {/* Floating Visual Editor Window - Outside main container to avoid stacking context issues */}
+      {/* Floating Visual Editor Window */}
       {visualEditorOpen && (
-        <div
-          ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-            zIndex: 99999999,
-          }}
-        >
-          {/* Header */}
-          <div
-            className="flex justify-between items-center p-3 sm:p-4 border-b border-zinc-700 bg-zinc-800"
-            onMouseDown={handleMouseDown}
-          >
-            <h3 className="text-base sm:text-lg font-bold text-white">Visual Editor</h3>
-            <button
-              onClick={() => setVisualEditorOpen(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1"
-            >
-              <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="flex border-b border-zinc-700">
-            {["layout", "typography", "buttons", "effects"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab ? "text-white" : "text-gray-400 hover:text-white"
-                  }`}
-                style={{
-                  background: activeTab === tab ? `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` : "transparent",
-                }}
-              >
-                {tab === "layout" && (
-                  <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                )}
-                {tab === "typography" && (
-                  <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                )}
-                {tab === "buttons" && (
-                  <Zap className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                )}
-                {tab === "effects" && (
-                  <Eye className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                )}
-                <span className="hidden sm:inline">{tab}</span>
-                <span className="sm:hidden">{tab.charAt(0)}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Tab Content */}
-          <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-            {activeTab === "layout" && (
-              <div className="space-y-4">
-                <BackgroundThemeSelector
-                  value={draftCustomization?.backgroundTheme ?? customization.backgroundTheme}
-                  onChange={value => updateDraftCustomization("backgroundTheme", value)}
-                />
-              </div>
-            )}
-
-            {activeTab === "typography" && (
-              <div className="space-y-4">
-                <SizeSelector
-                  value={draftCustomization?.titleSize ?? customization.titleSize}
-                  onChange={value => updateDraftCustomization("titleSize", value)}
-                  label="Title Size"
-                  options={[
-                    { value: "sm", label: "Small", size: "24px" },
-                    { value: "md", label: "Medium", size: "32px" },
-                    { value: "lg", label: "Large", size: "40px" },
-                    { value: "xl", label: "Extra Large", size: "52px" },
-                  ]}
-                />
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Title Weight
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: "normal", label: "Normal", weight: "font-normal" },
-                      { value: "medium", label: "Medium", weight: "font-medium" },
-                      { value: "semibold", label: "Semibold", weight: "font-semibold" },
-                      { value: "bold", label: "Bold", weight: "font-bold" },
-                      { value: "extrabold", label: "Extrabold", weight: "font-extrabold" },
-                    ].map(({ value, label, weight }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("titleWeight", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                          ? "border-white bg-zinc-700"
-                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div className={`text-white text-center px-3 py-1 ${weight}`} style={{ fontSize: "14px" }}>
-                            Aa
-                          </div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <SizeSelector
-                    value={draftCustomization?.subtitleSize ?? customization.subtitleSize}
-                    onChange={value => updateDraftCustomization("subtitleSize", value)}
-                    label="Subtitle Size"
-                    options={[
-                      { value: "sm", label: "Small", size: "16px" },
-                      { value: "md", label: "Medium", size: "18px" },
-                      { value: "lg", label: "Large", size: "20px" },
-                      { value: "xl", label: "Extra Large", size: "24px" },
-                    ]}
-                  />
-                </div>
-
-                <div className="border-t border-zinc-700 pt-4 mt-4">
-                  <SizeSelector
-                    value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
-                    onChange={value => updateDraftCustomization("descriptionSize", value)}
-                    label="Description Size"
-                    options={[
-                      { value: "sm", label: "Small", size: "14px" },
-                      { value: "md", label: "Medium", size: "16px" },
-                      { value: "lg", label: "Large", size: "18px" },
-                    ]}
-                  />
-                </div>
-              </div>
-            )}
-
-            {activeTab === "buttons" && (
-              <div className="space-y-4">
-                <StyleSelector
-                  value={draftCustomization?.resumeButtonStyle ?? customization.resumeButtonStyle}
-                  onChange={value => updateDraftCustomization("resumeButtonStyle", value)}
-                  label="Button Style"
-                  options={[
-                    { value: "default", label: "Default", style: "bg-gray-900 text-white rounded" },
-                    { value: "animated", label: "Animated", style: "bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded" },
-                    { value: "minimal", label: "Minimal", style: "border border-gray-300 text-gray-700 rounded" },
-                    { value: "outline", label: "Outline", style: "border-2 border-gray-900 text-gray-900 rounded" },
-                  ]}
-                />
-
-                <div>
-                  <label className="block text-white text-left font-medium mb-3">
-                    Button Size
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "sm", label: "Small", size: "px-4 py-2 text-sm" },
-                      { value: "md", label: "Medium", size: "px-6 py-3 text-base" },
-                      { value: "lg", label: "Large", size: "px-8 py-4 text-lg" },
-                    ].map(({ value, label, size }) => (
-                      <div
-                        key={value}
-                        onClick={() => updateDraftCustomization("resumeButtonSize", value)}
-                        className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${(draftCustomization?.resumeButtonSize ?? customization.resumeButtonSize) === value
-                          ? "border-white bg-zinc-700"
-                          : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                      >
-                        <div className="flex justify-center mb-2">
-                          <div className={`px-3 py-1 text-xs rounded bg-gray-900 text-white ${size}`}>
-                            Button
-                          </div>
-                        </div>
-                        <div className="text-center text-xs text-white">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "effects" && (
-              <div className="space-y-4">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-300">Hover Effects</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.hoverEffects ?? customization.hoverEffects}
-                        onChange={(e) => updateDraftCustomization("hoverEffects", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.hoverEffects ?? customization.hoverEffects) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-300">Stagger Animation</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={draftCustomization?.staggerAnimation ?? customization.staggerAnimation}
-                        onChange={(e) => updateDraftCustomization("staggerAnimation", e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-                        style={{
-                          backgroundColor: (draftCustomization?.staggerAnimation ?? customization.staggerAnimation) ? ColorTheme.primary : "",
-                        }}
-                      ></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
-            <div className="flex gap-2">
-              <button
-                onClick={resetCustomization}
-                className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Reset
-              </button>
-              <button
-                onClick={saveDraftCustomization}
-                className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                }}
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Overlay for floating window - Outside main container */}
-      {visualEditorOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40"
-          onClick={() => setVisualEditorOpen(false)}
+        <SimpleWhiteHeroVisualEditor
+          isOpen={visualEditorOpen}
+          onClose={() => setVisualEditorOpen(false)}
+          customization={customization}
+          draftCustomization={draftCustomization}
+          onUpdateDraft={updateDraftCustomization}
+          onSave={saveDraftCustomization}
+          onReset={resetCustomization}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
       )}
     </>
   );
 };
 
-export default Hero; 
+export default Hero;
