@@ -137,7 +137,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
                   : "bg-zinc-800 border border-zinc-700"
                 : effectiveCustomization.cardLayout === "minimal"
                   ? "bg-transparent border-0"
-                  : effectiveCustomization.cardLayout === "glassmorphism"
+                  : effectiveCustomization.cardLayout === "glass"
                     ? theme === "light"
                       ? "bg-white/50 backdrop-blur-sm border border-white/20"
                       : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"

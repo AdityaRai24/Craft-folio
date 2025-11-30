@@ -8,7 +8,7 @@ export interface ContactCustomizationState {
   cardSpacing: number;
 
   // Styling
-  cardStyle: "default" | "minimal" | "glassmorphism" | "neon";
+  cardStyle: "default" | "minimal" | "glass" | "neon";
   cardBorderRadius: number;
   cardPadding: number;
   iconSize: number;

@@ -18,50 +18,19 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
   };
 
   const getCardClasses = () => {
-    let classes = `section-card border overflow-hidden transition-all duration-${Math.round(
-      customization.animationSpeed * 1000
-    )} cursor-pointer `;
+    let classes = `relative transition-all  transform h-full flex flex-col `;
 
-    // Background and Border
-    switch (customization.cardStyle) {
-      case "minimal":
-        classes += "bg-transparent border-transparent";
-        break;
-      case "glassmorphism":
-        classes += "bg-white/10 backdrop-blur-md border-white/20 shadow-lg";
-        break;
-      case "neon":
-        classes += isDark
-          ? "bg-black border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.7)]"
-          : "bg-white border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]";
-        break;
-      case "gradient":
-        classes += isDark
-          ? "bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30 hover:border-blue-500/50"
-          : "bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200 hover:border-blue-300";
-        break;
-      case "elevated":
-        classes += isDark
-          ? "bg-[#2a2a2a] border-[#3a3a3a] shadow-xl hover:shadow-2xl hover:-translate-y-1"
-          : "bg-white border-gray-100 shadow-xl hover:shadow-2xl hover:-translate-y-1";
-        break;
-      case "outlined":
-        classes += isDark
-          ? "bg-transparent border-2 border-zinc-700 hover:border-zinc-500"
-          : "bg-transparent border-2 border-gray-300 hover:border-gray-400";
-        break;
-      case "filled":
-        classes += isDark
-          ? "bg-zinc-800 border-transparent hover:bg-zinc-700"
-          : "bg-gray-100 border-transparent hover:bg-gray-200";
-        break;
-      case "default":
-      default:
-        if (isDark) {
-          classes += "bg-[#2a2a2a] border-[#3a3a3a] hover:border-[#4a4a4a] shadow-xl hover:bg-zinc-900/80";
-        } else {
-          classes += "bg-white border-gray-200 hover:border-gray-300 shadow-md hover:shadow-xl";
-        }
+    // Layout based classes
+    if (customization.cardStyle === "default") {
+      classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
+    } else if (customization.cardStyle === "minimal") {
+      classes += "bg-transparent border-0";
+    } else if (customization.cardStyle === "glass") {
+      classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
+    } else if (customization.cardStyle === "neon") {
+      classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";
+    } else if (customization.cardStyle === "gradient") {
+      classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
     }
 
     return classes;
@@ -113,12 +82,12 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     if (style === "default") {
       if (buttonType === "live") {
         classes += isDark
-          ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-sm hover:shadow-md"
-          : "bg-blue-500 hover:bg-blue-600 text-white border-blue-400 shadow-sm hover:shadow-md";
+          ? " text-white shadow-sm hover:shadow-md"
+          : " text-white shadow-sm hover:shadow-md";
       } else {
         classes += isDark
-          ? "bg-gray-700 hover:bg-gray-600 text-white border-gray-600 shadow-sm hover:shadow-md"
-          : "bg-gray-800 hover:bg-gray-900 text-white border-gray-700 shadow-sm hover:shadow-md";
+          ? " text-white  shadow-sm hover:shadow-md"
+          : " text-white  shadow-sm hover:shadow-md";
       }
     } else if (style === "filled") {
       classes += " text-white";
@@ -193,11 +162,11 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
   const getTitleClasses = () => {
     const sizeMap = {
-      xs: "text-xs",
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg",
-      xl: "text-xl",
+      xs: "text-md",
+      sm: "text-lg",
+      md: "text-xl",
+      lg: "text-2xl",
+      xl: "text-3xl",
     };
 
     const weightMap = {
@@ -216,7 +185,6 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       sm: "text-sm",
       md: "text-base",
       lg: "text-lg",
-      xl: "text-xl",
     };
 
     const weightMap = {

@@ -12,7 +12,7 @@ export interface TechnologiesCustomizationState {
   containerWidth: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
 
   // Card Styling
-  cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient" | "elevated" | "outlined" | "filled";
+  cardStyle: "default" | "minimal" | "glass" | "neon" | "gradient" | "elevated" | "outlined" | "filled";
   cardBorderRadius: number;
   cardPadding: number;
   cardShadow: "none" | "light" | "medium" | "heavy";

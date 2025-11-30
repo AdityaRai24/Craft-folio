@@ -1,31 +1,32 @@
 import { ProjectsCustomizationState } from "./portfolio";
 
 export const defaultNeoSparkProjectsStyles: ProjectsCustomizationState = {
+
+    //layout
+    cardStyle: "glass",
     layout: "grid",
     gridColumns: 2,
-    cardSpacing: 24,
-    cardBorderRadius: 12,
-    imageBorderRadius: 8,
-    cardBackground: "bg-stone-800/30",
-    cardBorder: "border-gray-700",
-    cardStyle: "default",
-    imageAspectRatio: "auto",
-    imageHeight: 208,
-    githubButtonStyle: "default",
-    liveButtonStyle: "default",
-    buttonBorderRadius: 6,
-    techStackStyle: "pills",
-    animationSpeed: 0.3,
+    cardSpacing: 32,
     titleAlignment: "left",
-    cardPadding: 6,
-    imageOverlay: true,
-    imagePosition: "left",
-    hoverEffects: true,
-    glowEffect: true,
 
     // Typography
-    titleSize: "md",
+    titleSize: "lg",
     titleWeight: "semibold",
-    descriptionSize: "xs",
+    descriptionSize: "md",
     descriptionWeight: "normal",
+
+    //styling
+    cardBorderRadius: 12,
+    imageBorderRadius: 8,
+    cardPadding: 6,
+    githubButtonStyle: "minimal",
+    liveButtonStyle: "filled",
+    buttonBorderRadius: 8,
+    techStackStyle: "pills",
+
+    // timing
+    imageAspectRatio: "auto",
+    imageHeight: 210,
+    imagePosition: "left",
+
 };

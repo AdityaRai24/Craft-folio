@@ -15,7 +15,7 @@ export const useLumenEducationStyles = (
                     : "bg-zinc-800 border border-zinc-700"
                 : effectiveCustomization.cardStyle === "minimal"
                     ? "bg-transparent border-0"
-                    : effectiveCustomization.cardStyle === "glassmorphism"
+                    : effectiveCustomization.cardStyle === "glass"
                         ? theme === "light"
                             ? "bg-white/50 backdrop-blur-sm border border-white/20"
                             : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"

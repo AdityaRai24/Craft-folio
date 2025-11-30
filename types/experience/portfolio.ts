@@ -1,6 +1,6 @@
 export interface ExperienceCustomizationState {
   // Layout & Structure
-  cardLayout: "default" | "minimal" | "glassmorphism" | "neon" | "gradient" | "cards";
+  cardLayout: "default" | "minimal" | "glass" | "neon" | "gradient" | "cards";
   cardBorderRadius: number | "none" | "sm" | "md" | "lg" | "xl";
   cardPadding: number;
   cardSpacing: number;

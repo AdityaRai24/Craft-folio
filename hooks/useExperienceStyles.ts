@@ -12,7 +12,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
       classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
     } else if (customization.cardLayout === "minimal") {
       classes += "bg-transparent border-0";
-    } else if (customization.cardLayout === "glassmorphism") {
+    } else if (customization.cardLayout === "glass") {
       classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
     } else if (customization.cardLayout === "neon") {
       classes += isDark ? "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" : "bg-white border border-emerald-300/50 shadow-lg shadow-emerald-500/10";

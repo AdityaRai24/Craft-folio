@@ -190,7 +190,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                           : "w-full md:w-2/5 relative"
                       }
                     >
-                      <div className="relative overflow-hidden m-4">
+                      <div className="relative overflow-hidden">
                         <motion.img
                           src={project?.projectImage}
                           alt={`${project?.projectTitle} project screenshot`}
@@ -300,7 +300,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                               : ""
                             }`}
                         >
-                          {project?.techStack?.map((tech: Technology, idx: number) => (
+                          {project?.techStack?.slice(0, 5)?.map((tech: Technology, idx: number) => (
                             <motion.span
                               key={idx}
                               whileHover={{ scale: 1.05 }}

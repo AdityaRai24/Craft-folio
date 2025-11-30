@@ -73,7 +73,7 @@ export const useContactStyles = (
             case "minimal":
                 classes += " bg-transparent border-gray-600 hover:border-gray-400";
                 break;
-            case "glassmorphism":
+            case "glass":
                 classes +=
                     " bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20";
                 break;

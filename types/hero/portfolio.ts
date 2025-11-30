@@ -38,7 +38,7 @@ export interface HeroCustomizationState {
 
     // Effects
     scrollIndicator: boolean;
-    scrollIndicatorStyle: "line" | "dot" | "arrow";
+    scrollIndicatorStyle: "line" | "dot" | "arrow" | "animated";
     glowEffect: boolean;
     textShadow: boolean;
 }

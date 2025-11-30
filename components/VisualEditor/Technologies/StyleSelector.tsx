@@ -14,7 +14,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({
     const cardStyles = [
         { value: "default", label: "Default", preview: "bg-zinc-800 border-zinc-700" },
         { value: "minimal", label: "Minimal", preview: "bg-transparent border-transparent" },
-        { value: "glassmorphism", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
+        { value: "glass", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
         { value: "neon", label: "Neon", preview: "bg-black border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" },
         { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-500/30" },
         { value: "elevated", label: "Elevated", preview: "bg-zinc-800 shadow-lg border-zinc-700" },
@@ -33,8 +33,8 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({
                             key={style.value}
                             onClick={() => updateCustomization("cardStyle", style.value)}
                             className={`p-3 rounded-lg border-2 transition-all text-left group ${customization.cardStyle === style.value
-                                    ? "border-white bg-zinc-700"
-                                    : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
                                 }`}
                         >
                             <div className={`h-12 w-full rounded mb-2 border ${style.preview}`} />
@@ -98,8 +98,8 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({
                             key={intensity}
                             onClick={() => updateCustomization("cardShadow", intensity)}
                             className={`flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.cardShadow === intensity
-                                    ? "bg-white text-black"
-                                    : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                ? "bg-white text-black"
+                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                 }`}
                         >
                             {intensity}

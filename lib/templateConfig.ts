@@ -42,6 +42,7 @@ export const templateConfig: any = {
       longSummary: false,
       safari: false,
     },
+    hero: ["name", "titlePrefix", "titleSuffixOptions", "summary", "badge", "actions"],
     structure: {
       technologies: "flat",
     },
@@ -89,6 +90,7 @@ export const templateConfig: any = {
       longSummary: false,
       safari: false,
     },
+    hero: ["name", "titlePrefix", "titleSuffixOptions", "summary", "title", "shortSummary"],
     structure: {
       technologies: "flat",
     },
@@ -114,6 +116,7 @@ export const templateConfig: any = {
       longSummary: false,
       safari: false,
     },
+    hero: ["name", "titlePrefix", "titleSuffixOptions", "summary", "title", "shortSummary"],
     structure: {
       technologies: "flat",
     },
@@ -136,6 +139,7 @@ export const templateConfig: any = {
       safari: false,
       profileImage: true,
     },
+    hero: ["name", "title", "summary", "longSummary"],
     structure: {
       technologies: "flat",
     },
@@ -162,6 +166,7 @@ export const templateConfig: any = {
       safari: true,
       wallpaper: true,
     },
+    hero: ["name", "shortSummary", "longSummary"],
     structure: {
       technologies: "categorized",
     },

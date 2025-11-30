@@ -74,8 +74,8 @@ export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: a
 
     const getDescriptionClasses = () => {
         const sizeMap = {
-            xs: "text-base sm:text-lg",
-            sm: "text-base sm:text-lg",
+            xs: "text-base sm:text-sm",
+            sm: "text-base sm:text-md",
             md: "text-lg sm:text-xl",
             lg: "text-xl sm:text-2xl",
             xl: "text-2xl sm:text-3xl",

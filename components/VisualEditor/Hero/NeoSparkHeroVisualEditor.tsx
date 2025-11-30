@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { Layout, Move, RotateCcw, X, Type, Zap } from "lucide-react";
 import { AlignmentSelector } from "./AlignmentSelector";
 import { VerticalAlignmentSelector } from "./VerticalAlignmentSelector";
@@ -103,19 +104,15 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                 <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6 custom-scrollbar">
                     {activeTab === "layout" && (
                         <>
+
+                            <BackgroundThemeSelector
+                                value={draftCustomization.backgroundTheme}
+                                onChange={(value) => onUpdateDraft("backgroundTheme", value)}
+                            />
                             <AlignmentSelector
                                 value={draftCustomization.contentAlignment}
                                 onChange={(value) => onUpdateDraft("contentAlignment", value)}
                                 label="Content Alignment"
-                            />
-                            <VerticalAlignmentSelector
-                                value={draftCustomization.verticalAlignment}
-                                onChange={(value) => onUpdateDraft("verticalAlignment", value)}
-                                label="Vertical Alignment"
-                            />
-                            <BackgroundThemeSelector
-                                value={draftCustomization.backgroundTheme}
-                                onChange={(value) => onUpdateDraft("backgroundTheme", value)}
                             />
                             {renderToggle("Show Badge", draftCustomization.badgeVisible, (value) =>
                                 onUpdateDraft("badgeVisible", value)
@@ -135,18 +132,6 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                                     { value: "lg", label: "Large", size: "1.25rem" },
                                     { value: "xl", label: "XL", size: "1.5rem" },
                                     { value: "2xl", label: "2XL", size: "1.875rem" },
-                                    { value: "3xl", label: "3XL", size: "2.25rem" },
-                                ]}
-                            />
-                            <SizeSelector
-                                value={draftCustomization.subtitleSize}
-                                onChange={(value) => onUpdateDraft("subtitleSize", value)}
-                                label="Subtitle Size"
-                                options={[
-                                    { value: "sm", label: "Small", size: "0.875rem" },
-                                    { value: "md", label: "Medium", size: "1rem" },
-                                    { value: "lg", label: "Large", size: "1.25rem" },
-                                    { value: "xl", label: "XL", size: "1.5rem" },
                                 ]}
                             />
                             <SizeSelector
@@ -154,7 +139,7 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                                 onChange={(value) => onUpdateDraft("descriptionSize", value)}
                                 label="Description Size"
                                 options={[
-                                    { value: "xs", label: "XSmall", size: "0.75rem" },
+                                    { value: "xs", label: "XSmall", size: "0.6rem" },
                                     { value: "sm", label: "Small", size: "0.875rem" },
                                     { value: "md", label: "Medium", size: "1rem" },
                                     { value: "lg", label: "Large", size: "1.125rem" },
@@ -193,6 +178,52 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                         <>
                             {renderToggle("Scroll Indicator", draftCustomization.scrollIndicator, (value) =>
                                 onUpdateDraft("scrollIndicator", value)
+                            )}
+                            {draftCustomization.scrollIndicator && (
+                                <div className="mb-4 pl-2 border-l-2 border-zinc-700 ml-1">
+                                    <label className="text-xs font-medium text-gray-400 mb-2 block">Style</label>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {["line", "arrow", "dot", "animated"].map((style) => (
+                                            <button
+                                                key={style}
+                                                onClick={() => onUpdateDraft("scrollIndicatorStyle", style)}
+                                                className={`h-16 flex items-center justify-center rounded border transition-all relative overflow-hidden ${draftCustomization.scrollIndicatorStyle === style
+                                                    ? "bg-zinc-700 border-white text-white"
+                                                    : "bg-zinc-800 border-zinc-600 text-gray-400 hover:border-zinc-500"
+                                                    }`}
+                                                title={style.charAt(0).toUpperCase() + style.slice(1)}
+                                            >
+                                                {style === "line" && (
+                                                    <div className="h-8 w-0.5 bg-current mx-auto" />
+                                                )}
+                                                {style === "arrow" && (
+                                                    <motion.div
+                                                        animate={{ y: [0, 5, 0] }}
+                                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                                    >
+                                                        ↓
+                                                    </motion.div>
+                                                )}
+                                                {style === "dot" && (
+                                                    <motion.div
+                                                        animate={{ scale: [1, 1.5, 1] }}
+                                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                                        className="w-1.5 h-1.5 bg-current rounded-full"
+                                                    />
+                                                )}
+                                                {style === "animated" && (
+                                                    <div className="w-4 h-7 border-2 border-current rounded-full flex justify-center pt-1">
+                                                        <motion.div
+                                                            animate={{ y: [0, 8, 0] }}
+                                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                                            className="w-1 h-2 bg-current rounded-full"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             )}
                             {renderToggle("Glow Effect", draftCustomization.glowEffect, (value) =>
                                 onUpdateDraft("glowEffect", value)

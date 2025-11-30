@@ -1,5 +1,5 @@
 export interface EducationCustomizationState {
-    cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient";
+    cardStyle: "default" | "minimal" | "glass" | "neon" | "gradient";
     cardBorderRadius: number;
     cardPadding: number;
     cardSpacing: number;

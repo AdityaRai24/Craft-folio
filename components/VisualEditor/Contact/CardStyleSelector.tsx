@@ -2,8 +2,8 @@ import React from "react";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface CardStyleSelectorProps {
-    value: "default" | "minimal" | "glassmorphism" | "neon";
-    onChange: (value: "default" | "minimal" | "glassmorphism" | "neon") => void;
+    value: "default" | "minimal" | "glass" | "neon";
+    onChange: (value: "default" | "minimal" | "glass" | "neon") => void;
 }
 
 const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({ value, onChange }) => {
@@ -26,15 +26,15 @@ const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({ value, onChange }
                 {[
                     { value: "default", label: "Default" },
                     { value: "minimal", label: "Minimal" },
-                    { value: "glassmorphism", label: "Glass" },
+                    { value: "glass", label: "Glass" },
                     { value: "neon", label: "Neon" },
                 ].map((style) => (
                     <button
                         key={style.value}
                         onClick={() => onChange(style.value as any)}
                         className={`py-2 px-3 text-sm rounded transition-colors ${value === style.value
-                                ? "text-white"
-                                : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
+                            ? "text-white"
+                            : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
                             }`}
                         style={getThemeButtonStyle(value === style.value)}
                     >

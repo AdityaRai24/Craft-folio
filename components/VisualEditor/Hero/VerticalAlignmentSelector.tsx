@@ -29,8 +29,8 @@ export const VerticalAlignmentSelector: React.FC<VerticalAlignmentSelectorProps>
                         key={align}
                         onClick={() => onChange(align as any)}
                         className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${value === align
-                                ? "border-white bg-zinc-700 shadow-lg"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
+                            ? "border-white bg-zinc-700 shadow-lg"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
                             }`}
                     >
                         <div className="text-2xl text-white">{icon}</div>
@@ -40,10 +40,10 @@ export const VerticalAlignmentSelector: React.FC<VerticalAlignmentSelectorProps>
                             {/* Alignment indicator */}
                             <div
                                 className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${align === "top"
-                                        ? "top-0"
-                                        : align === "center"
-                                            ? "top-1/2 transform -translate-y-1/2"
-                                            : "bottom-0"
+                                    ? "top-0"
+                                    : align === "center"
+                                        ? "top-1/2 transform -translate-y-1/2"
+                                        : "top-8"
                                     }`}
                                 style={{
                                     background: `linear-gradient(135deg, ${ColorTheme.primary} ${ColorTheme.primaryDark})`,

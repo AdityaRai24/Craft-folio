@@ -7,36 +7,36 @@ interface CardStyleSelectorProps {
 }
 
 const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({ value, onChange }) => {
-    const styles = [
-        { value: "default", label: "Default", preview: "bg-zinc-800 border-zinc-700" },
-        { value: "minimal", label: "Minimal", preview: "bg-transparent border-transparent" },
-        { value: "glassmorphism", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
-        { value: "neon", label: "Neon", preview: "bg-black border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" },
-        { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-500/30" },
-        { value: "elevated", label: "Elevated", preview: "bg-zinc-800 shadow-lg border-zinc-700" },
-        { value: "outlined", label: "Outlined", preview: "bg-transparent border-zinc-500 border-2" },
-        { value: "filled", label: "Filled", preview: "bg-zinc-700 border-transparent" },
-    ];
 
     return (
         <div>
             <label className="block text-white text-left font-medium mb-3">Card Style</label>
             <div className="grid grid-cols-2 gap-3">
-                {styles.map((style) => (
-                    <button
+                {[
+                    { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+                    { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+                    { value: "glass", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+                    { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+                    { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
+                ].map((style) => (
+                    <div
                         key={style.value}
                         onClick={() => onChange(style.value as any)}
-                        className={`p-3 rounded-lg border-2 transition-all text-left group ${value === style.value
+                        className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
                             ? "border-white bg-zinc-700"
-                            : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                     >
-                        <div className={`h-12 w-full rounded mb-2 border ${style.preview}`} />
-                        <span className={`text-xs ${value === style.value ? "text-white" : "text-gray-400"
-                            }`}>
+                        <div className="space-y-2">
+                            <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                                <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                                <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                            </div>
+                        </div>
+                        <div className="text-center text-sm text-white mt-2">
                             {style.label}
-                        </span>
-                    </button>
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>

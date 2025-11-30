@@ -21,22 +21,22 @@ export interface ProjectsCustomizationState {
   cardSpacing: number;
   cardBorderRadius: number;
   imageBorderRadius: number;
-  cardBackground: string;
-  cardBorder: string;
-  cardStyle: "default" | "minimal" | "glassmorphism" | "neon" | "gradient" | "elevated" | "outlined" | "filled";
+  cardBackground?: string;
+  cardBorder?: string;
+  cardStyle: "default" | "minimal" | "glass" | "neon" | "gradient";
   imageAspectRatio: "auto" | "square" | "wide" | "tall";
   imageHeight: number;
   githubButtonStyle: "default" | "filled" | "ghost" | "minimal";
   liveButtonStyle: "default" | "filled" | "ghost" | "minimal";
   buttonBorderRadius: number;
   techStackStyle: "pills" | "badges" | "minimal" | "colorful";
-  animationSpeed: number;
+  animationSpeed?: number;
   titleAlignment: "left" | "center" | "right";
   cardPadding: number;
-  imageOverlay: boolean;
+  imageOverlay?: boolean;
   imagePosition: "left" | "right";
-  hoverEffects: boolean;
-  glowEffect: boolean;
+  hoverEffects?: boolean;
+  glowEffect?: boolean;
 
   // Typography
   titleSize: "xs" | "sm" | "md" | "lg" | "xl";

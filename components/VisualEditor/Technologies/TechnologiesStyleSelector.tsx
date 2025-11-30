@@ -14,7 +14,7 @@ export const TechnologiesStyleSelector: React.FC<TechnologiesStyleSelectorProps>
     const cardStyles = [
         { value: "default", label: "Default", preview: "bg-zinc-800 border-zinc-700" },
         { value: "minimal", label: "Minimal", preview: "bg-transparent border-transparent" },
-        { value: "glassmorphism", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
+        { value: "glass", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
         { value: "neon", label: "Neon", preview: "bg-black border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" },
         { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-500/30" },
         { value: "elevated", label: "Elevated", preview: "bg-zinc-800 shadow-lg border-zinc-700" },

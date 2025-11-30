@@ -246,6 +246,7 @@ const HeroSidebar = () => {
     { value: "ghost", label: "Ghost" }
   ];
 
+  console.log(fields);
   // Determine which tabs to show based on fields
   const showBasicTab = fields.includes("name") || fields.includes("titlePrefix") ||
     fields.includes("titleSuffixOptions") || fields.includes("summary");
@@ -267,7 +268,7 @@ const HeroSidebar = () => {
 
         <CardContent>
           <div className="space-y-5">
-            {heroSectionData?.sectionTitle && (
+            {/* {heroSectionData?.sectionTitle && (
               <div className="space-y-2">
                 <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
                 <Input
@@ -314,7 +315,7 @@ const HeroSidebar = () => {
               >
                 Save Section Header
               </Button>
-            )}
+            )} */}
 
             <Tabs defaultValue={defaultTab} className="mt-4">
               <TabsList style={{ backgroundColor: ColorTheme.bgNav, borderColor: ColorTheme.borderLight }}>

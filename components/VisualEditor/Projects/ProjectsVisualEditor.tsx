@@ -111,6 +111,11 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
         <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6 custom-scrollbar">
           {activeTab === "layout" && (
             <>
+              <CardStyleSelector
+                value={draftCustomization?.cardStyle ?? customization.cardStyle}
+                onChange={value => onUpdateDraft("cardStyle", value)}
+              />
+
               <LayoutSelector
                 value={draftCustomization?.layout ?? customization.layout}
                 onChange={value => onUpdateDraft("layout", value)}
@@ -176,6 +181,7 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                   onChange={value => onUpdateDraft("descriptionSize", value)}
                   type="size"
                   options={[
+                    { value: "xs", label: "Extra Small", preview: "0.75rem" },
                     { value: "sm", label: "Small", preview: "0.875rem" },
                     { value: "md", label: "Medium", preview: "1rem" },
                     { value: "lg", label: "Large", preview: "1.125rem" },
@@ -200,10 +206,6 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
 
           {activeTab === "styling" && (
             <>
-              <CardStyleSelector
-                value={draftCustomization?.cardStyle ?? customization.cardStyle}
-                onChange={value => onUpdateDraft("cardStyle", value)}
-              />
 
               <SliderControl
                 label="Card Border Radius"

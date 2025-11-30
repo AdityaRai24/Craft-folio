@@ -27,20 +27,18 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ value, onChan
           <div
             key={ratio}
             onClick={() => onChange(ratio as any)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-              value === ratio
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2 ${value === ratio
+              ? "border-white bg-zinc-700"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              }`}
           >
             <Icon
-              className={`text-white ${
-                ratio === "square"
-                  ? "h-6 w-6"
-                  : ratio === "tall"
+              className={`text-white ${ratio === "square"
+                ? "h-6 w-6"
+                : ratio === "tall"
                   ? "h-8 w-4"
                   : "h-4 w-8"
-              }`}
+                }`}
             />
             <div className="text-center">
               <div className="text-xs text-white font-medium">{label}</div>
