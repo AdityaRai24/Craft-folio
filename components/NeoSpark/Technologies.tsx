@@ -135,7 +135,7 @@ const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, 
       <TechnologiesVisualEditor
         isOpen={visualEditorOpen}
         onClose={() => setVisualEditorOpen(false)}
-        customization={draftCustomization || defaultTechnologiesStyles}
+        customization={draftCustomization || customization}
         updateCustomization={updateDraftCustomization}
         onSave={saveDraftCustomization}
         onReset={resetCustomization}

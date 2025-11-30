@@ -27,16 +27,9 @@ import Terminal from "./icons/terminal.svg";
 import ContactIcon from "./icons/contact.svg";
 import SafariIcon from "./icons/safari.svg";
 import CodeIcon from "./icons/code.svg";
+import { useDesktopEnvironment, WindowState } from "@/hooks/useDesktopEnvironment";
 
-interface WindowState {
-  id: string;
-  isOpen: boolean;
-  isMinimized: boolean;
-  isFullscreen: boolean;
-  zIndex: number;
-  position: { x: number; y: number };
-  size: { width: number; height: number };
-}
+
 
 interface DesktopProps {
   currentPortTheme?: string;
@@ -68,7 +61,7 @@ const Desktop: React.FC<DesktopProps> = ({
     (currentPortTheme && themeWallpapers[currentPortTheme]) ||
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80";
 
-  const [windows, setWindows] = useState<Record<string, WindowState>>({
+  const initialWindows: Record<string, WindowState> = {
     projects: {
       id: "projects",
       isOpen: false,
@@ -132,15 +125,7 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 250, y: 250 },
       size: { width: 900, height: 600 },
     },
-  });
-
-  const [nextZIndex, setNextZIndex] = useState(2);
-  const [draggingWindow, setDraggingWindow] = useState<string | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [showWallpaperEditor, setShowWallpaperEditor] = useState(false);
-
-  // Physics Dock Mouse Value
-  const mouseX = useMotionValue<number | null>(null);
+  };
 
   const dockConfig: Record<string, any> = {
     projects: { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
@@ -189,152 +174,27 @@ const Desktop: React.FC<DesktopProps> = ({
   };
 
   const dockItems = getOrderedDockItems();
+  const [showWallpaperEditor, setShowWallpaperEditor] = useState(false);
 
-  const openWindow = (id: string) => {
-    setWindows((prev) => {
-      const window = prev[id];
-      if (!window) return prev;
-
-      return {
-        ...prev,
-        [id]: {
-          ...window,
-          isOpen: true,
-          isMinimized: false,
-          zIndex: nextZIndex,
-        },
-      };
-    });
-    setNextZIndex((prev) => prev + 1);
-  };
-
-  const closeWindow = (id: string) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isOpen: false, isMinimized: false },
-    }));
-  };
-
-  const minimizeWindow = (id: string) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isMinimized: true },
-    }));
-  };
-
-  const restoreWindow = (id: string) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], isMinimized: false, zIndex: nextZIndex },
-    }));
-    setNextZIndex((prev) => prev + 1);
-  };
-
-  const toggleFullscreen = (id: string) => {
-    setWindows((prev) => {
-      const window = prev[id];
-      if (!window) return prev;
-
-      if (window.isFullscreen) {
-        // Restore to previous size
-        return {
-          ...prev,
-          [id]: {
-            ...window,
-            isFullscreen: false,
-            zIndex: nextZIndex,
-          },
-        };
-      } else {
-        // Save current size and go fullscreen
-        // Use a very high z-index for fullscreen windows (higher than topbar z-50)
-        return {
-          ...prev,
-          [id]: {
-            ...window,
-            isFullscreen: true,
-            zIndex: 1000, // Higher than topbar's z-50
-          },
-        };
-      }
-    });
-    setNextZIndex((prev) => prev + 1);
-  };
-
-  const bringToFront = (id: string) => {
-    setWindows((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], zIndex: nextZIndex },
-    }));
-    setNextZIndex((prev) => prev + 1);
-  };
-
-  const handleMouseDown = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    bringToFront(id);
-    setDraggingWindow(id);
-    const window = windows[id];
-    if (window) {
-      setDragOffset({
-        x: e.clientX - window.position.x,
-        y: e.clientY - window.position.y,
-      });
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (draggingWindow) {
-      const win = windows[draggingWindow];
-      if (!win) return;
-
-      // Calculate new position
-      let newX = e.clientX - dragOffset.x;
-      let newY = e.clientY - dragOffset.y;
-
-      // Get viewport dimensions
-      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
-      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
-      const topBarHeight = 28; // TopBar height in pixels
-
-      // Constrain window position to keep it within viewport
-      // Ensure at least 40px (title bar height) is always visible
-      const minVisibleHeight = 40;
-      const maxX = viewportWidth - minVisibleHeight;
-      const maxY = viewportHeight - minVisibleHeight;
-
-      // Clamp X position
-      newX = Math.max(-win.size.width + minVisibleHeight, Math.min(newX, maxX));
-
-      // Clamp Y position (account for topbar)
-      newY = Math.max(topBarHeight - win.size.height + minVisibleHeight, Math.min(newY, maxY));
-
-      setWindows((prev) => ({
-        ...prev,
-        [draggingWindow]: {
-          ...prev[draggingWindow],
-          position: {
-            x: newX,
-            y: newY,
-          },
-        },
-      }));
-    }
-  };
-
-  const handleMouseUp = () => {
-    setDraggingWindow(null);
-  };
-
-  useEffect(() => {
-    if (draggingWindow) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [draggingWindow, dragOffset]);
+  const {
+    windows,
+    setWindows,
+    nextZIndex,
+    setNextZIndex,
+    draggingWindow,
+    setDraggingWindow,
+    dragOffset,
+    setDragOffset,
+    mouseX,
+    openWindow,
+    closeWindow,
+    minimizeWindow,
+    restoreWindow,
+    toggleFullscreen,
+    bringToFront,
+    closeAllWindows,
+    handleMouseDown,
+  } = useDesktopEnvironment(initialWindows);
 
   const getWindowTitle = (id: string) => {
     const item = dockItems.find((item) => item.id === id);
