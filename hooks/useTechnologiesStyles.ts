@@ -59,7 +59,7 @@ export const useTechnologiesStyles = (
 
         const hoverMap: Record<string, string> = {
             lift: "hover:shadow-lg hover:-translate-y-1",
-            glow: `hover:shadow-lg ${isDark ? "hover:shadow-purple-500/20" : `hover:shadow-[${primaryColor}]/20`}`,
+            glow: `hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] ${isDark ? "hover:shadow-purple-500/50" : `hover:shadow-[${primaryColor}]/40`}`,
             scale: "hover:scale-105",
             rotate: "hover:rotate-3",
             none: "",

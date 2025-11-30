@@ -2,12 +2,12 @@ import { ContactCustomizationState } from "./portfolio";
 
 export const defaultNeoSparkContactStyles: ContactCustomizationState = {
     layout: "grid",
-    gridColumns: 3,
+    gridColumns: 4,
     cardLayout: "stacked",
     cardSize: "default",
     containerWidth: "wide",
     cardSpacing: 24,
-    cardStyle: "default",
+    cardStyle: "gradient",
     cardBorderRadius: 12,
     cardPadding: 8,
     iconSize: 32,
@@ -15,7 +15,7 @@ export const defaultNeoSparkContactStyles: ContactCustomizationState = {
     backgroundOpacity: 100,
     borderWidth: 1,
     showLabels: true,
-    showDescriptions: false,
+    showDescriptions: true,
     textAlignment: "center",
     animationStyle: "scale",
     animationSpeed: 300,

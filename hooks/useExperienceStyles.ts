@@ -118,14 +118,38 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
       hexagon: "rounded-none",
     };
 
+    let lineClasses = "";
+    let lineStyle: any = {
+      backgroundColor: primaryColor,
+      width: `${customization.timelineWidth}px`,
+      opacity: 0.3,
+    };
+
+    if (customization.timelineStyle === "dots") {
+      lineClasses = "";
+      lineStyle = {
+        borderLeft: `${customization.timelineWidth}px dotted ${primaryColor}`,
+        width: "0px",
+        opacity: 0.5,
+      };
+    } else if (customization.timelineStyle === "gradient") {
+      lineStyle = {
+        background: `linear-gradient(to bottom, ${primaryColor}00, ${primaryColor}, ${primaryColor}00)`,
+        width: `${customization.timelineWidth}px`,
+        opacity: 0.8,
+      };
+    } else if (customization.timelineStyle === "minimal") {
+      lineStyle = {
+        backgroundColor: primaryColor,
+        width: `${Math.max(1, customization.timelineWidth / 2)}px`,
+        opacity: 0.1,
+      };
+    }
+
     return {
       dot: `${dotSizeMap[customization.dotSize]} ${dotStyleMap[customization.dotStyle]}`,
-      line: `bg-opacity-30`,
-      lineStyle: {
-        backgroundColor: primaryColor,
-        width: `${customization.timelineWidth}px`,
-        opacity: 0.3,
-      },
+      line: lineClasses,
+      lineStyle,
       dotStyle: {
         backgroundColor: primaryColor,
         zIndex: 10,

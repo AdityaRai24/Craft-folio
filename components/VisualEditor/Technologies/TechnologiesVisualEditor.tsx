@@ -103,6 +103,8 @@ export const TechnologiesVisualEditor: React.FC<TechnologiesVisualEditorProps> =
                         <TechnologiesLayoutSelector
                             customization={customization}
                             updateCustomization={updateCustomization}
+                            onChange={value => updateCustomization("cardStyle", value)}
+                            value={customization.cardStyle}
                         />
                     )}
 
@@ -140,6 +142,7 @@ export const TechnologiesVisualEditor: React.FC<TechnologiesVisualEditorProps> =
                         <TechnologiesStyleSelector
                             customization={customization}
                             updateCustomization={updateCustomization}
+
                         />
                     )}
 

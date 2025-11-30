@@ -18,7 +18,7 @@ import CardLayoutSelector from "./CardLayoutSelector";
 import WidthSelector from "./WidthSelector";
 import SpacingSelector from "./SpacingSelector";
 import AlignmentSelector from "./AlignmentSelector";
-import CardStyleSelector from "./CardStyleSelector";
+import ContactCardStyleSelector from "./ContactCardStyleSelector";
 import IconStyleSelector from "./IconStyleSelector";
 import SliderControl from "./SliderControl";
 
@@ -151,7 +151,7 @@ export const ContactVisualEditor: React.FC<ContactVisualEditorProps> = ({
 
                     {activeTab === "styling" && (
                         <>
-                            <CardStyleSelector
+                            <ContactCardStyleSelector
                                 value={draftCustomization?.cardStyle ?? customization.cardStyle}
                                 onChange={(value) => onUpdateDraft("cardStyle", value)}
                             />

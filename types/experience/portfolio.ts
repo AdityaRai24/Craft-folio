@@ -70,7 +70,7 @@ export interface ExperienceCustomizationState {
 
   // Timeline Elements
   timelineStyle: "line" | "dots" | "gradient" | "minimal";
-  timelinePosition: "left" | "center" | "alternating";
+  timelinePosition: "left" | "alternating";
   timelineWidth: number;
   timelineColor: string;
   dotSize: "sm" | "md" | "lg";
@@ -81,10 +81,6 @@ export interface ExperienceCustomizationState {
   dateBadge: boolean;
   badgeStyle: "default" | "minimal" | "outlined" | "glow";
 
-  // Side Accent
-  sideAccent: boolean;
-  sideAccentWidth: number;
-  sideAccentColor: string;
 }
 
 

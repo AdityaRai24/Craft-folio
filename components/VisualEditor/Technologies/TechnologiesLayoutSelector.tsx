@@ -7,22 +7,61 @@ import { ColorTheme } from "@/lib/colorThemes";
 interface TechnologiesLayoutSelectorProps {
     customization: TechnologiesCustomizationState;
     updateCustomization: (key: keyof TechnologiesCustomizationState, value: any) => void;
+    onChange: (value: string) => void;
+    value: string;
+
 }
 
 export const TechnologiesLayoutSelector: React.FC<TechnologiesLayoutSelectorProps> = ({
     customization,
     updateCustomization,
+    onChange,
+    value
 }) => {
     return (
         <div className="space-y-6">
+
+            <div>
+                <label className="block text-white text-left font-medium mb-3">Card Style</label>
+                <div className="grid grid-cols-2 gap-3">
+                    {[
+                        { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+                        { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+                        { value: "glass", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+                        { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+                        { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
+                    ].map((style) => (
+                        <div
+                            key={style.value}
+                            onClick={() => onChange(style.value as any)}
+                            className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
+                                ? "border-white bg-zinc-700"
+                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                                }`}
+                        >
+                            <div className="space-y-2">
+                                <div className={`h-16 rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
+                                    <div className="w-8 h-2 bg-zinc-600 rounded mb-1"></div>
+                                    <div className="w-6 h-2 bg-zinc-500 rounded"></div>
+                                </div>
+                            </div>
+                            <div className="text-center text-sm text-white mt-2">
+                                {style.label}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+            </div>
+
+
             {/* Layout Mode */}
             <div>
                 <label className="block text-white text-left font-medium mb-3">Display Mode</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                     {[
                         { value: "grid", label: "Grid", icon: LayoutGrid },
                         { value: "marquee", label: "Marquee", icon: GalleryHorizontal },
-                        { value: "carousel", label: "Carousel", icon: List },
                     ].map(({ value, label, icon: Icon }) => (
                         <button
                             key={value}
@@ -56,6 +95,7 @@ export const TechnologiesLayoutSelector: React.FC<TechnologiesLayoutSelectorProp
                     min={2}
                     max={8}
                     onChange={(val) => updateCustomization("gridColumns", val)}
+                    unit=""
                 />
             )}
 
@@ -74,10 +114,10 @@ export const TechnologiesLayoutSelector: React.FC<TechnologiesLayoutSelectorProp
                 <label className="block text-white text-left font-medium mb-3">Container Width</label>
                 <div className="grid grid-cols-3 gap-2">
                     {[
-                        { value: "md", label: "Medium" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
-                        { value: "2xl", label: "2XL" },
+                        { value: "xl", label: "Small" },
+                        { value: "2xl", label: "Medium" },
+                        { value: "3xl", label: "Large" },
+                        { value: "4xl", label: "Extra Large" },
                         { value: "full", label: "Full Width" },
                     ].map(({ value, label }) => (
                         <button

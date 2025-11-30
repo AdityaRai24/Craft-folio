@@ -80,6 +80,9 @@ export const useContactStyles = (
             case "neon":
                 classes += " bg-black/70 border-2 hover:shadow-lg";
                 break;
+            case "gradient":
+                classes += " bg-gradient-to-br from-zinc-800 to-zinc-900 border-gray-700";
+                break;
             default:
                 classes += " bg-stone-900/60 border-gray-700";
         }

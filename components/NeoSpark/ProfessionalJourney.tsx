@@ -114,6 +114,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
   const animationVariants = getAnimationVariants();
   const timelineStyles = getTimelineStyles();
+  const isAlternating = effectiveCustomization.timelinePosition === "alternating";
 
   if (isLoading) return <SectionLoading />
 
@@ -142,27 +143,29 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
             experienceData.map((experience, index) => (
               <motion.div
                 key={index}
-                className="relative mb-8 last:mb-0"
+                className={`relative mb-8 last:mb-0 ${isAlternating ? "w-full" : ""}`}
                 variants={animationVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
               >
                 <div
-                  className={`absolute left-0 sm:left-4 w-4 h-4 rounded-full z-10`}
+                  className={`absolute z-10 flex items-center justify-center ${timelineStyles.dot} ${isAlternating ? "left-1/2 -translate-x-1/2" : "left-4 -translate-x-1/2"
+                    }`}
                   style={{
                     boxShadow: effectiveCustomization.borderGlow
                       ? `0 0 10px ${ColorTheme.primary}50`
                       : "none",
                     top: "1.5rem",
+                    ...timelineStyles.dotStyle,
                   }}
                 ></div>
                 {index !== experienceData.length - 1 && (
                   <div
-                    className={`absolute left-2 sm:left-6 top-0 bottom-0 ${timelineStyles.line}`}
+                    className={`absolute top-0 bottom-0 ${timelineStyles.line} ${isAlternating ? "left-1/2 -translate-x-1/2" : "left-4 -translate-x-1/2"
+                      }`}
                     style={{
                       ...timelineStyles.lineStyle,
-                      transform: "translateX(-50%)",
                       top: "3rem",
                       height: "calc(100% + 2rem)",
                     }}
@@ -170,7 +173,11 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                 )}
 
                 <div
-                  className={`ml-8 sm:ml-20 ${getCardClasses()}`}
+                  className={`${getCardClasses()} ${isAlternating
+                    ? `w-[calc(50%-2rem)] ${index % 2 === 0 ? "mr-auto text-right" : "ml-auto text-left"
+                    }`
+                    : "ml-8 sm:ml-20"
+                    }`}
                   style={{
                     ...getCardStyle(false),
                     borderColor:
@@ -181,7 +188,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                 >
                   <h2 className={getTitleClasses()}>{experience.role}</h2>
 
-                  <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400">
+                  <div className={`flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400 ${isAlternating && index % 2 === 0 ? "justify-end" : "justify-start"
+                    }`}>
                     <span
                       className={`truncate max-w-[60vw] sm:max-w-none ${effectiveCustomization.descriptionSize === "lg"
                         ? "text-lg"
@@ -220,7 +228,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       {experience.description}
                     </p>
                     {/* Magic Write Button */}
-                    <div className="absolute -top-2 -right-2 z-10 hidden md:block">
+                    <div className={`absolute -top-2 z-10 hidden md:block ${isAlternating && index % 2 === 0 ? "-left-10" : "-right-2"
+                      }`}>
                       <MagicWrite
                         onMagicWrite={async (prompt: string) => {
                           const enhanced = await handleMagicWrite(prompt, experience.description, "experience");
@@ -239,7 +248,8 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                   </div>
 
                   {effectiveCustomization.techStackVisible && experience.techStack && (
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className={`mt-4 flex flex-wrap gap-2 ${isAlternating && index % 2 === 0 ? "justify-end" : "justify-start"
+                      }`}>
                       {experience.techStack.map((tech, i) => (
                         <span key={i} className={getTechStackClasses()}>
                           {tech.name}

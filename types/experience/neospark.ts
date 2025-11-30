@@ -1,10 +1,12 @@
 import { ExperienceCustomizationState } from "./portfolio";
 
 export const defaultNeoSparkExperienceStyles: ExperienceCustomizationState = {
-    cardLayout: "default",
+
+    //layout
+    cardLayout: "glass",
+    cardSpacing: 32,
     cardBorderRadius: 16,
     cardPadding: 24,
-    cardSpacing: 32,
     containerWidth: "full",
     titleSize: "lg",
     titleWeight: "bold",
@@ -21,20 +23,15 @@ export const defaultNeoSparkExperienceStyles: ExperienceCustomizationState = {
     techStackVisible: true,
     techStackStyle: "pills",
     techStackSize: "sm",
-    timelineStyle: "line",
+    timelineStyle: "gradient",
     timelinePosition: "left",
     timelineWidth: 2,
     timelineColor: "#f97316",
     dotSize: "md",
-    dotStyle: "circle",
+    dotStyle: "hexagon",
     locationBadge: true,
     dateBadge: true,
     badgeStyle: "default",
-
-    // Side Accent
-    sideAccent: true,
-    sideAccentWidth: 4,
-    sideAccentColor: "primary",
 
     // Missing properties added during unification
     maxWidth: "full",

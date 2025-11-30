@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 import CardLayoutSelector from "./CardLayoutSelector";
 import TimelineSelector from "./TimelineSelector";
-import SideAccentSelector from "./SideAccentSelector";
-import AlignmentSelector from "../Shared/AlignmentSelector";
 import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
@@ -121,16 +119,18 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 step={4}
                             />
 
-                            <AlignmentSelector
+                            {/* <AlignmentSelector
                                 value={draftCustomization?.textAlignment ?? customization.textAlignment}
                                 onChange={value => onUpdateDraft("textAlignment", value)}
-                            />
+                            /> */}
 
                             <TimelineSelector
                                 styleValue={draftCustomization?.timelineStyle ?? customization.timelineStyle}
                                 onStyleChange={value => onUpdateDraft("timelineStyle", value)}
-                                positionValue={draftCustomization?.timelinePosition ?? customization.timelinePosition}
+                                positionValue={(draftCustomization?.timelinePosition ?? customization.timelinePosition) as any}
                                 onPositionChange={value => onUpdateDraft("timelinePosition", value)}
+                                dotStyleValue={draftCustomization?.dotStyle ?? customization.dotStyle}
+                                onDotStyleChange={value => onUpdateDraft("dotStyle", value)}
                             />
                         </>
                     )}
@@ -170,7 +170,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                     onChange={value => onUpdateDraft("descriptionSize", value)}
                                     type="size"
                                     options={[
-                                        { value: "xs", label: "Tiny", preview: "0.75rem" },
+                                        { value: "xs", label: "Extra Small", preview: "0.75rem" },
                                         { value: "sm", label: "Small", preview: "0.875rem" },
                                         { value: "md", label: "Medium", preview: "1rem" },
                                         { value: "lg", label: "Large", preview: "1.125rem" },
@@ -214,15 +214,6 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                             <TechStackStyleSelector
                                 value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
                                 onChange={value => onUpdateDraft("techStackStyle", value)}
-                            />
-
-                            <SideAccentSelector
-                                isVisible={draftCustomization?.sideAccent ?? customization.sideAccent}
-                                onVisibilityChange={value => onUpdateDraft("sideAccent", value)}
-                                width={draftCustomization?.sideAccentWidth ?? customization.sideAccentWidth}
-                                onWidthChange={value => onUpdateDraft("sideAccentWidth", value)}
-                                color={draftCustomization?.sideAccentColor ?? customization.sideAccentColor}
-                                onColorChange={value => onUpdateDraft("sideAccentColor", value)}
                             />
                         </>
                     )}

@@ -58,7 +58,7 @@ const SliderControl: React.FC<SliderControlProps> = ({
                 className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
                 style={{
                     background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary
-                        } ${(value / max) * 100}%, #3f3f46 ${(value / max) * 100}%, #3f3f46 100%)`,
+                        } ${((value - min) / (max - min)) * 100}%, #3f3f46 ${((value - min) / (max - min)) * 100}%, #3f3f46 100%)`,
                 }}
             />
         </div>

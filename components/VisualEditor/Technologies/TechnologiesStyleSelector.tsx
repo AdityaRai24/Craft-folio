@@ -11,41 +11,10 @@ export const TechnologiesStyleSelector: React.FC<TechnologiesStyleSelectorProps>
     customization,
     updateCustomization,
 }) => {
-    const cardStyles = [
-        { value: "default", label: "Default", preview: "bg-zinc-800 border-zinc-700" },
-        { value: "minimal", label: "Minimal", preview: "bg-transparent border-transparent" },
-        { value: "glass", label: "Glass", preview: "bg-white/10 backdrop-blur border-white/20" },
-        { value: "neon", label: "Neon", preview: "bg-black border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" },
-        { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-500/30" },
-        { value: "elevated", label: "Elevated", preview: "bg-zinc-800 shadow-lg border-zinc-700" },
-        { value: "outlined", label: "Outlined", preview: "bg-transparent border-zinc-500 border-2" },
-        { value: "filled", label: "Filled", preview: "bg-zinc-700 border-transparent" },
-    ];
 
     return (
         <div className="space-y-6">
             {/* Card Style Grid */}
-            <div>
-                <label className="block text-white text-left font-medium mb-3">Card Style</label>
-                <div className="grid grid-cols-2 gap-3">
-                    {cardStyles.map((style) => (
-                        <button
-                            key={style.value}
-                            onClick={() => updateCustomization("cardStyle", style.value)}
-                            className={`p-3 rounded-lg border-2 transition-all text-left group ${customization.cardStyle === style.value
-                                ? "border-white bg-zinc-700"
-                                : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
-                                }`}
-                        >
-                            <div className={`h-12 w-full rounded mb-2 border ${style.preview}`} />
-                            <span className={`text-xs ${customization.cardStyle === style.value ? "text-white" : "text-gray-400"
-                                }`}>
-                                {style.label}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-            </div>
 
             {/* Border Radius */}
             <SliderControl
@@ -76,17 +45,17 @@ export const TechnologiesStyleSelector: React.FC<TechnologiesStyleSelectorProps>
             />
 
             {/* Background Opacity */}
-            <SliderControl
+            {/* <SliderControl
                 label="Background Opacity"
                 value={customization.backgroundOpacity}
                 min={0}
                 max={100}
                 step={5}
                 onChange={(val) => updateCustomization("backgroundOpacity", val)}
-            />
+            /> */}
 
             {/* Shadow Intensity */}
-            <div>
+            {/* <div>
                 <label className="block text-white text-left font-medium mb-3">Shadow Intensity</label>
                 <div className="flex gap-2">
                     {["none", "light", "medium", "heavy"].map((intensity) => (
@@ -102,7 +71,7 @@ export const TechnologiesStyleSelector: React.FC<TechnologiesStyleSelectorProps>
                         </button>
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
