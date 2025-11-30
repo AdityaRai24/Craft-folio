@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Marquee from "react-fast-marquee";
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -127,10 +128,10 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
     <section id="skills" className={getSectionClasses()}>
       <style>{customCSS}</style>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         <SectionHeader
           sectionName="technologies"
-          headerVisible={true} // Assuming always visible for now, or add to customization state if needed
+          headerVisible={true}
           titleSize="3xl"
           titleWeight="bold"
           titleColor="black"
@@ -144,55 +145,114 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
           headerClasses={{ container: "mb-12 text-center relative", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
           currentPortTheme={currentPortTheme}
         />
+      </div>
 
-        <motion.div
-          className={getGridClasses()}
-          style={{ gap: `${effectiveCustomization.gap}px` }}
-          variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
-          initial={effectiveCustomization.staggerAnimation ? "hidden" : false}
-          animate={effectiveCustomization.staggerAnimation ? "visible" : false}
-        >
-          {technologiesData.map((technology, index) => (
-            <motion.div
-              key={index}
-              className={getCardClasses()}
-              style={{
-                borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
-                padding: `${effectiveCustomization.cardPadding}px`,
-                borderWidth: `${effectiveCustomization.borderWidth}px`,
-              }}
-              variants={effectiveCustomization.staggerAnimation ? skillVariants : undefined}
-              whileHover={effectiveCustomization.hoverEffects ? {
-                scale: effectiveCustomization.cardHoverEffect === "scale" ? 1.05 : 1,
-                y: effectiveCustomization.cardHoverEffect === "lift" ? -5 : 0,
-                rotate: effectiveCustomization.cardHoverEffect === "rotate" ? 3 : 0,
-                boxShadow: effectiveCustomization.cardHoverEffect === "glow" ? `0 0 20px ${primaryColor}40` : "none",
-              } : {}}
-              transition={{ duration: effectiveCustomization.animationSpeed / 1000 }}
+      <div className={`container mx-auto px-4 relative z-10 max-w-${effectiveCustomization.containerWidth}`}>
+        {effectiveCustomization.layout === "marquee" ? (
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10" />
+            <Marquee
+              gradient={false}
+              speed={effectiveCustomization.marqueeSpeed}
+              direction={effectiveCustomization.marqueeDirection}
+              pauseOnHover={effectiveCustomization.pauseOnHover}
+              className="py-4"
             >
-              {effectiveCustomization.showIcons && (
-                <div className={getIconClasses()} style={{ width: effectiveCustomization.iconSize, height: effectiveCustomization.iconSize }}>
-                  <img
-                    src={technology.logo}
-                    alt={technology.name}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-              )}
-              {effectiveCustomization.showLabels && (
-                <h3 className={getLabelClasses()} style={{ color: textSecondaryColor }}>
-                  {technology.name}
-                </h3>
-              )}
-            </motion.div>
-          ))}
-        </motion.div>
+              {technologiesData.map((technology, index) => (
+                <motion.div
+                  key={index}
+                  className={getCardClasses()}
+                  style={{
+                    borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+                    padding: `${effectiveCustomization.cardPadding}px`,
+                    borderWidth: `${effectiveCustomization.borderWidth}px`,
+                    width: "160px",
+                    height: "160px",
+                    margin: `0 ${effectiveCustomization.gap / 2}px`,
+                    backgroundColor: "white",
+                    borderColor: "#e5e7eb",
+                  }}
+                  whileHover={effectiveCustomization.hoverEffects ? {
+                    scale: effectiveCustomization.cardHoverEffect === "scale" ? 1.05 : 1,
+                    y: effectiveCustomization.cardHoverEffect === "lift" ? -5 : 0,
+                    rotate: effectiveCustomization.cardHoverEffect === "rotate" ? 3 : 0,
+                    boxShadow: effectiveCustomization.cardHoverEffect === "glow" ? `0 0 20px ${primaryColor}40` : "none",
+                  } : {}}
+                >
+                  {effectiveCustomization.showIcons && (
+                    <div className={getIconClasses()} style={{ width: effectiveCustomization.iconSize, height: effectiveCustomization.iconSize }}>
+                      <img
+                        src={technology.logo}
+                        alt={technology.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  {effectiveCustomization.showLabels && (
+                    <h3 className={getLabelClasses()} style={{ color: textSecondaryColor }}>
+                      {technology.name}
+                    </h3>
+                  )}
+                </motion.div>
+              ))}
+            </Marquee>
+          </div>
+        ) : (
+          <motion.div
+            className="grid gap-6"
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(effectiveCustomization.gridColumns, 6)}, minmax(0, 1fr))`,
+              gap: `${effectiveCustomization.gap}px`
+            }}
+            variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
+            initial={effectiveCustomization.staggerAnimation ? "hidden" : false}
+            animate={effectiveCustomization.staggerAnimation ? "visible" : false}
+          >
+            {technologiesData.map((technology, index) => (
+              <motion.div
+                key={index}
+                className={getCardClasses()}
+                style={{
+                  borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
+                  padding: `${effectiveCustomization.cardPadding}px`,
+                  borderWidth: `${effectiveCustomization.borderWidth}px`,
+                  backgroundColor: "white",
+                  borderColor: "#e5e7eb",
+                }}
+                variants={effectiveCustomization.staggerAnimation ? skillVariants : undefined}
+                whileHover={effectiveCustomization.hoverEffects ? {
+                  scale: effectiveCustomization.cardHoverEffect === "scale" ? 1.05 : 1,
+                  y: effectiveCustomization.cardHoverEffect === "lift" ? -5 : 0,
+                  rotate: effectiveCustomization.cardHoverEffect === "rotate" ? 3 : 0,
+                  boxShadow: effectiveCustomization.cardHoverEffect === "glow" ? `0 0 20px ${primaryColor}40` : "none",
+                } : {}}
+                transition={{ duration: effectiveCustomization.animationSpeed / 1000 }}
+              >
+                {effectiveCustomization.showIcons && (
+                  <div className={getIconClasses()} style={{ width: effectiveCustomization.iconSize, height: effectiveCustomization.iconSize }}>
+                    <img
+                      src={technology.logo}
+                      alt={technology.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                )}
+                {effectiveCustomization.showLabels && (
+                  <h3 className={getLabelClasses()} style={{ color: textSecondaryColor }}>
+                    {technology.name}
+                  </h3>
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
 
       <TechnologiesVisualEditor
         isOpen={visualEditorOpen}
         onClose={() => setVisualEditorOpen(false)}
-        customization={draftCustomization || defaultTechnologiesStyles}
+        customization={draftCustomization || customization}
         updateCustomization={updateDraftCustomization}
         onSave={saveDraftCustomization}
         onReset={resetCustomization}

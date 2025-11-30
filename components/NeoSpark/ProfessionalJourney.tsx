@@ -73,7 +73,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
     getTimelineStyles,
     getAnimationVariants,
     getBadgeClasses,
-    getBadgeStyle
+    getBadgeStyle,
+    getRoleClasses,
+    getCompanyClasses,
+    getDateClasses,
+    getLocationClasses,
+    getDescriptionTextClasses
   } = useExperienceStyles(effectiveCustomization, "dark", titleColor);
 
 
@@ -187,17 +192,12 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                         : `${titleColor}30`,
                   }}
                 >
-                  <h2 className={getTitleClasses()}>{experience.role}</h2>
+                  <h2 className={getRoleClasses()}>{experience.role}</h2>
 
                   <div className={`flex flex-wrap items-center gap-2 mb-2 sm:mb-4 text-gray-400 ${isAlternating && index % 2 === 0 ? "justify-end" : "justify-start"
                     }`}>
                     <span
-                      className={`truncate max-w-[60vw] sm:max-w-none ${effectiveCustomization.descriptionSize === "lg"
-                        ? "text-lg"
-                        : effectiveCustomization.descriptionSize === "md"
-                          ? "text-base"
-                          : "text-sm"
-                        }`}
+                      className={`truncate max-w-[60vw] sm:max-w-none ${getCompanyClasses()}`}
                     >
                       <Building className="inline h-4 w-4 mr-1" />
                       {experience.companyName}
@@ -205,7 +205,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
                     {(draftCustomization?.locationBadge ?? customization.locationBadge) && experience.location && (
                       <span
-                        className={getBadgeClasses()}
+                        className={`${getBadgeClasses()} ${getLocationClasses()}`}
                         style={getBadgeStyle()}
                       >
                         <MapPin className="inline h-3 w-3 mr-1" />
@@ -215,7 +215,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
 
                     {(draftCustomization?.dateBadge ?? customization.dateBadge) && (
                       <span
-                        className={getBadgeClasses()}
+                        className={`${getBadgeClasses()} ${getDateClasses()}`}
                         style={getBadgeStyle()}
                       >
                         <Calendar className="inline h-3 w-3 mr-1" />
@@ -225,7 +225,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                   </div>
 
                   <div className="relative">
-                    <p className={getDescriptionClasses()}>
+                    <p className={getDescriptionTextClasses()}>
                       {experience.description}
                     </p>
                     {/* Magic Write Button */}

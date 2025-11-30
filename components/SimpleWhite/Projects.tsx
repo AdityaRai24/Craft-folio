@@ -1,30 +1,15 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Github,
   ExternalLink,
   Code2,
-  Calendar, Palette,
-  Layout,
-  Move,
-  RotateCcw,
-  X, Square,
-  RectangleHorizontal,
-  RectangleVertical, Type
+  Calendar
 } from "lucide-react";
-import LayoutSelector from "@/components/VisualEditor/Projects/LayoutSelector";
-import AlignmentSelector from "@/components/VisualEditor/Shared/AlignmentSelector";
-import ButtonStyleSelector from "@/components/VisualEditor/Projects/ButtonStyleSelector";
-import AspectRatioSelector from "@/components/VisualEditor/Projects/AspectRatioSelector";
-import TechStackStyleSelector from "@/components/VisualEditor/Shared/TechStackStyleSelector";
-import SliderControl from "@/components/VisualEditor/Shared/SliderControl";
-import TypographySelector from "@/components/VisualEditor/Shared/TypographySelector";
-import ImagePositionSelector from "@/components/VisualEditor/Projects/ImagePositionSelector";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
-import { useDraggable } from "@/hooks/useDraggable";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { Technology, Project } from "@/types/projects/portfolio";
+import { Project } from "@/types/projects/portfolio";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -33,15 +18,11 @@ import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
-import toast from "react-hot-toast";
 import { defaultSimpleWhiteProjectsStyles } from "@/types/projects/simplewhite";
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
-import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization, updateSection } from "@/app/actions/portfolio";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import SectionLoading from "../Shared/SectionLoading";
-
-
+import { getContainerVariants, getProjectVariants, getImageVariants } from "./variants";
 
 
 const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
@@ -193,7 +174,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
   return (
     <section
       id="projects"
-      className="py-12  sm:py-16 md:py-20 lg:py-24 w-full bg-white overflow-hidden min-h-screen text-gray-900"
+      className="py-16 sm:py-24 w-full bg-white overflow-hidden min-h-screen text-gray-900"
     >
       <style>{`
         .slider::-webkit-slider-thumb {
@@ -218,7 +199,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
           position: relative;
         }
       `}</style>
-      <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
+      <div className="container relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           sectionName="projects"
           headerVisible={effectiveCustomization.headerVisible ?? true}
@@ -233,9 +214,9 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
           description={portfolioData?.find((section: any) => section.type === "projects")?.sectionDescription || "Some cool things that I have worked on."}
           onVisualEditorClick={openVisualEditor}
           headerClasses={{
-            container: "text-center mb-12 sm:mb-16 md:mb-20",
-            title: "font-display section-title text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-3 sm:mb-4 transition-all duration-700",
-            description: "font-sans text-base sm:text-lg section-description md:text-xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-2xl mx-auto transition-all duration-700"
+            container: "text-center mb-16 sm:mb-20",
+            title: "font-display section-title text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6 transition-all duration-700",
+            description: "font-sans text-lg sm:text-xl section-description md:text-2xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-3xl mx-auto transition-all duration-700"
           }}
           currentPortTheme={currentPortTheme}
         />
@@ -243,93 +224,68 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
         {/* Projects Grid */}
         {Array.isArray(projects) && projects.length > 0 ? (
           <motion.div
-            className={`${getLayoutClasses()}`}
+            className={`${getLayoutClasses()} gap-8 sm:gap-10 lg:gap-12`}
             style={getLayoutStyle()}
-            variants={containerVariants}
+            variants={getContainerVariants()}
             initial="hidden"
             animate="visible"
           >
             {projects.map((project: Project, index: number) => (
               <motion.div
                 key={index}
-                variants={projectVariants}
-                className={getCardClasses()}
+                variants={getProjectVariants(effectiveCustomization.animationSpeed || 0.5)}
+                className={`${getCardClasses()} group relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500`}
                 style={getCardStyle()}
               >
                 <div
                   className={
                     effectiveCustomization.layout === "grid"
-                      ? "flex flex-col items-center"
+                      ? "flex flex-col"
                       : effectiveCustomization.imagePosition === "right"
-                        ? "flex flex-col md:flex-row-reverse items-center"
-                        : "flex flex-col md:flex-row items-center"
+                        ? "flex flex-col lg:flex-row-reverse items-stretch"
+                        : "flex flex-col lg:flex-row items-stretch"
                   }
                 >
                   {/* Project Image */}
-                  {effectiveCustomization.showImages && (
+                  {(effectiveCustomization.showImages ?? true) && (
                     <div
                       className={
                         effectiveCustomization.layout === "grid"
-                          ? "w-full"
-                          : "w-full md:w-2/5 relative"
+                          ? "w-full aspect-video overflow-hidden bg-gray-100"
+                          : "w-full lg:w-2/5 relative min-h-[300px] lg:h-auto overflow-hidden bg-gray-100"
                       }
                     >
-                      <div className="relative overflow-hidden m-4">
-                        <motion.img
-                          src={project?.projectImage}
-                          alt={`${project?.projectTitle} project screenshot`}
-                          className="w-full section-image object-cover"
-                          style={getImageStyle()}
-                          initial="rest"
-                          whileHover="hover"
-                          variants={imageVariants}
-                        />
-                        {effectiveCustomization.imageOverlay && (
-                          <motion.div
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full blur-lg z-0"
-                            style={{ backgroundColor: "rgba(0, 0, 0, 0.1)" }}
-                            initial={{ opacity: 0.5, scale: 1 }}
-                            whileHover={{ opacity: 0.8, scale: 1.3 }}
-                            transition={{
-                              duration: effectiveCustomization.animationSpeed,
+                      <motion.div
+                        className="w-full h-full"
+                        initial="rest"
+                        whileHover="hover"
+                        variants={getImageVariants(effectiveCustomization.animationSpeed || 0.5)}
+                      >
+                        {project?.projectImage ? (
+                          <img
+                            src={project.projectImage}
+                            alt={`${project?.projectTitle} project screenshot`}
+                            className="w-full h-full object-cover object-center transition-transform duration-700"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              target.nextElementSibling?.classList.remove('hidden');
                             }}
                           />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400">
+                            <Code2 className="w-16 h-16 opacity-20" />
+                          </div>
                         )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      {effectiveCustomization.linksVisible && (
-                        <div className="p-3 flex justify-center gap-3">
-                          {effectiveCustomization.githubLinkVisible && (
-                            <motion.div whileHover={{ scale: 1.05 }}>
-                              <Link
-                                href={project?.githubLink || "#"}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={getButtonClasses("github")}
-                                style={getButtonStyle("github")}
-                              >
-                                <Github className="h-4 w-4" />
-                                GitHub
-                              </Link>
-                            </motion.div>
-                          )}
-                          {effectiveCustomization.liveLinkVisible && (
-                            <motion.div whileHover={{ scale: 1.05 }}>
-                              <Link
-                                href={project?.liveLink || "#"}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={getButtonClasses("live")}
-                                style={getButtonStyle("live")}
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                                Live Demo
-                              </Link>
-                            </motion.div>
-                          )}
+                        {/* Fallback for broken images */}
+                        <div className="hidden w-full h-full absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400">
+                          <Code2 className="w-16 h-16 opacity-20" />
                         </div>
-                      )}
+
+                        {effectiveCustomization.imageOverlay && (
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+                        )}
+                      </motion.div>
                     </div>
                   )}
 
@@ -337,85 +293,132 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                   <div
                     className={
                       effectiveCustomization.layout === "grid"
-                        ? "w-full"
-                        : "w-full md:w-3/5 p-5 md:p-6"
+                        ? "w-full p-6 sm:p-8 flex flex-col flex-grow"
+                        : "w-full lg:w-3/5 p-8 sm:p-10 lg:p-12 flex flex-col justify-center"
                     }
                   >
-                    <div
-                      className={`flex flex-wrap items-center ${effectiveCustomization.titleAlignment === "center"
-                        ? "justify-center"
-                        : effectiveCustomization.titleAlignment === "right"
-                          ? "justify-end"
-                          : "justify-between"
-                        } mb-3`}
-                    >
-                      <h3
-                        className={`${getTitleClasses()} ${getTitleAlignment()}`}
-                        style={{ color: textPrimaryColor }}
+                    <div className="flex flex-col h-full">
+                      <div
+                        className={`flex flex-wrap items-center gap-3 mb-4 ${effectiveCustomization.titleAlignment === "center"
+                          ? "justify-center"
+                          : effectiveCustomization.titleAlignment === "right"
+                            ? "justify-end"
+                            : "justify-start"
+                          }`}
                       >
-                        {project?.projectName}
-                      </h3>
-                      <div className="flex items-center text-sm mt-1 md:mt-0" style={{ color: textSecondaryColor }}>
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {project?.year}
-                      </div>
-                    </div>
-
-                    <div className={`relative ${getTitleAlignment()}`}>
-                      <p
-                        className={`${getDescriptionClasses()} mb-4`}
-                        style={{ color: textSecondaryColor }}
-                      >
-                        {project?.projectDescription}
-                      </p>
-                      <div className="absolute -top-1 -right-1 z-10 hidden md:block">
-                        <MagicWrite
-                          onMagicWrite={async (prompt: string, context?: string) => {
-                            const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription || "");
-                            handleProjectDescriptionUpdate(index, enhancedDescription);
-                            return enhancedDescription;
-                          }}
-                          placeholder="Enhance this project description..."
-                          buttonText=""
-                          context={project?.projectDescription || ""}
-                          className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
-                        />
-                      </div>
-                    </div>
-
-                    {effectiveCustomization.techStackVisible && project?.techStack && (
-                      <div className={getTitleAlignment()}>
-                        <h4 className="flex items-center gap-2 font-semibold mb-2">
-                          <Code2 className="h-4 w-4" />
-                          Technologies Used
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.techStack.map((tech, tagIndex) => (
-                            <motion.span
-                              key={tagIndex}
-                              className={getTechStackClasses()}
-                              style={{
-                                backgroundColor: backgroundSecondaryColor,
-                                color: textPrimaryColor,
-                                borderColor: `${textSecondaryColor}30`,
-                              }}
-                              whileHover={effectiveCustomization.hoverEffects ? { scale: 1.05 } : {}}
-                              whileTap={effectiveCustomization.hoverEffects ? { scale: 0.95 } : {}}
-                            >
-                              {tech.name}
-                            </motion.span>
-                          ))}
+                        <h3
+                          className={`${getTitleClasses()} tracking-tight`}
+                          style={{ color: textPrimaryColor }}
+                        >
+                          {project?.projectName}
+                        </h3>
+                        <div className="px-3 py-1 rounded-full bg-gray-100 text-xs font-medium tracking-wide uppercase" style={{ color: textSecondaryColor }}>
+                          {project?.year}
                         </div>
                       </div>
-                    )}
+
+                      <div className={`relative flex-grow ${getTitleAlignment()}`}>
+                        <p
+                          className={`${getDescriptionClasses()} mb-6`}
+                          style={{ color: textSecondaryColor }}
+                        >
+                          {project?.projectDescription}
+                        </p>
+                        <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <MagicWrite
+                            onMagicWrite={async (prompt: string, context?: string) => {
+                              const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription || "");
+                              handleProjectDescriptionUpdate(index, enhancedDescription);
+                              return enhancedDescription;
+                            }}
+                            placeholder="Enhance description..."
+                            buttonText=""
+                            context={project?.projectDescription || ""}
+                            className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
+                          />
+                        </div>
+                      </div>
+
+                      {(effectiveCustomization.techStackVisible ?? true) && project?.techStack && (
+                        <div className={`mb-8 ${getTitleAlignment()}`}>
+                          <div className="flex flex-wrap gap-2">
+                            {project.techStack.map((tech, tagIndex) => (
+                              <div
+                                key={tagIndex}
+                                className="group/tech relative flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 border border-transparent hover:border-gray-200 hover:bg-gray-50"
+                                style={{
+                                  backgroundColor: `${ColorTheme.primary}08`,
+                                  color: textPrimaryColor,
+                                }}
+                              >
+                                {tech.logo ? (
+                                  <img
+                                    src={tech.logo}
+                                    alt={tech.name}
+                                    className="w-4 h-4 object-contain"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).style.display = 'none';
+                                    }}
+                                  />
+                                ) : null}
+                                <span>{tech.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      {(effectiveCustomization.linksVisible ?? true) && (
+                        <div className={`flex gap-4 mt-auto ${effectiveCustomization.titleAlignment === "center"
+                          ? "justify-center"
+                          : effectiveCustomization.titleAlignment === "right"
+                            ? "justify-end"
+                            : "justify-start"
+                          }`}>
+                          {effectiveCustomization.githubLinkVisible && (
+                            <Link
+                              href={project?.githubLink || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
+                              style={{
+                                backgroundColor: "#24292e",
+                                color: "#ffffff",
+                                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                              }}
+                            >
+                              <Github className="h-4 w-4" />
+                              GitHub
+                            </Link>
+                          )}
+                          {effectiveCustomization.liveLinkVisible && (
+                            <Link
+                              href={project?.liveLink || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 border"
+                              style={{
+                                borderColor: ColorTheme.primary,
+                                color: ColorTheme.primary,
+                                backgroundColor: "transparent"
+                              }}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Live Demo
+                            </Link>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>
             ))}
           </motion.div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No projects found.</p>
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-xl">No projects found.</p>
           </div>
         )}
       </div>

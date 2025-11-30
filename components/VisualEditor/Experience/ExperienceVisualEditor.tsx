@@ -29,6 +29,7 @@ interface ExperienceVisualEditorProps {
     onTabChange: (tab: "layout" | "typography" | "styling" | "timing") => void;
     primaryColor?: string;
     primaryDarkColor?: string;
+    showTimelineControls?: boolean;
 }
 
 const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
@@ -43,6 +44,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
     onTabChange,
     primaryColor = ColorTheme.primary,
     primaryDarkColor = ColorTheme.primaryDark,
+    showTimelineControls = true,
 }) => {
     const { isDragging, position: windowPosition, dragRef, handleMouseDown } = useDraggable();
 
@@ -120,56 +122,149 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 step={4}
                             />
 
-                            <TimelineSelector
-                                styleValue={draftCustomization?.timelineStyle ?? customization.timelineStyle}
-                                onStyleChange={value => onUpdateDraft("timelineStyle", value)}
-                                positionValue={(draftCustomization?.timelinePosition ?? customization.timelinePosition) as any}
-                                onPositionChange={value => onUpdateDraft("timelinePosition", value)}
-                                dotStyleValue={draftCustomization?.dotStyle ?? customization.dotStyle}
-                                onDotStyleChange={value => onUpdateDraft("dotStyle", value)}
-                            />
+                            {showTimelineControls && (
+                                <TimelineSelector
+                                    styleValue={draftCustomization?.timelineStyle ?? customization.timelineStyle}
+                                    onStyleChange={value => onUpdateDraft("timelineStyle", value)}
+                                    positionValue={(draftCustomization?.timelinePosition ?? customization.timelinePosition) as any}
+                                    onPositionChange={value => onUpdateDraft("timelinePosition", value)}
+                                    dotStyleValue={draftCustomization?.dotStyle ?? customization.dotStyle}
+                                    onDotStyleChange={value => onUpdateDraft("dotStyle", value)}
+                                />
+                            )}
                         </>
                     )}
 
                     {activeTab === "typography" && (
                         <div className="space-y-6">
-                            <TypographySelector
-                                label="Title Size"
-                                value={draftCustomization?.titleSize ?? customization.titleSize}
-                                onChange={value => onUpdateDraft("titleSize", value)}
-                                type="size"
-                                options={[
-                                    { value: "sm", label: "Small", preview: "0.875rem" },
-                                    { value: "md", label: "Medium", preview: "1rem" },
-                                    { value: "lg", label: "Large", preview: "1.125rem" },
-                                    { value: "xl", label: "Extra Large", preview: "1.25rem" },
-                                ]}
-                            />
-
-                            <TypographySelector
-                                label="Title Weight"
-                                value={draftCustomization?.titleWeight ?? customization.titleWeight}
-                                onChange={value => onUpdateDraft("titleWeight", value)}
-                                type="weight"
-                                options={[
-                                    { value: "normal", label: "Normal", preview: "font-normal" },
-                                    { value: "medium", label: "Medium", preview: "font-medium" },
-                                    { value: "semibold", label: "Semibold", preview: "font-semibold" },
-                                    { value: "bold", label: "Bold", preview: "font-bold" },
-                                ]}
-                            />
+                            <div className="space-y-4">
+                                <TypographySelector
+                                    label="Role Size"
+                                    value={draftCustomization?.roleSize ?? customization.roleSize}
+                                    onChange={value => onUpdateDraft("roleSize", value)}
+                                    type="size"
+                                    options={[
+                                        { value: "sm", label: "Small", preview: "text-lg" },
+                                        { value: "md", label: "Medium", preview: "text-xl" },
+                                        { value: "lg", label: "Large", preview: "text-2xl" },
+                                        { value: "xl", label: "Extra Large", preview: "text-3xl" },
+                                    ]}
+                                />
+                                <TypographySelector
+                                    label="Role Weight"
+                                    value={draftCustomization?.roleWeight ?? customization.roleWeight}
+                                    onChange={value => onUpdateDraft("roleWeight", value)}
+                                    type="weight"
+                                    options={[
+                                        { value: "normal", label: "Normal", preview: "font-normal" },
+                                        { value: "medium", label: "Medium", preview: "font-medium" },
+                                        { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                        { value: "bold", label: "Bold", preview: "font-bold" },
+                                    ]}
+                                />
+                            </div>
 
                             <div className="border-t border-zinc-700 pt-4 space-y-4">
                                 <TypographySelector
-                                    label="Description Size"
-                                    value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
-                                    onChange={value => onUpdateDraft("descriptionSize", value)}
+                                    label="Company Name Size"
+                                    value={draftCustomization?.companyNameSize ?? customization.companyNameSize}
+                                    onChange={value => onUpdateDraft("companyNameSize", value)}
                                     type="size"
                                     options={[
-                                        { value: "xs", label: "Extra Small", preview: "0.75rem" },
-                                        { value: "sm", label: "Small", preview: "0.875rem" },
-                                        { value: "md", label: "Medium", preview: "1rem" },
-                                        { value: "lg", label: "Large", preview: "1.125rem" },
+                                        { value: "sm", label: "Small", preview: "text-base" },
+                                        { value: "md", label: "Medium", preview: "text-lg" },
+                                        { value: "lg", label: "Large", preview: "text-xl" },
+                                        { value: "xl", label: "Extra Large", preview: "text-2xl" },
+                                    ]}
+                                />
+                                <TypographySelector
+                                    label="Company Name Weight"
+                                    value={draftCustomization?.companyNameWeight ?? customization.companyNameWeight}
+                                    onChange={value => onUpdateDraft("companyNameWeight", value)}
+                                    type="weight"
+                                    options={[
+                                        { value: "normal", label: "Normal", preview: "font-normal" },
+                                        { value: "medium", label: "Medium", preview: "font-medium" },
+                                        { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                        { value: "bold", label: "Bold", preview: "font-bold" },
+                                    ]}
+                                />
+                            </div>
+
+                            <div className="border-t border-zinc-700 pt-4 space-y-4">
+                                <TypographySelector
+                                    label="Date Size"
+                                    value={draftCustomization?.dateSize ?? customization.dateSize ?? "sm"}
+                                    onChange={value => onUpdateDraft("dateSize", value)}
+                                    type="size"
+                                    options={[
+                                        { value: "sm", label: "Small", preview: "text-xs" },
+                                        { value: "md", label: "Medium", preview: "text-sm" },
+                                        { value: "lg", label: "Large", preview: "text-base" },
+                                    ]}
+                                />
+                                <TypographySelector
+                                    label="Date Weight"
+                                    value={draftCustomization?.dateWeight ?? customization.dateWeight ?? "medium"}
+                                    onChange={value => onUpdateDraft("dateWeight", value)}
+                                    type="weight"
+                                    options={[
+                                        { value: "normal", label: "Normal", preview: "font-normal" },
+                                        { value: "medium", label: "Medium", preview: "font-medium" },
+                                        { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                        { value: "bold", label: "Bold", preview: "font-bold" },
+                                    ]}
+                                />
+                            </div>
+
+                            <div className="border-t border-zinc-700 pt-4 space-y-4">
+                                <TypographySelector
+                                    label="Location Size"
+                                    value={draftCustomization?.locationSize ?? customization.locationSize ?? "sm"}
+                                    onChange={value => onUpdateDraft("locationSize", value)}
+                                    type="size"
+                                    options={[
+                                        { value: "sm", label: "Small", preview: "text-xs" },
+                                        { value: "md", label: "Medium", preview: "text-sm" },
+                                        { value: "lg", label: "Large", preview: "text-base" },
+                                    ]}
+                                />
+                                <TypographySelector
+                                    label="Location Weight"
+                                    value={draftCustomization?.locationWeight ?? customization.locationWeight ?? "normal"}
+                                    onChange={value => onUpdateDraft("locationWeight", value)}
+                                    type="weight"
+                                    options={[
+                                        { value: "normal", label: "Normal", preview: "font-normal" },
+                                        { value: "medium", label: "Medium", preview: "font-medium" },
+                                        { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                        { value: "bold", label: "Bold", preview: "font-bold" },
+                                    ]}
+                                />
+                            </div>
+
+                            <div className="border-t border-zinc-700 pt-4 space-y-4">
+                                <TypographySelector
+                                    label="Description Text Size"
+                                    value={draftCustomization?.descriptionTextSize ?? customization.descriptionTextSize}
+                                    onChange={value => onUpdateDraft("descriptionTextSize", value)}
+                                    type="size"
+                                    options={[
+                                        { value: "sm", label: "Small", preview: "text-sm" },
+                                        { value: "md", label: "Medium", preview: "text-base" },
+                                        { value: "lg", label: "Large", preview: "text-lg" },
+                                    ]}
+                                />
+                                <TypographySelector
+                                    label="Description Text Weight"
+                                    value={draftCustomization?.descriptionTextWeight ?? customization.descriptionTextWeight ?? "normal"}
+                                    onChange={value => onUpdateDraft("descriptionTextWeight", value)}
+                                    type="weight"
+                                    options={[
+                                        { value: "normal", label: "Normal", preview: "font-normal" },
+                                        { value: "medium", label: "Medium", preview: "font-medium" },
+                                        { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                                        { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
                                 />
                             </div>
@@ -216,22 +311,22 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
 
                     {activeTab === "timing" && (
                         <>
-                            {typeof (draftCustomization?.animationSpeed ?? customization.animationSpeed) === 'number' && (
-                                <SliderControl
-                                    label="Animation Speed"
-                                    value={(draftCustomization?.animationSpeed ?? customization.animationSpeed) as number}
-                                    onChange={value => onUpdateDraft("animationSpeed", value)}
-                                    min={100}
-                                    max={1000}
-                                    step={50}
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-300">Stagger Animation</span>
+                                <input
+                                    type="checkbox"
+                                    checked={draftCustomization?.staggerAnimation ?? customization.staggerAnimation}
+                                    onChange={e => onUpdateDraft("staggerAnimation", e.target.checked)}
+                                    className="w-4 h-4 rounded border-gray-600 bg-zinc-700 text-blue-600 focus:ring-blue-500"
                                 />
-                            )}
+                            </div>
+
                             <SliderControl
-                                label="Stagger Delay"
-                                value={draftCustomization?.staggerDelay ?? customization.staggerDelay}
-                                onChange={value => onUpdateDraft("staggerDelay", value)}
-                                min={0}
-                                max={500}
+                                label="Animation Speed (ms)"
+                                value={typeof (draftCustomization?.animationSpeed ?? customization.animationSpeed) === 'number' ? (draftCustomization?.animationSpeed ?? customization.animationSpeed) as number : 500}
+                                onChange={value => onUpdateDraft("animationSpeed", value)}
+                                min={100}
+                                max={1000}
                                 step={50}
                             />
                         </>
@@ -239,29 +334,35 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
-                    <div className="flex gap-2">
+                <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800 flex justify-between gap-3">
+                    <button
+                        onClick={onReset}
+                        className="p-2 text-gray-400 hover:text-white hover:bg-zinc-700 rounded-md transition-colors"
+                        title="Reset to Defaults"
+                    >
+                        <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </button>
+                    <div className="flex gap-2 sm:gap-3">
                         <button
-                            onClick={onReset}
-                            className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                            onClick={onClose}
+                            className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-300 hover:text-white hover:bg-zinc-700 rounded-md transition-colors"
                         >
-                            <RotateCcw className="h-3 w-3" />
-                            Reset
+                            Cancel
                         </button>
                         <button
                             onClick={onSave}
-                            className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
+                            className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white rounded-md transition-colors shadow-sm"
                             style={{
                                 background: `linear-gradient(135deg, ${primaryColor}, ${primaryDarkColor})`,
                             }}
                         >
-                            Done
+                            Save Changes
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Overlay for floating window */}
+            {/* Backdrop */}
             <div
                 className="fixed inset-0 bg-black/20 z-40"
                 onClick={onClose}

@@ -70,7 +70,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
   };
 
   const getTechStackClasses = () => {
-    let classes = "px-2 py-1 text-xs font-medium transition-all duration-300 ";
+    let classes = "inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium transition-all duration-300 ";
 
     if (customization.techStackStyle === "pills") {
       classes += "rounded-full border ";
@@ -187,6 +187,83 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     };
   };
 
+  const getRoleClasses = () => {
+    const sizeMap = {
+      sm: "text-lg",
+      md: "text-xl",
+      lg: "text-2xl",
+      xl: "text-3xl",
+    };
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+    return `${sizeMap[customization.roleSize]} ${weightMap[customization.roleWeight]} tracking-tight`;
+  };
+
+  const getCompanyClasses = () => {
+    const sizeMap = {
+      sm: "text-base",
+      md: "text-lg",
+      lg: "text-xl",
+      xl: "text-2xl",
+    };
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+    return `${sizeMap[customization.companyNameSize]} ${weightMap[customization.companyNameWeight]}`;
+  };
+
+  const getDescriptionTextClasses = () => {
+    const sizeMap = {
+      sm: "text-sm",
+      md: "text-base",
+      lg: "text-lg",
+    };
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+    return `${sizeMap[customization.descriptionTextSize]} ${weightMap[customization.descriptionTextWeight || "normal"]} leading-relaxed`;
+  };
+
+  const getDateClasses = () => {
+    const sizeMap = {
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-base",
+    };
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+    return `${sizeMap[customization.dateSize || "sm"]} ${weightMap[customization.dateWeight || "medium"]}`;
+  };
+
+  const getLocationClasses = () => {
+    const sizeMap = {
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-base",
+    };
+    const weightMap = {
+      normal: "font-normal",
+      medium: "font-medium",
+      semibold: "font-semibold",
+      bold: "font-bold",
+    };
+    return `${sizeMap[customization.locationSize || "sm"]} ${weightMap[customization.locationWeight || "normal"]}`;
+  };
+
   return {
     getCardClasses,
     getCardStyle,
@@ -199,6 +276,11 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
     getTimelineStyles,
     getAnimationVariants,
     getBadgeClasses,
-    getBadgeStyle
+    getBadgeStyle,
+    getRoleClasses,
+    getCompanyClasses,
+    getDescriptionTextClasses,
+    getDateClasses,
+    getLocationClasses
   };
 };

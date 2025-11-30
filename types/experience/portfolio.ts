@@ -36,10 +36,15 @@ export interface ExperienceCustomizationState {
   roleWeight: "normal" | "medium" | "semibold" | "bold";
   roleColor: "gray-900" | "gray-800" | "primary" | string;
   dateFormat: "month-year" | "full-date" | "year-only";
+  dateSize: "sm" | "md" | "lg";
+  dateWeight: "normal" | "medium" | "semibold" | "bold";
   dateColor: "gray-500" | "gray-600" | "gray-700" | string;
   locationVisible: boolean;
+  locationSize: "sm" | "md" | "lg";
+  locationWeight: "normal" | "medium" | "semibold" | "bold";
   locationColor: "gray-500" | "gray-600" | "gray-700" | string;
   descriptionTextSize: "sm" | "md" | "lg";
+  descriptionTextWeight: "normal" | "medium" | "semibold" | "bold";
   descriptionTextColor: "gray-600" | "gray-700" | "gray-800" | string;
 
   // Visual Effects
@@ -80,6 +85,11 @@ export interface ExperienceCustomizationState {
   locationBadge: boolean;
   dateBadge: boolean;
   badgeStyle: "default" | "minimal" | "outlined" | "glow";
+
+  // Side Accent
+  sideAccent: boolean;
+  sideAccentColor: string;
+  sideAccentWidth: number;
 
 }
 

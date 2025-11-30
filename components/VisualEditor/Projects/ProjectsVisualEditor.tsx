@@ -137,6 +137,36 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                 onChange={value => onUpdateDraft("titleAlignment", value)}
               />
 
+              <div className="space-y-3 pt-2 border-t border-zinc-700">
+                <label className="flex items-center justify-between text-sm text-gray-300">
+                  <span>Show Images</span>
+                  <input
+                    type="checkbox"
+                    checked={draftCustomization?.showImages ?? customization.showImages ?? true}
+                    onChange={e => onUpdateDraft("showImages", e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-zinc-700 text-blue-600 focus:ring-blue-500"
+                  />
+                </label>
+                <label className="flex items-center justify-between text-sm text-gray-300">
+                  <span>Show Tech Stack</span>
+                  <input
+                    type="checkbox"
+                    checked={draftCustomization?.techStackVisible ?? customization.techStackVisible ?? true}
+                    onChange={e => onUpdateDraft("techStackVisible", e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-zinc-700 text-blue-600 focus:ring-blue-500"
+                  />
+                </label>
+                <label className="flex items-center justify-between text-sm text-gray-300">
+                  <span>Show Links</span>
+                  <input
+                    type="checkbox"
+                    checked={draftCustomization?.linksVisible ?? customization.linksVisible ?? true}
+                    onChange={e => onUpdateDraft("linksVisible", e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-zinc-700 text-blue-600 focus:ring-blue-500"
+                  />
+                </label>
+              </div>
+
               {(draftCustomization?.layout ?? customization.layout) === "single" && (
                 <ImagePositionSelector
                   value={draftCustomization?.imagePosition ?? customization.imagePosition}

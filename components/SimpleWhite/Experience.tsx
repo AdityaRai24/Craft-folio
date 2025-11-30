@@ -52,8 +52,16 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
 
   const {
     getCardClasses,
+    getCardStyle,
     getTechStackClasses,
+    getTechStackStyle,
+    getTimelineStyles,
     getAnimationVariants,
+    getRoleClasses,
+    getCompanyClasses,
+    getDescriptionTextClasses,
+    getDateClasses,
+    getLocationClasses
   } = useExperienceStyles(effectiveCustomization, "light", primaryColor);
 
   const { getHeaderClasses } = useSimpleWhiteExperienceStyles(effectiveCustomization);
@@ -112,7 +120,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
   return (
     <section
       id="experience"
-      className="py-20 bg-white"
+      className="py-16 sm:py-24 bg-white"
     >
       <style>{customCSS}</style>
 
@@ -136,76 +144,75 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
           title={portfolioData?.find((section: any) => section.type === "experience")?.sectionTitle || "Professional Experience"}
           description={portfolioData?.find((section: any) => section.type === "experience")?.sectionDescription || "My journey in the industry"}
           onVisualEditorClick={openVisualEditor}
-          headerClasses={getHeaderClasses()}
+          headerClasses={{
+            container: "text-center mb-16 sm:mb-20",
+            title: "font-display section-title text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6 transition-all duration-700",
+            description: "font-sans text-lg sm:text-xl section-description md:text-2xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-3xl mx-auto transition-all duration-700"
+          }}
           currentPortTheme={currentPortTheme}
         />
 
         {experienceData.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-20 text-gray-400 text-xl">
             No professional experience added yet.
           </div>
         ) : (
-          <>
+          <div className="relative max-w-4xl mx-auto">
+            {/* Vertical Line Removed for SimpleWhite */}
+
             <motion.div
               variants={effectiveCustomization.staggerAnimation ? animationVariants : undefined}
               initial={effectiveCustomization.staggerAnimation ? "hidden" : undefined}
               whileInView={effectiveCustomization.staggerAnimation ? "visible" : undefined}
               viewport={{ once: true, margin: "-50px" }}
-              className="relative"
+              className="flex flex-col"
+              style={{ gap: `${effectiveCustomization.cardSpacing}px` }}
             >
               {experienceData.map((exp, index) => (
                 <motion.div
                   key={index}
                   variants={effectiveCustomization.staggerAnimation ? animationVariants : undefined}
-                  className={`${getCardClasses()} ${visibleItems[index] ? 'opacity-100' : 'opacity-0'
-                    } mx-auto`}
+                  className={`relative flex flex-col gap-8 ${visibleItems[index] ? 'opacity-100' : 'opacity-0'}`}
                 >
+                  {/* Timeline Dot Removed */}
 
-                  <motion.div className="mb-6">
-                    <h3 className={`font-title section-sub-title mb-2 ${effectiveCustomization.roleSize === "sm" ? "text-lg md:text-xl" :
-                      effectiveCustomization.roleSize === "md" ? "text-xl md:text-2xl" :
-                        effectiveCustomization.roleSize === "lg" ? "text-2xl md:text-3xl" : "text-3xl md:text-4xl"
-                      } ${effectiveCustomization.roleWeight === "normal" ? "font-normal" :
-                        effectiveCustomization.roleWeight === "medium" ? "font-medium" :
-                          effectiveCustomization.roleWeight === "semibold" ? "font-semibold" : "font-bold"
-                      }`}
-                      style={{ color: textPrimaryColor }}>
-                      {exp.role}
-                    </h3>
-                    <p className={`font-title section-sub-title mb-3 ${effectiveCustomization.companyNameSize === "sm" ? "text-base" :
-                      effectiveCustomization.companyNameSize === "md" ? "text-lg" :
-                        effectiveCustomization.companyNameSize === "lg" ? "text-xl" : "text-2xl"
-                      } ${effectiveCustomization.companyNameWeight === "normal" ? "font-normal" :
-                        effectiveCustomization.companyNameWeight === "medium" ? "font-medium" :
-                          effectiveCustomization.companyNameWeight === "semibold" ? "font-semibold" : "font-bold"
-                      }`}
-                      style={{ color: textSecondaryColor }}>
-                      {exp.company}
-                    </p>
-                    <p className={`font-sans text-sm uppercase tracking-wider font-medium`}
-                      style={{ color: textSecondaryColor }}>
-                      {effectiveCustomization.dateFormat === "year-only"
-                        ? `${(exp.startDate || "").split(' ')[1] || exp.startDate} - ${(exp.endDate || "").split(' ')[1] || exp.endDate}`
-                        : `${exp.startDate} - ${exp.endDate}`}
-                    </p>
-                    {effectiveCustomization.locationVisible && exp.location && (
-                      <span className="capitalize" style={{ color: textSecondaryColor }}>{exp.location}</span>
-                    )}
-                  </motion.div>
-
-                  <ul className="space-y-4">
-                    <motion.li
-                      className="flex items-start group relative"
+                  {/* Content Card */}
+                  <div className="w-full">
+                    <div
+                      className={getCardClasses()}
+                      style={getCardStyle(false)}
                     >
-                      <span className="inline-block w-1.5 h-1.5 rounded-full mt-2.5 mr-3 flex-shrink-0" style={{ backgroundColor: textSecondaryColor }} />
-                      <div className="flex-1 relative">
-                        <p className={`font-sans section-sub-description leading-relaxed font-normal ${effectiveCustomization.descriptionTextSize === "sm" ? "text-sm" :
-                          effectiveCustomization.descriptionTextSize === "md" ? "text-base" : "text-lg"
-                          }`}
-                          style={{ color: textSecondaryColor }}>
+                      <div className="flex flex-col gap-1 mb-4">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className={getRoleClasses()}
+                            style={{ color: textPrimaryColor }}>
+                            {exp.role}
+                          </h3>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 whitespace-nowrap ${getDateClasses()}`}>
+                            {effectiveCustomization.dateFormat === "year-only"
+                              ? `${(exp.startDate || "").split(' ')[1] || exp.startDate} - ${(exp.endDate || "").split(' ')[1] || exp.endDate}`
+                              : `${exp.startDate} - ${exp.endDate}`}
+                          </span>
+                        </div>
+                        <div className={getCompanyClasses()} style={{ color: ColorTheme.primary }}>
+                          {exp.company}
+                        </div>
+                        {effectiveCustomization.locationVisible && exp.location && (
+                          <div className={`flex items-center gap-1 ${getLocationClasses()}`} style={{ color: effectiveCustomization.locationColor }}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {exp.location}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="relative">
+                        <p className={`${getDescriptionTextClasses()} mb-6`} style={{ color: textSecondaryColor }}>
                           {exp.description}
                         </p>
-                        <div className="absolute -top-1 -right-1 z-10 hidden md:block">
+                        <div className="absolute -top-2 -right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <MagicWrite
                             onMagicWrite={async (prompt: string) => {
                               const enhanced = await handleMagicWrite(prompt, exp.description, "experience");
@@ -215,35 +222,43 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                               await saveEnhancedContent(updated);
                               return enhanced;
                             }}
-                            placeholder="Enhance this experience description..."
+                            placeholder="Enhance description..."
                             buttonText=""
                             context={exp.description}
-                            className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
+                            className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
                           />
                         </div>
                       </div>
-                    </motion.li>
-                  </ul>
 
-                  {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {exp.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech: Technology, techIndex: number) => (
-                        <span
-                          key={techIndex}
-                          className={getTechStackClasses()}
-                        >
-                          {effectiveCustomization.techStackShowIcons && tech.logo && (
-                            <img src={tech.logo || "https://placehold.co/100x100?text=${searchValue}&font=montserrat&fontsize=18"} alt={tech.name} className="h-4 w-4 inline-block mr-1" />
-                          )}
-                          {tech.name}
-                        </span>
-                      ))}
+                      {effectiveCustomization.techStackVisible && exp.techStack && exp.techStack.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-50">
+                          {exp.techStack.slice(0, effectiveCustomization.techStackLimit).map((tech: Technology, techIndex: number) => (
+                            <div
+                              key={techIndex}
+                              className={getTechStackClasses()}
+                              style={getTechStackStyle()}
+                            >
+                              {effectiveCustomization.techStackShowIcons && tech.logo && (
+                                <img
+                                  src={tech.logo}
+                                  alt={tech.name}
+                                  className="h-3.5 w-3.5 object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              {tech.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
-          </>
+          </div>
         )}
       </div>
 

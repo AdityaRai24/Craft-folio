@@ -72,7 +72,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     getSocialLinksClasses,
     getResumeButtonStyle,
     getResumeButtonInlineStyle,
-  } = useSimpleWhiteHeroStyles(customization, theme, ColorTheme);
+  } = useSimpleWhiteHeroStyles(effectiveCustomization, theme, ColorTheme);
 
 
 
@@ -360,13 +360,13 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           transition: { delay: 0.8, duration: 0.5 },
                         }}
                       >
-                        {userInfo?.shortSummary ||
+                        {heroData?.shortSummary || userInfo?.shortSummary ||
                           "I build exceptional and accessible digital experiences for the web."}
                       </motion.p>
                       <div className="absolute -top-1 -right-1 z-10 hidden md:block">
                         <MagicWrite
                           onMagicWrite={async (prompt: string, context?: string) => {
-                            const enhancedSummary = await handleMagicWrite(prompt, userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web.");
+                            const enhancedSummary = await handleMagicWrite(prompt, heroData?.shortSummary || userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web.");
                             // Update userInfo with enhanced summary
                             const updatedUserInfo = {
                               ...userInfo,
@@ -398,7 +398,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           }}
                           placeholder="Enhance this summary..."
                           buttonText=""
-                          context={userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web."}
+                          context={heroData?.shortSummary || userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web."}
                           className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
                         />
                       </div>
@@ -439,7 +439,6 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             {effectiveCustomization.scrollIndicatorVisible && (
               <motion.div
                 className="flex justify-center mt-8 sm:mt-10 lg:mt-12"
-                initial={{ y: -20, opacity: 0 }}
                 animate={{
                   y: 0,
                   opacity: 1,

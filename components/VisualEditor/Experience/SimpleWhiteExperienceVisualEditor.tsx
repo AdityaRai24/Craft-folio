@@ -19,7 +19,7 @@ interface SimpleWhiteExperienceVisualEditorProps {
 const SimpleWhiteExperienceVisualEditor: React.FC<
     SimpleWhiteExperienceVisualEditorProps
 > = (props) => {
-    return <ExperienceVisualEditor {...props} />;
+    return <ExperienceVisualEditor {...props} showTimelineControls={false} />;
 };
 
 export default SimpleWhiteExperienceVisualEditor;
