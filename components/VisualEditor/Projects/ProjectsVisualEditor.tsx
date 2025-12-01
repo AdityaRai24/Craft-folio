@@ -19,7 +19,7 @@ import TypographySelector from "../Shared/TypographySelector";
 import ImagePositionSelector from "./ImagePositionSelector";
 import CardStyleSelector from "../Shared/CardStyleSelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { ProjectsCustomizationState } from "@/types/interfaces/ProjectsCustomizationState";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface ProjectsVisualEditorProps {

@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useUser } from "@clerk/nextjs";
 import { RootState } from "@/store/store";
 import {
   motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
+  AnimatePresence, useSpring,
   useTransform,
-  MotionValue,
+  MotionValue
 } from "framer-motion";
-import { Maximize2, Minimize2, FileText, Github, Linkedin, Mail, Image as ImageIcon, Cpu, X, Layout } from "lucide-react";
+import { Maximize2, Minimize2, Github, Linkedin, X } from "lucide-react";
 import TopBar from "./TopBar";
 import ProjectsGrid from "./Projects";
 import TerminalWindow from "./TerminalWindow";
@@ -30,7 +28,14 @@ import Terminal from "./icons/terminal.svg";
 import ContactIcon from "./icons/contact.svg";
 import SafariIcon from "./icons/safari.svg";
 import CodeIcon from "./icons/code.svg";
+import WallpaperIcon from "./icons/wallpaper.svg";
+import WidgetIcon from "./icons/widget.svg";
+import SkillsIcon from "./icons/skills.svg";
+
 import { useDesktopEnvironment, WindowState } from "@/hooks/useDesktopEnvironment";
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultMacOSHeroStyles } from "@/types/macos/hero";
+import { defaultMacOSWidgetStyles } from "@/types/macos/widget";
 
 interface DesktopProps {
   currentPortTheme?: string;
@@ -48,18 +53,13 @@ const Desktop: React.FC<DesktopProps> = ({
   const portfolioData = useSelector(
     (state: RootState) => state.data.portfolioData
   );
-  const heroData =
-    portfolioData?.find((item: any) => item.type === "hero")?.data || {};
+  const {
+    effectiveCustomization: heroCustomization
+  } = useCustomization("hero", defaultMacOSHeroStyles, portfolioId || "");
 
-  const widgetData = portfolioData?.find((item: any) => item.type === "desktopWidget")?.data || {
-    isVisible: true,
-    showTime: true,
-    showDate: true,
-    showGreeting: true,
-    position: "top-right",
-    style: "modern",
-    customGreeting: "",
-  };
+  const {
+    effectiveCustomization: widgetCustomization
+  } = useCustomization("desktopWidget", defaultMacOSWidgetStyles, portfolioId || "");
 
   const themeWallpapers: Record<string, string> = {
     Sonoma: "https://4kwallpapers.com/images/wallpapers/macos-sonoma-5120x2880-12164.jpg",
@@ -68,7 +68,7 @@ const Desktop: React.FC<DesktopProps> = ({
   };
 
   const backgroundImage =
-    heroData.image ||
+    heroCustomization.image ||
     (currentPortTheme && themeWallpapers[currentPortTheme]) ||
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80";
 
@@ -159,13 +159,13 @@ const Desktop: React.FC<DesktopProps> = ({
   const dockConfig: Record<string, any> = {
     projects: { id: "projects", icon: CodeIcon, label: "Projects", component: ProjectsGrid },
     experience: { id: "experience", icon: "https://cdn-icons-png.flaticon.com/512/3281/3281289.png", label: "Experience", component: ExperienceWindow },
-    skills: { id: "skills", icon: "/tie-svgrepo-com.svg", label: "Skills", component: Technologies },
+    skills: { id: "skills", icon: SkillsIcon, label: "Skills", component: Technologies },
     terminal: { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
     resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
     safari: { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
-    wallpaper: { id: "wallpaper", icon: "/wallpaper-svgrepo-com.svg", label: "Wallpaper", component: WallpaperVisualEditor },
-    widgets: { id: "widgets", icon: "/widget-5-svgrepo-com.svg", label: "Widgets", component: DesktopWidgetVisualEditor },
+    wallpaper: { id: "wallpaper", icon: WallpaperIcon, label: "Wallpaper", component: WallpaperVisualEditor },
+    widgets: { id: "widgets", icon: WidgetIcon, label: "Widgets", component: DesktopWidgetVisualEditor },
   };
 
   // Dynamically order dock items based on portfolioData
@@ -258,7 +258,8 @@ const Desktop: React.FC<DesktopProps> = ({
         handleMouseDown={handleMouseDown}
         getWindowTitle={getWindowTitle}
         font={font}
-        widgetData={widgetData}
+        widgetData={widgetCustomization}
+        heroCustomization={heroCustomization}
         closeAllWindows={closeAllWindows} // Pass closeAllWindows
       />
     </MacOSThemeProvider>
@@ -291,6 +292,7 @@ function DesktopContent({
   font,
   widgetData,
   closeAllWindows, // Receive closeAllWindows
+  heroCustomization,
 }: any) {
   const { theme } = useMacOSTheme();
   const { user } = useUser();
@@ -376,12 +378,18 @@ function DesktopContent({
     <div className={`fixed inset-0 overflow-hidden ${isDark ? "bg-gray-900" : "bg-gray-100"} ${font || ""}`}>
       {/* Desktop Background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
           backgroundImage: `url(${backgroundImage})`,
+          filter: `blur(${heroCustomization?.blur || 0}px) grayscale(${heroCustomization?.grayscale || 0}%) brightness(${heroCustomization?.brightness || 100}%)`,
         }}
       >
-        <div className="absolute inset-0 bg-black/20" />
+        <div
+          className="absolute inset-0 transition-all duration-500"
+          style={{
+            backgroundColor: `rgba(0,0,0,${(heroCustomization?.overlayOpacity || 20) / 100})`
+          }}
+        />
       </div>
 
       {/* Desktop Widget */}

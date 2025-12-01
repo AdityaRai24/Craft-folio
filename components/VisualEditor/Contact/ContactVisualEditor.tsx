@@ -8,7 +8,6 @@ import {
     RotateCcw,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { ContactCustomizationState } from "@/types/contact/portfolio";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ColorTheme } from "@/lib/colorThemes";
 
@@ -21,6 +20,7 @@ import AlignmentSelector from "./AlignmentSelector";
 import CardStyleSelector from "../Shared/CardStyleSelector";
 import IconStyleSelector from "./IconStyleSelector";
 import SliderControl from "./SliderControl";
+import { ContactCustomizationState } from "@/types/interfaces/ContactCustomizationState";
 
 interface ContactVisualEditorProps {
     isOpen: boolean;

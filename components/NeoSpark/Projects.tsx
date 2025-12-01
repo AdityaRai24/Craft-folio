@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
 import { defaultNeoSparkProjectsStyles } from "@/types/neospark/projects";
-import { Project, Technology } from "@/types/projects/portfolio";
+import { Project, Technology } from "@/types/interfaces/ProjectsCustomizationState";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { useProjectStyles } from "@/hooks/useProjectStyles";

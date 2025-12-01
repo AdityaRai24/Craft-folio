@@ -10,12 +10,12 @@ import SectionHeader from './SectionHeader';
 import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
-import { TechnologiesCustomizationState, Technology } from "@/types/technologies/portfolio";
 import { defaultSimpleWhiteTechnologiesStyles } from "@/types/simplewhite/technologies";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import SectionLoading from "../Shared/SectionLoading";
+import { Technology } from "@/types/interfaces/TechnologiesCustomizationState";
 
 
 const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
@@ -170,8 +170,6 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
                     width: "160px",
                     height: "160px",
                     margin: `0 ${effectiveCustomization.gap / 2}px`,
-                    backgroundColor: "white",
-                    borderColor: "#e5e7eb",
                   }}
                   whileHover={effectiveCustomization.hoverEffects ? {
                     scale: effectiveCustomization.cardHoverEffect === "scale" ? 1.05 : 1,
@@ -217,8 +215,6 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
                   borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                   padding: `${effectiveCustomization.cardPadding}px`,
                   borderWidth: `${effectiveCustomization.borderWidth}px`,
-                  backgroundColor: "white",
-                  borderColor: "#e5e7eb",
                 }}
                 variants={effectiveCustomization.staggerAnimation ? skillVariants : undefined}
                 whileHover={effectiveCustomization.hoverEffects ? {

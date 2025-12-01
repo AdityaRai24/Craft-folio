@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { updateSection } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
-import { Project } from '@/types/projects/portfolio';
+import { Project } from '@/types/interfaces/ProjectsCustomizationState';
 
 interface UseProjectActionsProps {
   portfolioId: string;
@@ -10,7 +10,7 @@ interface UseProjectActionsProps {
 }
 
 export const useProjectActions = ({ portfolioId, projectsData, setProjectsData }: UseProjectActionsProps) => {
-  
+
   const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
     try {
       const response = await fetch('/api/magicwrite', {
@@ -31,7 +31,7 @@ export const useProjectActions = ({ portfolioId, projectsData, setProjectsData }
 
       const data = await response.json();
       const enhancedDescription = data.response || data.content || data.result;
-      
+
       return enhancedDescription;
     } catch (error) {
       console.error('Magic Write API error:', error);
@@ -47,7 +47,7 @@ export const useProjectActions = ({ portfolioId, projectsData, setProjectsData }
         projectDescription: newDescription
       };
       setProjectsData(updatedProjects);
-      
+
       // Save to database
       const result = await updateSection({
         sectionName: "projects",
@@ -56,7 +56,7 @@ export const useProjectActions = ({ portfolioId, projectsData, setProjectsData }
         sectionTitle: "Projects",
         sectionDescription: "Projects section"
       });
-      
+
       if (result.success) {
         toast.success("Project description enhanced and saved successfully!");
       } else {

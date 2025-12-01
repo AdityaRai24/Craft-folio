@@ -14,7 +14,7 @@ import TechStackStyleSelector from "../Shared/TechStackStyleSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { ExperienceCustomizationState } from "@/types/interfaces/ExperienceCustomizationState";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface ExperienceVisualEditorProps {

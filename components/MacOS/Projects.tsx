@@ -7,17 +7,13 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { Project } from "@/types/projects/portfolio";
+import { Project } from "@/types/interfaces/ProjectsCustomizationState";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
 import { motion } from "framer-motion";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { useUser } from "@clerk/nextjs";
-import toast from "react-hot-toast";
 import { defaultMacOSProjectsStyles } from "@/types/macos/projects";
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
-import { deleteComponentCustomization, getComponentCustomization, saveComponentCustomization } from "@/app/actions/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { ColorTheme } from "@/lib/colorThemes";

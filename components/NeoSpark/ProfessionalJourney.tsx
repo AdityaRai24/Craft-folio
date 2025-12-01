@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { Experience } from "@/types/experience/shared";
+import { Experience } from "@/types/interfaces/Experience";
 import { defaultNeoSparkExperienceStyles } from "@/types/neospark/experience";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useCustomization } from "@/hooks/useCustomization";
@@ -270,7 +270,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
         onClose={() => setVisualEditorOpen(false)}
         customization={customization}
         draftCustomization={draftCustomization}
-        onUpdateDraft={updateDraftCustomization}
+        onUpdateDraft={updateDraftCustomization as any}
         onSave={saveDraftCustomization}
         onReset={resetCustomization}
         activeTab={activeTab}

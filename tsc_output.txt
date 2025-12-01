@@ -1,0 +1,45 @@
+﻿components/MacOS/Contact.tsx(241,9): error TS2322: Type '(key: keyof ContactCustomizationState, value: any) => void' is not assignable to type '(key: string | number | symbol, value: any) => void'.
+  Types of parameters 'key' and 'key' are incompatible.
+    Type 'string | number | symbol' is not assignable to type 'keyof ContactCustomizationState'.
+      Type 'string' is not assignable to type 'keyof ContactCustomizationState'.
+components/MacOS/Technologies.tsx(9,28): error TS2307: Cannot find module '@/types/technologies/portfolio' or its corresponding type declarations.
+components/NeoSpark/Contact.tsx(369,9): error TS2322: Type '(key: keyof ContactCustomizationState, value: any) => void' is not assignable to type '(key: string | number | symbol, value: any) => void'.
+  Types of parameters 'key' and 'key' are incompatible.
+    Type 'string | number | symbol' is not assignable to type 'keyof ContactCustomizationState'.
+      Type 'string' is not assignable to type 'keyof ContactCustomizationState'.
+components/NeoSpark/Technologies.tsx(9,28): error TS2307: Cannot find module '@/types/technologies/portfolio' or its corresponding type declarations.
+components/SimpleWhite/Contact.tsx(193,17): error TS2322: Type '(key: keyof ContactCustomizationState, value: any) => void' is not assignable to type '(key: string | number | symbol, value: any) => void'.
+  Types of parameters 'key' and 'key' are incompatible.
+    Type 'string | number | symbol' is not assignable to type 'keyof ContactCustomizationState'.
+      Type 'string' is not assignable to type 'keyof ContactCustomizationState'.
+components/SimpleWhite/Hero.tsx(512,11): error TS2322: Type '(key: keyof SimpleWhiteHeroCustomizationState, value: any) => void' is not assignable to type '(key: string | number | symbol, value: any) => void'.
+  Types of parameters 'key' and 'key' are incompatible.
+    Type 'string | number | symbol' is not assignable to type 'keyof SimpleWhiteHeroCustomizationState'.
+      Type 'string' is not assignable to type 'keyof SimpleWhiteHeroCustomizationState'.
+components/SimpleWhite/Hero.tsx(527,11): error TS2322: Type '(key: keyof ContactCustomizationState, value: any) => void' is not assignable to type '(key: string | number | symbol, value: any) => void'.
+  Types of parameters 'key' and 'key' are incompatible.
+    Type 'string | number | symbol' is not assignable to type 'keyof ContactCustomizationState'.
+      Type 'string' is not assignable to type 'keyof ContactCustomizationState'.
+components/VisualEditor/Contact/ContactVisualEditor.tsx(11,43): error TS2307: Cannot find module '@/types/contact/portfolio' or its corresponding type declarations.
+components/VisualEditor/Hero/SimpleWhiteHeroVisualEditor.tsx(7,51): error TS2307: Cannot find module '@/types/simplewhite/hero-types' or its corresponding type declarations.
+components/VisualEditor/Technologies/TypographySelector.tsx(3,48): error TS2307: Cannot find module '@/types/technologies/portfolio' or its corresponding type declarations.
+hooks/useContactStyles.ts(1,43): error TS2307: Cannot find module '@/types/contact/portfolio' or its corresponding type declarations.
+hooks/useContactStyles.ts(69,24): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ compact: string; default: string; large: string; }'.
+hooks/useLumenEducationStyles.ts(1,45): error TS2307: Cannot find module '@/types/education/portfolio' or its corresponding type declarations.
+hooks/useSimpleWhiteHeroStyles.ts(1,51): error TS2307: Cannot find module '@/types/simplewhite/hero-types' or its corresponding type declarations.
+hooks/useSimpleWhiteHeroStyles.ts(32,157): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ center: string; left: string; right: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(33,17): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; xl: string; "2xl": string; full: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(54,43): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; xl: string; "2xl": string; "3xl": string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(54,79): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ normal: string; medium: string; semibold: string; bold: string; extrabold: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(73,47): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; xl: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(73,86): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ normal: string; medium: string; semibold: string; bold: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(84,49): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(93,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ white: string; "gray-50": string; "gray-100": string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(170,28): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ solid: string; gradient: string; transparent: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(170,99): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ none: string; light: string; medium: string; heavy: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(170,138): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ none: string; subtle: string; bold: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(195,68): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ border: string; scale: string; glow: string; none: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(195,118): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ circular: string; square: string; minimal: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(195,241): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(207,19): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sm: string; md: string; lg: string; }'.
+hooks/useSimpleWhiteHeroStyles.ts(234,16): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ default: { backgroundColor: any; color: string; border: string; }; animated: { background: string; color: string; border: string; }; minimal: { backgroundColor: string; color: any; border: string; }; outline: { ...; }; }'.

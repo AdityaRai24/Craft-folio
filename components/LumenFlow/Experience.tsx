@@ -15,8 +15,7 @@ import { HeaderComponent } from "./Components";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
 import { defaultLumenFlowExperienceStyles } from "@/types/lumenflow/experience";
-
-import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
+import { Experience as ExperienceData, Technology } from "@/types/interfaces/Experience";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
 import SectionLoading from "../Shared/SectionLoading";
@@ -325,7 +324,7 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
         onClose={() => setVisualEditorOpen(false)}
         customization={customization}
         draftCustomization={draftCustomization}
-        onUpdateDraft={updateDraftCustomization}
+        onUpdateDraft={updateDraftCustomization as any}
         onSave={saveDraftCustomization}
         onReset={resetCustomization}
         activeTab={activeTab}

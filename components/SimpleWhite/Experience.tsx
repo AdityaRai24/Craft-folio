@@ -6,7 +6,7 @@ import { RootState } from '@/store/store';
 import { supabase } from '@/lib/supabase-client';
 import SectionHeader from './SectionHeader';
 import MagicWrite from "@/components/Shared/MagicWrite";
-import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
+import { Experience as ExperienceData, Technology } from "@/types/interfaces/Experience";
 import SimpleWhiteExperienceVisualEditor from "@/components/VisualEditor/Experience/SimpleWhiteExperienceVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
 import { defaultSimpleWhiteExperienceStyles } from "@/types/simplewhite/experience";

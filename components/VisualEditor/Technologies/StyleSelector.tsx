@@ -1,5 +1,5 @@
 import React from "react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import { SliderControl } from "./SliderControl";
 
 interface StyleSelectorProps {

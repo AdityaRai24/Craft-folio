@@ -1,4 +1,4 @@
-import { EducationCustomizationState } from "@/types/education/portfolio";
+import { EducationCustomizationState } from "@/types/interfaces/EducationCustomizationState";
 
 export const useLumenEducationStyles = (
     effectiveCustomization: EducationCustomizationState,
