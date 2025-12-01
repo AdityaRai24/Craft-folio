@@ -8,6 +8,7 @@ interface TimelineSelectorProps {
     onPositionChange: (value: "left" | "alternating") => void;
     dotStyleValue?: "circle" | "square" | "diamond" | "hexagon";
     onDotStyleChange?: (value: "circle" | "square" | "diamond" | "hexagon") => void;
+    primaryColor?: string;
 }
 
 const TimelineSelector: React.FC<TimelineSelectorProps> = ({
@@ -17,6 +18,7 @@ const TimelineSelector: React.FC<TimelineSelectorProps> = ({
     onPositionChange,
     dotStyleValue,
     onDotStyleChange,
+    primaryColor = ColorTheme.primary,
 }) => {
     return (
         <div className="space-y-6">
@@ -34,9 +36,14 @@ const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                             key={style.value}
                             onClick={() => onStyleChange(style.value as any)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${styleValue === style.value
-                                ? "border-white bg-zinc-700"
+                                ? "border-transparent text-white"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
+                            style={
+                                styleValue === style.value
+                                    ? { background: primaryColor }
+                                    : {}
+                            }
                         >
                             <div className="text-center text-sm text-white">
                                 {style.label}
@@ -60,9 +67,14 @@ const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                             key={style.value}
                             onClick={() => onDotStyleChange?.(style.value as any)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${dotStyleValue === style.value
-                                ? "border-white bg-zinc-700"
+                                ? "border-transparent text-white"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
+                            style={
+                                dotStyleValue === style.value
+                                    ? { background: primaryColor }
+                                    : {}
+                            }
                         >
                             <div className="text-center text-sm text-white">
                                 {style.label}
@@ -84,9 +96,14 @@ const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                             key={pos.value}
                             onClick={() => onPositionChange(pos.value as any)}
                             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${positionValue === pos.value
-                                ? "border-white bg-zinc-700"
+                                ? "border-transparent text-white"
                                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                                 }`}
+                            style={
+                                positionValue === pos.value
+                                    ? { background: primaryColor }
+                                    : {}
+                            }
                         >
                             <div className="text-center text-sm text-white">
                                 {pos.label}

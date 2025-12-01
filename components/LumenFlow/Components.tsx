@@ -72,7 +72,7 @@ const HeaderComponent = ({
               </motion.div>
               <div className="flex items-center gap-2">
                 <EditButton
-                  sectionName={sectionName}
+                  sectionName={sectionName === "hero" ? "lumenflow-hero-merged" : sectionName}
                   divStyles=""
                   styles={` ${theme === "light" ? "text-gray-700" : ""} opacity-70 hover:opacity-100 transition-opacity`}
                 />

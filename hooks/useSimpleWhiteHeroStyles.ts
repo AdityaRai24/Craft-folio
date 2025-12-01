@@ -1,4 +1,4 @@
-import { SimpleWhiteHeroCustomizationState } from "@/components/SimpleWhite/defaultStyles/types";
+import { SimpleWhiteHeroCustomizationState } from "@/types/hero/simplewhite-types";
 
 export const useSimpleWhiteHeroStyles = (
     customization: SimpleWhiteHeroCustomizationState,

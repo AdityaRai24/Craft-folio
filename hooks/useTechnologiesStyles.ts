@@ -37,24 +37,24 @@ export const useTechnologiesStyles = (
     const getCardClasses = () => {
         const styleMap: Record<string, string> = isDark
             ? {
-                minimal: "bg-transparent",
+                minimal: "bg-transparent border-0",
                 elevated: "bg-zinc-800 shadow-xl",
                 outlined: "border border-zinc-700 bg-transparent",
                 filled: "bg-zinc-800",
-                glass: "bg-white/5 backdrop-blur-md border border-white/10",
-                neon: "bg-black border shadow-lg",
+                glass: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50",
+                neon: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20",
                 gradient: "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700",
-                default: "bg-zinc-900 border border-zinc-800",
+                default: "bg-zinc-800 border border-zinc-700",
             }
             : {
-                minimal: "bg-transparent",
+                minimal: "bg-transparent border-0",
                 elevated: "bg-white shadow-md",
                 outlined: "border border-gray-300 bg-transparent",
                 filled: "bg-gray-100",
-                glass: "bg-white/10 backdrop-blur-sm border border-white/20",
-                neon: "bg-black border border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]",
-                gradient: "bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20",
-                default: "bg-white border border-gray-200",
+                glass: "bg-white/50 backdrop-blur-sm border border-white/20",
+                neon: "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20",
+                gradient: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200",
+                default: "bg-white border border-gray-200 shadow-sm",
             };
 
         const hoverMap: Record<string, string> = {
@@ -65,7 +65,7 @@ export const useTechnologiesStyles = (
             none: "",
         };
 
-        return `flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${styleMap[customization.cardStyle]
+        return `group relative flex flex-col items-center justify-center cursor-pointer transition-all duration-300 ${styleMap[customization.cardStyle]
             } ${customization.hoverEffects ? hoverMap[customization.cardHoverEffect] : ""}`;
     };
 

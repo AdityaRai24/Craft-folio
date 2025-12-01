@@ -2,13 +2,13 @@
     "sections": [
         {
             "data": {
-                "name": "Jake Ryan",
+                "name": "Alex Rivera",
                 "badge": {
                     "color": "green",
                     "texts": [
-                        "Open to work",
-                        "Available for freelance",
-                        "Let's Collaborate!"
+                        "Open to Opportunities",
+                        "Available for Projects",
+                        "Let's Build Together!"
                     ],
                     "isVisible": true
                 },
@@ -22,16 +22,16 @@
                     {
                         "url": "#contact",
                         "type": "button",
-                        "label": "Contact Me",
+                        "label": "Get in Touch",
                         "style": "outline"
                     }
                 ],
-                "summary": "Highly motivated and skilled Full-Stack Developer with experience in Python, Java, and JavaScript frameworks like React and Flask, seeking a challenging role to leverage my expertise in building scalable and robust applications.",
+                "summary": "Senior Full Stack Engineer with 5+ years of experience building scalable web applications and cloud-native solutions. Specialized in React, Node.js, and AWS with a proven track record of delivering high-impact projects for startups and enterprise clients. Passionate about clean code, system design, and mentoring developers.",
                 "titlePrefix": "Full Stack",
                 "titleSuffixOptions": [
                     "Engineer",
                     "Developer",
-                    "Software Engineer"
+                    "Architect"
                 ]
             },
             "type": "hero"
@@ -39,194 +39,377 @@
         {
             "data": [
                 {
-                    "liveLink": "https://project-demo.vercel.app",
+                    "liveLink": "https://clouddash-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+                            "name": "TypeScript"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+                            "name": "AWS"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                            "name": "Node.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        }
+                    ],
+                    "githubLink": "https://github.com/alexrivera/clouddash",
+                    "projectName": "CloudDash Analytics",
+                    "projectImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "CloudDash Analytics",
+                    "projectDescription": "Real-time analytics dashboard for cloud resource monitoring across AWS, Azure, and GCP. Built with React and D3.js for data visualization, processing over 10M metrics daily. Reduced cloud costs by 35% through intelligent resource optimization algorithms."
+                },
+                {
+                    "liveLink": "https://taskflow-pro.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+                            "name": "Next.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg",
+                            "name": "TailwindCSS"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+                            "name": "Redis"
+                        }
+                    ],
+                    "githubLink": "https://github.com/alexrivera/taskflow",
+                    "projectName": "TaskFlow Pro",
+                    "projectImage": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "TaskFlow Pro",
+                    "projectDescription": "Team collaboration platform with real-time updates and intelligent task prioritization. Features include workspace management, time tracking, and productivity analytics. Supports 50K+ active users with 99.9% uptime using WebSockets and Redis pub/sub."
+                },
+                {
+                    "liveLink": "https://ai-content-studio.io",
                     "techStack": [
                         {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
                             "name": "Python"
                         },
                         {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
-                            "name": "Flask"
-                        },
-                        {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-                            "name": "React.js"
+                            "name": "React"
                         },
                         {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-                            "name": "PostgreSQL"
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+                            "name": "MongoDB"
                         },
                         {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
                             "name": "Docker"
                         }
                     ],
-                    "githubLink": "https://github.com/user/project",
-                    "projectName": "Gitlytics",
-                    "projectImage": "https://gitlytics.com/assets/images/homepage2.png",
-                    "projectTitle": "Gitlytics",
-                    "projectDescription": "Developed a full-stack web application with Flask serving a REST API and React as the frontend. Implemented GitHub OAuth to get data and visualized GitHub data to show collaboration. Used Celery and Redis for asynchronous tasks."
+                    "githubLink": "https://github.com/alexrivera/ai-studio",
+                    "projectName": "AI Content Studio",
+                    "projectImage": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "AI Content Studio",
+                    "projectDescription": "AI-powered content generation platform integrating GPT-4 and DALL-E for creating marketing materials. Implements advanced prompt engineering and fine-tuned models. Processes 100K+ content requests monthly with custom caching layer for cost optimization."
                 },
                 {
-                    "liveLink": "https://project-demo.vercel.app",
+                    "liveLink": "https://devportal-cms.dev",
                     "techStack": [
                         {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-                            "name": "Java"
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gatsby/gatsby-original.svg",
+                            "name": "Gatsby"
                         },
                         {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
-                            "name": "Git"
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg",
+                            "name": "GraphQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/markdown/markdown-original.svg",
+                            "name": "Markdown"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                            "name": "Node.js"
                         }
                     ],
-                    "githubLink": "https://github.com/user/project",
-                    "projectName": "Weather API Project",
-                    "projectImage": "https://nordicapis.com/wp-content/uploads/How-to-Build-an-API-Driven-Weather-App.png",
-                    "projectTitle": "Weather API Project",
-                    "projectDescription": "Developed a React.js application that fetches and displays weather data using a public weather API. Implemented features for searching locations and displaying various weather parameters."
+                    "githubLink": "https://github.com/alexrivera/devportal",
+                    "projectName": "DevPortal CMS",
+                    "projectImage": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "DevPortal CMS",
+                    "projectDescription": "Headless CMS for developer documentation with advanced search powered by Algolia. Features versioning, API playground, and multi-language support. Built with Gatsby and GraphQL, serving 1M+ page views monthly with sub-second load times."
+                },
+                {
+                    "liveLink": "https://streamsync.cloud",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg",
+                            "name": "Go"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+                            "name": "Redis"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
+                            "name": "Kubernetes"
+                        }
+                    ],
+                    "githubLink": "https://github.com/alexrivera/streamsync",
+                    "projectName": "StreamSync",
+                    "projectImage": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "StreamSync",
+                    "projectDescription": "High-performance real-time data synchronization service built with Go and Kafka. Handles 50K+ events per second with sub-100ms latency. Implements CQRS pattern and event sourcing for distributed systems with eventual consistency."
+                },
+                {
+                    "liveLink": "https://securevault.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
+                            "name": "Vue.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                            "name": "Node.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+                            "name": "AWS S3"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
+                            "name": "Kubernetes"
+                        }
+                    ],
+                    "githubLink": "https://github.com/alexrivera/securevault",
+                    "projectName": "SecureVault",
+                    "projectImage": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=800",
+                    "projectTitle": "SecureVault",
+                    "projectDescription": "End-to-end encrypted file storage with zero-knowledge architecture. Implements AES-256 encryption client-side with secure key management. Deployed on Kubernetes with 99.99% availability, storing 10TB+ of encrypted data with SOC 2 compliance."
                 }
             ],
             "type": "projects",
-            "sectionTitle": "My Projects",
-            "sectionDescription": "Some cool things that i have worked on."
+            "sectionTitle": "Featured Projects",
+            "sectionDescription": "Innovative solutions I've built for production environments"
         },
         {
             "data": [
                 {
-                    "role": "Undergraduate Research Assistant",
+                    "role": "Senior Full Stack Engineer",
                     "endDate": "Present",
-                    "location": "College Station, TX",
-                    "startDate": "06/2020",
+                    "location": "San Francisco, CA",
+                    "startDate": "01/2022",
                     "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                            "name": "Node.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+                            "name": "AWS"
+                        },
                         {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
                             "name": "PostgreSQL"
-                        },
-                        {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
-                            "name": "Flask"
-                        },
-                        {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-                            "name": "React.js"
                         },
                         {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
                             "name": "Docker"
                         }
                     ],
-                    "companyName": "Texas A&M University",
-                    "description": "Developed a REST API using FastAPI and PostgreSQL to store data. Developed a full-stack web application using Flask, React, PostgreSQL, and Docker to analyze GitHub data. Explored ways to visualize GitHub collaboration in a classroom setting."
+                    "companyName": "TechCorp Inc.",
+                    "description": "Leading development of a cloud-native SaaS platform serving 100K+ users. Architected microservices infrastructure reducing latency by 40%. Mentoring team of 5 engineers and establishing best practices for code quality and DevOps. Implemented CI/CD pipelines cutting deployment time from hours to minutes."
                 },
                 {
-                    "role": "Information Technology Support Specialist",
-                    "endDate": "Present",
-                    "location": "Georgetown, TX",
-                    "startDate": "09/2018",
-                    "techStack": [],
-                    "companyName": "Southwestern University",
-                    "description": "Communicated with managers to set up campus computers. Assessed and troubleshooted computer problems. Maintained upkeep of computers, classroom equipment, and 200 printers."
-                },
-                {
-                    "role": "Artificial Intelligence Research Assistant",
-                    "endDate": "07/2019",
-                    "location": "Georgetown, TX",
-                    "startDate": "05/2019",
+                    "role": "Full Stack Developer",
+                    "endDate": "12/2021",
+                    "location": "Remote",
+                    "startDate": "06/2020",
                     "techStack": [
                         {
-                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-                            "name": "Java"
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+                            "name": "TypeScript"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-plain.svg",
+                            "name": "NestJS"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+                            "name": "MongoDB"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
+                            "name": "Kubernetes"
+                        }
+                    ],
+                    "companyName": "InnovateLabs",
+                    "description": "Developed RESTful and GraphQL APIs powering mobile and web applications. Migrated monolithic application to microservices architecture improving scalability. Implemented automated testing achieving 90% code coverage. Reduced infrastructure costs by 35% through Kubernetes optimization."
+                },
+                {
+                    "role": "Software Engineer",
+                    "endDate": "05/2020",
+                    "location": "Austin, TX",
+                    "startDate": "03/2019",
+                    "techStack": [
+                        {
+                            "logo ": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                            "name": "Python"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+                            "name": "Redis"
+                        }
+                    ],
+                    "companyName": "StartupHub",
+                    "description": "Built customer-facing features for a B2B SaaS platform. Developed real-time notification system using WebSockets and Redis. Collaborated with product team on feature specifications and UX improvements. Improved application performance by 50% through database query optimization."
+                },
+                {
+                    "role": "Junior Developer",
+                    "endDate": "02/2019",
+                    "location": "San Jose, CA",
+                    "startDate": "06/2018",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                            "name": "JavaScript"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
+                            "name": "Vue.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sass/sass-original.svg",
+                            "name": "SASS"
                         },
                         {
                             "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
                             "name": "Git"
                         }
                     ],
-                    "companyName": "Southwestern University",
-                    "description": "Explored methods to generate video game dungeons. Developed a game in Java to test the generated dungeons. Contributed to an established codebase and conducted a human subject study."
+                    "companyName": "CodeCraft Solutions",
+                    "description": "Developed responsive web interfaces following modern design patterns. Implemented component libraries and design systems. Participated in agile ceremonies and code reviews. Contributed to open-source projects and internal tooling."
                 }
             ],
             "type": "experience",
             "sectionTitle": "Professional Experience",
-            "sectionDescription": "My journey in the industry"
+            "sectionDescription": "My journey in building production-grade applications"
         },
         {
             "data": [
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-                    "name": "Java"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                    "name": "React"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
-                    "name": "Python"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+                    "name": "Next.js"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
-                    "name": "C++"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
+                    "name": "Vue.js"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-                    "name": "SQL"
-                },
-                {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-                    "name": "PostgreSQL"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+                    "name": "TypeScript"
                 },
                 {
                     "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
                     "name": "JavaScript"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-                    "name": "HTML"
-                },
-                {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-                    "name": "CSS"
-                },
-                {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-                    "name": "R"
-                },
-                {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-                    "name": "React.js"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg",
+                    "name": "TailwindCSS"
                 },
                 {
                     "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
                     "name": "Node.js"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
-                    "name": "Flask"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                    "name": "Python"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg",
+                    "name": "Go"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                    "name": "PostgreSQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+                    "name": "MongoDB"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+                    "name": "Redis"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg",
+                    "name": "AWS"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                    "name": "Docker"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
+                    "name": "Kubernetes"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg",
+                    "name": "GraphQL"
                 },
                 {
                     "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
                     "name": "Git"
                 },
                 {
-                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-                    "name": "Docker"
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
+                    "name": "GitHub Actions"
                 }
             ],
             "type": "technologies",
             "sectionTitle": "Technical Skills",
-            "sectionDescription": "A comprehensive list of technologies and tools I work with."
+            "sectionDescription": "Modern technologies and tools I work with daily"
         },
         {
             "data": {
-                "name": "Jake Ryan",
-                "email": "jake@su.edu",
-                "title": "Full Stack Engineer",
-                "github": "github.com/jake",
-                "linkedin": "linkedin.com/in/jake",
+                "name": "Alex Rivera",
+                "email": "alex.rivera@email.com",
+                "title": "Senior Full Stack Engineer",
+                "github": "github.com/alexrivera",
+                "linkedin": "linkedin.com/in/alexrivera",
                 "location": "San Francisco, CA",
                 "resumeLink": ""
             },
             "type": "userInfo",
-            "sectionTitle": "Let's Work Together!",
-            "sectionDescription": "Interested in collaborating, hiring, or just having a chat? Reach out to me on your favorite platform!"
+            "sectionTitle": "Let's Connect!",
+            "sectionDescription": "Interested in collaborating or discussing opportunities? Feel free to reach out!"
         },
         {
             "data": {
@@ -349,9 +532,9 @@
         },
         {
             "data": {
-                "title": "Jake Ryan's Portfolio",
+                "title": "Alex Rivera - Full Stack Engineer",
                 "favicon": "",
-                "description": "Jake Ryan's Portfolio"
+                "description": "Senior Full Stack Engineer specializing in React, Node.js, and cloud-native applications"
             },
             "type": "seo",
             "sectionTitle": "SEO Settings",

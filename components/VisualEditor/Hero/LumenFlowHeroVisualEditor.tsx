@@ -53,9 +53,14 @@ const LumenFlowHeroVisualEditor: React.FC<LumenFlowHeroVisualEditorProps> = ({
                         key={option.value}
                         onClick={() => onChange(option.value)}
                         className={`px-3 py-2 text-sm rounded-md transition-colors ${value === option.value
-                            ? "bg-orange-500 text-white"
+                            ? "text-white"
                             : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                             }`}
+                        style={
+                            value === option.value
+                                ? { background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})` }
+                                : {}
+                        }
                     >
                         {option.label}
                     </button>

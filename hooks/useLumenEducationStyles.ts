@@ -4,7 +4,6 @@ export const useLumenEducationStyles = (
     effectiveCustomization: EducationCustomizationState,
     theme: string,
     themeClasses: any,
-    titleColor: string,
     hoveredEducation: number | null
 ) => {
     const getCardClasses = () => {
@@ -21,11 +20,11 @@ export const useLumenEducationStyles = (
                             : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
                         : effectiveCustomization.cardStyle === "neon"
                             ? theme === "light"
-                                ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
-                                : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                                ? "bg-emerald-50/30 border border-emerald-300/50 shadow-lg shadow-emerald-500/20"
+                                : "bg-zinc-900 border border-emerald-500/30 shadow-lg shadow-emerald-500/20"
                             : effectiveCustomization.cardStyle === "gradient"
                                 ? theme === "light"
-                                    ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                                    ? "bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200"
                                     : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
                                 : theme === "light"
                                     ? "bg-white border border-gray-200 shadow-sm"
@@ -45,13 +44,15 @@ export const useLumenEducationStyles = (
                 effectiveCustomization.hoverEffects && hoveredEducation === index
                     ? "translateY(-4px) scale(1.02)"
                     : "none",
-            filter: effectiveCustomization.glowEffect
-                ? `drop-shadow(0 0 20px ${titleColor}30)`
-                : "none",
+            ...(effectiveCustomization.glowEffect && {
+                filter: theme === "light"
+                    ? "drop-shadow(0 0 20px rgba(249,115,22,0.2))"
+                    : "drop-shadow(0 0 20px rgba(16, 185, 129, 0.2))"
+            }),
             ...(effectiveCustomization.cardShadow && {
-                boxShadow: `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8
-                    }px rgba(0,0,0,0.1), 0 0 ${effectiveCustomization.shadowIntensity * 20
-                    }px ${titleColor}20`,
+                boxShadow: theme === "light"
+                    ? `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8}px rgba(0,0,0,0.1), 0 0 ${effectiveCustomization.shadowIntensity * 20}px rgba(249,115,22,0.15)`
+                    : `0 ${effectiveCustomization.shadowIntensity * 4}px ${effectiveCustomization.shadowIntensity * 8}px rgba(0,0,0,0.1), 0 0 ${effectiveCustomization.shadowIntensity * 20}px rgba(16, 185, 129, 0.15)`,
             }),
         };
     };

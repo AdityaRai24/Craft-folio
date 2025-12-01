@@ -37,6 +37,7 @@ export interface ProjectsCustomizationState {
   imagePosition: "left" | "right";
   hoverEffects?: boolean;
   glowEffect?: boolean;
+  borderWidth: number;
 
   // Typography
   titleSize: "xs" | "sm" | "md" | "lg" | "xl";

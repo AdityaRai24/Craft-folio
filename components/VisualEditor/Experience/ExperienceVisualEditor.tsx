@@ -111,6 +111,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                             <CardStyleSelector
                                 value={draftCustomization?.cardLayout ?? customization.cardLayout}
                                 onChange={(value) => onUpdateDraft("cardLayout", value)}
+                                primaryColor={primaryColor}
                             />
 
                             <SliderControl
@@ -130,6 +131,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                     onPositionChange={value => onUpdateDraft("timelinePosition", value)}
                                     dotStyleValue={draftCustomization?.dotStyle ?? customization.dotStyle}
                                     onDotStyleChange={value => onUpdateDraft("dotStyle", value)}
+                                    primaryColor={primaryColor}
                                 />
                             )}
                         </>
@@ -149,6 +151,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "lg", label: "Large", preview: "text-2xl" },
                                         { value: "xl", label: "Extra Large", preview: "text-3xl" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                                 <TypographySelector
                                     label="Role Weight"
@@ -161,6 +164,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "semibold", label: "Semibold", preview: "font-semibold" },
                                         { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                             </div>
 
@@ -176,6 +180,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "lg", label: "Large", preview: "text-xl" },
                                         { value: "xl", label: "Extra Large", preview: "text-2xl" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                                 <TypographySelector
                                     label="Company Name Weight"
@@ -188,6 +193,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "semibold", label: "Semibold", preview: "font-semibold" },
                                         { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                             </div>
 
@@ -202,6 +208,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "md", label: "Medium", preview: "text-sm" },
                                         { value: "lg", label: "Large", preview: "text-base" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                                 <TypographySelector
                                     label="Date Weight"
@@ -214,6 +221,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "semibold", label: "Semibold", preview: "font-semibold" },
                                         { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                             </div>
 
@@ -228,6 +236,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "md", label: "Medium", preview: "text-sm" },
                                         { value: "lg", label: "Large", preview: "text-base" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                                 <TypographySelector
                                     label="Location Weight"
@@ -240,6 +249,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "semibold", label: "Semibold", preview: "font-semibold" },
                                         { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                             </div>
 
@@ -254,6 +264,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "md", label: "Medium", preview: "text-base" },
                                         { value: "lg", label: "Large", preview: "text-lg" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                                 <TypographySelector
                                     label="Description Text Weight"
@@ -266,6 +277,7 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                         { value: "semibold", label: "Semibold", preview: "font-semibold" },
                                         { value: "bold", label: "Bold", preview: "font-bold" },
                                     ]}
+                                    primaryColor={primaryColor}
                                 />
                             </div>
                         </div>

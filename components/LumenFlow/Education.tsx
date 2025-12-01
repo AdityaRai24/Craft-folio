@@ -65,7 +65,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
-  const titleColor = theme === "light" ? "#f97316" : "#f97316";
 
   const {
     getCardClasses,
@@ -78,7 +77,6 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
     effectiveCustomization,
     theme,
     themeClasses,
-    titleColor,
     hoveredEducation
   );
 
@@ -136,7 +134,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
 
                   {effectiveCustomization.showInstitution && (
                     <div className="flex items-center space-x-2 pl-6">
-                      <GraduationCap size={16} className="text-orange-400" />
+                      <GraduationCap size={16} className={theme === "light" ? "text-orange-500" : "text-emerald-500"} />
                       <span
                         className={`text-base font-medium ${theme === "light" ? "text-gray-700" : "text-gray-300"
                           }`}
@@ -194,7 +192,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                   <div className="flex items-center space-x-4 pl-6">
                     {effectiveCustomization.showLocation && (
                       <div className="flex items-center space-x-1">
-                        <MapPin size={14} className="text-orange-400" />
+                        <MapPin size={14} className={theme === "light" ? "text-orange-500" : "text-emerald-500"} />
                         <span
                           className={`text-sm ${theme === "light"
                             ? "text-gray-600"
@@ -207,7 +205,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                     )}
                     {effectiveCustomization.showDates && (
                       <div className="flex items-center space-x-1">
-                        <Calendar size={14} className="text-orange-400" />
+                        <Calendar size={14} className={theme === "light" ? "text-orange-500" : "text-emerald-500"} />
                         <span
                           className={`text-sm ${theme === "light"
                             ? "text-gray-600"
@@ -228,7 +226,7 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
                         : "opacity-0 translate-x-2"
                         }`}
                     >
-                      <ArrowUpRight size={18} className="text-orange-400" />
+                      <ArrowUpRight size={18} className={theme === "light" ? "text-orange-500" : "text-emerald-500"} />
                     </div>
                   )}
                 </div>
@@ -274,8 +272,8 @@ const Education: React.FC<EducationProps> = ({ currentTheme, portfolioId }) => {
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor={titleColor}
-        primaryDarkColor={titleColor}
+        primaryColor="#10b981"
+        primaryDarkColor="#059669"
       />
     </div>
   );

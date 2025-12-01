@@ -330,8 +330,8 @@ const Experience = ({ currentTheme, portfolioId }: any) => {
         onReset={resetCustomization}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        primaryColor={titleColor}
-        primaryDarkColor={titleColor}
+        primaryColor="#10b981"
+        primaryDarkColor="#059669"
       />
     </div>
   );

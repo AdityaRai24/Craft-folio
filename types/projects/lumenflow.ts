@@ -8,7 +8,7 @@ export const defaultLumenFlowProjectsStyles: ProjectsCustomizationState = {
     imageBorderRadius: 8,
     cardBackground: "bg-stone-800/30",
     cardBorder: "border-gray-700",
-    cardStyle: "default",
+    cardStyle: "minimal",
     imageAspectRatio: "auto",
     imageHeight: 208,
     githubButtonStyle: "default",
@@ -22,6 +22,7 @@ export const defaultLumenFlowProjectsStyles: ProjectsCustomizationState = {
     imagePosition: "left",
     hoverEffects: true,
     glowEffect: true,
+    borderWidth: 1,
 
     // Typography
     titleSize: "md",

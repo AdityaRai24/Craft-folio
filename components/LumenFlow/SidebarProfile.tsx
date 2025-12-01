@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Github, Linkedin, Mail, MapPin } from "lucide-react";
 
 interface SidebarProfileProps {
     heroData: any;
@@ -144,6 +145,77 @@ const SidebarProfile: React.FC<SidebarProfileProps> = ({
                         >
                             {heroData?.title || "Your Title"}
                         </motion.p>
+                    </motion.div>
+
+                    {/* Social Media Links */}
+                    <motion.div
+                        className="space-y-3"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.9 }}
+                    >
+                        {contactData?.email && (
+                            <a
+                                href={`mailto:${contactData.email}`}
+                                className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group ${theme === "light"
+                                        ? "hover:bg-orange-50 text-gray-600 hover:text-orange-600"
+                                        : "hover:bg-white/5 text-gray-400 hover:text-white"
+                                    }`}
+                            >
+                                <div className={`p-2 rounded-lg transition-colors ${theme === "light" ? "bg-gray-100 group-hover:bg-orange-100" : "bg-white/5 group-hover:bg-white/10"
+                                    }`}>
+                                    <Mail size={18} />
+                                </div>
+                                <span className="text-sm font-medium truncate">{contactData.email}</span>
+                            </a>
+                        )}
+
+                        {contactData?.linkedin && (
+                            <a
+                                href={contactData.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group ${theme === "light"
+                                        ? "hover:bg-orange-50 text-gray-600 hover:text-orange-600"
+                                        : "hover:bg-white/5 text-gray-400 hover:text-white"
+                                    }`}
+                            >
+                                <div className={`p-2 rounded-lg transition-colors ${theme === "light" ? "bg-gray-100 group-hover:bg-orange-100" : "bg-white/5 group-hover:bg-white/10"
+                                    }`}>
+                                    <Linkedin size={18} />
+                                </div>
+                                <span className="text-sm font-medium">LinkedIn</span>
+                            </a>
+                        )}
+
+                        {contactData?.github && (
+                            <a
+                                href={contactData.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-300 group ${theme === "light"
+                                        ? "hover:bg-orange-50 text-gray-600 hover:text-orange-600"
+                                        : "hover:bg-white/5 text-gray-400 hover:text-white"
+                                    }`}
+                            >
+                                <div className={`p-2 rounded-lg transition-colors ${theme === "light" ? "bg-gray-100 group-hover:bg-orange-100" : "bg-white/5 group-hover:bg-white/10"
+                                    }`}>
+                                    <Github size={18} />
+                                </div>
+                                <span className="text-sm font-medium">GitHub</span>
+                            </a>
+                        )}
+
+                        {contactData?.location && (
+                            <div className={`flex items-center gap-3 p-3 rounded-xl ${theme === "light" ? "text-gray-600" : "text-gray-400"
+                                }`}>
+                                <div className={`p-2 rounded-lg ${theme === "light" ? "bg-gray-100" : "bg-white/5"
+                                    }`}>
+                                    <MapPin size={18} />
+                                </div>
+                                <span className="text-sm font-medium">{contactData.location}</span>
+                            </div>
+                        )}
                     </motion.div>
                 </div>
             </div>

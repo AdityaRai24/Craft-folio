@@ -10,10 +10,17 @@ import { defaultLumenFlowTechnologiesStyles } from "@/types/technologies/lumenfl
 import LumenFlowTechnologiesVisualEditor from "@/components/VisualEditor/Technologies/LumenFlowTechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { ColorTheme } from "@/lib/colorThemes";
+import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 
 const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, currentTheme: string }) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const { theme } = useLumenFlowTheme();
+  const themeClasses = getThemeClasses(currentTheme);
+
+  const technologiesSection = portfolioData?.find((item: any) => item.type === "technologies");
+  const sectionTitle = technologiesSection?.sectionTitle || "Technologies";
+  const sectionDescription = technologiesSection?.sectionDescription || "A curated list of technologies and tools I use to build digital products.";
 
   useEffect(() => {
     if (portfolioData) {
@@ -41,50 +48,48 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
     getCardClasses,
     getLabelClasses,
     getAnimationVariants
-  } = useTechnologiesStyles(effectiveCustomization, ColorTheme.primary, currentTheme as "light" | "dark");
+  } = useTechnologiesStyles(effectiveCustomization, ColorTheme.primary, theme as "light" | "dark");
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: effectiveCustomization.staggerAnimation ? 0.1 : 0,
       },
     },
   };
 
   return (
-    <section className="py-32 bg-zinc-50 dark:bg-black relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-      </div>
+    <div className="space-y-4 md:space-y-6 lg:space-y-12 max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      {/* Header Section */}
+      <HeaderComponent
+        currentTheme={currentTheme}
+        sectionTitle={sectionTitle}
+        sectionDescription={sectionDescription}
+        sectionName="technologies"
+        openVisualEditor={openVisualEditor}
+        visualEditorOpen={visualEditorOpen}
+      />
 
-      <div className={`container mx-auto px-4 relative z-10 max-w-${effectiveCustomization.containerWidth}`}>
-        <HeaderComponent
-          sectionTitle="Technologies"
-          sectionDescription="A curated list of technologies and tools I use to build digital products."
-          sectionName="technologies"
-          currentTheme={currentTheme}
-          openVisualEditor={openVisualEditor}
-          visualEditorOpen={visualEditorOpen}
-        />
-
-        <motion.div
-          className={getGridClasses()}
-          style={{
-            gap: effectiveCustomization.gap
-          }}
-          variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {technologies.map((tech, index) => (
+      {/* Technologies Grid */}
+      <motion.div
+        className={getGridClasses()}
+        style={{
+          gap: effectiveCustomization.gap
+        }}
+        variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        {technologies.map((tech, index) => (
+          <motion.div
+            key={index}
+            className="group relative"
+            variants={effectiveCustomization.staggerAnimation ? getAnimationVariants() : undefined}
+          >
             <motion.div
-              key={index}
-              variants={effectiveCustomization.staggerAnimation ? getAnimationVariants() : undefined}
               className={getCardClasses()}
               style={{
                 borderRadius: effectiveCustomization.cardBorderRadius,
@@ -95,13 +100,12 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
                 y: effectiveCustomization.cardHoverEffect === "lift" ? -8 : 0,
                 scale: effectiveCustomization.cardHoverEffect === "scale" ? 1.05 : 1,
                 rotate: effectiveCustomization.cardHoverEffect === "rotate" ? 3 : 0,
-                boxShadow: effectiveCustomization.cardHoverEffect === "glow" ? `0 0 30px ${ColorTheme.primary}20` : "none",
               } : {}}
             >
               {effectiveCustomization.showIcons && (
                 <div
                   style={{ width: effectiveCustomization.iconSize, height: effectiveCustomization.iconSize }}
-                  className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                  className="relative flex items-center justify-center"
                 >
                   <img
                     src={tech.logo}
@@ -114,9 +118,29 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
                 <span className={getLabelClasses()}>{tech.name}</span>
               )}
             </motion.div>
-          ))}
-        </motion.div>
-      </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Empty State */}
+      {technologies.length === 0 && (
+        <div className="text-center py-16">
+          <div className="space-y-4">
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto ${theme === "light" ? "bg-gray-200" : "bg-gray-800"
+              }`}>
+              <span className="text-4xl">🛠️</span>
+            </div>
+            <h3 className={`text-xl font-semibold ${theme === "light" ? "text-gray-700" : "text-gray-400"
+              }`}>
+              No technologies added yet
+            </h3>
+            <p className={`max-w-md mx-auto ${theme === "light" ? "text-gray-600" : "text-gray-500"
+              }`}>
+              Add technologies to showcase your technical skills and tools.
+            </p>
+          </div>
+        </div>
+      )}
 
       <LumenFlowTechnologiesVisualEditor
         isOpen={visualEditorOpen}
@@ -126,7 +150,7 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
         onSave={saveDraftCustomization}
         onReset={resetCustomization}
       />
-    </section>
+    </div>
   );
 };
 

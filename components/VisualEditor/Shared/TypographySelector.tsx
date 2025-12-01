@@ -1,5 +1,7 @@
 import React from "react";
 
+import { ColorTheme } from "@/lib/colorThemes";
+
 interface TypographyOption {
   value: string;
   label: string;
@@ -12,6 +14,7 @@ interface TypographySelectorProps {
   onChange: (value: string) => void;
   options: TypographyOption[];
   type: "size" | "weight";
+  primaryColor?: string;
 }
 
 const TypographySelector: React.FC<TypographySelectorProps> = ({
@@ -20,6 +23,7 @@ const TypographySelector: React.FC<TypographySelectorProps> = ({
   onChange,
   options,
   type,
+  primaryColor = ColorTheme.primary,
 }) => {
   return (
     <div>
@@ -31,17 +35,20 @@ const TypographySelector: React.FC<TypographySelectorProps> = ({
           <div
             key={option.value}
             onClick={() => onChange(option.value)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === option.value
-                ? "border-white bg-zinc-700"
+            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === option.value
+                ? "border-transparent text-white"
                 : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
+              }`}
+            style={
+              value === option.value
+                ? { background: primaryColor }
+                : {}
+            }
           >
             <div className="flex justify-center mb-2">
               <div
-                className={`text-white text-center ${
-                  type === "weight" ? option.preview : "font-bold"
-                }`}
+                className={`text-white text-center ${type === "weight" ? option.preview : "font-bold"
+                  }`}
                 style={
                   type === "size"
                     ? { fontSize: option.preview }

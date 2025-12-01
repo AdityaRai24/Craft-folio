@@ -157,13 +157,33 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
 
             {/* Main Card */}
             <div
-              className={`relative transition-all duration-300 transform h-full flex flex-col ${theme === "light"
-                ? "bg-white border border-gray-200 shadow-sm"
-                : "bg-zinc-800 border border-zinc-700"
+              className={`relative transition-all duration-300 transform h-full flex flex-col ${effectiveCustomization.cardStyle === "default"
+                ? theme === "light"
+                  ? "bg-white border border-gray-200 shadow-sm"
+                  : "bg-zinc-800 border border-zinc-700"
+                : effectiveCustomization.cardStyle === "minimal"
+                  ? "bg-transparent border-0"
+                  : effectiveCustomization.cardStyle === "glass"
+                    ? theme === "light"
+                      ? "bg-white/50 backdrop-blur-sm border border-white/20"
+                      : "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50"
+                    : effectiveCustomization.cardStyle === "neon"
+                      ? theme === "light"
+                        ? "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20"
+                        : "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20"
+                      : effectiveCustomization.cardStyle === "gradient"
+                        ? theme === "light"
+                          ? "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200"
+                          : "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700"
+                        : theme === "light"
+                          ? "bg-white border border-gray-200 shadow-sm"
+                          : "bg-zinc-800 border border-zinc-700"
                 }`}
               style={{
                 borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 padding: `${effectiveCustomization.cardPadding}px`,
+                borderWidth: effectiveCustomization.cardStyle === "minimal" ? 0 : `${effectiveCustomization.borderWidth}px`,
+                filter: effectiveCustomization.glowEffect ? `drop-shadow(0 0 20px ${titleColor}30)` : "none",
               }}
             >
               {/* Project Image */}

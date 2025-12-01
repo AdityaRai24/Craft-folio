@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { updateSection } from "@/app/actions/portfolio";
-import { defaultSimpleWhiteHeroStyles } from "./defaultStyles/hero";
+import { defaultSimpleWhiteHeroStyles } from "@/types/hero/simplewhite";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from '@clerk/nextjs';
 import { useCustomization } from "@/hooks/useCustomization";

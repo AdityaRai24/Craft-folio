@@ -18,7 +18,7 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { EducationCustomizationState } from "@/types/education/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
 import { Switch } from "@/components/ui/switch";
-import CardLayoutSelector from "../Contact/CardLayoutSelector";
+import CardStyleSelector from "../Shared/CardStyleSelector";
 
 interface EducationVisualEditorProps {
     isOpen: boolean;
@@ -109,9 +109,10 @@ const EducationVisualEditor: React.FC<EducationVisualEditorProps> = ({
                 <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
                     {activeTab === "layout" && (
                         <>
-                            <CardLayoutSelector
+                            <CardStyleSelector
                                 value={draftCustomization?.cardStyle ?? customization.cardStyle}
-                                onChange={value => onUpdateDraft("cardStyle", value)}
+                                onChange={(value) => onUpdateDraft("cardStyle", value)}
+                                primaryColor={primaryColor}
                             />
 
                             <SliderControl

@@ -10,6 +10,7 @@ import ContactSidebar from '@/components/sidebar-forms/ContactSidebar';
 import EducationSidebar from '@/components/sidebar-forms/EducationSidebar';
 import TerminalSidebar from '@/components/sidebar-forms/TerminalSidebar';
 import SimpleWhiteHeroSidebar from '@/components/sidebar-forms/SimpleWhiteHeroSidebar';
+import LumenFlowMergedSidebar from '@/components/sidebar-forms/LumenFlowMergedSidebar';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ColorTheme } from '@/lib/colorThemes';
@@ -54,6 +55,7 @@ const Sidebar = () => {
         {currentlyEditing === "education" && <EducationSidebar />}
         {currentlyEditing === "terminal" && <TerminalSidebar />}
         {currentlyEditing === "simple-white-hero" && <SimpleWhiteHeroSidebar />}
+        {currentlyEditing === "lumenflow-hero-merged" && <LumenFlowMergedSidebar />}
       </div>
     </div>
   );

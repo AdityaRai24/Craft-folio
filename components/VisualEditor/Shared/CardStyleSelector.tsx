@@ -1,15 +1,19 @@
 import React from "react";
 
+import { ColorTheme } from "@/lib/colorThemes";
+
 interface CardStyleSelectorProps {
     value: string;
     onChange: (value: any) => void;
     previewHeight?: string;
+    primaryColor?: string;
 }
 
 const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({
     value,
     onChange,
-    previewHeight = "h-16"
+    previewHeight = "h-16",
+    primaryColor = ColorTheme.primary,
 }) => {
     return (
         <div>
@@ -26,9 +30,14 @@ const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({
                         key={style.value}
                         onClick={() => onChange(style.value)}
                         className={`cursor-pointer p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 ${value === style.value
-                            ? "border-white bg-zinc-700"
+                            ? "border-transparent text-white"
                             : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
+                        style={
+                            value === style.value
+                                ? { background: primaryColor }
+                                : {}
+                        }
                     >
                         <div className="space-y-2">
                             <div className={`${previewHeight} rounded-lg ${style.preview} flex flex-col justify-center items-center`}>
