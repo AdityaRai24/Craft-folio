@@ -29,7 +29,6 @@ const HeroSidebar = () => {
   const [sectionTitle, setSectionTitle] = useState(heroSectionData?.sectionTitle || "");
   const [sectionDescription, setSectionDescription] = useState(heroSectionData?.sectionDescription || "");
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
-
   const emptyContent = {
     titlePrefix: "",
     name: "",
@@ -268,55 +267,6 @@ const HeroSidebar = () => {
 
         <CardContent>
           <div className="space-y-5">
-            {/* {heroSectionData?.sectionTitle && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input
-                  id="sectionTitle"
-                  value={sectionTitle}
-                  onChange={(e) => setSectionTitle(e.target.value)}
-                  placeholder="Enter section title"
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
-
-            {heroSectionData?.sectionDescription && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea
-                  id="sectionDescription"
-                  value={sectionDescription}
-                  onChange={(e) => setSectionDescription(e.target.value)}
-                  placeholder="Enter section description"
-                  className="resize-none h-20"
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
-
-            {hasHeaderChanges && (
-              <Button
-                onClick={handleSaveHeader}
-                className="w-full"
-                style={{
-                  backgroundColor: ColorTheme.primary,
-                  color: ColorTheme.textPrimary,
-                  boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
-                }}
-              >
-                Save Section Header
-              </Button>
-            )} */}
-
             <Tabs defaultValue={defaultTab} className="mt-4">
               <TabsList style={{ backgroundColor: ColorTheme.bgNav, borderColor: ColorTheme.borderLight }}>
                 {showBasicTab && (
@@ -350,7 +300,7 @@ const HeroSidebar = () => {
                       </div>
                     )}
 
-                    {fields.includes("titlePrefix") && (
+                    {fields.includes("titlePrefix") && templateName === "NeoSpark" && (
                       <div className="space-y-2">
                         <Label htmlFor="titlePrefix" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Title Prefix</Label>
                         <Input
@@ -384,7 +334,7 @@ const HeroSidebar = () => {
                       </div>
                     )}
 
-                    {fields.includes("titleSuffixOptions") && (
+                    {fields.includes("titleSuffixOptions") && templateName === "NeoSpark" && (
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <Label className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Title Suffixes</Label>

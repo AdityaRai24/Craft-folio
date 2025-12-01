@@ -22,7 +22,7 @@ export interface ContactCustomizationState {
   showEmail: boolean;
   showLinkedin: boolean;
   showGithub: boolean;
-  showPhone: boolean;
+
   showLocation: boolean;
   textAlignment: "center" | "left" | "right";
 

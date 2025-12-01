@@ -6,6 +6,7 @@ export const defaultNeoSparkHeroStyles: HeroCustomizationState = {
     verticalAlignment: "center",
     maxWidth: "full",
     containerPadding: 16,
+    containerWidth: "full",
 
     // Background Theme
     backgroundTheme: "noise-pattern",

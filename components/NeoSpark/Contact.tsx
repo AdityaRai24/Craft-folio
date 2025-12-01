@@ -5,7 +5,7 @@ import {
   Mail,
   Github,
   Linkedin,
-  Phone,
+
   MapPin,
   ExternalLink,
   Copy,
@@ -131,17 +131,7 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       });
     }
 
-    // Always add Phone
-    if (effectiveCustomization.showPhone) {
-      platforms.push({
-        key: "phone",
-        icon: Phone,
-        label: "Phone",
-        value: contactData.phone || "+1 (555) 123-4567",
-        href: `tel:${contactData.phone || "+15551234567"}`,
-        description: contactData.phone || "+1 (555) 123-4567",
-      });
-    }
+
 
     // Always add Location
     if (effectiveCustomization.showLocation) {

@@ -8,6 +8,7 @@ import { VerticalAlignmentSelector } from "./VerticalAlignmentSelector";
 import { SizeSelector } from "./SizeSelector";
 import { ButtonStyleSelector } from "./ButtonStyleSelector";
 import { BackgroundThemeSelector } from "./BackgroundThemeSelector";
+import WidthSelector from "../Contact/WidthSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { HeroCustomizationState } from "@/types/hero/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -105,6 +106,7 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                     {activeTab === "layout" && (
                         <>
 
+
                             <BackgroundThemeSelector
                                 value={draftCustomization.backgroundTheme}
                                 onChange={(value) => onUpdateDraft("backgroundTheme", value)}
@@ -113,6 +115,10 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                                 value={draftCustomization.contentAlignment}
                                 onChange={(value) => onUpdateDraft("contentAlignment", value)}
                                 label="Content Alignment"
+                            />
+                            <WidthSelector
+                                value={draftCustomization.containerWidth}
+                                onChange={(value) => onUpdateDraft("containerWidth", value)}
                             />
                             {renderToggle("Show Badge", draftCustomization.badgeVisible, (value) =>
                                 onUpdateDraft("badgeVisible", value)

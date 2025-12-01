@@ -174,7 +174,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
   };
 
   const getBadgeClasses = () => {
-    return `px-2 sm:px-3 py-1 text-xs sm:text-sm ${customization.badgeStyle === "outlined" ? "border" : ""}`;
+    return `px-2 sm:px-3 py-1  ${customization.badgeStyle === "outlined" ? "border" : ""}`;
   };
 
   const getBadgeStyle = () => {
@@ -246,7 +246,7 @@ export const useExperienceStyles = (customization: ExperienceCustomizationState,
       semibold: "font-semibold",
       bold: "font-bold",
     };
-    return `${sizeMap[customization.dateSize || "sm"]} ${weightMap[customization.dateWeight || "medium"]}`;
+    return `${sizeMap[customization.dateSize]} ${weightMap[customization.dateWeight || "medium"]}`;
   };
 
   const getLocationClasses = () => {

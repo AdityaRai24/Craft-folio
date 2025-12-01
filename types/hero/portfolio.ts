@@ -5,6 +5,7 @@ export interface HeroCustomizationState {
     verticalAlignment: "top" | "center" | "bottom";
     maxWidth: "sm" | "md" | "lg" | "xl" | "2xl" | "full";
     containerPadding: number;
+    containerWidth: "narrow" | "wide" | "full";
 
     // Background Theme
     backgroundTheme:
@@ -50,6 +51,7 @@ export const defaultHeroStyles: HeroCustomizationState = {
     verticalAlignment: "center",
     maxWidth: "full",
     containerPadding: 16,
+    containerWidth: "full",
 
     // Background Theme
     backgroundTheme: "pearl-mist",

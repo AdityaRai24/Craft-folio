@@ -24,9 +24,15 @@ export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: a
             full: "w-full",
         };
 
+        const containerWidthMap = {
+            narrow: "md:max-w-[60%] md:mx-auto",
+            wide: "md:max-w-[80%] md:mx-auto",
+            full: "max-w-full",
+        };
+
         let classes = `relative flex-1 flex pt-8 flex-col px-4 sm:px-6 md:px-8 ${alignmentMap[customization.contentAlignment]
             } ${verticalMap[customization.verticalAlignment]} ${maxWidthMap[customization.maxWidth]
-            } mx-auto space-y-4 sm:space-y-6`;
+            } ${containerWidthMap[customization.containerWidth]} mx-auto space-y-4 sm:space-y-6`;
 
         return classes;
     };

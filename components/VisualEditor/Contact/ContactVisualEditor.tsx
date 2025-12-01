@@ -240,13 +240,7 @@ export const ContactVisualEditor: React.FC<ContactVisualEditorProps> = ({
                                         onCheckedChange={(checked) => onUpdateDraft("showGithub", checked)}
                                     />
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-white font-medium">Phone</span>
-                                    <Switch
-                                        checked={draftCustomization?.showPhone ?? customization.showPhone}
-                                        onCheckedChange={(checked) => onUpdateDraft("showPhone", checked)}
-                                    />
-                                </div>
+
                                 <div className="flex items-center justify-between">
                                     <span className="text-white font-medium">Location</span>
                                     <Switch

@@ -333,7 +333,7 @@ const ContactSidebar = () => {
             <TabsContent value="basic" className="mt-4">
               <CardContent className="p-0 space-y-5">
                 {/* Name Field */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label
                     htmlFor="name"
                     className="text-sm font-medium"
@@ -354,10 +354,10 @@ const ContactSidebar = () => {
                       color: ColorTheme.textPrimary,
                     }}
                   />
-                </div>
+                </div> */}
 
                 {/* Title Field */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label
                     htmlFor="title"
                     className="text-sm font-medium"
@@ -378,7 +378,7 @@ const ContactSidebar = () => {
                       color: ColorTheme.textPrimary,
                     }}
                   />
-                </div>
+                </div> */}
 
                 {/* Profile Image Field - Hide for MacOS */}
                 {"profileImage" in content && templateName !== "macos" && (

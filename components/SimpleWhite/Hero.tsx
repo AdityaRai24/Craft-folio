@@ -1,4 +1,3 @@
-
 "use client";
 
 import { FaGithub, FaLinkedin, FaChevronDown, FaFile } from "react-icons/fa";
@@ -23,6 +22,8 @@ import { useMagicWrite } from "@/hooks/useMagicWrite";
 import SectionLoading from "../Shared/SectionLoading";
 import SimpleWhiteHeroVisualEditor from "@/components/VisualEditor/Hero/SimpleWhiteHeroVisualEditor";
 import { useSimpleWhiteHeroStyles } from "@/hooks/useSimpleWhiteHeroStyles";
+import { defaultSimpleWhiteContactStyles } from "@/types/contact/simplewhite";
+import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 
 
 type Tab = "layout" | "typography" | "buttons" | "effects";
@@ -46,6 +47,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const [heroData, setHeroData] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<Tab>("layout");
+  const [contactActiveTab, setContactActiveTab] = useState<"layout" | "styling">("layout");
 
 
   const {
@@ -59,6 +61,17 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     resetCustomization,
     draftCustomization
   } = useCustomization("hero", defaultSimpleWhiteHeroStyles, portfolioId);
+
+  const {
+    customization: contactCustomization,
+    visualEditorOpen: contactVisualEditorOpen,
+    setVisualEditorOpen: setContactVisualEditorOpen,
+    openVisualEditor: openContactVisualEditor,
+    updateDraftCustomization: updateContactDraftCustomization,
+    saveDraftCustomization: saveContactDraftCustomization,
+    resetCustomization: resetContactCustomization,
+    draftCustomization: draftContactCustomization
+  } = useCustomization("contact", defaultSimpleWhiteContactStyles, portfolioId);
 
 
   const {
@@ -160,30 +173,29 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
         <div className="flex h-full pt-16 sm:pt-20 md:pt-24 justify-center items-end mb-16 sm:mb-20 md:mb-24">
           <div className={getContainerClasses()}>
-            <div className="flex absolute gap-4 right-2 sm:right-24 top-2 sm:top-24 z-20">
-              <EditButton
-                sectionName={"hero"}
-                styles="text-xs px-2 sm:px-3 py-1"
-              />
-              {shouldShowButton && (
-                <button
-                  onClick={openVisualEditor}
-                  className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  }}
-                >
-                  <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Visual Editor</span>
-
-                </button>
-              )}
-            </div>
-
 
             <main className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-4 xl:gap-8">
               {/* Left Column - Main Info */}
               <div className="lg:col-span-2 relative">
+                <div className="flex gap-2 mb-4">
+                  <EditButton
+                    sectionName={"hero"}
+                    styles="text-xs px-2 sm:px-3 py-1"
+                  />
+                  {shouldShowButton && (
+                    <button
+                      onClick={openVisualEditor}
+                      className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                      }}
+                    >
+                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Visual Editor</span>
+                    </button>
+                  )}
+                </div>
+
                 <motion.h1
                   className={getTitleClasses()}
                   style={{ color: textPrimaryColor }}
@@ -258,6 +270,13 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     animate={{
                       scale: 1,
                       opacity: 1,
+                      transition: {
+                        scale: {
+                          type: "spring",
+                          damping: 10,
+                          stiffness: 100,
+                        }
+                      }
                     }}
                   >
                     <FaGithub className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
@@ -272,6 +291,13 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                     animate={{
                       scale: 1,
                       opacity: 1,
+                      transition: {
+                        scale: {
+                          type: "spring",
+                          damping: 10,
+                          stiffness: 100,
+                        }
+                      }
                     }}
                   >
                     <FaLinkedin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
@@ -281,6 +307,25 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
               {/* Right Column - About */}
               <div className="lg:col-span-2 relative">
+                <div className="flex gap-2 mb-4 justify-end">
+                  <EditButton
+                    sectionName={"contact"}
+                    styles="text-xs px-2 sm:px-3 py-1"
+                  />
+                  {shouldShowButton && (
+                    <button
+                      onClick={openContactVisualEditor}
+                      className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                      }}
+                    >
+                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Visual Editor</span>
+                    </button>
+                  )}
+                </div>
+
                 {effectiveCustomization.aboutCardVisible && (
                   <motion.div
                     className={`${getCardStyle()} cursor-pointer`}
@@ -488,6 +533,23 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           onReset={resetCustomization}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+        />
+      )}
+
+      {/* Contact Visual Editor Window */}
+      {contactVisualEditorOpen && (
+        <ContactVisualEditor
+          isOpen={contactVisualEditorOpen}
+          onClose={() => setContactVisualEditorOpen(false)}
+          customization={contactCustomization}
+          draftCustomization={draftContactCustomization}
+          onUpdateDraft={updateContactDraftCustomization}
+          onSave={saveContactDraftCustomization}
+          onReset={resetContactCustomization}
+          activeTab={contactActiveTab}
+          onTabChange={setContactActiveTab}
+          primaryColor={ColorTheme.primary}
+          primaryDarkColor={ColorTheme.primaryDark}
         />
       )}
     </>

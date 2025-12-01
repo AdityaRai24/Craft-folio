@@ -19,7 +19,7 @@ export const defaultNeoSparkContactStyles: ContactCustomizationState = {
     showEmail: true,
     showLinkedin: true,
     showGithub: true,
-    showPhone: false,
+
     showLocation: true,
     textAlignment: "center",
     animationStyle: "scale",
