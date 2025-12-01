@@ -14,7 +14,7 @@ import {
 import { motion } from "framer-motion";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
 import { Experience } from "@/types/experience/shared";
-import { defaultNeoSparkExperienceStyles } from "@/types/experience/neospark";
+import { defaultNeoSparkExperienceStyles } from "@/types/neospark/experience";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";

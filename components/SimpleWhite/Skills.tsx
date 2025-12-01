@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization } from "@/app/actions/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
 import { TechnologiesCustomizationState, Technology } from "@/types/technologies/portfolio";
-import { defaultSimpleWhiteTechnologiesStyles } from "@/types/technologies/simplewhite";
+import { defaultSimpleWhiteTechnologiesStyles } from "@/types/simplewhite/technologies";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";

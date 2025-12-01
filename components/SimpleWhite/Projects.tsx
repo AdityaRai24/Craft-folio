@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultSimpleWhiteProjectsStyles } from "@/types/projects/simplewhite";
+import { defaultSimpleWhiteProjectsStyles } from "@/types/simplewhite/projects";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import SectionLoading from "../Shared/SectionLoading";

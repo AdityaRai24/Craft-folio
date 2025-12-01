@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HeaderComponent } from "./Components";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
-import { defaultLumenFlowHeroStyles } from "@/types/hero/lumenflow";
+import { defaultLumenFlowHeroStyles } from "@/types/lumenflow/hero";
 import LumenFlowHeroVisualEditor from "@/components/VisualEditor/Hero/LumenFlowHeroVisualEditor";
 import { useLumenHeroStyles } from "@/hooks/useLumenHeroStyles";
 import SectionLoading from "../Shared/SectionLoading";

@@ -4,7 +4,7 @@ import React from "react";
 import { Grid3X3, RotateCcw, Type, Zap, Eye, X } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useDraggable } from "@/hooks/useDraggable";
-import { SimpleWhiteHeroCustomizationState } from "@/types/hero/simplewhite-types";
+import { SimpleWhiteHeroCustomizationState } from "@/types/simplewhite/hero-types";
 
 // Visual Size Selector Component
 const SizeSelector: React.FC<{

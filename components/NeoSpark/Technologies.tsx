@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultNeoSparkTechnologiesStyles } from "@/types/technologies/neospark";
+import { defaultNeoSparkTechnologiesStyles } from "@/types/neospark/technologies";
 import { Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import SectionHeader from "./SectionHeader";

@@ -1,6 +1,6 @@
-import { HeroCustomizationState } from "@/types/hero/portfolio";
+import { NeoSparkHeroCustomizationState } from "@/types/interfaces/NeoSparkHeroCustomizationState";
 
-export const useNeoHeroStyles = (customization: HeroCustomizationState, theme: any, ColorTheme: any) => {
+export const useNeoHeroStyles = (customization: NeoSparkHeroCustomizationState, theme: any, ColorTheme: any) => {
 
     const getContainerClasses = () => {
         const alignmentMap = {

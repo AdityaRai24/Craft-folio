@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 import { useCustomization } from "@/hooks/useCustomization";
-import { defaultLumenFlowNavbarStyles } from "@/types/navbar/lumenflow";
+import { defaultLumenFlowNavbarStyles } from "@/types/lumenflow/navbar";
 
 const Navbar = ({
   onTabChange,

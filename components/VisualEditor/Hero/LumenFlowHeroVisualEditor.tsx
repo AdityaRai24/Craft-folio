@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { X, RotateCcw, Layout, Palette, Sparkles } from "lucide-react";
 import { useDraggable } from "@/hooks/useDraggable";
-import { LumenFlowHeroCustomizationState } from "@/types/hero/lumenflow";
+import { LumenFlowHeroCustomizationState } from "@/types/lumenflow/hero";
 import { ColorTheme } from "@/lib/colorThemes";
 import { Switch } from "@/components/ui/switch";
 import SliderControl from "@/components/VisualEditor/Shared/SliderControl";

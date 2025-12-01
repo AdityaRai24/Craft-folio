@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { supabase } from '@/lib/supabase-client';
 import { ColorTheme } from '@/lib/colorThemes';
-import { defaultSimpleWhiteContactStyles } from '@/types/contact/simplewhite';
+import { defaultSimpleWhiteContactStyles } from '@/types/simplewhite/contact';
 import { ContactVisualEditor } from '@/components/VisualEditor/Contact/ContactVisualEditor';
 import SectionHeader from './SectionHeader';
 import { useCustomization } from '@/hooks/useCustomization';

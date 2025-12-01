@@ -15,7 +15,7 @@ const menuItems = [
 ];
 
 import { useCustomization } from "@/hooks/useCustomization";
-import { defaultSimpleWhiteNavbarStyles } from "@/types/navbar/simplewhite";
+import { defaultSimpleWhiteNavbarStyles } from "@/types/simplewhite/navbar";
 
 const Navbar = ({ currentPortTheme, portfolioId }: any) => {
   const [isOpen, setIsOpen] = useState(false);

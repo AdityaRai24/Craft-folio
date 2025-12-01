@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { defaultLumenFlowProjectsStyles } from "@/types/projects/lumenflow";
+import { defaultLumenFlowProjectsStyles } from "@/types/lumenflow/projects";
 import { Project } from "@/types/projects/portfolio";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";

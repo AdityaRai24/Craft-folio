@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import EditButton from '@/components/Shared/EditButton';
 
 import { useCustomization } from "@/hooks/useCustomization";
-import { defaultNeoSparkNavbarStyles } from "@/types/navbar/neospark";
+import { defaultNeoSparkNavbarStyles } from "@/types/neospark/navbar";
 
 const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle, portfolioId }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

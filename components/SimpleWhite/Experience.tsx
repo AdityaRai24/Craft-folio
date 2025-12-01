@@ -9,7 +9,7 @@ import MagicWrite from "@/components/Shared/MagicWrite";
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
 import SimpleWhiteExperienceVisualEditor from "@/components/VisualEditor/Experience/SimpleWhiteExperienceVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultSimpleWhiteExperienceStyles } from "@/types/experience/simplewhite";
+import { defaultSimpleWhiteExperienceStyles } from "@/types/simplewhite/experience";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";

@@ -12,7 +12,7 @@ import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import LumenFlowEducationVisualEditor from "@/components/VisualEditor/Education/LumenFlowEducationVisualEditor";
-import { defaultLumenFlowEducationStyles } from "@/types/education/lumenflow";
+import { defaultLumenFlowEducationStyles } from "@/types/lumenflow/education";
 import { Education as EducationData } from "@/types/experience/shared";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";

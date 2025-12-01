@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase-client";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { updateSection } from "@/app/actions/portfolio";
-import { defaultSimpleWhiteHeroStyles } from "@/types/hero/simplewhite";
+import { defaultSimpleWhiteHeroStyles } from "@/types/simplewhite/hero";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useUser } from '@clerk/nextjs';
 import { useCustomization } from "@/hooks/useCustomization";
@@ -22,7 +22,7 @@ import { useMagicWrite } from "@/hooks/useMagicWrite";
 import SectionLoading from "../Shared/SectionLoading";
 import SimpleWhiteHeroVisualEditor from "@/components/VisualEditor/Hero/SimpleWhiteHeroVisualEditor";
 import { useSimpleWhiteHeroStyles } from "@/hooks/useSimpleWhiteHeroStyles";
-import { defaultSimpleWhiteContactStyles } from "@/types/contact/simplewhite";
+import { defaultSimpleWhiteContactStyles } from "@/types/simplewhite/contact";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 
 

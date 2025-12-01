@@ -9,7 +9,7 @@ import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButto
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { defaultMacOSContactStyles } from '@/types/contact/macos';
+import { defaultMacOSContactStyles } from '@/types/macos/contact';
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useMacOSTheme } from "./ThemeContext";

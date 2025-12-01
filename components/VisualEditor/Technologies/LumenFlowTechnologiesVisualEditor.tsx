@@ -2,7 +2,7 @@
 
 import React from "react";
 import { TechnologiesVisualEditor } from "./TechnologiesVisualEditor";
-import { LumenFlowTechnologiesCustomizationState } from "@/types/technologies/lumenflow";
+import { LumenFlowTechnologiesCustomizationState } from "@/types/lumenflow/technologies";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface LumenFlowTechnologiesVisualEditorProps {

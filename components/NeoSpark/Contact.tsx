@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase-client";
 import { ColorTheme } from "@/lib/colorThemes";
 import SectionHeader from "./SectionHeader";
-import { defaultNeoSparkContactStyles } from "@/types/contact/neospark";
+import { defaultNeoSparkContactStyles } from "@/types/neospark/contact";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { useCustomization } from "@/hooks/useCustomization";
 import SectionLoading from "../Shared/SectionLoading";

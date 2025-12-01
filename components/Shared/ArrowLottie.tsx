@@ -15,7 +15,7 @@ const ArrowLottie = () => {
         renderer: "svg",
         autoplay: false,
         loop: false,
-        path: "/arrow-lottie2.json",
+        path: "/animations/arrow-lottie2.json",
       });
 
       // Set up intersection observer

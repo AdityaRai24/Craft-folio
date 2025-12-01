@@ -50,21 +50,20 @@ const MainNavbar = () => {
 
   return (
     <header
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? "backdrop-blur-md shadow-lg py-5" : "transparent py-4"
-      }`}
+      className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "backdrop-blur-md shadow-lg py-5" : "transparent py-4"
+        }`}
     >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <img
-              src="/craftfolioicon.png"
+              src="/images/icons/craftfolioicon.png"
               alt="CraftFolio"
               onClick={() => router.push("/")}
               className="w-11 cursor-pointer"
             />
             <img
-              src="/craftfolio.png"
+              src="/images/craftfolio.png"
               alt="CraftFolio"
               onClick={() => router.push("/")}
               className="w-40 cursor-pointer"
@@ -78,9 +77,8 @@ const MainNavbar = () => {
               <motion.a
                 key={item.href}
                 href={item.href}
-                className={`relative hover:text-opacity-100 transition-colors text-lg${
-                  pathname === item.href ? " font-bold text-emerald-400" : ""
-                }`}
+                className={`relative hover:text-opacity-100 transition-colors text-lg${pathname === item.href ? " font-bold text-emerald-400" : ""
+                  }`}
                 style={{
                   color:
                     pathname === item.href
@@ -88,8 +86,8 @@ const MainNavbar = () => {
                       : ColorTheme.textSecondary,
                   borderBottom:
                     pathname === item.href &&
-                    (pathname === "/choose-templates" ||
-                      pathname === "/my-portfolios")
+                      (pathname === "/choose-templates" ||
+                        pathname === "/my-portfolios")
                       ? `2px solid ${ColorTheme.primary}`
                       : undefined,
                 }}
@@ -251,9 +249,8 @@ const MainNavbar = () => {
               <motion.a
                 key={item.href}
                 href={item.href}
-                className={`block py-3 hover:text-opacity-100 transition-colors${
-                  pathname === item.href ? " font-bold text-emerald-400" : ""
-                }`}
+                className={`block py-3 hover:text-opacity-100 transition-colors${pathname === item.href ? " font-bold text-emerald-400" : ""
+                  }`}
                 style={{
                   color:
                     pathname === item.href
@@ -261,8 +258,8 @@ const MainNavbar = () => {
                       : ColorTheme.textSecondary,
                   borderBottom:
                     pathname === item.href &&
-                    (pathname === "/choose-templates" ||
-                      pathname === "/my-portfolios")
+                      (pathname === "/choose-templates" ||
+                        pathname === "/my-portfolios")
                       ? `2px solid ${ColorTheme.primary}`
                       : undefined,
                 }}

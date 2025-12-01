@@ -14,7 +14,7 @@ import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { HeaderComponent } from "./Components";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultLumenFlowExperienceStyles } from "@/types/experience/lumenflow";
+import { defaultLumenFlowExperienceStyles } from "@/types/lumenflow/experience";
 
 import { Experience as ExperienceData, Technology } from "@/types/experience/shared";
 import { useCustomization } from "@/hooks/useCustomization";

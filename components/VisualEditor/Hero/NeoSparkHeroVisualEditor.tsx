@@ -10,15 +10,15 @@ import { ButtonStyleSelector } from "./ButtonStyleSelector";
 import { BackgroundThemeSelector } from "./BackgroundThemeSelector";
 import WidthSelector from "../Contact/WidthSelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { HeroCustomizationState } from "@/types/hero/portfolio";
+import { NeoSparkHeroCustomizationState } from "@/types/interfaces/NeoSparkHeroCustomizationState";
 import { ColorTheme } from "@/lib/colorThemes";
 
 interface HeroVisualEditorProps {
     isOpen: boolean;
     onClose: () => void;
-    customization: HeroCustomizationState;
-    draftCustomization: HeroCustomizationState | null;
-    onUpdateDraft: (key: keyof HeroCustomizationState, value: any) => void;
+    customization: NeoSparkHeroCustomizationState;
+    draftCustomization: NeoSparkHeroCustomizationState | null;
+    onUpdateDraft: (key: keyof NeoSparkHeroCustomizationState, value: any) => void;
     onSave: () => void;
     onReset: () => void;
     activeTab: "layout" | "typography" | "buttons" | "effects";

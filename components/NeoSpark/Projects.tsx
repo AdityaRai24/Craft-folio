@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase-client";
 import { motion } from "framer-motion";
 import SectionHeader from "./SectionHeader";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultNeoSparkProjectsStyles } from "@/types/projects/neospark";
+import { defaultNeoSparkProjectsStyles } from "@/types/neospark/projects";
 import { Project, Technology } from "@/types/projects/portfolio";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectActions } from "@/hooks/useProjectActions";

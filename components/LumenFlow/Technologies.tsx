@@ -6,7 +6,7 @@ import { RootState } from "@/store/store";
 import { HeaderComponent } from "./Components";
 import { useCustomization } from "@/hooks/useCustomization";
 import { Technology } from "@/types/technologies/portfolio";
-import { defaultLumenFlowTechnologiesStyles } from "@/types/technologies/lumenflow";
+import { defaultLumenFlowTechnologiesStyles } from "@/types/lumenflow/technologies";
 import LumenFlowTechnologiesVisualEditor from "@/components/VisualEditor/Technologies/LumenFlowTechnologiesVisualEditor";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { ColorTheme } from "@/lib/colorThemes";

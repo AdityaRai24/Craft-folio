@@ -1,7 +1,7 @@
 import React from "react";
-import { HeroCustomizationState } from "@/types/hero/portfolio";
+import { NeoSparkHeroCustomizationState } from "@/types/interfaces/NeoSparkHeroCustomizationState";
 
-type BackgroundTheme = HeroCustomizationState["backgroundTheme"];
+type BackgroundTheme = NeoSparkHeroCustomizationState["backgroundTheme"];
 
 export interface BackgroundThemeSelectorProps {
     value: BackgroundTheme;
@@ -107,8 +107,8 @@ export const BackgroundThemeSelector: React.FC<BackgroundThemeSelectorProps> = (
                         key={themeValue}
                         onClick={() => onChange(themeValue)}
                         className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === themeValue
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+                            ? "border-white bg-zinc-700"
+                            : "border-gray-600 hover:border-gray-400 bg-zinc-800"
                             }`}
                     >
                         <div

@@ -9,7 +9,7 @@
 .main-bg-noise {
   background-repeat: repeat;
   z-index: 0;
-  background-image: url("/noise-texture.svg");
+  background-image: url("/images/backgrounds/noise-texture.svg");
   scroll-behavior: smooth;
 }
 
@@ -196,7 +196,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("../public/custombg2.svg");
+  background-image: url("/images/backgrounds/custombg2.svg");
   background-repeat: no-repeat;
   background-size: cover;
   opacity: 0.1; /* Adjust this value between 0 and 1 to control opacity */

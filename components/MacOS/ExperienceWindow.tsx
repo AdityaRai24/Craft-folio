@@ -8,7 +8,7 @@ import { Briefcase, Calendar, MapPin, Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultMacOSExperienceStyles } from "@/types/experience/macos";
+import { defaultMacOSExperienceStyles } from "@/types/macos/experience";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useMacOSTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";

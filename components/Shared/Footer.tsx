@@ -10,12 +10,12 @@ const Footer = () => {
           {/* Logo and Title */}
           <div className="flex items-center gap-2">
             <img
-              src="/craftfolioicon.png"
+              src="/images/icons/craftfolioicon.png"
               alt="CraftFolio"
               className="w-10"
             />
             <img
-              src="/craftfolio.png"
+              src="/images/craftfolio.png"
               alt="CraftFolio"
               className="w-36"
             />
