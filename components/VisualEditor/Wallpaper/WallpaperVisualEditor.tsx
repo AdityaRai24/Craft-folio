@@ -115,6 +115,11 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
 
     return (
         <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1a1a1a] text-gray-200" : "bg-white text-gray-800"}`}>
+            {/* Creator Visibility Notice */}
+            <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2 text-xs text-blue-600 dark:text-blue-400 flex items-center justify-center text-center">
+                Only visible to you (Creator)
+            </div>
+
             {/* Content */}
             <div className="flex-1 p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 {/* Preview */}

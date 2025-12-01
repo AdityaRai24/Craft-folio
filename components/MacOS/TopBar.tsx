@@ -2,50 +2,14 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Apple,
-  Wifi,
-  Battery,
-  Search,
-  Signal,
   FileText,
   Github,
   Linkedin,
   Mail,
-  Sun,
-  Moon,
   Image as ImageIcon,
 } from "lucide-react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 import { useMacOSTheme } from "./ThemeContext";
 import { FaApple } from "react-icons/fa6";
-
-// --- Helper: Date Formatter ---
-const getOrdinalSuffix = (day: number) => {
-  if (day > 3 && day < 21) return 'th';
-  switch (day % 10) {
-    case 1: return "st";
-    case 2: return "nd";
-    case 3: return "rd";
-    default: return "th";
-  }
-};
-
-const formatFullDate = (date: Date) => {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  const dayName = days[date.getDay()];
-  const monthName = months[date.getMonth()];
-  const dayNum = date.getDate();
-  const time = date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return `${dayName} ${dayNum}${getOrdinalSuffix(dayNum)} ${monthName} ${time}`;
-};
 
 // --- Configuration Types ---
 interface DropdownItem {
@@ -73,23 +37,12 @@ const TopBar = ({
   onEditWallpaper?: () => void;
   onOpenResume?: () => void;
 }) => {
-  const [time, setTime] = useState(new Date());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme } = useMacOSTheme();
   const isDark = theme === "dark";
 
-  // --- Redux Integration (Preserved) ---
-  const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
-
-  const topBarData = portfolioData?.find((item: any) => item.type === "topBar")?.data || {
-    showTime: true,
-    showControlCenter: true,
-  };
-
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-
     // Click outside listener for dropdowns
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -99,7 +52,6 @@ const TopBar = ({
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      clearInterval(timer);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
@@ -129,12 +81,12 @@ const TopBar = ({
         { label: "Resume", icon: FileText, action: handleResume }
       ]
     },
-    {
+    ...(onEditWallpaper ? [{
       label: "View",
-      items: onEditWallpaper ? [
+      items: [
         { label: "Change Wallpaper", icon: ImageIcon, action: handleWallpaperEdit }
-      ] : []
-    },
+      ]
+    }] : []),
     { label: "Window", action: () => { } },
     {
       label: "Contact",
@@ -207,53 +159,7 @@ const TopBar = ({
           </div>
         ))}
       </div>
-
-      {/* Right side - Control Center icons and time */}
-      {topBarData.showControlCenter !== false && (
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
-          <div className="flex items-center space-x-2 opacity-90">
-            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
-              <Search size={14} strokeWidth={2.5} />
-            </div>
-            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
-              <Signal size={14} strokeWidth={2.5} />
-            </div>
-            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
-              <Wifi size={14} strokeWidth={2.5} />
-            </div>
-            <div className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
-              <Battery size={16} />
-            </div>
-          </div>
-
-          {topBarData.showTime !== false && (
-            <div className="text-xs font-medium min-w-[130px] text-right cursor-default">
-              {formatFullDate(time)}
-            </div>
-          )}
-        </div>
-      )}
     </div>
-  );
-};
-
-const ThemeToggle = () => {
-  const { theme, toggleTheme } = useMacOSTheme();
-  const isDark = theme === "dark";
-
-  return (
-    <button
-      onClick={toggleTheme}
-      className={`p-1 rounded cursor-pointer transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"}`}
-      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-    >
-      {theme === "light" ? (
-        <Moon size={14} strokeWidth={2.5} />
-      ) : (
-        <Sun size={14} strokeWidth={2.5} />
-      )}
-    </button>
   );
 };
 

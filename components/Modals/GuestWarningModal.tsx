@@ -32,27 +32,19 @@ const GuestWarningModal: React.FC<GuestWarningModalProps> = ({ open, onClose }) 
         </DialogHeader>
 
         <div className="mt-4 space-y-3">
-          <h4 className="font-medium text-sm">Premium Features Available After Login:</h4>
+          <h4 className="font-medium text-sm">Sign in to:</h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2 text-sm">
               <CheckCircle size={16} className="text-green-500" />
-              Multiple theme options and customization
+              Deploy your portfolio to a live URL
             </li>
             <li className="flex items-center gap-2 text-sm">
               <CheckCircle size={16} className="text-green-500" />
-              Custom subdomain deployment
+              Claim a custom subdomain
             </li>
             <li className="flex items-center gap-2 text-sm">
               <CheckCircle size={16} className="text-green-500" />
-              Advanced SEO optimization
-            </li>
-            <li className="flex items-center gap-2 text-sm">
-              <CheckCircle size={16} className="text-green-500" />
-              Full chatbot functionality
-            </li>
-            <li className="flex items-center gap-2 text-sm">
-              <CheckCircle size={16} className="text-green-500" />
-              Section reordering and management
+              Save your progress permanently
             </li>
           </ul>
         </div>

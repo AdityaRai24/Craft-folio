@@ -27,33 +27,30 @@ const GuestWarning = ({ user, themeColors }: GuestWarningProps) => {
           className="font-semibold mb-2"
           style={{ color: themeColors.primary }}
         >
-          Login to Access Premium Features
+          Deploy Your Portfolio
         </h5>
-        <ul
-          className="text-sm space-y-2"
+        <div
+          className="text-sm mb-4"
           style={{ color: themeColors.textSecondary }}
         >
-          <li className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-500" />
-            Multiple theme options and customization
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-500" />
-            Custom subdomain deployment
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-500" />
-            Advanced SEO optimization
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-500" />
-            Full chatbot functionality
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-green-500" />
-            Section reordering and management
-          </li>
-        </ul>
+          <p className="mb-2">
+            You are currently in <strong>Guest Mode</strong>. While you can customize your portfolio freely, you need to sign in to:
+          </p>
+          <ul className="space-y-2 pl-1">
+            <li className="flex items-center gap-2">
+              <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+              <span>Deploy your portfolio to a live URL</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+              <span>Claim a custom subdomain</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+              <span>Save your progress permanently</span>
+            </li>
+          </ul>
+        </div>
         <SignInButton
           mode="modal"
           fallbackRedirectUrl={pathname}
@@ -63,14 +60,14 @@ const GuestWarning = ({ user, themeColors }: GuestWarningProps) => {
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
-            className="w-full mt-4 text-sm py-2 px-4 rounded-lg font-medium transition-colors"
+            className="w-full text-sm py-2 px-4 rounded-lg font-medium transition-colors"
             style={{
               backgroundColor: themeColors.primary,
               color: themeColors.textPrimary,
               boxShadow: `0 4px 14px ${themeColors.primaryGlow}`,
             }}
           >
-            Sign In to Unlock Features
+            Sign In to Deploy
           </motion.button>
         </SignInButton>
       </div>
@@ -78,4 +75,4 @@ const GuestWarning = ({ user, themeColors }: GuestWarningProps) => {
   );
 };
 
-export default GuestWarning; 
+export default GuestWarning;

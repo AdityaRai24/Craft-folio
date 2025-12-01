@@ -212,15 +212,7 @@ const PortfolioChatbot = ({
   const [isApplyingTheme, setIsApplyingTheme] = useState(false);
 
   const handleApplyFont = async (font: string) => {
-    if (!user) {
-      toast.error("Please sign up to apply changes to your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
+
     try {
       setIsApplyingFont(true);
       await updateFont({ fontName: font, portfolioId });
@@ -236,15 +228,7 @@ const PortfolioChatbot = ({
   };
 
   const handleApplySelectedTheme = async () => {
-    if (!user) {
-      toast.error("Please sign up to apply changes to your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
+
     try {
       setIsApplyingTheme(true);
       setCurrentPortTheme(selectedTheme);
@@ -313,15 +297,7 @@ const PortfolioChatbot = ({
   };
 
   const handleSectionReorder = async () => {
-    if (!user) {
-      toast.error("Please sign up to apply changes to your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
+
 
     try {
       setIsProcessing(true);
@@ -505,15 +481,7 @@ const PortfolioChatbot = ({
   };
 
   const handleSaveSEO = async () => {
-    if (!user) {
-      toast.error("Please sign up to apply changes to your portfolio", {
-        duration: 2500,
-        style: {
-          zIndex: 999999,
-        },
-      });
-      return;
-    }
+
 
     // Call the save function from SEOSettings component
     if (seoSettingsRef.current) {
@@ -646,37 +614,7 @@ const PortfolioChatbot = ({
               borderLeft: `1px solid ${themeColors.borderLight}`,
             }}
           >
-            {(portfolioUserId === "guest" && !isLoaded) ||
-              (portfolioUserId === "guest" && isLoaded && !user) ? (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-3 text-center border-b"
-                style={{
-                  backgroundColor: themeColors.bgCard,
-                  borderColor: themeColors.borderLight,
-                }}
-              >
-                <div
-                  className="text-sm"
-                  style={{ color: themeColors.textSecondary }}
-                >
-                  ⚠️ You are in guest mode. Sign up to save your portfolio and
-                  unlock all features including the AI chatbot, theme
-                  customization, and more.{" "}
-                  <SignInButton
-                    mode="modal"
-                    fallbackRedirectUrl={pathname}
-                    signUpFallbackRedirectUrl={pathname}
-                  >
-                    <div className="underline inline-block cursor-pointer text-blue-300">
-                      Sign up
-                    </div>
-                  </SignInButton>{" "}
-                  to get started.
-                </div>
-              </motion.div>
-            ) : null}
+
 
 
             <div
