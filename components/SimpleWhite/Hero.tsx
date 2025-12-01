@@ -179,7 +179,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
               <div className="lg:col-span-2 relative">
                 <div className="flex gap-2 mb-4">
                   <EditButton
-                    sectionName={"hero"}
+                    sectionName={"simple-white-hero"}
                     styles="text-xs px-2 sm:px-3 py-1"
                   />
                   {shouldShowButton && (
@@ -307,25 +307,6 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
               {/* Right Column - About */}
               <div className="lg:col-span-2 relative">
-                <div className="flex gap-2 mb-4 justify-end">
-                  <EditButton
-                    sectionName={"contact"}
-                    styles="text-xs px-2 sm:px-3 py-1"
-                  />
-                  {shouldShowButton && (
-                    <button
-                      onClick={openContactVisualEditor}
-                      className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
-                      style={{
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                      }}
-                    >
-                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="hidden sm:inline">Visual Editor</span>
-                    </button>
-                  )}
-                </div>
-
                 {effectiveCustomization.aboutCardVisible && (
                   <motion.div
                     className={`${getCardStyle()} cursor-pointer`}
@@ -405,7 +386,7 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           transition: { delay: 0.8, duration: 0.5 },
                         }}
                       >
-                        {heroData?.shortSummary || userInfo?.shortSummary ||
+                        {userInfo?.shortSummary ||
                           "I build exceptional and accessible digital experiences for the web."}
                       </motion.p>
                       <div className="absolute -top-1 -right-1 z-10 hidden md:block">

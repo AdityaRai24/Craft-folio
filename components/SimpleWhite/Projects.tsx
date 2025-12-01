@@ -92,6 +92,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
     getButtonClasses,
     getButtonStyle,
     getTechStackClasses,
+    getTechStackStyle,
     getTitleAlignment,
     getTitleClasses,
     getDescriptionClasses,
@@ -242,8 +243,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     effectiveCustomization.layout === "grid"
                       ? "flex flex-col"
                       : effectiveCustomization.imagePosition === "right"
-                        ? "flex flex-col lg:flex-row-reverse items-stretch"
-                        : "flex flex-col lg:flex-row items-stretch"
+                        ? "flex flex-col lg:flex-row-reverse items-center gap-8"
+                        : "flex flex-col lg:flex-row items-center gap-8"
                   }
                 >
                   {/* Project Image */}
@@ -251,9 +252,10 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     <div
                       className={
                         effectiveCustomization.layout === "grid"
-                          ? "w-full aspect-video overflow-hidden bg-gray-100"
-                          : "w-full lg:w-2/5 relative min-h-[300px] lg:h-auto overflow-hidden bg-gray-100"
+                          ? "w-full overflow-hidden bg-gray-100"
+                          : "w-full lg:w-2/5 relative overflow-hidden flex items-center justify-center pl-4"
                       }
+                      style={getImageStyle()}
                     >
                       <motion.div
                         className="w-full h-full"
@@ -294,7 +296,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     className={
                       effectiveCustomization.layout === "grid"
                         ? "w-full p-6 sm:p-8 flex flex-col flex-grow"
-                        : "w-full lg:w-3/5 p-8 sm:p-10 lg:p-12 flex flex-col justify-center"
+                        : "flex-1 p-8 sm:p-10 lg:p-12 flex flex-col justify-center"
                     }
                   >
                     <div className="flex flex-col h-full">
@@ -345,11 +347,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                             {project.techStack.map((tech, tagIndex) => (
                               <div
                                 key={tagIndex}
-                                className="group/tech relative flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors duration-200 border border-transparent hover:border-gray-200 hover:bg-gray-50"
-                                style={{
-                                  backgroundColor: `${ColorTheme.primary}08`,
-                                  color: textPrimaryColor,
-                                }}
+                                className={getTechStackClasses()}
+                                style={getTechStackStyle()}
                               >
                                 {tech.logo ? (
                                   <img
@@ -381,12 +380,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                               href={project?.githubLink || "#"}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
-                              style={{
-                                backgroundColor: "#24292e",
-                                color: "#ffffff",
-                                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
-                              }}
+                              className={getButtonClasses("github")}
+                              style={getButtonStyle("github")}
                             >
                               <Github className="h-4 w-4" />
                               GitHub
@@ -397,12 +392,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                               href={project?.liveLink || "#"}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 border"
-                              style={{
-                                borderColor: ColorTheme.primary,
-                                color: ColorTheme.primary,
-                                backgroundColor: "transparent"
-                              }}
+                              className={getButtonClasses("live")}
+                              style={getButtonStyle("live")}
                             >
                               <ExternalLink className="h-4 w-4" />
                               Live Demo

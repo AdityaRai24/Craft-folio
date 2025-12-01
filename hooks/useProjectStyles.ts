@@ -22,15 +22,15 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
 
     // Layout based classes
     if (customization.cardStyle === "default") {
-      classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-md";
+      classes += isDark ? "bg-zinc-800 border border-zinc-700" : "bg-white border border-gray-200 shadow-lg hover:shadow-xl";
     } else if (customization.cardStyle === "minimal") {
-      classes += "bg-transparent border-0";
+      classes += isDark ? "bg-transparent border-0" : "bg-transparent border-0 shadow-none";
     } else if (customization.cardStyle === "glass") {
-      classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/70 backdrop-blur-sm border border-gray-200 shadow-lg";
+      classes += isDark ? "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" : "bg-white/80 backdrop-blur-md border border-white/20 shadow-xl ring-1 ring-black/5";
     } else if (customization.cardStyle === "neon") {
-      classes += isDark ? "bg-zinc-900 border shadow-lg" : "bg-white border shadow-lg";
+      classes += isDark ? "bg-zinc-900 border shadow-lg" : "bg-white border-2 border-indigo-100 shadow-[0_0_15px_rgba(99,102,241,0.1)] hover:shadow-[0_0_25px_rgba(99,102,241,0.2)]";
     } else if (customization.cardStyle === "gradient") {
-      classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-md";
+      classes += isDark ? "bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700" : "bg-gradient-to-br from-white to-slate-50 border border-slate-200 shadow-md";
     }
 
     return classes;
@@ -91,7 +91,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       } else {
         classes += isDark
           ? " text-white  shadow-sm hover:shadow-md"
-          : " text-white  shadow-sm hover:shadow-md";
+          : " text-gray-900 bg-white border border-gray-200 shadow-sm hover:shadow-md hover:bg-gray-50";
       }
     } else if (style === "filled") {
       classes += " text-white";
@@ -130,27 +130,31 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
   };
 
   const getTechStackClasses = () => {
-    let classes =
-      "px-3 py-1 text-sm font-medium cursor-pointer transition-all duration-300 ";
+    let classes = "inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium transition-all duration-300 ";
 
-    switch (customization.techStackStyle) {
-      case "badges":
-        classes += isDark ? "bg-gray-800 text-white rounded" : "bg-gray-800 text-white rounded";
-        break;
-      case "minimal":
-        classes += isDark ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900";
-        break;
-      case "colorful":
-        classes += "text-white rounded-full border-2";
-        break;
-      case "pills":
-      default:
-        classes += isDark
-          ? "bg-gray-700/50 text-gray-300 border border-gray-600/50 hover:bg-gray-700 hover:border-gray-500 rounded-full"
-          : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 hover:border-gray-300 rounded-full";
+    if (customization.techStackStyle === "pills") {
+      classes += "rounded-full border ";
+      classes += isDark ? "border-gray-700 text-gray-300" : "border-gray-200 text-gray-600";
+    } else if (customization.techStackStyle === "badges") {
+      classes += isDark ? "rounded bg-gray-700 text-white" : "rounded bg-gray-200 text-gray-800";
+    } else if (customization.techStackStyle === "minimal") {
+      classes += isDark ? "text-gray-400" : "text-gray-600";
+    } else if (customization.techStackStyle === "colorful") {
+      classes += "rounded-full border-2";
     }
 
     return classes;
+  };
+
+  const getTechStackStyle = () => {
+    if (customization.techStackStyle === "colorful") {
+      return {
+        borderColor: titleColor,
+        backgroundColor: `${titleColor}20`,
+        color: isDark ? "white" : "black"
+      };
+    }
+    return {};
   };
 
   const getTitleAlignment = () => {
@@ -215,6 +219,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
     getButtonClasses,
     getButtonStyle,
     getTechStackClasses,
+    getTechStackStyle,
     getTitleAlignment,
     getTitleClasses,
     getDescriptionClasses,

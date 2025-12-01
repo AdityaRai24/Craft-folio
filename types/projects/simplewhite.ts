@@ -1,7 +1,7 @@
 import { ProjectsCustomizationState } from "./portfolio";
 
 export const defaultSimpleWhiteProjectsStyles: ProjectsCustomizationState = {
-    layout: "grid",
+    layout: "single",
     gridColumns: 2,
     cardSpacing: 24,
     cardBorderRadius: 12,
@@ -10,7 +10,7 @@ export const defaultSimpleWhiteProjectsStyles: ProjectsCustomizationState = {
     cardBorder: "border-gray-700",
     cardStyle: "default",
     imageAspectRatio: "auto",
-    imageHeight: 208,
+    imageHeight: 150,
     githubButtonStyle: "default",
     liveButtonStyle: "default",
     buttonBorderRadius: 6,

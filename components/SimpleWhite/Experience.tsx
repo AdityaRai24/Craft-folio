@@ -117,6 +117,8 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
 
   const animationVariants = getAnimationVariants();
 
+  console.log("Experience Data:", experienceData);
+
   return (
     <section
       id="experience"
@@ -184,28 +186,42 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                     >
                       <div className="flex flex-col gap-1 mb-4">
                         <div className="flex justify-between items-start gap-4">
-                          <h3 className={getRoleClasses()}
-                            style={{ color: textPrimaryColor }}>
-                            {exp.role}
-                          </h3>
+                          <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                            <h3 className={getRoleClasses()}
+                              style={{ color: textPrimaryColor }}>
+                              {exp.role}
+                            </h3>
+                            {exp.companyName && (
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-gray-400">at</span>
+                                <div className={getCompanyClasses()} style={{ color: primaryColor }}>
+                                  {exp.companyName}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {exp.location && (
+                            <div
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 whitespace-nowrap  ${getLocationClasses()}`}
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              {exp.location}
+                            </div>
+
+                          )}
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-800 whitespace-nowrap ${getDateClasses()}`}>
                             {effectiveCustomization.dateFormat === "year-only"
                               ? `${(exp.startDate || "").split(' ')[1] || exp.startDate} - ${(exp.endDate || "").split(' ')[1] || exp.endDate}`
                               : `${exp.startDate} - ${exp.endDate}`}
                           </span>
                         </div>
-                        <div className={getCompanyClasses()} style={{ color: ColorTheme.primary }}>
-                          {exp.company}
-                        </div>
-                        {effectiveCustomization.locationVisible && exp.location && (
-                          <div className={`flex items-center gap-1 ${getLocationClasses()}`} style={{ color: effectiveCustomization.locationColor }}>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {exp.location}
-                          </div>
-                        )}
                       </div>
 
                       <div className="relative">
