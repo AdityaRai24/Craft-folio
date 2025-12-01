@@ -125,6 +125,15 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 250, y: 250 },
       size: { width: 900, height: 600 },
     },
+    wallpaper: {
+      id: "wallpaper",
+      isOpen: false,
+      isMinimized: false,
+      isFullscreen: false,
+      zIndex: 0,
+      position: { x: 350, y: 150 },
+      size: { width: 500, height: 600 },
+    },
   };
 
   const dockConfig: Record<string, any> = {
@@ -135,6 +144,7 @@ const Desktop: React.FC<DesktopProps> = ({
     resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
     safari: { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
+    wallpaper: { id: "wallpaper", icon: ImageIcon, label: "Wallpaper", component: WallpaperVisualEditor },
   };
 
   // Dynamically order dock items based on portfolioData
@@ -154,7 +164,7 @@ const Desktop: React.FC<DesktopProps> = ({
 
     // 2. Add remaining fixed apps (Terminal, Safari, Resume if not in portfolioData)
     // Note: Resume might be a section, but Terminal and Safari are usually system apps
-    const systemApps = ["terminal", "safari", "resume"];
+    const systemApps = ["terminal", "safari", "resume", "wallpaper"];
     systemApps.forEach((appId) => {
       if (!processedIds.has(appId) && dockConfig[appId]) {
         orderedItems.push(dockConfig[appId]);
@@ -174,7 +184,6 @@ const Desktop: React.FC<DesktopProps> = ({
   };
 
   const dockItems = getOrderedDockItems();
-  const [showWallpaperEditor, setShowWallpaperEditor] = useState(false);
 
   const {
     windows,
@@ -227,8 +236,6 @@ const Desktop: React.FC<DesktopProps> = ({
         bringToFront={bringToFront}
         handleMouseDown={handleMouseDown}
         getWindowTitle={getWindowTitle}
-        showWallpaperEditor={showWallpaperEditor}
-        setShowWallpaperEditor={setShowWallpaperEditor}
         font={font}
       />
     </MacOSThemeProvider>
@@ -258,8 +265,6 @@ const DesktopContent = ({
   bringToFront,
   handleMouseDown,
   getWindowTitle,
-  showWallpaperEditor,
-  setShowWallpaperEditor,
   font,
 }: any) => {
   const { theme } = useMacOSTheme();
@@ -357,7 +362,8 @@ const DesktopContent = ({
         currentPortTheme={currentPortTheme}
         customCSS={customCSS}
         portfolioId={portfolioId}
-        onEditWallpaper={() => setShowWallpaperEditor(true)}
+        onEditWallpaper={() => openWindow("wallpaper")}
+        onOpenResume={() => openWindow("resume")}
       />
 
       {/* Desktop Icons - positioned on left side like macOS */}
@@ -368,32 +374,6 @@ const DesktopContent = ({
           isDark={isDark}
         />
       </div>
-
-      {/* Wallpaper Visual Editor */}
-      <AnimatePresence>
-        {showWallpaperEditor && (
-          <WallpaperVisualEditor
-            initialWallpaper={backgroundImage}
-            onClose={() => setShowWallpaperEditor(false)}
-            portfolioId={portfolioId!}
-            currentTheme={theme}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Floating Wallpaper Edit Button */}
-      {portfolioId && (
-        <button
-          onClick={() => setShowWallpaperEditor(true)}
-          className={`fixed bottom-24 right-6 z-[45] p-3 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-110 border ${isDark
-            ? "bg-gray-800/90 border-gray-700 text-gray-200 hover:bg-gray-700"
-            : "bg-white/90 border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
-          title="Change Wallpaper"
-        >
-          <ImageIcon size={20} />
-        </button>
-      )}
 
       {/* Windows */}
       <div className="relative w-full h-full pt-7 z-[2]">

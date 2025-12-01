@@ -28,9 +28,9 @@ export const defaultSimpleWhiteProjectsStyles: ProjectsCustomizationState = {
     titleWeight: "semibold",
     descriptionSize: "xs",
     descriptionWeight: "normal",
-    showImages: true,
-    techStackVisible: true,
-    linksVisible: true,
+
+
+
     githubLinkVisible: true,
     liveLinkVisible: true,
 };

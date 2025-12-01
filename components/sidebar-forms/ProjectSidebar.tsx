@@ -54,8 +54,12 @@ const ProjectSidebar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (projectsData && projectsData.length > 0) {
-      setProjects(projectsData);
+    if (projectsData) {
+      if (Array.isArray(projectsData)) {
+        setProjects(projectsData);
+      } else if (projectsData.projects && Array.isArray(projectsData.projects)) {
+        setProjects(projectsData.projects);
+      }
     }
   }, [projectsData]);
 

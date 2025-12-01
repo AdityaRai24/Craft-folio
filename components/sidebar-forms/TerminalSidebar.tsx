@@ -1,6 +1,6 @@
 "use client";
 import { RootState } from '@/store/store'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Label } from '@radix-ui/react-label'
@@ -13,6 +13,9 @@ import { useParams } from 'next/navigation'
 import { updateSection } from '@/app/actions/portfolio'
 import toast from 'react-hot-toast'
 import { ColorTheme } from '@/lib/colorThemes'
+
+const EMPTY_OBJECT = {};
+const EMPTY_ARRAY: any[] = [];
 
 const TerminalSidebar = () => {
     interface TerminalCommand {
@@ -30,20 +33,24 @@ const TerminalSidebar = () => {
     }
 
     const { portfolioData } = useSelector((state: RootState) => state.data)
-    const terminalSection = portfolioData?.find((item: any) => item.type === "terminal");
-    const terminalData = terminalSection?.data || {};
+
+    const terminalSection = useMemo(() => portfolioData?.find((item: any) => item.type === "terminal"), [portfolioData]);
+    const terminalData = useMemo(() => terminalSection?.data || EMPTY_OBJECT, [terminalSection]);
 
     // Data for default command generation
-    // Data for default command generation
-    const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
-    const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
+    const heroData = useMemo(() => portfolioData?.find((item: any) => item.type === "hero")?.data || EMPTY_OBJECT, [portfolioData]);
+    const userInfoData = useMemo(() => portfolioData?.find((item: any) => item.type === "userInfo")?.data || EMPTY_OBJECT, [portfolioData]);
 
     // Fix: Correctly extract projects array whether it's direct or wrapped in an object
-    const projectsSection = portfolioData?.find((item: any) => item.type === "projects")?.data;
-    const projectsData = Array.isArray(projectsSection) ? projectsSection : (projectsSection?.projects || []);
+    const projectsData = useMemo(() => {
+        const projectsSection = portfolioData?.find((item: any) => item.type === "projects")?.data;
+        if (Array.isArray(projectsSection)) return projectsSection;
+        if (projectsSection?.projects && Array.isArray(projectsSection.projects)) return projectsSection.projects;
+        return EMPTY_ARRAY;
+    }, [portfolioData]);
 
-    const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
-    const technologiesData = portfolioData?.find((item: any) => item.type === "technologies")?.data || [];
+    const experienceData = useMemo(() => portfolioData?.find((item: any) => item.type === "experience")?.data || EMPTY_ARRAY, [portfolioData]);
+    const technologiesData = useMemo(() => portfolioData?.find((item: any) => item.type === "technologies")?.data || EMPTY_ARRAY, [portfolioData]);
 
     const [commands, setCommands] = useState<TerminalCommand[]>([]);
     const [currentCommand, setCurrentCommand] = useState<TerminalCommand>(emptyCommand);
@@ -193,7 +200,7 @@ const TerminalSidebar = () => {
         });
 
         setCommands(mergedCommands);
-    }, [terminalData, portfolioData]); // Re-run when data changes
+    }, [terminalData, heroData, userInfoData, projectsData, experienceData, technologiesData]); // Re-run when data changes
 
     const updateDB = async (newCommands: any[], newHiddenCommands: string[]) => {
         const newData = {

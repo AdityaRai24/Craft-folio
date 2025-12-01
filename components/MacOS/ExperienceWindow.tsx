@@ -90,7 +90,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
                     </div>
 
                     {experienceData.length > 0 ? (
-                        <div className={`space-y-8 relative ${effectiveCustomization.timelineStyle !== "minimal" ? "before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent" : ""}`}>
+                        <div className={`space-y-8 relative`}>
                             {experienceData.map((exp: any, index: number) => {
                                 const animationVariants = getAnimationVariants();
                                 return (
@@ -105,12 +105,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
                                         onMouseEnter={() => setHoveredIndex(index)}
                                         onMouseLeave={() => setHoveredIndex(null)}
                                     >
-                                        {/* Timeline Icon */}
-                                        {effectiveCustomization.timelineStyle !== "minimal" && (
-                                            <div className={`flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-emerald-500 text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 ${effectiveCustomization.timelinePosition === "alternating" ? "md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2" : "md:-translate-x-1/2"}`}>
-                                                <Briefcase size={18} />
-                                            </div>
-                                        )}
+
 
                                         {/* Card */}
                                         <div
@@ -199,6 +194,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
                 onReset={resetCustomization}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
+                showTimelineControls={false}
             />
         </div >
     );

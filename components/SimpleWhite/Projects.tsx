@@ -248,7 +248,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                   }
                 >
                   {/* Project Image */}
-                  {(effectiveCustomization.showImages ?? true) && (
+                  {true && (
                     <div
                       className={
                         effectiveCustomization.layout === "grid"
@@ -341,7 +341,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                         </div>
                       </div>
 
-                      {(effectiveCustomization.techStackVisible ?? true) && project?.techStack && (
+                      {(true) && project?.techStack && (
                         <div className={`mb-8 ${getTitleAlignment()}`}>
                           <div className="flex flex-wrap gap-2">
                             {project.techStack.map((tech, tagIndex) => (
@@ -368,7 +368,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                       )}
 
                       {/* Action Buttons */}
-                      {(effectiveCustomization.linksVisible ?? true) && (
+                      {(true) && (
                         <div className={`flex gap-4 mt-auto ${effectiveCustomization.titleAlignment === "center"
                           ? "justify-center"
                           : effectiveCustomization.titleAlignment === "right"

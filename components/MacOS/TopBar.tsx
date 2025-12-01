@@ -65,11 +65,13 @@ const TopBar = ({
   customCSS,
   portfolioId,
   onEditWallpaper,
+  onOpenResume,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
   onEditWallpaper?: () => void;
+  onOpenResume?: () => void;
 }) => {
   const [time, setTime] = useState(new Date());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -104,7 +106,7 @@ const TopBar = ({
 
   // --- Handlers ---
   const handleResume = () => {
-    // Add your resume logic here (e.g., window.open('/resume.pdf'))
+    onOpenResume?.();
     setActiveMenu(null);
   };
 

@@ -51,16 +51,16 @@ export interface ProjectsCustomizationState {
   descriptionVisible?: boolean;
 
   // Project Cards (SimpleWhite-specific, optional for others)
-  showImages?: boolean;
+
   projectTitleColor?: "gray-900" | "gray-800" | "primary";
   projectDescriptionColor?: "gray-600" | "gray-700" | "gray-800";
 
   // Tech Stack (SimpleWhite-specific, optional for others)
-  techStackVisible?: boolean;
+
   techStackSize?: "sm" | "md" | "lg";
 
   // Project Links (SimpleWhite-specific, optional for others)
-  linksVisible?: boolean;
+
   linksStyle?: "buttons" | "icons" | "text";
   linksPosition?: "bottom" | "top" | "overlay";
   githubLinkVisible?: boolean;

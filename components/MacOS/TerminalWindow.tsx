@@ -69,7 +69,6 @@ const TerminalWindow = ({ theme = "light", portfolioId, font }: { theme?: "light
   contact       - Contact information
   projects      - List my projects
   experience    - My work experience
-
 ${terminalData.commands?.map((cmd: any) => `  ${cmd.command.padEnd(12)} - ${cmd.description}`).join("\n") || ""}`,
     clear: () => {
       setCommandHistory([""]);

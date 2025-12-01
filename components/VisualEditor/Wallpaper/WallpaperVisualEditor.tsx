@@ -4,16 +4,16 @@ import React, { useState, useRef } from "react";
 import { X, Upload, Save, RotateCcw, Image as ImageIcon } from "lucide-react";
 import { useDraggable } from "@/hooks/useDraggable";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 import { updatePortfolioData } from "@/slices/dataSlice";
 import { updateSection } from "@/app/actions/portfolio";
-import { ColorTheme } from "@/lib/colorThemes";
 
 interface WallpaperVisualEditorProps {
-    initialWallpaper: string;
-    onClose: () => void;
-    portfolioId: string;
-    currentTheme: string;
+    initialWallpaper?: string;
+    onClose?: () => void;
+    portfolioId?: string;
+    theme?: string;
 }
 
 const defaultWallpapers = [
@@ -27,15 +27,15 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
     initialWallpaper,
     onClose,
     portfolioId,
-    currentTheme,
+    theme,
 }) => {
-    const [wallpaperUrl, setWallpaperUrl] = useState(initialWallpaper || defaultWallpapers[0]);
+    const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
+    const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
+    const currentWallpaper = heroData.image || defaultWallpapers[0];
+
+    const [wallpaperUrl, setWallpaperUrl] = useState(initialWallpaper || currentWallpaper);
     const [isUploading, setIsUploading] = useState(false);
     const dispatch = useDispatch();
-    const { position, dragRef, handleMouseDown } = useDraggable({
-        x: window.innerWidth / 2 - 200,
-        y: window.innerHeight / 2 - 150,
-    });
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -86,19 +86,24 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
             );
 
             // Update Database
-            const result = await updateSection({
-                portfolioId,
-                sectionName: "hero",
-                sectionContent: { image: wallpaperUrl },
-                sectionTitle: "",
-                sectionDescription: "",
-            });
+            if (portfolioId) {
+                const result = await updateSection({
+                    portfolioId,
+                    sectionName: "hero",
+                    sectionContent: { image: wallpaperUrl },
+                    sectionTitle: "",
+                    sectionDescription: "",
+                });
 
-            if (result.success) {
-                toast.success("Wallpaper updated!", { id: "saveWallpaper" });
-                onClose();
+                if (result.success) {
+                    toast.success("Wallpaper updated!", { id: "saveWallpaper" });
+                    onClose?.(); // Close the window after saving
+                } else {
+                    throw new Error("Failed to save to database");
+                }
             } else {
-                throw new Error("Failed to save to database");
+                toast.success("Wallpaper updated (Local Only)!", { id: "saveWallpaper" });
+                onClose?.();
             }
         } catch (error) {
             console.error("Save error:", error);
@@ -106,48 +111,12 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
         }
     };
 
-    const isDark = currentTheme === "dark";
+    const isDark = theme === "dark";
 
     return (
-        <div
-            ref={dragRef}
-            style={{
-                position: "fixed",
-                left: position.x,
-                top: position.y,
-                zIndex: 50,
-            }}
-            className={`w-[400px] rounded-xl shadow-2xl overflow-hidden border ${isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
-                }`}
-        >
-            {/* Header */}
-            <div
-                onMouseDown={handleMouseDown}
-                className={`px-4 py-3 flex items-center justify-between cursor-move select-none border-b ${isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"
-                    }`}
-            >
-                <div className="flex items-center gap-2">
-                    <ImageIcon size={16} className="text-emerald-500" />
-                    <span
-                        className={`font-medium text-sm ${isDark ? "text-gray-200" : "text-gray-700"
-                            }`}
-                    >
-                        Edit Wallpaper
-                    </span>
-                </div>
-                <button
-                    onClick={onClose}
-                    className={`p-1 rounded-md transition-colors ${isDark
-                        ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
-                        : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"
-                        }`}
-                >
-                    <X size={16} />
-                </button>
-            </div>
-
+        <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1a1a1a] text-gray-200" : "bg-white text-gray-800"}`}>
             {/* Content */}
-            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+            <div className="flex-1 p-5 space-y-4 overflow-y-auto custom-scrollbar">
                 {/* Preview */}
                 <div className="space-y-2">
                     <label
@@ -157,7 +126,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                         Preview
                     </label>
                     <div
-                        className={`relative aspect-video rounded-lg overflow-hidden border-2 border-dashed ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"
+                        className={`relative h-48 w-full rounded-lg overflow-hidden border-2 border-dashed ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"
                             }`}
                     >
                         {wallpaperUrl ? (
@@ -188,8 +157,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                                 key={index}
                                 onClick={() => setWallpaperUrl(url)}
                                 className={`relative aspect-video rounded-md overflow-hidden border-2 transition-all ${wallpaperUrl === url
-                                        ? "border-emerald-500 ring-2 ring-emerald-500/20"
-                                        : isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-300"
+                                    ? "border-emerald-500 ring-2 ring-emerald-500/20"
+                                    : isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-300"
                                     }`}
                             >
                                 <img
@@ -223,12 +192,12 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                 </div>
 
                 {/* Upload Button */}
-                <div className="relative">
+                <div className="relative pt-2">
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         disabled={isUploading}
                     />
                     <button
@@ -251,7 +220,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
 
             {/* Footer */}
             <div
-                className={`px-6 py-4 border-t flex justify-between items-center ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"
+                className={`px-6 py-4 border-t flex justify-between items-center mt-auto ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"
                     }`}
             >
                 <button

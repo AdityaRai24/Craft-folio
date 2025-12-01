@@ -67,10 +67,23 @@ const ProjectsGrid = ({
 
   useEffect(() => {
     if (portfolioData) {
-      const data = portfolioData.find((item: any) => item.type === "projects")?.data || [];
-      setProjectsData(data.projects);
+      const sectionData = portfolioData.find((item: any) => item.type === "projects");
+      if (sectionData) {
+        const data = sectionData.data;
+        if (Array.isArray(data)) {
+          setProjectsData(data);
+        } else if (data && Array.isArray(data.projects)) {
+          setProjectsData(data.projects);
+        } else {
+          setProjectsData([]);
+        }
+      }
     }
   }, [portfolioData]);
+
+  const sectionData = portfolioData?.find((item: any) => item.type === "projects");
+  const sectionTitle = sectionData?.sectionTitle || "Projects";
+  const sectionDescription = sectionData?.sectionDescription || "A collection of my recent work";
 
 
   const { handleMagicWrite, handleDescriptionUpdate } = useProjectActions({
@@ -92,7 +105,7 @@ const ProjectsGrid = ({
     getTitleClasses,
     getDescriptionClasses,
     getAnimationVariants
-  } = useProjectStyles(effectiveCustomization, "", theme);
+  } = useProjectStyles(effectiveCustomization, currentTheme.primary, theme);
 
   const animationVariants = getAnimationVariants();
 
@@ -127,10 +140,10 @@ const ProjectsGrid = ({
             transition={{ duration: 0.4 }}
           >
             <h1 className={`text-3xl md:text-4xl font-semibold mb-1.5 tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}>
-              Projects
+              {sectionTitle}
             </h1>
             <p className={`text-sm md:text-base ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-              A collection of my recent work
+              {sectionDescription}
             </p>
           </motion.div>
 
