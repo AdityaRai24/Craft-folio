@@ -13,7 +13,7 @@ import { HeaderComponent } from "./Components";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import LumenFlowEducationVisualEditor from "@/components/VisualEditor/Education/LumenFlowEducationVisualEditor";
 import { defaultLumenFlowEducationStyles } from "@/types/lumenflow/education";
-import { Education as EducationData } from "@/types/experience/shared";
+import { Education as EducationData } from "@/types/interfaces/Education";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useMagicWrite } from "@/hooks/useMagicWrite";
 import { useLumenEducationStyles } from "@/hooks/useLumenEducationStyles";

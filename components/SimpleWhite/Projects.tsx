@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
-import { Project } from "@/types/projects/portfolio";
+import { Project } from "@/types/interfaces/ProjectsCustomizationState";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -243,8 +243,8 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                     effectiveCustomization.layout === "grid"
                       ? "flex flex-col"
                       : effectiveCustomization.imagePosition === "right"
-                        ? "flex flex-col lg:flex-row-reverse items-center gap-8"
-                        : "flex flex-col lg:flex-row items-center gap-8"
+                        ? "flex flex-col lg:flex-row-reverse items-center gap-0"
+                        : "flex flex-col max-w-[95%] mx-auto lg:flex-row items-center gap-0"
                   }
                 >
                   {/* Project Image */}
@@ -253,7 +253,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                       className={
                         effectiveCustomization.layout === "grid"
                           ? "w-full overflow-hidden bg-gray-100"
-                          : "w-full lg:w-2/5 relative overflow-hidden flex items-center justify-center pl-4"
+                          : "w-full lg:w-2/5 relative overflow-hidden flex items-center justify-center"
                       }
                       style={getImageStyle()}
                     >

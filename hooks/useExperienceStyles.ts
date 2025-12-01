@@ -1,4 +1,4 @@
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { ExperienceCustomizationState } from "@/types/interfaces/ExperienceCustomizationState";
 import { getVariantByName } from "@/lib/animationVariants";
 
 export const useExperienceStyles = (customization: ExperienceCustomizationState, theme: "light" | "dark", primaryColor: string) => {

@@ -15,7 +15,7 @@ import AlignmentSelector from "../Shared/AlignmentSelector";
 import SliderControl from "../Shared/SliderControl";
 import TypographySelector from "../Shared/TypographySelector";
 import { useDraggable } from "@/hooks/useDraggable";
-import { EducationCustomizationState } from "@/types/education/portfolio";
+import { EducationCustomizationState } from "@/types/interfaces/EducationCustomizationState";
 import { ColorTheme } from "@/lib/colorThemes";
 import { Switch } from "@/components/ui/switch";
 import CardStyleSelector from "../Shared/CardStyleSelector";

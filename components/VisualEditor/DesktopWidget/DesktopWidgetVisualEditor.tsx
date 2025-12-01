@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Save, RotateCcw, Layout, Type, Clock, Calendar, MessageSquare, Monitor } from "lucide-react";
-import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { updatePortfolioData } from "@/slices/dataSlice";
-import { updateSection } from "@/app/actions/portfolio";
+import React from "react";
+import { Save, RotateCcw, Layout, Type, Clock, Calendar, MessageSquare, Monitor } from "lucide-react";
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultMacOSWidgetStyles } from "@/types/macos/widget";
 
 interface DesktopWidgetVisualEditorProps {
     onClose?: () => void;
@@ -19,76 +16,23 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
     portfolioId,
     theme,
 }) => {
-    const dispatch = useDispatch();
-    const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
-    const widgetData = portfolioData?.find((item: any) => item.type === "desktopWidget")?.data || {
-        isVisible: true,
-        showTime: true,
-        showDate: true,
-        showGreeting: true,
-        position: "top-right",
-        style: "modern",
-        customGreeting: "",
-    };
+    const {
+        customization,
+        updateDraftCustomization,
+        saveDraftCustomization,
+        resetCustomization,
+        draftCustomization
+    } = useCustomization("desktopWidget", defaultMacOSWidgetStyles, portfolioId || "");
 
-    const [config, setConfig] = useState(widgetData);
+    // Use draft customization for live preview if available, otherwise fall back to saved customization
+    const currentStyles = draftCustomization || customization;
 
     const handleSave = async () => {
-        try {
-            toast.loading("Saving widget settings...", { id: "saveWidget" });
-
-            // Update Redux
-            dispatch(
-                updatePortfolioData({
-                    sectionType: "desktopWidget",
-                    newData: config,
-                    sectionTitle: "Desktop Widget",
-                    sectionDescription: "Customizable desktop clock and greeting",
-                })
-            );
-
-            // Update Database
-            if (portfolioId) {
-                const result = await updateSection({
-                    portfolioId,
-                    sectionName: "desktopWidget",
-                    sectionContent: config,
-                    sectionTitle: "Desktop Widget",
-                    sectionDescription: "Customizable desktop clock and greeting",
-                });
-
-                if (result.success) {
-                    toast.success("Widget settings saved!", { id: "saveWidget" });
-                    onClose?.();
-                } else {
-                    throw new Error("Failed to save to database");
-                }
-            } else {
-                toast.success("Widget settings saved (Local Only)!", { id: "saveWidget" });
-                onClose?.();
-            }
-        } catch (error) {
-            console.error("Save error:", error);
-            toast.error("Failed to save widget settings", { id: "saveWidget" });
-        }
+        await saveDraftCustomization();
+        onClose?.();
     };
 
     const isDark = theme === "dark";
-
-    const updateConfig = (key: string, value: any) => {
-        const newConfig = { ...config, [key]: value };
-        setConfig(newConfig);
-
-        // Live Preview: Update Redux immediately
-        dispatch(
-            updatePortfolioData({
-                sectionType: "desktopWidget",
-                newData: newConfig,
-                sectionTitle: "Desktop Widget",
-                sectionDescription: "Customizable desktop clock and greeting",
-            })
-        );
-    };
 
     return (
         <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#1a1a1a] text-gray-200" : "bg-white text-gray-800"}`}>
@@ -114,8 +58,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                             <input
                                 type="checkbox"
                                 className="sr-only peer"
-                                checked={config.isVisible}
-                                onChange={(e) => updateConfig("isVisible", e.target.checked)}
+                                checked={currentStyles.isVisible}
+                                onChange={(e) => updateDraftCustomization("isVisible", e.target.checked)}
                             />
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
                         </label>
@@ -133,8 +77,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                             return (
                                 <button
                                     key={pos}
-                                    onClick={() => updateConfig("position", pos)}
-                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${config.position === pos
+                                    onClick={() => updateDraftCustomization("position", pos)}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${currentStyles.position === pos
                                         ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
                                         : isDark ? "border-gray-700 hover:bg-gray-800" : "border-gray-200 hover:bg-gray-50"
                                         }`}
@@ -155,8 +99,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                         {["modern", "classic", "minimal", "glass", "neumorphic"].map((style) => (
                             <button
                                 key={style}
-                                onClick={() => updateConfig("style", style)}
-                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${config.style === style
+                                onClick={() => updateDraftCustomization("style", style)}
+                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${currentStyles.style === style
                                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-500"
                                     : isDark ? "border-gray-700 hover:bg-gray-800" : "border-gray-200 hover:bg-gray-50"
                                     }`}
@@ -180,8 +124,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                             </div>
                             <input
                                 type="checkbox"
-                                checked={config.showTime}
-                                onChange={(e) => updateConfig("showTime", e.target.checked)}
+                                checked={currentStyles.showTime}
+                                onChange={(e) => updateDraftCustomization("showTime", e.target.checked)}
                                 className="accent-emerald-500 w-4 h-4"
                             />
                         </div>
@@ -192,8 +136,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                             </div>
                             <input
                                 type="checkbox"
-                                checked={config.showDate}
-                                onChange={(e) => updateConfig("showDate", e.target.checked)}
+                                checked={currentStyles.showDate}
+                                onChange={(e) => updateDraftCustomization("showDate", e.target.checked)}
                                 className="accent-emerald-500 w-4 h-4"
                             />
                         </div>
@@ -204,8 +148,8 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                             </div>
                             <input
                                 type="checkbox"
-                                checked={config.showGreeting}
-                                onChange={(e) => updateConfig("showGreeting", e.target.checked)}
+                                checked={currentStyles.showGreeting}
+                                onChange={(e) => updateDraftCustomization("showGreeting", e.target.checked)}
                                 className="accent-emerald-500 w-4 h-4"
                             />
                         </div>
@@ -213,15 +157,15 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                 </div>
 
                 {/* Custom Greeting */}
-                {config.showGreeting && (
+                {currentStyles.showGreeting && (
                     <div className="space-y-2">
                         <label className={`text-xs font-medium uppercase tracking-wider ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                             Custom Greeting (Optional)
                         </label>
                         <input
                             type="text"
-                            value={config.customGreeting}
-                            onChange={(e) => updateConfig("customGreeting", e.target.value)}
+                            value={currentStyles.customGreeting}
+                            onChange={(e) => updateDraftCustomization("customGreeting", e.target.value)}
                             placeholder="Leave empty for dynamic greeting"
                             className={`w-full px-3 py-2 rounded-lg text-sm border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${isDark
                                 ? "bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500"
@@ -239,7 +183,7 @@ const DesktopWidgetVisualEditor: React.FC<DesktopWidgetVisualEditorProps> = ({
                     }`}
             >
                 <button
-                    onClick={() => setConfig(widgetData)}
+                    onClick={resetCustomization}
                     className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark
                         ? "text-gray-400 hover:text-gray-300"
                         : "text-gray-500 hover:text-gray-700"

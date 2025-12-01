@@ -1,6 +1,6 @@
 import React from "react";
 import { LayoutGrid, List, GalleryHorizontal, Columns, Maximize } from "lucide-react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import { SliderControl } from "./SliderControl";
 import { ColorTheme } from "@/lib/colorThemes";
 
@@ -28,8 +28,8 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = ({
                             key={value}
                             onClick={() => updateCustomization("layout", value)}
                             className={`flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all ${customization.layout === value
-                                    ? "border-white bg-zinc-700"
-                                    : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
+                                ? "border-white bg-zinc-700"
+                                : "border-zinc-700 hover:border-zinc-600 bg-zinc-800"
                                 }`}
                         >
                             <Icon
@@ -85,8 +85,8 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = ({
                             key={value}
                             onClick={() => updateCustomization("containerWidth", value)}
                             className={`py-2 px-3 rounded-lg text-xs font-medium transition-all ${customization.containerWidth === value
-                                    ? "bg-white text-black"
-                                    : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                ? "bg-white text-black"
+                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                 }`}
                         >
                             {label}
@@ -106,8 +106,8 @@ export const LayoutSelector: React.FC<LayoutSelectorProps> = ({
                                 key={dir}
                                 onClick={() => updateCustomization("marqueeDirection", dir)}
                                 className={`flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.marqueeDirection === dir
-                                        ? "bg-white text-black"
-                                        : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                    ? "bg-white text-black"
+                                    : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                     }`}
                             >
                                 {dir}

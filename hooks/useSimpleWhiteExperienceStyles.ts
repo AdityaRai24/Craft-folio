@@ -1,4 +1,4 @@
-import { ExperienceCustomizationState } from "@/types/experience/portfolio";
+import { ExperienceCustomizationState } from "@/types/interfaces/ExperienceCustomizationState";
 
 export const useSimpleWhiteExperienceStyles = (
     effectiveCustomization: ExperienceCustomizationState

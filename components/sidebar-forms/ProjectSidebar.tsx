@@ -14,8 +14,8 @@ import { updateSection } from '@/app/actions/portfolio';
 import toast from 'react-hot-toast';
 import { techList } from '@/lib/techlist';
 import { ColorTheme } from '@/lib/colorThemes';
-import { Project } from '@/types/projects/portfolio';
-import { Technology } from '@/types/projects/portfolio';
+import { Project } from '@/types/interfaces/ProjectsCustomizationState';
+import { Technology } from '@/types/interfaces/ProjectsCustomizationState';
 
 const ProjectSidebar = () => {
 

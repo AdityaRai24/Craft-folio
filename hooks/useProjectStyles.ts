@@ -1,4 +1,4 @@
-import { ProjectsCustomizationState } from "@/types/projects/portfolio";
+import { ProjectsCustomizationState } from "@/types/interfaces/ProjectsCustomizationState";
 import { getVariantByName } from "@/lib/animationVariants";
 
 export const useProjectStyles = (customization: ProjectsCustomizationState, titleColor: string, theme: "light" | "dark" = "light") => {
@@ -87,7 +87,7 @@ export const useProjectStyles = (customization: ProjectsCustomizationState, titl
       if (buttonType === "live") {
         classes += isDark
           ? " text-white shadow-sm hover:shadow-md"
-          : " text-white shadow-sm hover:shadow-md";
+          : " text-gray-900 shadow-sm hover:shadow-md";
       } else {
         classes += isDark
           ? " text-white  shadow-sm hover:shadow-md"

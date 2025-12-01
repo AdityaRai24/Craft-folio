@@ -14,7 +14,7 @@ import { updateSection } from '@/app/actions/portfolio';
 import toast from 'react-hot-toast';
 import { techList } from '@/lib/techlist';
 import { ColorTheme } from '@/lib/colorThemes';
-import { Experience, Technology } from '@/types/experience/shared';
+import { Experience, Technology } from '@/types/interfaces/Experience';
 
 const ExperienceSidebar = () => {
 

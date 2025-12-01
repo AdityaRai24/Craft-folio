@@ -14,7 +14,7 @@ import {
 import ProjectsVisualEditor from "@/components/VisualEditor/Projects/ProjectsVisualEditor";
 import { useProjectActions } from "@/hooks/useProjectActions";
 import { defaultLumenFlowProjectsStyles } from "@/types/lumenflow/projects";
-import { Project } from "@/types/projects/portfolio";
+import { Project } from "@/types/interfaces/ProjectsCustomizationState";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { supabase } from "@/lib/supabase-client";
@@ -135,7 +135,10 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
 
       {/* Projects Grid */}
       <div
-        className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-${effectiveCustomization.gridColumns} gap-${effectiveCustomization.cardSpacing / 4}`}
+        className={`grid grid-cols-1 ${effectiveCustomization.layout === "single"
+          ? "grid-cols-1"
+          : `sm:grid-cols-2 md:grid-cols-${effectiveCustomization.gridColumns}`
+          }`}
         style={{ gap: `${effectiveCustomization.cardSpacing}px` }}
       >
         {displayedProjects.map((project, index) => (
@@ -147,8 +150,9 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
           >
             {/* Background Glow Effect */}
             <div
-              className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+              className="absolute -inset-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
               style={{
+                borderRadius: `${effectiveCustomization.cardBorderRadius}px`,
                 background: theme === "light"
                   ? "linear-gradient(to right, rgba(249,115,22,0.08), rgba(168,85,247,0.08))"
                   : themeClasses.gradientHover
@@ -157,7 +161,7 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
 
             {/* Main Card */}
             <div
-              className={`relative transition-all duration-300 transform h-full flex flex-col ${effectiveCustomization.cardStyle === "default"
+              className={`relative transition-all duration-300 transform h-full flex flex-col overflow-hidden ${effectiveCustomization.cardStyle === "default"
                 ? theme === "light"
                   ? "bg-white border border-gray-200 shadow-sm"
                   : "bg-zinc-800 border border-zinc-700"
@@ -187,7 +191,12 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
               }}
             >
               {/* Project Image */}
-              <div className="relative h-48 overflow-hidden">
+              <div
+                className="relative h-48 overflow-hidden mb-4"
+                style={{
+                  borderRadius: `${effectiveCustomization.imageBorderRadius}px`
+                }}
+              >
                 {project.projectImage ? (
                   <>
                     <img
@@ -226,7 +235,7 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
               </div>
 
               {/* Project Content */}
-              <div className="p-6 space-y-4 flex-grow">
+              <div className="space-y-4 flex-grow">
                 {/* Header Section */}
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3">
@@ -258,10 +267,18 @@ const Projects = ({ currentTheme, portfolioId }: any) => {
                 {/* Description */}
                 <div className="relative">
                   <p
-                    className={`text-sm leading-relaxed transition-colors duration-300 mb-2 ${theme === "light"
+                    className={`leading-relaxed transition-colors duration-300 mb-2 ${theme === "light"
                       ? "text-gray-700"
                       : themeClasses.textSecondary
-                      } ${!expandedDescriptions[index] ? "line-clamp-3" : ""}`}
+                      } ${!expandedDescriptions[index] ? "line-clamp-3" : ""} ${effectiveCustomization.descriptionSize === "xs" ? "text-xs" :
+                        effectiveCustomization.descriptionSize === "sm" ? "text-sm" :
+                          effectiveCustomization.descriptionSize === "md" ? "text-base" :
+                            "text-lg"
+                      } ${effectiveCustomization.descriptionWeight === "normal" ? "font-normal" :
+                        effectiveCustomization.descriptionWeight === "medium" ? "font-medium" :
+                          effectiveCustomization.descriptionWeight === "semibold" ? "font-semibold" :
+                            "font-bold"
+                      }`}
                   >
                     {project.projectDescription}
                   </p>

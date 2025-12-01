@@ -1,6 +1,6 @@
 import React from "react";
 import { AlignLeft, AlignCenter, AlignRight, Type } from "lucide-react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import { SliderControl } from "./SliderControl";
 
 interface TypographySelectorProps {
@@ -72,8 +72,8 @@ export const TypographySelector: React.FC<TypographySelectorProps> = ({
                                         key={pos}
                                         onClick={() => updateCustomization("labelPosition", pos)}
                                         className={`flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.labelPosition === pos
-                                                ? "bg-white text-black"
-                                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                            ? "bg-white text-black"
+                                            : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                             }`}
                                     >
                                         {pos}
@@ -91,8 +91,8 @@ export const TypographySelector: React.FC<TypographySelectorProps> = ({
                                         key={size}
                                         onClick={() => updateCustomization("labelSize", size)}
                                         className={`flex-1 py-2 rounded-lg text-xs font-medium uppercase transition-all ${customization.labelSize === size
-                                                ? "bg-white text-black"
-                                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                            ? "bg-white text-black"
+                                            : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                             }`}
                                     >
                                         {size}
@@ -110,8 +110,8 @@ export const TypographySelector: React.FC<TypographySelectorProps> = ({
                                         key={weight}
                                         onClick={() => updateCustomization("labelWeight", weight)}
                                         className={`flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.labelWeight === weight
-                                                ? "bg-white text-black"
-                                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                            ? "bg-white text-black"
+                                            : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                             }`}
                                     >
                                         {weight}
@@ -133,8 +133,8 @@ export const TypographySelector: React.FC<TypographySelectorProps> = ({
                                         key={value}
                                         onClick={() => updateCustomization("textAlignment", value)}
                                         className={`flex-1 py-2 flex justify-center rounded-lg transition-all ${customization.textAlignment === value
-                                                ? "bg-white text-black"
-                                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                            ? "bg-white text-black"
+                                            : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                             }`}
                                     >
                                         <Icon size={18} />

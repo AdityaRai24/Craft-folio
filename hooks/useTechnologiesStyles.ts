@@ -1,5 +1,5 @@
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
 import { getVariantByName } from "@/lib/animationVariants";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 
 export const useTechnologiesStyles = (
     customization: TechnologiesCustomizationState,
@@ -51,7 +51,7 @@ export const useTechnologiesStyles = (
                 elevated: "bg-white shadow-md",
                 outlined: "border border-gray-300 bg-transparent",
                 filled: "bg-gray-100",
-                glass: "bg-white/50 backdrop-blur-sm border border-white/20",
+                glass: "bg-white/80 backdrop-blur-md border border-white/20 shadow-xl ring-1 ring-black/5",
                 neon: "bg-orange-50/30 border border-orange-300/50 shadow-lg shadow-orange-500/20",
                 gradient: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200",
                 default: "bg-white border border-gray-200 shadow-sm",

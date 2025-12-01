@@ -1,6 +1,6 @@
 import React from "react";
 import { LayoutGrid, List, GalleryHorizontal } from "lucide-react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import SliderControl from "../Shared/SliderControl";
 import CardStyleSelector from "../Shared/CardStyleSelector";
 import { ColorTheme } from "@/lib/colorThemes";

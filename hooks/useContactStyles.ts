@@ -1,5 +1,5 @@
-import { ContactCustomizationState } from "@/types/contact/portfolio";
 import { ColorTheme } from "@/lib/colorThemes";
+import { ContactCustomizationState } from "@/types/interfaces/ContactCustomizationState";
 
 export const useContactStyles = (
     effectiveCustomization: ContactCustomizationState,

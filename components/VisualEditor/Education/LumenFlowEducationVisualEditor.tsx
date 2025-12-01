@@ -1,6 +1,6 @@
 import React from "react";
 import EducationVisualEditor from "./EducationVisualEditor";
-import { EducationCustomizationState } from "@/types/education/portfolio";
+import { EducationCustomizationState } from "@/types/interfaces/EducationCustomizationState";
 
 interface LumenFlowEducationVisualEditorProps {
     isOpen: boolean;

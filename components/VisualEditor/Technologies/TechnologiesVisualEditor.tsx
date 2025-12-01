@@ -9,7 +9,7 @@ import {
     X,
     Type,
 } from "lucide-react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import { TechnologiesLayoutSelector } from "./TechnologiesLayoutSelector";
 import { TechnologiesStyleSelector } from "./TechnologiesStyleSelector";
 import TypographySelector from "../Shared/TypographySelector";

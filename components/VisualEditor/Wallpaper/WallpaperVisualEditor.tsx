@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { X, Upload, Save, RotateCcw, Image as ImageIcon } from "lucide-react";
-import { useDraggable } from "@/hooks/useDraggable";
+import { X, Upload, Save, RotateCcw, Image as ImageIcon, Sliders } from "lucide-react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { updatePortfolioData } from "@/slices/dataSlice";
-import { updateSection } from "@/app/actions/portfolio";
+import { useCustomization } from "@/hooks/useCustomization";
+import { defaultMacOSHeroStyles } from "@/types/macos/hero";
 
 interface WallpaperVisualEditorProps {
     initialWallpaper?: string;
@@ -24,18 +21,22 @@ const defaultWallpapers = [
 ];
 
 const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
-    initialWallpaper,
     onClose,
     portfolioId,
     theme,
 }) => {
-    const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
-    const heroData = portfolioData?.find((item: any) => item.type === "hero")?.data || {};
-    const currentWallpaper = heroData.image || defaultWallpapers[0];
+    const {
+        customization,
+        updateDraftCustomization,
+        saveDraftCustomization,
+        resetCustomization,
+        draftCustomization
+    } = useCustomization("hero", defaultMacOSHeroStyles, portfolioId || "");
 
-    const [wallpaperUrl, setWallpaperUrl] = useState(initialWallpaper || currentWallpaper);
     const [isUploading, setIsUploading] = useState(false);
-    const dispatch = useDispatch();
+
+    // Use draft customization for live preview if available, otherwise fall back to saved customization
+    const currentStyles = draftCustomization || customization;
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -61,7 +62,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
             if (!response.ok) throw new Error("Upload failed");
 
             const data = await response.json();
-            setWallpaperUrl(data.secure_url);
+            updateDraftCustomization("image", data.secure_url);
             toast.success("Image uploaded successfully!");
         } catch (error) {
             console.error("Upload error:", error);
@@ -72,43 +73,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
     };
 
     const handleSave = async () => {
-        try {
-            toast.loading("Saving wallpaper...", { id: "saveWallpaper" });
-
-            // Update Redux
-            dispatch(
-                updatePortfolioData({
-                    sectionType: "hero",
-                    newData: { image: wallpaperUrl },
-                    sectionTitle: "",
-                    sectionDescription: "",
-                })
-            );
-
-            // Update Database
-            if (portfolioId) {
-                const result = await updateSection({
-                    portfolioId,
-                    sectionName: "hero",
-                    sectionContent: { image: wallpaperUrl },
-                    sectionTitle: "",
-                    sectionDescription: "",
-                });
-
-                if (result.success) {
-                    toast.success("Wallpaper updated!", { id: "saveWallpaper" });
-                    onClose?.(); // Close the window after saving
-                } else {
-                    throw new Error("Failed to save to database");
-                }
-            } else {
-                toast.success("Wallpaper updated (Local Only)!", { id: "saveWallpaper" });
-                onClose?.();
-            }
-        } catch (error) {
-            console.error("Save error:", error);
-            toast.error("Failed to save wallpaper", { id: "saveWallpaper" });
-        }
+        await saveDraftCustomization();
+        onClose?.();
     };
 
     const isDark = theme === "dark";
@@ -121,7 +87,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
             </div>
 
             {/* Content */}
-            <div className="flex-1 p-5 space-y-4 overflow-y-auto custom-scrollbar">
+            <div className="flex-1 p-5 space-y-6 overflow-y-auto custom-scrollbar">
                 {/* Preview */}
                 <div className="space-y-2">
                     <label
@@ -134,12 +100,23 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                         className={`relative h-48 w-full rounded-lg overflow-hidden border-2 border-dashed ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-50"
                             }`}
                     >
-                        {wallpaperUrl ? (
-                            <img
-                                src={wallpaperUrl}
-                                alt="Wallpaper Preview"
-                                className="w-full h-full object-cover"
-                            />
+                        {currentStyles.image ? (
+                            <div className="relative w-full h-full">
+                                <img
+                                    src={currentStyles.image}
+                                    alt="Wallpaper Preview"
+                                    className="w-full h-full object-cover"
+                                    style={{
+                                        filter: `blur(${currentStyles.blur}px) grayscale(${currentStyles.grayscale}%) brightness(${currentStyles.brightness}%)`
+                                    }}
+                                />
+                                <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                        backgroundColor: `rgba(0,0,0,${currentStyles.overlayOpacity / 100})`
+                                    }}
+                                />
+                            </div>
                         ) : (
                             <div className="flex items-center justify-center h-full text-gray-400">
                                 <ImageIcon size={32} />
@@ -160,8 +137,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                         {defaultWallpapers.map((url, index) => (
                             <button
                                 key={index}
-                                onClick={() => setWallpaperUrl(url)}
-                                className={`relative aspect-video rounded-md overflow-hidden border-2 transition-all ${wallpaperUrl === url
+                                onClick={() => updateDraftCustomization("image", url)}
+                                className={`relative aspect-video rounded-md overflow-hidden border-2 transition-all ${currentStyles.image === url
                                     ? "border-emerald-500 ring-2 ring-emerald-500/20"
                                     : isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-300"
                                     }`}
@@ -186,8 +163,8 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                     </label>
                     <input
                         type="text"
-                        value={wallpaperUrl}
-                        onChange={(e) => setWallpaperUrl(e.target.value)}
+                        value={currentStyles.image}
+                        onChange={(e) => updateDraftCustomization("image", e.target.value)}
                         placeholder="https://example.com/image.jpg"
                         className={`w-full px-3 py-2 rounded-lg text-sm border focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${isDark
                             ? "bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500"
@@ -221,6 +198,80 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                         )}
                     </button>
                 </div>
+
+                {/* Adjustments */}
+                <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <label
+                        className={`text-xs font-medium uppercase tracking-wider flex items-center gap-2 ${isDark ? "text-gray-400" : "text-gray-500"
+                            }`}
+                    >
+                        <Sliders size={14} /> Adjustments
+                    </label>
+
+                    {/* Overlay Opacity */}
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                            <span className={isDark ? "text-gray-300" : "text-gray-700"}>Overlay Opacity</span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>{currentStyles.overlayOpacity}%</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="90"
+                            value={currentStyles.overlayOpacity}
+                            onChange={(e) => updateDraftCustomization("overlayOpacity", parseInt(e.target.value))}
+                            className="w-full accent-emerald-500"
+                        />
+                    </div>
+
+                    {/* Blur */}
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                            <span className={isDark ? "text-gray-300" : "text-gray-700"}>Blur</span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>{currentStyles.blur}px</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="20"
+                            value={currentStyles.blur}
+                            onChange={(e) => updateDraftCustomization("blur", parseInt(e.target.value))}
+                            className="w-full accent-emerald-500"
+                        />
+                    </div>
+
+                    {/* Grayscale */}
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                            <span className={isDark ? "text-gray-300" : "text-gray-700"}>Grayscale</span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>{currentStyles.grayscale}%</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={currentStyles.grayscale}
+                            onChange={(e) => updateDraftCustomization("grayscale", parseInt(e.target.value))}
+                            className="w-full accent-emerald-500"
+                        />
+                    </div>
+
+                    {/* Brightness */}
+                    <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                            <span className={isDark ? "text-gray-300" : "text-gray-700"}>Brightness</span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-400"}>{currentStyles.brightness}%</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="50"
+                            max="150"
+                            value={currentStyles.brightness}
+                            onChange={(e) => updateDraftCustomization("brightness", parseInt(e.target.value))}
+                            className="w-full accent-emerald-500"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Footer */}
@@ -229,7 +280,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
                     }`}
             >
                 <button
-                    onClick={() => setWallpaperUrl(initialWallpaper)}
+                    onClick={resetCustomization}
                     className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${isDark
                         ? "text-gray-400 hover:text-gray-300"
                         : "text-gray-500 hover:text-gray-700"

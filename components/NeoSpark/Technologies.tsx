@@ -6,11 +6,11 @@ import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
 import { ColorTheme } from "@/lib/colorThemes";
 import { defaultNeoSparkTechnologiesStyles } from "@/types/neospark/technologies";
-import { Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import SectionHeader from "./SectionHeader";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";
+import { Technology } from "@/types/interfaces/TechnologiesCustomizationState";
 
 const Technologies = ({ portfolioId, currentPortTheme }: { portfolioId: string, currentPortTheme: string }) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);

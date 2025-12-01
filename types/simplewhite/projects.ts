@@ -10,14 +10,14 @@ export const defaultSimpleWhiteProjectsStyles: ProjectsCustomizationState = {
     cardBorder: "border-gray-700",
     cardStyle: "default",
     imageAspectRatio: "auto",
-    imageHeight: 150,
+    imageHeight: 250,
     githubButtonStyle: "default",
-    liveButtonStyle: "default",
+    liveButtonStyle: "filled",
     buttonBorderRadius: 6,
     techStackStyle: "pills",
     animationSpeed: 0.3,
     titleAlignment: "left",
-    cardPadding: 6,
+    cardPadding: 0,
     imageOverlay: true,
     imagePosition: "left",
     hoverEffects: true,
@@ -25,9 +25,9 @@ export const defaultSimpleWhiteProjectsStyles: ProjectsCustomizationState = {
     borderWidth: 1,
 
     // Typography
-    titleSize: "md",
+    titleSize: "lg",
     titleWeight: "semibold",
-    descriptionSize: "xs",
+    descriptionSize: "md",
     descriptionWeight: "normal",
 
 

@@ -6,7 +6,6 @@ import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
 import { ColorTheme } from "@/lib/colorThemes";
 import { defaultMacOSTechnologiesStyles } from "@/types/macos/technologies";
-import { Technology } from "@/types/technologies/portfolio";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
@@ -14,6 +13,7 @@ import { useMacOSTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";
 import { useTechnologiesStyles } from "@/hooks/useTechnologiesStyles";
 import { useCustomization } from "@/hooks/useCustomization";
+import { Technology } from "@/types/interfaces/TechnologiesCustomizationState";
 
 
 const Technologies = ({ portfolioId }: { portfolioId: string }) => {

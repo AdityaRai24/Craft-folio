@@ -1,5 +1,5 @@
 import React from "react";
-import { TechnologiesCustomizationState } from "@/types/technologies/portfolio";
+import { TechnologiesCustomizationState } from "@/types/interfaces/TechnologiesCustomizationState";
 import { SliderControl } from "./SliderControl";
 
 interface AnimationSelectorProps {
@@ -22,8 +22,8 @@ export const AnimationSelector: React.FC<AnimationSelectorProps> = ({
                             key={anim}
                             onClick={() => updateCustomization("animationStyle", anim)}
                             className={`py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.animationStyle === anim
-                                    ? "bg-white text-black"
-                                    : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                ? "bg-white text-black"
+                                : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                 }`}
                         >
                             {anim}
@@ -85,8 +85,8 @@ export const AnimationSelector: React.FC<AnimationSelectorProps> = ({
                                     key={effect}
                                     onClick={() => updateCustomization("cardHoverEffect", effect)}
                                     className={`py-2 rounded-lg text-xs font-medium capitalize transition-all ${customization.cardHoverEffect === effect
-                                            ? "bg-white text-black"
-                                            : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                                        ? "bg-white text-black"
+                                        : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                                         }`}
                                 >
                                     {effect}
