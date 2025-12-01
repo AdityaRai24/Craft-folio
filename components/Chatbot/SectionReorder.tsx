@@ -157,7 +157,7 @@ const SectionReorder = ({
 
   return (
     <div className="space-y-4">
-     
+
       <div
         className="rounded-lg p-4"
         style={{ backgroundColor: themeColors.bgCard }}
@@ -174,7 +174,6 @@ const SectionReorder = ({
             axis="y"
             values={reorderedSections}
             onReorder={(newOrder) => {
-              console.log("Reorder triggered:", newOrder);
               setReorderedSections(newOrder);
             }}
             className="space-y-2"

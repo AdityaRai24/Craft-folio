@@ -1,3 +1,4 @@
+"use client";
 import { RootState } from '@/store/store'
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,7 +25,7 @@ const EducationSidebar = () => {
     gpa?: string;
     achievements?: string[];
   }
-  
+
   const emptyEducation: Education = {
     degree: "",
     institution: "",
@@ -39,7 +40,7 @@ const EducationSidebar = () => {
   const { portfolioData } = useSelector((state: RootState) => state.data)
   const educationData = portfolioData?.find((item: any) => item.type === "education")?.data || [];
   const educationSection = portfolioData?.find((item: any) => item.type === "education");
-  
+
   const [educations, setEducations] = useState<Education[]>([]);
   const [currentEducation, setCurrentEducation] = useState<Education>(emptyEducation);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -84,33 +85,33 @@ const EducationSidebar = () => {
     });
   }
 
-  const handleSaveEducation = async() => {
+  const handleSaveEducation = async () => {
     const originalEducations = [...educations];
     const originalCurrentEducation = { ...currentEducation };
-    
+
     try {
       if (editingIndex !== null) {
         const updatedEducations = [...educations];
         updatedEducations[editingIndex] = currentEducation;
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "education", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "education",
           newData: updatedEducations,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
+        const result = await updateSection({
           portfolioId: portfolioId,
-          sectionName: "education", 
+          sectionName: "education",
           sectionContent: updatedEducations,
           sectionTitle,
           sectionDescription
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "education", 
+          dispatch(updatePortfolioData({
+            sectionType: "education",
             newData: originalEducations,
             sectionTitle,
             sectionDescription
@@ -122,25 +123,25 @@ const EducationSidebar = () => {
         setEditingIndex(null);
       } else {
         const updatedEducations = [...educations, currentEducation];
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "education", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "education",
           newData: updatedEducations,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
-          portfolioId: portfolioId, 
-          sectionName: "education", 
+        const result = await updateSection({
+          portfolioId: portfolioId,
+          sectionName: "education",
           sectionContent: updatedEducations,
           sectionTitle,
           sectionDescription
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "education", 
+          dispatch(updatePortfolioData({
+            sectionType: "education",
             newData: originalEducations,
             sectionTitle,
             sectionDescription
@@ -166,31 +167,31 @@ const EducationSidebar = () => {
     setEditingIndex(index);
   }
 
-  const deleteEducation = async(index: number) => {
+  const deleteEducation = async (index: number) => {
     const originalEducations = [...educations];
-    
+
     try {
       const updatedEducations = [...educations];
       updatedEducations.splice(index, 1);
-      
-      dispatch(updatePortfolioData({ 
-        sectionType: "education", 
+
+      dispatch(updatePortfolioData({
+        sectionType: "education",
         newData: updatedEducations,
         sectionTitle,
         sectionDescription
       }));
 
-      const result = await updateSection({ 
-        portfolioId: portfolioId, 
-        sectionName: "education", 
+      const result = await updateSection({
+        portfolioId: portfolioId,
+        sectionName: "education",
         sectionContent: updatedEducations,
         sectionTitle,
         sectionDescription
       });
 
       if (!result.success) {
-        dispatch(updatePortfolioData({ 
-          sectionType: "education", 
+        dispatch(updatePortfolioData({
+          sectionType: "education",
           newData: originalEducations,
           sectionTitle,
           sectionDescription
@@ -209,14 +210,14 @@ const EducationSidebar = () => {
 
   const handleSaveHeader = async () => {
     try {
-      dispatch(updatePortfolioData({ 
-        sectionType: "education", 
+      dispatch(updatePortfolioData({
+        sectionType: "education",
         newData: educations,
         sectionTitle,
         sectionDescription
       }));
-      await updateSection({ 
-        portfolioId: portfolioId, 
+      await updateSection({
+        portfolioId: portfolioId,
         sectionName: "education",
         sectionContent: educations,
         sectionTitle,
@@ -242,12 +243,12 @@ const EducationSidebar = () => {
             {educationSection?.sectionTitle && (
               <div className="space-y-2">
                 <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input 
-                  id="sectionTitle" 
-                  value={sectionTitle} 
-                  onChange={(e) => setSectionTitle(e.target.value)} 
-                  placeholder="Enter section title" 
-                  style={{ 
+                <Input
+                  id="sectionTitle"
+                  value={sectionTitle}
+                  onChange={(e) => setSectionTitle(e.target.value)}
+                  placeholder="Enter section title"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -259,13 +260,13 @@ const EducationSidebar = () => {
             {educationSection?.sectionDescription && (
               <div className="space-y-2">
                 <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea 
-                  id="sectionDescription" 
-                  value={sectionDescription} 
-                  onChange={(e) => setSectionDescription(e.target.value)} 
-                  placeholder="Enter section description" 
+                <Textarea
+                  id="sectionDescription"
+                  value={sectionDescription}
+                  onChange={(e) => setSectionDescription(e.target.value)}
+                  placeholder="Enter section description"
                   className="resize-none h-20"
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -275,10 +276,10 @@ const EducationSidebar = () => {
             )}
 
             {hasHeaderChanges && (
-              <Button 
+              <Button
                 onClick={handleSaveHeader}
                 className="w-full"
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.primary,
                   color: ColorTheme.textPrimary,
                   boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -290,12 +291,12 @@ const EducationSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="institution" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Institution</Label>
-              <Input 
-                id="institution" 
-                value={currentEducation.institution || ""} 
-                onChange={(e) => setCurrentEducation({...currentEducation, institution: e.target.value})} 
-                placeholder="Enter institution name" 
-                style={{ 
+              <Input
+                id="institution"
+                value={currentEducation.institution || ""}
+                onChange={(e) => setCurrentEducation({ ...currentEducation, institution: e.target.value })}
+                placeholder="Enter institution name"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -305,12 +306,12 @@ const EducationSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="degree" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Degree</Label>
-              <Input 
-                id="degree" 
-                value={currentEducation.degree || ""} 
-                onChange={(e) => setCurrentEducation({...currentEducation, degree: e.target.value})} 
-                placeholder="Enter your degree" 
-                style={{ 
+              <Input
+                id="degree"
+                value={currentEducation.degree || ""}
+                onChange={(e) => setCurrentEducation({ ...currentEducation, degree: e.target.value })}
+                placeholder="Enter your degree"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -320,12 +321,12 @@ const EducationSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Description</Label>
-              <Textarea 
-                id="description" 
-                value={currentEducation.description || ""} 
-                onChange={(e) => setCurrentEducation({...currentEducation, description: e.target.value})} 
-                placeholder="Enter education description" 
-                style={{ 
+              <Textarea
+                id="description"
+                value={currentEducation.description || ""}
+                onChange={(e) => setCurrentEducation({ ...currentEducation, description: e.target.value })}
+                placeholder="Enter education description"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -336,12 +337,12 @@ const EducationSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Location</Label>
-              <Input 
-                id="location" 
-                value={currentEducation.location || ""} 
-                onChange={(e) => setCurrentEducation({...currentEducation, location: e.target.value})} 
-                placeholder="City, Country" 
-                style={{ 
+              <Input
+                id="location"
+                value={currentEducation.location || ""}
+                onChange={(e) => setCurrentEducation({ ...currentEducation, location: e.target.value })}
+                placeholder="City, Country"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -352,27 +353,27 @@ const EducationSidebar = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Start Date</Label>
-                <Input 
-                  id="startDate" 
-                  value={currentEducation.startDate || ""} 
-                  onChange={(e) => setCurrentEducation({...currentEducation, startDate: e.target.value})} 
-                  placeholder="MM/YYYY" 
-                  style={{ 
+                <Input
+                  id="startDate"
+                  value={currentEducation.startDate || ""}
+                  onChange={(e) => setCurrentEducation({ ...currentEducation, startDate: e.target.value })}
+                  placeholder="MM/YYYY"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
                   }}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="endDate" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>End Date</Label>
-                <Input 
-                  id="endDate" 
-                  value={currentEducation.endDate || ""} 
-                  onChange={(e) => setCurrentEducation({...currentEducation, endDate: e.target.value})} 
-                  placeholder="MM/YYYY or Present" 
-                  style={{ 
+                <Input
+                  id="endDate"
+                  value={currentEducation.endDate || ""}
+                  onChange={(e) => setCurrentEducation({ ...currentEducation, endDate: e.target.value })}
+                  placeholder="MM/YYYY or Present"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -383,12 +384,12 @@ const EducationSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="gpa" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>GPA</Label>
-              <Input 
-                id="gpa" 
-                value={currentEducation.gpa || ""} 
-                onChange={(e) => setCurrentEducation({...currentEducation, gpa: e.target.value})} 
-                placeholder="Enter your GPA (optional)" 
-                style={{ 
+              <Input
+                id="gpa"
+                value={currentEducation.gpa || ""}
+                onChange={(e) => setCurrentEducation({ ...currentEducation, gpa: e.target.value })}
+                placeholder="Enter your GPA (optional)"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -400,11 +401,11 @@ const EducationSidebar = () => {
               <div className="flex flex-col justify-between items-start">
                 <Label className="text-sm font-medium mb-2" style={{ color: ColorTheme.textPrimary }}>Achievements</Label>
                 <div className="flex gap-2 w-full">
-                  <Input 
-                    value={achievementInput} 
-                    onChange={(e) => setAchievementInput(e.target.value)} 
-                    placeholder="Add an achievement..." 
-                    style={{ 
+                  <Input
+                    value={achievementInput}
+                    onChange={(e) => setAchievementInput(e.target.value)}
+                    placeholder="Add an achievement..."
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight,
                       color: ColorTheme.textPrimary
@@ -415,12 +416,12 @@ const EducationSidebar = () => {
                       }
                     }}
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={addAchievement}
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight,
                       color: ColorTheme.textPrimary
@@ -430,23 +431,23 @@ const EducationSidebar = () => {
                   </Button>
                 </div>
               </div>
-              
+
               {currentEducation.achievements && currentEducation.achievements.length > 0 && (
                 <div className="mt-3">
                   <Label className="text-xs font-medium mb-1" style={{ color: ColorTheme.textSecondary }}>Added Achievements</Label>
                   <div className="space-y-2 mt-2">
                     {currentEducation.achievements.map((achievement, index) => (
-                      <div key={index} style={{ 
+                      <div key={index} style={{
                         backgroundColor: ColorTheme.bgCard,
                         color: ColorTheme.textPrimary
                       }} className="flex items-center justify-between rounded-md px-3 py-2">
                         <span className="text-sm">{achievement}</span>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => removeAchievement(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}
@@ -461,10 +462,10 @@ const EducationSidebar = () => {
               )}
             </div>
 
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleSaveEducation}
-              style={{ 
+              style={{
                 backgroundColor: ColorTheme.primary,
                 color: ColorTheme.textPrimary,
                 boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -480,7 +481,7 @@ const EducationSidebar = () => {
               <h3 className="text-lg font-medium" style={{ color: ColorTheme.textPrimary }}>Saved Education</h3>
               <div className="space-y-4">
                 {educations.map((education, index) => (
-                  <div key={index} style={{ 
+                  <div key={index} style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight
                   }} className="p-4 rounded-lg border">
@@ -499,7 +500,7 @@ const EducationSidebar = () => {
                         {education.achievements && education.achievements.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {education.achievements.map((achievement, achievementIndex) => (
-                              <div key={achievementIndex} style={{ 
+                              <div key={achievementIndex} style={{
                                 backgroundColor: ColorTheme.bgCardHover,
                                 color: ColorTheme.textSecondary
                               }} className="text-xs px-2 py-1 rounded">
@@ -510,12 +511,12 @@ const EducationSidebar = () => {
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => editEducation(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}
@@ -523,12 +524,12 @@ const EducationSidebar = () => {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => deleteEducation(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}

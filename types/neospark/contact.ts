@@ -1,0 +1,31 @@
+import { ContactCustomizationState } from "@/types/interfaces/ContactCustomizationState";
+
+export const defaultNeoSparkContactStyles: ContactCustomizationState = {
+    layout: "grid",
+    gridColumns: 4,
+    cardLayout: "stacked",
+    cardSize: "default",
+    containerWidth: "wide",
+    cardSpacing: 24,
+    cardStyle: "gradient",
+    cardBorderRadius: 12,
+    cardPadding: 8,
+    iconSize: 32,
+    iconStyle: "outline",
+    backgroundOpacity: 100,
+    borderWidth: 1,
+    showLabels: true,
+    showDescriptions: true,
+    showEmail: true,
+    showLinkedin: true,
+    showGithub: true,
+
+    showLocation: true,
+    textAlignment: "center",
+    animationStyle: "scale",
+    animationSpeed: 300,
+    staggerDelay: 100,
+    hoverEffects: true,
+    copyToClipboard: false,
+    openInNewTab: true,
+};

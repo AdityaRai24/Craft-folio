@@ -1,35 +1,24 @@
-import { RootState } from '@/store/store'
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Label } from '../ui/label'
-import { Textarea } from '../ui/textarea'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { Plus, X, Edit, Trash, Check } from 'lucide-react'
-import { updatePortfolioData } from '@/slices/dataSlice'
-import { useParams } from 'next/navigation'
-import { updateSection } from '@/app/actions/portfolio'
-import toast from 'react-hot-toast'
-import { techList } from '@/lib/techlist'
-import { ColorTheme } from '@/lib/colorThemes'
+"use client";
+import { RootState } from '@/store/store';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Plus, X, Edit, Trash } from 'lucide-react';
+import { updatePortfolioData } from '@/slices/dataSlice';
+import { useParams } from 'next/navigation';
+import { updateSection } from '@/app/actions/portfolio';
+import toast from 'react-hot-toast';
+import { techList } from '@/lib/techlist';
+import { ColorTheme } from '@/lib/colorThemes';
+import { Experience, Technology } from '@/types/experience/shared';
 
 const ExperienceSidebar = () => {
-  interface Technology {
-    name: string;
-    logo: string;
-  }
-  
-  interface Experience {
-    role?: string;
-    companyName?: string;
-    location?: string;
-    startDate?: string;
-    endDate?: string;
-    description?: string;
-    techStack?: Technology[];
-  }
-  
+
+
   const emptyExperience: Experience = {
     role: "",
     companyName: "",
@@ -43,7 +32,7 @@ const ExperienceSidebar = () => {
   const { portfolioData } = useSelector((state: RootState) => state.data)
   const experienceData = portfolioData?.find((item: any) => item.type === "experience")?.data || [];
   const experienceSection = portfolioData?.find((item: any) => item.type === "experience");
-  
+
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [currentExperience, setCurrentExperience] = useState<Experience>(emptyExperience);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -74,11 +63,11 @@ const ExperienceSidebar = () => {
   const handleTechInputChange = (value: string) => {
     setTechInput(value);
     setHasSearched(value.trim() !== "");
-    
-    if(value.trim() === "") {
+
+    if (value.trim() === "") {
       setSuggestions([]);
     } else {
-      const results = techList.filter((item: Technology) => 
+      const results = techList.filter((item: Technology) =>
         item.name.toLowerCase().includes(value.toLowerCase()));
       setSuggestions(results.slice(0, 4));
     }
@@ -115,33 +104,33 @@ const ExperienceSidebar = () => {
     });
   }
 
-  const handleSaveExperience = async() => {
+  const handleSaveExperience = async () => {
     const originalExperiences = [...experiences];
     const originalCurrentExperience = { ...currentExperience };
-    
+
     try {
       if (editingIndex !== null) {
         const updatedExperiences = [...experiences];
         updatedExperiences[editingIndex] = currentExperience;
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "experience", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "experience",
           newData: updatedExperiences,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
+        const result = await updateSection({
           portfolioId: portfolioId,
-          sectionName: "experience", 
+          sectionName: "experience",
           sectionContent: updatedExperiences,
           sectionTitle,
           sectionDescription
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "experience", 
+          dispatch(updatePortfolioData({
+            sectionType: "experience",
             newData: originalExperiences,
             sectionTitle,
             sectionDescription
@@ -153,25 +142,25 @@ const ExperienceSidebar = () => {
         setEditingIndex(null);
       } else {
         const updatedExperiences = [...experiences, currentExperience];
-        
-        dispatch(updatePortfolioData({ 
-          sectionType: "experience", 
+
+        dispatch(updatePortfolioData({
+          sectionType: "experience",
           newData: updatedExperiences,
           sectionTitle,
           sectionDescription
         }));
 
-        const result = await updateSection({ 
-          portfolioId: portfolioId, 
-          sectionName: "experience", 
+        const result = await updateSection({
+          portfolioId: portfolioId,
+          sectionName: "experience",
           sectionContent: updatedExperiences,
           sectionTitle,
           sectionDescription
         });
 
         if (!result.success) {
-          dispatch(updatePortfolioData({ 
-            sectionType: "experience", 
+          dispatch(updatePortfolioData({
+            sectionType: "experience",
             newData: originalExperiences,
             sectionTitle,
             sectionDescription
@@ -197,31 +186,31 @@ const ExperienceSidebar = () => {
     setEditingIndex(index);
   }
 
-  const deleteExperience = async(index: number) => {
+  const deleteExperience = async (index: number) => {
     const originalExperiences = [...experiences];
-    
+
     try {
       const updatedExperiences = [...experiences];
       updatedExperiences.splice(index, 1);
-      
-      dispatch(updatePortfolioData({ 
-        sectionType: "experience", 
+
+      dispatch(updatePortfolioData({
+        sectionType: "experience",
         newData: updatedExperiences,
         sectionTitle,
         sectionDescription
       }));
 
-      const result = await updateSection({ 
-        portfolioId: portfolioId, 
-        sectionName: "experience", 
+      const result = await updateSection({
+        portfolioId: portfolioId,
+        sectionName: "experience",
         sectionContent: updatedExperiences,
         sectionTitle,
         sectionDescription
       });
 
       if (!result.success) {
-        dispatch(updatePortfolioData({ 
-          sectionType: "experience", 
+        dispatch(updatePortfolioData({
+          sectionType: "experience",
           newData: originalExperiences,
           sectionTitle,
           sectionDescription
@@ -240,14 +229,14 @@ const ExperienceSidebar = () => {
 
   const handleSaveHeader = async () => {
     try {
-      dispatch(updatePortfolioData({ 
-        sectionType: "experience", 
+      dispatch(updatePortfolioData({
+        sectionType: "experience",
         newData: experiences,
         sectionTitle,
         sectionDescription
       }));
-      await updateSection({ 
-        portfolioId: portfolioId, 
+      await updateSection({
+        portfolioId: portfolioId,
         sectionName: "experience",
         sectionContent: experiences,
         sectionTitle,
@@ -273,12 +262,12 @@ const ExperienceSidebar = () => {
             {experienceSection?.sectionTitle && (
               <div className="space-y-2">
                 <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input 
-                  id="sectionTitle" 
-                  value={sectionTitle} 
-                  onChange={(e) => setSectionTitle(e.target.value)} 
-                  placeholder="Enter section title" 
-                  style={{ 
+                <Input
+                  id="sectionTitle"
+                  value={sectionTitle}
+                  onChange={(e) => setSectionTitle(e.target.value)}
+                  placeholder="Enter section title"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -290,13 +279,13 @@ const ExperienceSidebar = () => {
             {experienceSection?.sectionDescription && (
               <div className="space-y-2">
                 <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea 
-                  id="sectionDescription" 
-                  value={sectionDescription} 
-                  onChange={(e) => setSectionDescription(e.target.value)} 
-                  placeholder="Enter section description" 
+                <Textarea
+                  id="sectionDescription"
+                  value={sectionDescription}
+                  onChange={(e) => setSectionDescription(e.target.value)}
+                  placeholder="Enter section description"
                   className="resize-none h-20"
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -306,10 +295,10 @@ const ExperienceSidebar = () => {
             )}
 
             {hasHeaderChanges && (
-              <Button 
+              <Button
                 onClick={handleSaveHeader}
                 className="w-full"
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.primary,
                   color: ColorTheme.textPrimary,
                   boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -321,12 +310,12 @@ const ExperienceSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="company" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Company</Label>
-              <Input 
-                id="company" 
-                value={currentExperience.companyName || ""} 
-                onChange={(e) => setCurrentExperience({...currentExperience, companyName: e.target.value})} 
-                placeholder="Enter company name" 
-                style={{ 
+              <Input
+                id="company"
+                value={currentExperience.companyName || ""}
+                onChange={(e) => setCurrentExperience({ ...currentExperience, companyName: e.target.value })}
+                placeholder="Enter company name"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -336,12 +325,12 @@ const ExperienceSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="position" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Position</Label>
-              <Input 
-                id="position" 
-                value={currentExperience.role || ""} 
-                onChange={(e) => setCurrentExperience({...currentExperience, role: e.target.value})} 
-                placeholder="Enter your position" 
-                style={{ 
+              <Input
+                id="position"
+                value={currentExperience.role || ""}
+                onChange={(e) => setCurrentExperience({ ...currentExperience, role: e.target.value })}
+                placeholder="Enter your position"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -351,12 +340,12 @@ const ExperienceSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Description</Label>
-              <Textarea 
-                id="description" 
-                value={currentExperience.description || ""} 
-                onChange={(e) => setCurrentExperience({...currentExperience, description: e.target.value})} 
-                placeholder="Enter job description" 
-                style={{ 
+              <Textarea
+                id="description"
+                value={currentExperience.description || ""}
+                onChange={(e) => setCurrentExperience({ ...currentExperience, description: e.target.value })}
+                placeholder="Enter job description"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -367,12 +356,12 @@ const ExperienceSidebar = () => {
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Location</Label>
-              <Input 
-                id="location" 
-                value={currentExperience.location || ""} 
-                onChange={(e) => setCurrentExperience({...currentExperience, location: e.target.value})} 
-                placeholder="City, Country or Remote" 
-                style={{ 
+              <Input
+                id="location"
+                value={currentExperience.location || ""}
+                onChange={(e) => setCurrentExperience({ ...currentExperience, location: e.target.value })}
+                placeholder="City, Country or Remote"
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -383,27 +372,27 @@ const ExperienceSidebar = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Start Date</Label>
-                <Input 
-                  id="startDate" 
-                  value={currentExperience.startDate || ""} 
-                  onChange={(e) => setCurrentExperience({...currentExperience, startDate: e.target.value})} 
-                  placeholder="MM/YYYY" 
-                  style={{ 
+                <Input
+                  id="startDate"
+                  value={currentExperience.startDate || ""}
+                  onChange={(e) => setCurrentExperience({ ...currentExperience, startDate: e.target.value })}
+                  placeholder="MM/YYYY"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
                   }}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="endDate" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>End Date</Label>
-                <Input 
-                  id="endDate" 
-                  value={currentExperience.endDate || ""} 
-                  onChange={(e) => setCurrentExperience({...currentExperience, endDate: e.target.value})} 
-                  placeholder="MM/YYYY or Present" 
-                  style={{ 
+                <Input
+                  id="endDate"
+                  value={currentExperience.endDate || ""}
+                  onChange={(e) => setCurrentExperience({ ...currentExperience, endDate: e.target.value })}
+                  placeholder="MM/YYYY or Present"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -416,11 +405,11 @@ const ExperienceSidebar = () => {
               <div className="flex flex-col justify-between items-start">
                 <Label className="text-sm font-medium mb-2" style={{ color: ColorTheme.textPrimary }}>Tech Stack / Skills</Label>
                 <div className="flex gap-2 w-full">
-                  <Input 
-                    value={techInput} 
-                    onChange={(e) => handleTechInputChange(e.target.value)} 
-                    placeholder="Search technologies..." 
-                    style={{ 
+                  <Input
+                    value={techInput}
+                    onChange={(e) => handleTechInputChange(e.target.value)}
+                    placeholder="Search technologies..."
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight,
                       color: ColorTheme.textPrimary
@@ -433,12 +422,12 @@ const ExperienceSidebar = () => {
                       }
                     }}
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={addCustomTech}
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight,
                       color: ColorTheme.textPrimary
@@ -448,14 +437,14 @@ const ExperienceSidebar = () => {
                   </Button>
                 </div>
               </div>
-              
+
               {suggestions.length > 0 && (
                 <div className="mb-4 mt-1">
                   {suggestions.map((tech) => (
-                    <div 
+                    <div
                       key={tech.name}
                       onClick={() => addTechItem(tech)}
-                      style={{ 
+                      style={{
                         backgroundColor: ColorTheme.bgCardHover,
                         borderColor: ColorTheme.borderLight,
                         color: ColorTheme.textPrimary
@@ -468,9 +457,9 @@ const ExperienceSidebar = () => {
                   ))}
                 </div>
               )}
-              
+
               {hasSearched && suggestions.length === 0 && (
-                <div style={{ 
+                <div style={{
                   backgroundColor: ColorTheme.bgCardHover,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textSecondary
@@ -479,13 +468,13 @@ const ExperienceSidebar = () => {
                   <p className="text-xs mt-1" style={{ color: ColorTheme.textMuted }}>Click Add to create it as a custom technology</p>
                 </div>
               )}
-              
+
               {currentExperience.techStack && currentExperience.techStack.length > 0 && (
                 <div className="mt-3">
                   <Label className="text-xs font-medium mb-1" style={{ color: ColorTheme.textSecondary }}>Selected Technologies</Label>
                   <div className="space-y-2 mt-2">
                     {currentExperience.techStack.map((tech, index) => (
-                      <div key={index} style={{ 
+                      <div key={index} style={{
                         backgroundColor: ColorTheme.bgCard,
                         color: ColorTheme.textPrimary
                       }} className="flex items-center justify-between rounded-md px-3 py-2">
@@ -493,12 +482,12 @@ const ExperienceSidebar = () => {
                           <img src={tech.logo} alt={tech.name} className="w-5 h-5" />
                           <span className="text-sm">{tech.name}</span>
                         </div>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => removeTechItem(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}
@@ -513,10 +502,10 @@ const ExperienceSidebar = () => {
               )}
             </div>
 
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleSaveExperience}
-              style={{ 
+              style={{
                 backgroundColor: ColorTheme.primary,
                 color: ColorTheme.textPrimary,
                 boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -532,7 +521,7 @@ const ExperienceSidebar = () => {
               <h3 className="text-lg font-medium" style={{ color: ColorTheme.textPrimary }}>Saved Experiences</h3>
               <div className="space-y-4">
                 {experiences.map((experience, index) => (
-                  <div key={index} style={{ 
+                  <div key={index} style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight
                   }} className="p-4 rounded-lg border">
@@ -546,7 +535,7 @@ const ExperienceSidebar = () => {
                         {experience.techStack && experience.techStack.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                             {experience.techStack.map((tech, techIndex) => (
-                              <div key={techIndex} style={{ 
+                              <div key={techIndex} style={{
                                 backgroundColor: ColorTheme.bgCardHover,
                                 color: ColorTheme.textSecondary
                               }} className="text-xs px-2 py-1 rounded">
@@ -557,12 +546,12 @@ const ExperienceSidebar = () => {
                         )}
                       </div>
                       <div className="flex gap-2">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => editExperience(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}
@@ -570,12 +559,12 @@ const ExperienceSidebar = () => {
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
                           onClick={() => deleteExperience(index)}
-                          style={{ 
+                          style={{
                             color: ColorTheme.textSecondary,
                             backgroundColor: 'transparent'
                           }}

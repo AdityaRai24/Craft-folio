@@ -1,393 +1,28 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight, Settings, Grid3X3,
-  RotateCcw,
-  Type,
-  Zap,
-  Eye,
-  X
-} from "lucide-react";
-import React, { useEffect, useState, useRef } from "react";
+import { ArrowRight, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
 import { motion, useAnimate } from "framer-motion";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { setComponentCustomizations } from "@/slices/dataSlice";
-import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
-import EditButton, { shouldShowEditButtons } from "@/components/EditButton";
+import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { ColorTheme } from "@/lib/colorThemes";
-
-import { getComponentCustomization, saveComponentCustomization, deleteComponentCustomization, updateSection } from "@/app/actions/portfolio";
-import toast from "react-hot-toast";
-import MagicWrite from "@/components/MagicWrite";
-import { defaultHeroStyles } from "./defaultStyles/hero";
-import { CustomizationState } from "./defaultStyles/types";
+import MagicWrite from "@/components/Shared/MagicWrite";
+import { defaultNeoSparkHeroStyles } from "@/types/neospark/hero";
+import HeroVisualEditor from "@/components/VisualEditor/Hero/NeoSparkHeroVisualEditor";
 import { useUser } from '@clerk/nextjs';
-
-// Visual Alignment Selector Component
-const AlignmentSelector: React.FC<{
-  value: "center" | "left" | "right";
-  onChange: (value: "center" | "left" | "right") => void;
-  label: string;
-}> = ({ value, onChange, label }) => {
-  const alignments = [
-    { value: "left", icon: "←", label: "Left" },
-    { value: "center", icon: "↔", label: "Center" },
-    { value: "right", icon: "→", label: "Right" },
-  ];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-3 gap-2">
-        {alignments.map(({ value: align, icon, label: alignLabel }) => (
-          <div
-            key={align}
-            onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
-              value === align
-                ? "border-white bg-zinc-700 shadow-lg"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
-            }`}
-          >
-            <div className="text-2xl text-white">{icon}</div>
-            <div className="relative w-full h-8 flex items-center justify-center">
-              {/* Background line */}
-              <div className="w-full h-1 bg-gray-600 rounded-full"></div>
-              {/* Alignment indicator */}
-              <div
-                className={`absolute h-2 w-2 rounded-full transition-all duration-300 shadow-lg ${
-                  align === "left"
-                    ? "left-0"
-                    : align === "center"
-                    ? "left-1/2 transform -translate-x-1/2"
-                    : "right-0"
-                }`}
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  boxShadow: `0 0 8px ${ColorTheme.primary}40`,
-                }}
-              ></div>
-              {/* Subtle pulse animation for selected state */}
-              {value === align && (
-                <div
-                  className="absolute h-2 w-2 rounded-full animate-pulse"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}20, ${ColorTheme.primaryDark}20)`,
-                  }}
-                ></div>
-              )}
-            </div>
-            <div className="text-xs text-white font-medium">{alignLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Vertical Alignment Selector Component
-const VerticalAlignmentSelector: React.FC<{
-  value: "top" | "center" | "bottom";
-  onChange: (value: "top" | "center" | "bottom") => void;
-  label: string;
-}> = ({ value, onChange, label }) => {
-  const alignments = [
-    { value: "top", icon: "↑", label: "Top" },
-    { value: "center", icon: "↕", label: "Center" },
-    { value: "bottom", icon: "↓", label: "Bottom" },
-  ];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-3 gap-2">
-        {alignments.map(({ value: align, icon, label: alignLabel }) => (
-          <div
-            key={align}
-            onClick={() => onChange(align as any)}
-            className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center gap-2 ${
-              value === align
-                ? "border-white bg-zinc-700 shadow-lg"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800 hover:shadow-md"
-            }`}
-          >
-            <div className="text-2xl text-white">{icon}</div>
-            <div className="relative w-full h-12 flex items-center justify-center">
-              {/* Background container */}
-              <div className="w-1 h-10 bg-gray-600 rounded-full"></div>
-              {/* Alignment indicator */}
-              <div
-                className={`absolute w-3 h-3 rounded-full transition-all duration-300 shadow-lg ${
-                  align === "top"
-                    ? "top-0"
-                    : align === "center"
-                    ? "top-1/2 transform -translate-y-1/2"
-                    : "bottom-0"
-                }`}
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  boxShadow: `0 0 8px ${ColorTheme.primary}40`,
-                }}
-              ></div>
-              {/* Subtle pulse animation for selected state */}
-              {value === align && (
-                <div
-                  className="absolute w-3 h-3 rounded-full animate-pulse"
-                  style={{
-                    background: `linear-gradient(135deg, ${ColorTheme.primary}20, ${ColorTheme.primaryDark}20)`,
-                  }}
-                ></div>
-              )}
-            </div>
-            <div className="text-xs text-white font-medium">{alignLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Size Selector Component
-const SizeSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; size: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, size }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div
-                className="bg-gradient-to-r  rounded text-white text-center font-bold"
-                style={{ fontSize: size }}
-              >
-                Aa
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Button Style Selector Component
-const ButtonStyleSelector: React.FC<{
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-  options: { value: string; label: string; style: string }[];
-}> = ({ value, onChange, label, options }) => {
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        {label}
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map(({ value: optionValue, label: optionLabel, style }) => (
-          <div
-            key={optionValue}
-            onClick={() => onChange(optionValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === optionValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div className="flex justify-center mb-2">
-              <div
-                className={`px-3 py-1 text-xs rounded transition-all ${style}`}
-                style={
-                  optionValue === "default" || optionValue === "rounded"
-                    ? { backgroundColor: ColorTheme.primary, color: "white" }
-                    : {}
-                }
-              >
-                Button
-              </div>
-            </div>
-            <div className="text-center text-xs text-white">{optionLabel}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Visual Background Theme Selector Component
-const BackgroundThemeSelector: React.FC<{
-  value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots";
-  onChange: (
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots"
-  ) => void;
-}> = ({ value, onChange }) => {
-  // Helper function to generate the actual background styles for each theme
-  const getThemeStyle = (themeValue: string) => {
-    switch (themeValue) {
-      case "pearl-mist":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.3), transparent 90%)",
-        };
-      case "aurora-midnight":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.4), transparent 90%)",
-        };
-      case "crimson-shadow":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.4), transparent 90%)",
-        };
-      case "ocean-abyss":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.4), transparent 90%)",
-        };
-      case "noise-pattern":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.4) 1px, transparent 0),
-            radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.35) 1px, transparent 0),
-            radial-gradient(circle at 1px 1px, rgba(236, 72, 153, 0.3) 1px, transparent 0)
-          `,
-          backgroundSize: "12px 12px, 18px 18px, 15px 15px",
-          backgroundPosition: "0 0, 6px 6px, 9px 3px",
-        };
-      case "diagonal-lines":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.2) 0, rgba(0, 255, 65, 0.2) 1px, transparent 1px, transparent 8px),
-            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.2) 0, rgba(0, 255, 65, 0.2) 1px, transparent 1px, transparent 8px),
-            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.1) 0, rgba(0, 255, 65, 0.1) 1px, transparent 1px, transparent 3px)
-          `,
-          backgroundSize: "16px 16px, 16px 16px, 6px 6px",
-        };
-      case "magenta-orb-grid":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            linear-gradient(to right, rgba(71,85,105,0.2) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(71,85,105,0.2) 1px, transparent 1px),
-            radial-gradient(circle at 50% 60%, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)
-          `,
-          backgroundSize: "20px 20px, 20px 20px, 100% 100%",
-        };
-      case "black-grid-dots":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.15) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.15) 1px, transparent 1px),
-            radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)
-          `,
-          backgroundSize: "10px 10px, 10px 10px, 10px 10px",
-          backgroundPosition: "0 0, 0 0, 0 0",
-        };
-      default:
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.3), transparent 90%)",
-        };
-    }
-  };
-
-  const themes: Array<{
-    value: "pearl-mist" | "aurora-midnight" | "crimson-shadow" | "ocean-abyss" | "noise-pattern" | "diagonal-lines" | "magenta-orb-grid" | "black-grid-dots";
-    label: string;
-  }> = [
-    {
-      value: "noise-pattern",
-      label: "Noise Pattern",
-    },
-    {
-      value: "diagonal-lines",
-      label: "Diagonal Lines",
-    },
-    {
-      value: "magenta-orb-grid",
-      label: "Magenta Orb Grid",
-    },
-    {
-      value: "black-grid-dots",
-      label: "Black Grid Dots",
-    },
-    {
-      value: "pearl-mist",
-      label: "Pearl Mist",
-    },
-    {
-      value: "aurora-midnight",
-      label: "Aurora Midnight",
-    },
-    {
-      value: "crimson-shadow",
-      label: "Crimson Shadow",
-    },
-    {
-      value: "ocean-abyss",
-      label: "Ocean Abyss",
-    },
-  ];
-
-  return (
-    <div>
-      <label className="block text-white text-left font-medium mb-3">
-        Background Theme
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        {themes.map(({ value: themeValue, label }) => (
-          <div
-            key={themeValue}
-            onClick={() => onChange(themeValue)}
-            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-              value === themeValue
-                ? "border-white bg-zinc-700"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-            }`}
-          >
-            <div
-              className="w-full h-20 rounded mb-2"
-              style={getThemeStyle(themeValue)}
-            ></div>
-            <div className="text-center text-xs text-white">{label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import { useNeoHeroStyles } from "@/hooks/useNeoHeroStyles";
+import { useCustomization } from "@/hooks/useCustomization";
+import { useMagicWrite } from "@/hooks/useMagicWrite";
+import SectionLoading from "../Shared/SectionLoading";
 
 
+type Tab = "layout" | "typography" | "buttons" | "effects";
 
 const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
-  const dispatch = useDispatch();
-  const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
 
@@ -396,426 +31,45 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const { user, isLoaded } = useUser();
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
-  // Magic Write functionality
-  const handleMagicWrite = async (prompt: string, context?: string): Promise<string> => {
-    try {
-      const response = await fetch('/api/magicwrite', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: `Enhance this hero description: "${context}" with the following request: ${prompt}. Return only the enhanced description without any explanations.`,
-          context: context || "",
-          section: "hero-description"
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to enhance description');
-      }
-
-      const data = await response.json();
-      const enhancedDescription = data.response || data.content || data.result;
-      
-      return enhancedDescription;
-    } catch (error) {
-      console.error('Magic Write API error:', error);
-      throw error;
-    }
-  };
-
-  const handleDescriptionUpdate = async (newDescription: string) => {
-    try {
-      // Update the hero data with the new description
-      const updatedHeroData = {
-        ...heroData,
-        summary: newDescription
-      };
-      setHeroData(updatedHeroData);
-      
-      // Save to database
-      const result = await updateSection({
-        sectionName: "hero",
-        portfolioId,
-        sectionContent: updatedHeroData,
-        sectionTitle: "Hero",
-        sectionDescription: "Hero section"
-      });
-      
-      if (result.success) {
-        toast.success("Hero description enhanced and saved successfully!");
-      } else {
-        toast.error("Failed to save changes to database");
-      }
-    } catch (error) {
-      console.error("Error saving hero description:", error);
-      toast.error("Failed to save changes to database");
-    }
-  };
+  const { handleMagicWrite, saveEnhancedContent } = useMagicWrite({
+    portfolioId,
+    sectionName: "hero",
+    sectionTitle: "Hero",
+    sectionDescription: "Hero section"
+  });
 
   const [badgeScope, animateBadge] = useAnimate();
   const [titleScope, animateTitle] = useAnimate();
-
   const [badgeIndex, setBadgeIndex] = useState(0);
   const [titleIndex, setTitleIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
-  const [visualEditorOpen, setVisualEditorOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "layout" | "typography" | "buttons" | "effects"
-  >("layout");
-
-  // Dragging state for floating window
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [windowPosition, setWindowPosition] = useState({ x: 100, y: 100 });
-  const dragRef = useRef<HTMLDivElement>(null);
-
-  // Main customization state (from DB or default)
-  const [customization, setCustomization] = useState<CustomizationState>(defaultHeroStyles);
-  // Local draft state for visual editor
-  const [draftCustomization, setDraftCustomization] = useState<CustomizationState | null>(null);
-
-  // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
-  const effectiveCustomization = visualEditorOpen && draftCustomization ? draftCustomization : customization;
+  const [activeTab, setActiveTab] = useState<Tab>("layout");
 
 
-  // Load customizations from Redux state or database on component mount
-  useEffect(() => {
-    const loadCustomizations = async () => {
-      try {
-        // First check if customizations exist in Redux state
-        if (componentCustomizations && componentCustomizations["hero"]) {
-          setCustomization(componentCustomizations["hero"] as CustomizationState);
-        } else {
-          // Fallback to database
-          const result = await getComponentCustomization({
-            portfolioId,
-            componentType: "hero",
-          });
-          if (result.success && result.data) {
-            setCustomization(result.data as any);
-            // Update Redux state
-            dispatch(setComponentCustomizations({
-              ...componentCustomizations,
-              hero: result.data
-            }));
-          } else {
-            setCustomization(defaultHeroStyles);
-          }
-        }
-      } catch (error) {
-        setCustomization(defaultHeroStyles);
-      }
-    };
-    if (portfolioId) loadCustomizations();
-  }, [portfolioId, componentCustomizations, dispatch]);
+  const {
+    customization,
+    effectiveCustomization,
+    visualEditorOpen,
+    setVisualEditorOpen,
+    openVisualEditor,
+    updateDraftCustomization,
+    saveDraftCustomization,
+    resetCustomization,
+    draftCustomization
+  } = useCustomization("hero", defaultNeoSparkHeroStyles, portfolioId);
 
-  // When opening the editor, copy customization to draft
-  const openVisualEditor = () => {
-   
-    setDraftCustomization({ ...customization });
-    setVisualEditorOpen(true);
-  };
-
-  // All visual editor controls update draftCustomization
-  const updateDraftCustomization = (key: keyof CustomizationState, value: any) => {
-    if (!draftCustomization) return;
-    setDraftCustomization({ ...draftCustomization, [key]: value });
-  };
-
-  // When 'Done' is clicked, save draft to DB and update main state
-  const saveDraftCustomization = async () => {
-    if (!draftCustomization) return;
-   
-    setCustomization(draftCustomization);
-    setVisualEditorOpen(false);
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "hero",
-        settings: draftCustomization,
-      });
-      if (result.success) {
-        // Update Redux state
-        dispatch(setComponentCustomizations({
-          ...componentCustomizations,
-          hero: draftCustomization
-        }));
-        toast.success("Customization saved successfully");
-      } else {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      toast.error("Failed to save customization");
-    }
-  };
-
-  // On reset, delete from DB, set both states to default, and close editor
-  const resetCustomization = async () => {
-    try {
-      await deleteComponentCustomization({
-        portfolioId,
-        componentType: "hero",
-      });
-      setCustomization(defaultHeroStyles);
-      setDraftCustomization(defaultHeroStyles);
-      setVisualEditorOpen(false);
-      // Update Redux state
-      const updatedCustomizations = { ...componentCustomizations };
-      delete updatedCustomizations["hero"];
-      dispatch(setComponentCustomizations(updatedCustomizations));
-      toast.success("Customization reset successfully");
-    } catch (error) {
-      toast.error("Failed to reset customization");
-    }
-  };
-
-  const getThemeButtonStyle = (isActive: boolean) => {
-    if (isActive) {
-      return {
-        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-        color: "white",
-      };
-    }
-    return {};
-  };
-
-  // Dragging functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (dragRef.current) {
-      const rect = dragRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-      setIsDragging(true);
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setWindowPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
-  // Helper functions for styling
-  const getContainerClasses = () => {
-    const alignmentMap = {
-      center: "items-center justify-center text-center",
-      left: "items-start justify-start text-left",
-      right: "items-end justify-end text-right",
-    };
-
-    const verticalMap = {
-      center: "justify-center min-h-screen",
-      top: "justify-start pt-12",
-      bottom: "justify-end pb-12 min-h-screen",
-    };
-
-    const maxWidthMap = {
-      sm: "max-w-sm",
-      md: "max-w-2xl",
-      lg: "max-w-4xl",
-      xl: "max-w-6xl",
-      full: "w-full",
-    };
-
-    let classes = `relative flex-1 flex pt-8 flex-col px-4 sm:px-6 md:px-8 ${
-      alignmentMap[effectiveCustomization.contentAlignment]
-    } ${verticalMap[effectiveCustomization.verticalAlignment]} ${
-      maxWidthMap[effectiveCustomization.maxWidth]
-    } mx-auto space-y-4 sm:space-y-6`;
-
-    return classes;
-  };
-
-  const getTitleClasses = () => {
-    const sizeMap = {
-      sm: "text-3xl sm:text-2xl md:text-4xl lg:text-5xl",
-      md: "text-3xl sm:text-3xl md:text-5xl lg:text-6xl",
-      lg: "text-4xl sm:text-4xl md:text-6xl lg:text-7xl",
-      xl: "text-5xl sm:text-5xl md:text-7xl lg:text-8xl",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-      extrabold: "font-extrabold",
-    };
-
-    const lineHeightMap = {
-      tight: "leading-tight",
-      snug: "leading-snug",
-      normal: "leading-normal",
-      relaxed: "leading-relaxed",
-    };
-
-    const letterSpacingMap = {
-      tighter: "tracking-tighter",
-      tight: "tracking-tight",
-      normal: "tracking-normal",
-      wide: "tracking-wide",
-    };
-
-    return `section-title ${sizeMap[effectiveCustomization.titleSize]} ${
-      weightMap[effectiveCustomization.titleWeight]
-    } ${lineHeightMap[effectiveCustomization.titleLineHeight]} ${
-      letterSpacingMap[effectiveCustomization.titleLetterSpacing]
-    }`;
-  };
-
-  const getDescriptionClasses = () => {
-    const sizeMap = {
-      sm: "text-base sm:text-lg",
-      md: "text-lg sm:text-xl",
-      lg: "text-xl sm:text-2xl",
-    };
-
-    const weightMap = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    };
-
-    const maxWidthMap = {
-      sm: "max-w-sm",
-      md: "max-w-xl",
-      lg: "max-w-2xl",
-      xl: "max-w-4xl",
-      full: "max-w-full",
-    };
-
-    return `section-description ${
-      sizeMap[effectiveCustomization.descriptionSize]
-    } ${weightMap[effectiveCustomization.descriptionWeight]} ${maxWidthMap[effectiveCustomization.descriptionMaxWidth]} ${
-      effectiveCustomization.contentAlignment === "center" ? "mx-auto" : ""
-    }`;
-  };
-
-  const getBadgeClasses = () => {
-    return `inline-flex items-center text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full`;
-  };
-
-  const getButtonClasses = () => {
-    const sizeMap = {
-      sm: "px-3 sm:px-4 py-2 text-xs sm:text-sm",
-      md: "px-4 sm:px-7 py-3 sm:py-5 text-sm",
-      lg: "px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base",
-    };
-
-    const styleMap = {
-      default: "rounded",
-      rounded: "rounded-lg",
-      square: "rounded-none",
-      pill: "rounded-full",
-    };
-
-    const layoutMap = {
-      horizontal: "flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6",
-      vertical: "flex flex-col items-center gap-3 sm:gap-4",
-      stacked: "flex flex-col sm:flex-row items-center gap-3 sm:gap-4",
-    };
-
-    return {
-      container: `${layoutMap[effectiveCustomization.buttonLayout]} mt-8`,
-      button: `flex btn-primary items-center gap-2 ${
-        sizeMap[effectiveCustomization.buttonSize]
-      } ${
-        styleMap[effectiveCustomization.buttonStyle]
-      } cursor-pointer transition-all duration-300`,
-    };
-  };
-
-  const getAnimationVariants = () => {
-    return {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1 },
-    };
-  };
-
-  const getTitleStyle = () => {
-    let style: any = {};
-
-    if (effectiveCustomization.glowEffect) {
-      style.textShadow = `0 0 20px ${theme.colors.primary}50`;
-    }
-
-    if (effectiveCustomization.textShadow) {
-      style.textShadow = "2px 2px 4px rgba(0,0,0,0.5)";
-    }
-
-    return style;
-  };
-
-  // Update customization helper
-  const updateCustomization = async (key: keyof CustomizationState, value: any) => {
-    const newCustomization = { ...customization, [key]: value };
-    setCustomization(newCustomization);
-    
-    // Save to database
-    try {
-      const result = await saveComponentCustomization({
-        portfolioId,
-        componentType: "hero",
-        settings: newCustomization,
-      });
-      
-      if (!result.success) {
-        toast.error("Failed to save customization");
-      }
-    } catch (error) {
-      console.error("Error saving customization:", error);
-      toast.error("Failed to save customization");
-    }
-  };
-
-  const renderToggle = (
-    label: string,
-    value: boolean,
-    onChange: (value: boolean) => void
-  ) => (
-    <div className="mb-4 flex items-center justify-between">
-      <label className="text-sm font-medium text-gray-300">{label}</label>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          checked={value}
-          onChange={(e) => onChange(e.target.checked)}
-          className="sr-only peer"
-        />
-        <div
-          className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"
-          style={{
-            backgroundColor: value ? ColorTheme.primary : "",
-          }}
-        ></div>
-      </label>
-    </div>
-  );
+  const { getContainerClasses,
+    getTitleClasses,
+    getDescriptionClasses,
+    getBadgeClasses,
+    getButtonClasses,
+    getAnimationVariants,
+    getTitleStyle,
+    getBackgroundStyle,
+    customCssAnimations,
+    getThemeButtonStyle
+  } = useNeoHeroStyles(effectiveCustomization, theme, ColorTheme)
 
   useEffect(() => {
     if (portfolioData) {
@@ -887,11 +141,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           filter: `id=eq.${portfolioId}`,
         },
         (payload) => {
-          // console.log("Portfolio update detected!", payload);
         }
       )
       .subscribe((status) => {
-        // console.log(`Supabase subscription status: ${status}`);
       });
 
     return () => {
@@ -911,7 +163,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   if (isLoading || !heroData) {
     return (
-      <div className="flex items-center justify-center h-64">Loading...</div>
+      <SectionLoading />
     );
   }
 
@@ -926,88 +178,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const buttonHoverBgColor = theme.colors.primaryHover;
   const buttonTextColor = theme.colors.text.primary;
   const buttonHoverTextColor = theme.colors.text.secondary;
-  const mutedColor = theme.colors.states.muted;
   const scrollLineColor = theme.colors.background.secondary;
 
   const animationVariants = getAnimationVariants();
   const buttonClasses = getButtonClasses();
-
-  const getBackgroundStyle = () => {
-    switch (effectiveCustomization.backgroundTheme) {
-      case "pearl-mist":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%)",
-        };
-      case "aurora-midnight":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.25), transparent 90%)",
-        };
-      case "crimson-shadow":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255, 80, 120, 0.25), transparent 90%)",
-        };
-      case "ocean-abyss":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.25), transparent 90%)",
-        };
-      case "noise-pattern":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.2) 1px, transparent 0),
-            radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.18) 1px, transparent 0),
-            radial-gradient(circle at 1px 1px, rgba(236, 72, 153, 0.15) 1px, transparent 0)
-          `,
-          backgroundSize: "20px 20px, 30px 30px, 25px 25px",
-          backgroundPosition: "0 0, 10px 10px, 15px 5px",
-        };
-      case "diagonal-lines":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            repeating-linear-gradient(45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-            repeating-linear-gradient(-45deg, rgba(0, 255, 65, 0.08) 0, rgba(0, 255, 65, 0.08) 1px, transparent 1px, transparent 12px),
-            repeating-linear-gradient(90deg, rgba(0, 255, 65, 0.03) 0, rgba(0, 255, 65, 0.03) 1px, transparent 1px, transparent 4px)
-          `,
-          backgroundSize: "24px 24px, 24px 24px, 8px 8px",
-        };
-      case "magenta-orb-grid":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            linear-gradient(to right, rgba(71,85,105,0.2) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(71,85,105,0.2) 1px, transparent 1px),
-            radial-gradient(circle at 50% 60%, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.05) 40%, transparent 70%)
-          `,
-          backgroundSize: "20px 20px, 20px 20px, 100% 100%",
-        };
-      case "black-grid-dots":
-        return {
-          backgroundColor: "#000000",
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px),
-            radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: "20px 20px, 20px 20px, 20px 20px",
-          backgroundPosition: "0 0, 0 0, 0 0",
-        };
-      default:
-        return {
-          backgroundColor: "#000000",
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 90%)",
-        };
-    }
-  };
 
   return (
     <div className="w-full relative bg-black">
@@ -1015,13 +189,13 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
       <div className="absolute inset-0 z-0" style={getBackgroundStyle()} />
       {/* Fade effect at bottom to smooth transition */}
       <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-10"></div>
-              <div
-          className={getContainerClasses()}
-          style={{
-            paddingLeft: `${effectiveCustomization.containerPadding}px`,
-            paddingRight: `${effectiveCustomization.containerPadding}px`,
-          }}
-        >
+      <div
+        className={getContainerClasses()}
+        style={{
+          paddingLeft: `${effectiveCustomization.containerPadding}px`,
+          paddingRight: `${effectiveCustomization.containerPadding}px`,
+        }}
+      >
         <style>{customCSS}</style>
 
         {/* Badge */}
@@ -1050,7 +224,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             </span>
           </motion.div>
         )}
-        
+
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
           {shouldShowButton && (
@@ -1064,7 +238,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             </button>
           )}
         </div>
-        
+
         {/* Title */}
         <motion.h1
           initial={animationVariants.hidden}
@@ -1098,10 +272,12 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           {/* Magic Write Button */}
           <div className="absolute hidden md:block -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
             <MagicWrite
-              onMagicWrite={async (prompt: string, context?: string) => {
-                const enhancedDescription = await handleMagicWrite(prompt, heroData.summary);
-                handleDescriptionUpdate(enhancedDescription);
-                return enhancedDescription;
+              onMagicWrite={async (prompt: string) => {
+                const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
+                const updated = { ...heroData, summary: enhanced };
+                setHeroData(updated);
+                await saveEnhancedContent(updated);
+                return enhanced;
               }}
               placeholder="Enhance this hero description..."
               buttonText=""
@@ -1186,7 +362,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             <p>Scroll to explore</p>
             {(() => {
               const style = effectiveCustomization.scrollIndicatorStyle?.toLowerCase();
-             
+
               return null;
             })()}
             {(effectiveCustomization.scrollIndicatorStyle?.toLowerCase() === "line") && (
@@ -1236,574 +412,17 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
         {/* Floating Visual Editor Window */}
         {visualEditorOpen && (
-                  <div
-          ref={dragRef}
-          className="fixed bg-zinc-900 shadow-2xl z-50 rounded-lg border border-zinc-700 w-[90vw] sm:w-96 max-h-[80vh] overflow-hidden"
-          style={{
-            left: `${windowPosition.x}px`,
-            top: `${windowPosition.y}px`,
-            cursor: isDragging ? "grabbing" : "grab",
-          }}
-        >
-            {/* Header */}
-            <div
-              className="flex justify-between items-center p-4 border-b border-zinc-700 bg-zinc-800"
-              onMouseDown={handleMouseDown}
-            >
-              <h3 className="text-lg font-bold text-white">Visual Editor</h3>
-              <button
-                onClick={() => setVisualEditorOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors p-1"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Tab Navigation */}
-            <div className="flex border-b border-zinc-700">
-              {["layout", "typography", "buttons", "effects"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab as any)}
-                  className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors`}
-                  style={getThemeButtonStyle(activeTab === tab)}
-                >
-                  {tab === "layout" && (
-                    <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                  )}
-                  {tab === "typography" && (
-                    <Type className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                  )}
-                  {tab === "buttons" && (
-                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                  )}
-                  {tab === "effects" && (
-                    <Eye className="h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1" />
-                  )}
-                  <span className="hidden sm:inline">{tab}</span>
-                  <span className="sm:hidden">{tab.charAt(0)}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Tab Content */}
-            <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-              {activeTab === "layout" && (
-                <div className="space-y-4">
-                  <BackgroundThemeSelector
-                    value={draftCustomization?.backgroundTheme ?? customization.backgroundTheme}
-                    onChange={value => updateDraftCustomization("backgroundTheme", value)}
-                  />
-
-                  <AlignmentSelector
-                    value={draftCustomization?.contentAlignment ?? customization.contentAlignment}
-                    onChange={value => updateDraftCustomization("contentAlignment", value)}
-                    label="Content Alignment"
-                  />
-
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Max Width
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "sm", label: "Small", width: "25%" },
-                        { value: "md", label: "Medium", width: "50%" },
-                        { value: "lg", label: "Large", width: "75%" },
-                        { value: "full", label: "Full Width", width: "100%" },
-                      ].map(({ value, label, width }) => (
-                        <div
-                          key={value}
-                          onClick={() => updateDraftCustomization("maxWidth", value)}
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.maxWidth ?? customization.maxWidth) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="w-full  block mx-auto">
-                              <div
-                                className="h-4 rounded"
-                                style={{
-                                  width: width,
-                                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                                }}
-                              ></div>
-                            </div>
-                            <div className="text-xs text-white font-medium text-center">
-                              {label}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="block text-left text-sm font-medium text-gray-300 mb-2">
-                      Container Padding: {draftCustomization?.containerPadding ?? customization.containerPadding}px
-                    </label>
-                    <input
-                      type="range"
-                      min={0}
-                      max={64}
-                      step={4}
-                      value={draftCustomization?.containerPadding ?? customization.containerPadding}
-                      onChange={e => updateDraftCustomization("containerPadding", Number(e.target.value))}
-                      className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
-                      style={{
-                        background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary} ${Math.max(0, Math.min(100, ((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100))}%, #3f3f46 ${Math.max(0, Math.min(100, ((draftCustomization?.containerPadding ?? customization.containerPadding) / 64) * 100))}%, #3f3f46 100%)`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="border-t border-zinc-700 pt-4 mt-4">
-                    <h5 className="text-sm text-left font-medium text-white mb-3">
-                      Badge Settings
-                    </h5>
-
-                    {renderToggle(
-                      "Show Badge",
-                      draftCustomization?.badgeVisible ?? customization.badgeVisible,
-                      value => updateDraftCustomization("badgeVisible", value)
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "typography" && (
-                <div>
-                  <div className="mb-6 space-y-4">
-                    <SizeSelector
-                      value={draftCustomization?.titleSize ?? customization.titleSize}
-                      onChange={value => updateDraftCustomization("titleSize", value)}
-                      label="Title Size"
-                      options={[
-                        { value: "sm", label: "Small", size: "24px" },
-                        { value: "md", label: "Medium", size: "32px" },
-                        { value: "lg", label: "Large", size: "40px" },
-                        { value: "xl", label: "Extra Large", size: "52px" },
-                      ]}
-                    />
-
-                    <div>
-                      <label className="block text-left text-white font-medium mb-3">
-                        Title Weight
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          {
-                            value: "normal",
-                            label: "Normal",
-                            weight: "font-normal",
-                          },
-                          {
-                            value: "medium",
-                            label: "Medium",
-                            weight: "font-medium",
-                          },
-                          {
-                            value: "semibold",
-                            label: "Semibold",
-                            weight: "font-semibold",
-                          },
-                          { value: "bold", label: "Bold", weight: "font-bold" },
-                          {
-                            value: "extrabold",
-                            label: "Extrabold",
-                            weight: "font-extrabold",
-                          },
-                        ].map(({ value, label, weight }) => (
-                          <div
-                            key={value}
-                            onClick={() =>
-                              updateDraftCustomization("titleWeight", value)
-                            }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleWeight ?? customization.titleWeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className="flex justify-center mb-2">
-                              <div
-                                className={`text-white text-center px-3 py-1 ${weight}`}
-                                style={{ fontSize: "14px" }}
-                              >
-                                Aa
-                              </div>
-                            </div>
-                            <div className="text-center text-xs text-white">
-                              {label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-left text-white font-medium mb-3">
-                        Line Height
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: "tight", label: "Tight", height: "1.25" },
-                          { value: "snug", label: "Snug", height: "1.375" },
-                          { value: "normal", label: "Normal", height: "1.5" },
-                          {
-                            value: "relaxed",
-                            label: "Relaxed",
-                            height: "1.625",
-                          },
-                        ].map(({ value, label, height }) => (
-                          <div
-                            key={value}
-                            onClick={() =>
-                              updateDraftCustomization("titleLineHeight", value)
-                            }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleLineHeight ?? customization.titleLineHeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className="flex justify-center mb-2">
-                              <div
-                                className="text-white text-center px-3 py-1"
-                                style={{ fontSize: "12px", lineHeight: height }}
-                              >
-                                Aa
-                                <br />
-                                Bb
-                              </div>
-                            </div>
-                            <div className="text-center text-xs text-white">
-                              {label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-left text-white font-medium mb-3">
-                        Letter Spacing
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          {
-                            value: "tighter",
-                            label: "Tighter",
-                            spacing: "-0.05em",
-                          },
-                          {
-                            value: "tight",
-                            label: "Tight",
-                            spacing: "-0.025em",
-                          },
-                          { value: "normal", label: "Normal", spacing: "0em" },
-                          { value: "wide", label: "Wide", spacing: "0.025em" },
-                        ].map(({ value, label, spacing }) => (
-                          <div
-                            key={value}
-                            onClick={() =>
-                              updateDraftCustomization("titleLetterSpacing", value)
-                            }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.titleLetterSpacing ?? customization.titleLetterSpacing) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className="flex justify-center mb-2">
-                              <div
-                                className="text-white text-center px-3 py-1"
-                                style={{
-                                  fontSize: "12px",
-                                  letterSpacing: spacing,
-                                }}
-                              >
-                                A B C
-                              </div>
-                            </div>
-                            <div className="text-center text-xs text-white">
-                              {label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t text-left space-y-4 border-zinc-700 ">
-                    <SizeSelector
-                      value={draftCustomization?.descriptionSize ?? customization.descriptionSize}
-                      onChange={value => updateDraftCustomization("descriptionSize", value)}
-                      label="Description Size"
-                      options={[
-                        { value: "sm", label: "Small", size: "18px" },
-                        { value: "md", label: "Medium", size: "20px" },
-                        { value: "lg", label: "Large", size: "24px" },
-                      ]}
-                    />
-
-                    <div>
-                      <label className="block text-white font-medium mb-3">
-                        Description Weight
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: "normal", label: "Normal", weight: "font-normal" },
-                          { value: "medium", label: "Medium", weight: "font-medium" },
-                          { value: "semibold", label: "Semibold", weight: "font-semibold" },
-                          { value: "bold", label: "Bold", weight: "font-bold" },
-                        ].map(({ value, label, weight }) => (
-                          <div
-                            key={value}
-                            onClick={() =>
-                              updateDraftCustomization("descriptionWeight", value)
-                            }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.descriptionWeight ?? customization.descriptionWeight) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className="flex justify-center mb-2">
-                              <div
-                                className={`text-white text-center px-3 py-1 ${weight}`}
-                                style={{ fontSize: "14px" }}
-                              >
-                                Aa
-                              </div>
-                            </div>
-                            <div className="text-center text-xs text-white">
-                              {label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-white font-medium mb-3">
-                        Description Max Width
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: "sm", label: "Small", width: "25%" },
-                          { value: "md", label: "Medium", width: "50%" },
-                          { value: "lg", label: "Large", width: "75%" },
-                          { value: "xl", label: "Extra Large", width: "90%" },
-                          { value: "full", label: "Full Width", width: "100%" },
-                        ].map(({ value, label, width }) => (
-                          <div
-                            key={value}
-                            onClick={() =>
-                              updateDraftCustomization("descriptionMaxWidth", value)
-                            }
-                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                              (draftCustomization?.descriptionMaxWidth ?? customization.descriptionMaxWidth) === value
-                                ? "border-white bg-zinc-700"
-                                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                            }`}
-                          >
-                            <div className="flex flex-col items-center gap-2">
-                              <div className="w-full block mx-auto">
-                                <div
-                                  className="h-3 rounded"
-                                  style={{
-                                    width: width,
-                                    background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                                  }}
-                                ></div>
-                              </div>
-                              <div className="text-xs text-white font-medium text-center">
-                                {label}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "buttons" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-white text-left font-medium mb-3">
-                      Button Layout
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { value: "horizontal", label: "Horizontal", icon: "↔" },
-                        { value: "vertical", label: "Vertical", icon: "↕" },
-                      ].map(({ value, label, icon }) => (
-                        <div
-                          key={value}
-                          onClick={() =>
-                            updateDraftCustomization("buttonLayout", value)
-                          }
-                          className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.buttonLayout ?? customization.buttonLayout) === value
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="text-center text-lg text-white mb-1">
-                            {icon}
-                          </div>
-                          <div className="text-center text-xs text-white">
-                            {label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <SizeSelector
-                    value={draftCustomization?.buttonSize ?? customization.buttonSize}
-                    onChange={value => updateDraftCustomization("buttonSize", value)}
-                    label="Button Size"
-                    options={[
-                      { value: "sm", label: "Small", size: "12px" },
-                      { value: "md", label: "Medium", size: "14px" },
-                      { value: "lg", label: "Large", size: "16px" },
-                    ]}
-                  />
-
-                  <ButtonStyleSelector
-                    value={draftCustomization?.buttonStyle ?? customization.buttonStyle}
-                    onChange={value => updateDraftCustomization("buttonStyle", value)}
-                    label="Button Style"
-                    options={[
-                      { value: "default", label: "Default", style: "rounded" },
-                      {
-                        value: "rounded",
-                        label: "Rounded",
-                        style: "rounded-lg",
-                      },
-                      {
-                        value: "square",
-                        label: "Square",
-                        style: "rounded-none",
-                      },
-                      { value: "pill", label: "Pill", style: "rounded-full" },
-                    ]}
-                  />
-                </div>
-              )}
-
-              {activeTab === "effects" && (
-                <div>
-                  <div className="mb-6">
-                    <h5 className="text-sm text-left font-medium text-white mb-3">
-                      Text Effects
-                    </h5>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { key: "glowEffect", label: "Glow Effect", icon: "✨" },
-                        { key: "textShadow", label: "Text Shadow", icon: "🌫" },
-                      ].map(({ key, label, icon }) => (
-                        <div
-                          key={key}
-                          onClick={() =>
-                            updateDraftCustomization(
-                              key as any,
-                              !(draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
-                            )
-                          }
-                          className={`cursor-pointer p-4 rounded-lg border-2 transition-all duration-200 ${
-                            (draftCustomization?.[key as keyof CustomizationState] ?? customization[key as keyof CustomizationState])
-                              ? "border-white bg-zinc-700"
-                              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                          }`}
-                        >
-                          <div className="text-center text-lg text-white mb-1">
-                            {icon}
-                          </div>
-                          <div className="text-center text-xs text-white">
-                            {label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t text-left border-zinc-700 pt-4">
-                    {renderToggle(
-                      "Show Scroll Indicator",
-                      draftCustomization?.scrollIndicator ?? customization.scrollIndicator,
-                      (value) => updateDraftCustomization("scrollIndicator", value)
-                    )}
-
-                    {(draftCustomization?.scrollIndicator ?? customization.scrollIndicator) && (
-                      <div>
-                        <label className="block text-white font-medium mb-3">
-                          Indicator Style
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {[
-                            { value: "line", label: "Line", icon: "|" },
-                            { value: "arrow", label: "Arrow", icon: "↓" },
-                            { value: "dot", label: "Dot", icon: "●" },
-                            { value: "animated", label: "Animated", icon: "⟳" },
-                          ].map(({ value, label, icon }) => (
-                            <div
-                              key={value}
-                              onClick={() =>
-                                updateDraftCustomization(
-                                  "scrollIndicatorStyle",
-                                  value
-                                )
-                              }
-                              className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${
-                                (draftCustomization?.scrollIndicatorStyle ?? customization.scrollIndicatorStyle) === value
-                                  ? "border-white bg-zinc-700"
-                                  : "border-gray-600 hover:border-gray-400 bg-zinc-800"
-                              }`}
-                            >
-                              
-                              <div className="text-center text-lg text-white mb-1">
-                                {icon}
-                              </div>
-                              <div className="text-center text-xs text-white">
-                                {label}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-3 sm:p-4 border-t border-zinc-700 bg-zinc-800">
-              <div className="flex gap-2">
-                <button
-                  onClick={resetCustomization}
-                  className="flex items-center gap-1 flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  Reset
-                </button>
-                <button
-                  onClick={saveDraftCustomization}
-                  className="flex-1 py-2 px-2 sm:px-3 text-xs sm:text-sm text-white rounded transition-colors"
-                  style={getThemeButtonStyle(true)}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
+          <HeroVisualEditor
+            isOpen={visualEditorOpen}
+            onClose={() => setVisualEditorOpen(false)}
+            customization={customization}
+            draftCustomization={draftCustomization}
+            onUpdateDraft={updateDraftCustomization}
+            onSave={saveDraftCustomization}
+            onReset={resetCustomization}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
         )}
 
         {/* Overlay for floating window */}
@@ -1815,84 +434,10 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
         )}
 
         {/* Custom CSS for animations */}
-        <style jsx>{`
-          @keyframes blink {
-            0%,
-            50% {
-              opacity: 1;
-            }
-            51%,
-            100% {
-              opacity: 0.3;
-            }
-          }
-
-          @keyframes pulse {
-            0%,
-            100% {
-              transform: scale(1);
-              opacity: 1;
-            }
-            50% {
-              transform: scale(1.1);
-              opacity: 0.7;
-            }
-          }
-
-          @keyframes bounce {
-            0%,
-            20%,
-            53%,
-            80%,
-            100% {
-              transform: translate3d(0, 0, 0);
-            }
-            40%,
-            43% {
-              transform: translate3d(0, -8px, 0);
-            }
-            70% {
-              transform: translate3d(0, -4px, 0);
-            }
-            90% {
-              transform: translate3d(0, -2px, 0);
-            }
-          }
-
-          @keyframes slide {
-            0% {
-              transform: translateX(-10px);
-              opacity: 0.5;
-            }
-            100% {
-              transform: translateX(0);
-              opacity: 1;
-            }
-          }
-
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-          }
-
-          .slider::-moz-range-thumb {
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: ${ColorTheme.primary};
-            cursor: pointer;
-            border: none;
-          }
-        `}</style>
+        <style>{customCssAnimations()}</style>
       </div>
     </div>
   );
 };
 
 export default Hero;
-
-

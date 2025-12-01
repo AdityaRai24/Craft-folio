@@ -1,0 +1,263 @@
+{
+    "sections": [
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "title": "Full Stack Web Developer",
+                "summary": "Highly motivated and skilled full-stack developer with experience in building and deploying web applications using React, Flask, FastAPI, and PostgreSQL.  Seeking a challenging role where I can contribute to innovative projects.",
+                "titlePrefix": "Aspiring Software",
+                "shortSummary": "Full-stack developer building scalable web applications.",
+                "titleSuffixOptions": [
+                    "Engineer",
+                    "Developer"
+                ]
+            },
+            "type": "hero"
+        },
+        {
+            "data": [
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                            "name": "Python"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/project",
+                    "projectName": "Gitlytics",
+                    "projectImage": "https://gitlytics.com/assets/images/homepage2.png",
+                    "projectTitle": "Gitlytics",
+                    "projectDescription": "Developed a full-stack web application with Flask serving a REST API and React as the frontend. Implemented GitHub OAuth to get data from user repositories and visualized GitHub data to show collaboration. Used Celery and Redis for asynchronous tasks."
+                },
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                            "name": "JavaScript"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/weather-api-project",
+                    "projectName": "Weather API Project",
+                    "projectImage": "https://nordicapis.com/wp-content/uploads/How-to-Build-an-API-Driven-Weather-App.png",
+                    "projectTitle": "Weather API Project",
+                    "projectDescription": "Developed a React.js application that fetches and displays weather data using a public weather API. Implemented features for searching locations and displaying various weather parameters."
+                }
+            ],
+            "type": "projects",
+            "sectionTitle": "My Projects",
+            "sectionDescription": "Some cool things that i have worked on."
+        },
+        {
+            "data": [
+                {
+                    "role": "Undergraduate Research Assistant",
+                    "endDate": "Present",
+                    "location": "College Station, TX",
+                    "startDate": "06/2020",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "companyName": "Texas A&M University",
+                    "description": "Developed a REST API using FastAPI and PostgreSQL. Developed a full-stack web application using Flask, React, PostgreSQL, and Docker to analyze GitHub data. Explored ways to visualize GitHub collaboration in a classroom setting."
+                },
+                {
+                    "role": "Information Technology Support Specialist",
+                    "endDate": "Present",
+                    "location": "Georgetown, TX",
+                    "startDate": "09/2018",
+                    "techStack": [],
+                    "companyName": "Southwestern University",
+                    "description": "Communicated with managers to set up campus computers. Assessed and troubleshooted computer problems for students, faculty, and staff. Maintained upkeep of computers, classroom equipment, and 200 printers across campus."
+                },
+                {
+                    "role": "Artificial Intelligence Research Assistant",
+                    "endDate": "07/2019",
+                    "location": "Georgetown, TX",
+                    "startDate": "05/2019",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                            "name": "Java"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                            "name": "Git"
+                        }
+                    ],
+                    "companyName": "Southwestern University",
+                    "description": "Explored methods to generate video game dungeons based on The Legend of Zelda. Developed a game in Java to test the generated dungeons. Contributed 50K+ lines of code and presented research findings at the World Conference on Computational Intelligence."
+                }
+            ],
+            "type": "experience",
+            "sectionTitle": "Professional Experience",
+            "sectionDescription": "My journey in the industry"
+        },
+        {
+            "data": [
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                    "name": "Java"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                    "name": "Python"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+                    "name": "C/C++"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+                    "name": "SQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                    "name": "PostgreSQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "JavaScript"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "R"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                    "name": "React.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                    "name": "Node.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                    "name": "Flask"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                    "name": "Git"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                    "name": "Docker"
+                }
+            ],
+            "type": "technologies",
+            "sectionTitle": "Technical Skills",
+            "sectionDescription": "A comprehensive list of technologies and tools I work with"
+        },
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "email": "jake@su.edu",
+                "title": "Full Stack Web Developer",
+                "github": "github.com/jake",
+                "linkedin": "linkedin.com/in/jake",
+                "location": "San Francisco, CA",
+                "resumeLink": ""
+            },
+            "type": "userInfo"
+        },
+        {
+            "data": {
+                "modernSlate": {
+                    "colors": {
+                        "text": {
+                            "primary": "#1E293B",
+                            "secondary": "#334155"
+                        },
+                        "accent": "#64748B",
+                        "states": {
+                            "muted": "rgba(71, 85, 105, 0.1)"
+                        },
+                        "primary": "#475569",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(100,116,139,0.1), rgba(71,85,105,0.1))",
+                            "header": "linear-gradient(90deg, rgba(100,116,139,0.05), transparent)",
+                            "primary": "linear-gradient(90deg, #64748B, #475569)"
+                        },
+                        "secondary": "#1E293B",
+                        "background": {
+                            "primary": "#FFFFFF",
+                            "secondary": "#F1F5F9"
+                        },
+                        "primaryHover": "#1E293B"
+                    }
+                },
+                "simpleBlack": {
+                    "colors": {
+                        "text": {
+                            "primary": "#111827",
+                            "secondary": "#374151"
+                        },
+                        "accent": "#6B7280",
+                        "states": {
+                            "muted": "rgba(107, 114, 128, 0.1)"
+                        },
+                        "primary": "#374151",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(107,114,128,0.1), rgba(55,65,81,0.1))",
+                            "header": "linear-gradient(90deg, rgba(107,114,128,0.05), transparent)",
+                            "primary": "linear-gradient(90deg, #6B7280, #374151)"
+                        },
+                        "secondary": "#1F2937",
+                        "background": {
+                            "primary": "#FFFFFF",
+                            "secondary": "#F9FAFB"
+                        },
+                        "primaryHover": "#1F2937"
+                    }
+                }
+            },
+            "type": "themes"
+        },
+        {
+            "data": {
+                "title": "Jake Ryan - Full Stack Web Developer Portfolio",
+                "favicon": "",
+                "description": "Experienced full-stack developer specializing in React, Flask, Python & PostgreSQL. Building scalable web apps & intelligent systems. View projects now!"
+            },
+            "type": "seo",
+            "sectionTitle": "SEO Settings",
+            "sectionDescription": "SEO settings for your portfolio"
+        }
+    ]
+}

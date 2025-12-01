@@ -16,5 +16,11 @@ export const prompts : any = {
         titlePrompt : true,
         longSummaryPrompt : true,
         title : true,
+    },
+    MacOs: {
+        titlePrompt : true,
+        summaryPrompt : true,
+        longSummaryPrompt : true,
+        title : true,
     }
 }

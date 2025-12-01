@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -63,11 +64,11 @@ const TechnologiesSidebar: React.FC = () => {
   const handleChange = (value: string): void => {
     setSearchValue(value)
     setHasSearched(value.trim() !== "")
-    
-    if(value.trim() === "") {
+
+    if (value.trim() === "") {
       setSuggestions([])
     } else {
-      const results = techList.filter((item: Technology) => 
+      const results = techList.filter((item: Technology) =>
         item.name.toLowerCase().includes(value.toLowerCase()))
       setSuggestions(results.slice(0, 6))
     }
@@ -96,29 +97,29 @@ const TechnologiesSidebar: React.FC = () => {
     }
   }
 
-  const handleSaveChanges = async() => {
+  const handleSaveChanges = async () => {
     const originalSelected = [...selected];
-    
+
     try {
       setIsLoading(true);
-      dispatch(updatePortfolioData({ 
-        sectionType: "technologies", 
+      dispatch(updatePortfolioData({
+        sectionType: "technologies",
         newData: selected,
         sectionTitle,
         sectionDescription
       }));
-      
-      const result = await updateSection({ 
+
+      const result = await updateSection({
         portfolioId: portfolioId,
-        sectionName: "technologies", 
+        sectionName: "technologies",
         sectionContent: selected,
         sectionTitle,
         sectionDescription
       });
 
       if (!result.success) {
-        dispatch(updatePortfolioData({ 
-          sectionType: "technologies", 
+        dispatch(updatePortfolioData({
+          sectionType: "technologies",
           newData: originalSelected,
           sectionTitle,
           sectionDescription
@@ -146,14 +147,14 @@ const TechnologiesSidebar: React.FC = () => {
 
   const handleSaveHeader = async () => {
     try {
-      dispatch(updatePortfolioData({ 
-        sectionType: "technologies", 
+      dispatch(updatePortfolioData({
+        sectionType: "technologies",
         newData: selected,
         sectionTitle,
         sectionDescription
       }));
-      await updateSection({ 
-        portfolioId: portfolioId, 
+      await updateSection({
+        portfolioId: portfolioId,
         sectionName: "technologies",
         sectionContent: selected,
         sectionTitle,
@@ -179,12 +180,12 @@ const TechnologiesSidebar: React.FC = () => {
             {technologiesSection?.sectionTitle && (
               <div className="space-y-2">
                 <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input 
-                  id="sectionTitle" 
-                  value={sectionTitle} 
-                  onChange={(e) => setSectionTitle(e.target.value)} 
-                  placeholder="Enter section title" 
-                  style={{ 
+                <Input
+                  id="sectionTitle"
+                  value={sectionTitle}
+                  onChange={(e) => setSectionTitle(e.target.value)}
+                  placeholder="Enter section title"
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -196,13 +197,13 @@ const TechnologiesSidebar: React.FC = () => {
             {technologiesSection?.sectionDescription && (
               <div className="space-y-2">
                 <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea 
-                  id="sectionDescription" 
-                  value={sectionDescription} 
-                  onChange={(e) => setSectionDescription(e.target.value)} 
-                  placeholder="Enter section description" 
+                <Textarea
+                  id="sectionDescription"
+                  value={sectionDescription}
+                  onChange={(e) => setSectionDescription(e.target.value)}
+                  placeholder="Enter section description"
                   className="resize-none h-20"
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -212,10 +213,10 @@ const TechnologiesSidebar: React.FC = () => {
             )}
 
             {hasHeaderChanges && (
-              <Button 
+              <Button
                 onClick={handleSaveHeader}
                 className="w-full"
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.primary,
                   color: ColorTheme.textPrimary,
                   boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -233,7 +234,7 @@ const TechnologiesSidebar: React.FC = () => {
                   value={searchValue}
                   onChange={(e) => handleChange(e.target.value)}
                   placeholder="Search technologies..."
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.bgCard,
                     borderColor: ColorTheme.borderLight,
                     color: ColorTheme.textPrimary
@@ -250,7 +251,7 @@ const TechnologiesSidebar: React.FC = () => {
                   type="button"
                   onClick={() => handleAddCustomTech()}
                   disabled={!searchValue.trim()}
-                  style={{ 
+                  style={{
                     backgroundColor: ColorTheme.primary,
                     color: ColorTheme.textPrimary,
                     boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
@@ -265,7 +266,7 @@ const TechnologiesSidebar: React.FC = () => {
                     <div
                       key={index}
                       className="px-3 py-2 hover:bg-opacity-50 cursor-pointer"
-                      style={{ 
+                      style={{
                         backgroundColor: ColorTheme.bgCardHover,
                         color: ColorTheme.textPrimary
                       }}
@@ -288,7 +289,7 @@ const TechnologiesSidebar: React.FC = () => {
                   <div
                     key={index}
                     className="flex items-center gap-1 rounded-md px-2 py-1"
-                    style={{ 
+                    style={{
                       backgroundColor: ColorTheme.bgCard,
                       borderColor: ColorTheme.borderLight
                     }}
@@ -314,7 +315,7 @@ const TechnologiesSidebar: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleReset}
-                style={{ 
+                style={{
                   backgroundColor: ColorTheme.bgCard,
                   borderColor: ColorTheme.borderLight,
                   color: ColorTheme.textPrimary
@@ -324,11 +325,11 @@ const TechnologiesSidebar: React.FC = () => {
                 Reset
               </Button>
             )}
-            <Button 
+            <Button
               className={`${hasChanges ? "flex-1" : "w-full"}`}
               onClick={handleSaveChanges}
               disabled={isLoading || !hasChanges}
-              style={{ 
+              style={{
                 backgroundColor: ColorTheme.primary,
                 color: ColorTheme.textPrimary,
                 boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`

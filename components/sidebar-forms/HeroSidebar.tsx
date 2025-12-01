@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
 import React from 'react';
-import { templatesConfig } from '@/lib/templateConfig';
+import { templateConfig } from '@/lib/templateConfig';
 import { ColorTheme } from '@/lib/colorThemes';
 import { setCurrentEdit } from '@/slices/editModeSlice';
 
@@ -22,20 +23,19 @@ const HeroSidebar = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const portfolioId = params.portfolioId as string;
-  const { portfolioData,templateName } = useSelector((state: RootState) => state.data);
+  const { portfolioData, templateName } = useSelector((state: RootState) => state.data);
   const heroSectionData = portfolioData?.find((section: any) => section.type === "hero");
   const heroData = heroSectionData?.data || {};
   const [sectionTitle, setSectionTitle] = useState(heroSectionData?.sectionTitle || "");
   const [sectionDescription, setSectionDescription] = useState(heroSectionData?.sectionDescription || "");
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
-
   const emptyContent = {
     titlePrefix: "",
     name: "",
     summary: "",
-    title : "",
+    title: "",
     shortSummary: "",
-    longSummary : "",
+    longSummary: "",
     titleSuffixOptions: [""],
     badge: {
       isVisible: true,
@@ -46,12 +46,12 @@ const HeroSidebar = () => {
     ]
   };
 
-  const fields = templatesConfig[templateName as keyof typeof templatesConfig].hero!;
+  const fields = templateConfig[templateName as keyof typeof templateConfig].hero!;
   const [content, setContent] = useState(emptyContent);
   const [isLoading, setIsLoading] = useState(false);
   const [originalContent, setOriginalContent] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   useEffect(() => {
     if (heroData && Object.keys(heroData).length > 0) {
       setContent({
@@ -60,8 +60,8 @@ const HeroSidebar = () => {
         summary: heroData.summary || "",
         shortSummary: heroData.shortSummary || "",
         titleSuffixOptions: heroData.titleSuffixOptions || [""],
-        title : heroData.title || "",
-        longSummary : heroData.longSummary || "",
+        title: heroData.title || "",
+        longSummary: heroData.longSummary || "",
         badge: {
           isVisible: heroData.badge?.isVisible ?? true,
           texts: heroData.badge?.texts || [""]
@@ -91,30 +91,30 @@ const HeroSidebar = () => {
 
   const handleSubmit = async () => {
     const originalContent = { ...content };
-    
+
     try {
       setIsLoading(true);
-      dispatch(updatePortfolioData({ 
-        sectionType: "hero", 
-        sectionTitle: "Hero Section", 
-        sectionDescription: "Manage your hero section.", 
-        newData: content 
+      dispatch(updatePortfolioData({
+        sectionType: "hero",
+        sectionTitle: "Hero Section",
+        sectionDescription: "Manage your hero section.",
+        newData: content
       }));
-      
-      const result = await updateSection({ 
+
+      const result = await updateSection({
         portfolioId: portfolioId,
-        sectionName: "hero", 
-        sectionTitle: "Hero Section", 
-        sectionDescription: "Manage your hero section.", 
-        sectionContent: content 
+        sectionName: "hero",
+        sectionTitle: "Hero Section",
+        sectionDescription: "Manage your hero section.",
+        sectionContent: content
       });
 
       if (!result.success) {
-        dispatch(updatePortfolioData({ 
-          sectionType: "hero", 
-          sectionTitle: "Hero Section", 
-          sectionDescription: "Manage your hero section.", 
-          newData: originalContent 
+        dispatch(updatePortfolioData({
+          sectionType: "hero",
+          sectionTitle: "Hero Section",
+          sectionDescription: "Manage your hero section.",
+          newData: originalContent
         }));
         throw new Error("Database update failed");
       }
@@ -133,14 +133,14 @@ const HeroSidebar = () => {
 
   const handleSaveHeader = async () => {
     try {
-      dispatch(updatePortfolioData({ 
-        sectionType: "hero", 
+      dispatch(updatePortfolioData({
+        sectionType: "hero",
         newData: content,
         sectionTitle,
         sectionDescription
       }));
-      await updateSection({ 
-        portfolioId: portfolioId, 
+      await updateSection({
+        portfolioId: portfolioId,
         sectionName: "hero",
         sectionContent: content,
         sectionTitle,
@@ -245,9 +245,10 @@ const HeroSidebar = () => {
     { value: "ghost", label: "Ghost" }
   ];
 
+  console.log(fields);
   // Determine which tabs to show based on fields
-  const showBasicTab = fields.includes("name") || fields.includes("titlePrefix") || 
-                       fields.includes("titleSuffixOptions") || fields.includes("summary");
+  const showBasicTab = fields.includes("name") || fields.includes("titlePrefix") ||
+    fields.includes("titleSuffixOptions") || fields.includes("summary");
   const showBadgeTab = fields.includes("badge");
   const showActionsTab = fields.includes("actions");
 
@@ -266,55 +267,6 @@ const HeroSidebar = () => {
 
         <CardContent>
           <div className="space-y-5">
-            {heroSectionData?.sectionTitle && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input 
-                  id="sectionTitle" 
-                  value={sectionTitle} 
-                  onChange={(e) => setSectionTitle(e.target.value)} 
-                  placeholder="Enter section title" 
-                  style={{ 
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
-
-            {heroSectionData?.sectionDescription && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea 
-                  id="sectionDescription" 
-                  value={sectionDescription} 
-                  onChange={(e) => setSectionDescription(e.target.value)} 
-                  placeholder="Enter section description" 
-                  className="resize-none h-20"
-                  style={{ 
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
-
-            {hasHeaderChanges && (
-              <Button 
-                onClick={handleSaveHeader}
-                className="w-full"
-                style={{ 
-                  backgroundColor: ColorTheme.primary,
-                  color: ColorTheme.textPrimary,
-                  boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
-                }}
-              >
-                Save Section Header
-              </Button>
-            )}
-
             <Tabs defaultValue={defaultTab} className="mt-4">
               <TabsList style={{ backgroundColor: ColorTheme.bgNav, borderColor: ColorTheme.borderLight }}>
                 {showBasicTab && (
@@ -339,7 +291,7 @@ const HeroSidebar = () => {
                           value={content.name}
                           onChange={(e) => setContent({ ...content, name: e.target.value })}
                           placeholder="Enter your name"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -348,7 +300,7 @@ const HeroSidebar = () => {
                       </div>
                     )}
 
-                    {fields.includes("titlePrefix") && (
+                    {fields.includes("titlePrefix") && templateName === "NeoSpark" && (
                       <div className="space-y-2">
                         <Label htmlFor="titlePrefix" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Title Prefix</Label>
                         <Input
@@ -356,7 +308,7 @@ const HeroSidebar = () => {
                           value={content.titlePrefix}
                           onChange={(e) => setContent({ ...content, titlePrefix: e.target.value })}
                           placeholder="e.g. Aspiring Software"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -373,7 +325,7 @@ const HeroSidebar = () => {
                           value={content.title}
                           onChange={(e) => setContent({ ...content, title: e.target.value })}
                           placeholder="e.g. Full Stack Developer"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -382,7 +334,7 @@ const HeroSidebar = () => {
                       </div>
                     )}
 
-                    {fields.includes("titleSuffixOptions") && (
+                    {fields.includes("titleSuffixOptions") && templateName === "NeoSpark" && (
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <Label className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Title Suffixes</Label>
@@ -391,7 +343,7 @@ const HeroSidebar = () => {
                             variant="outline"
                             size="sm"
                             onClick={addTitleSuffix}
-                            style={{ 
+                            style={{
                               backgroundColor: ColorTheme.bgCard,
                               borderColor: ColorTheme.borderLight,
                               color: ColorTheme.textPrimary
@@ -408,7 +360,7 @@ const HeroSidebar = () => {
                                 value={suffix}
                                 onChange={(e) => updateTitleSuffix(index, e.target.value)}
                                 placeholder={`Title suffix ${index + 1}`}
-                                style={{ 
+                                style={{
                                   backgroundColor: ColorTheme.bgCard,
                                   borderColor: ColorTheme.borderLight,
                                   color: ColorTheme.textPrimary
@@ -420,7 +372,7 @@ const HeroSidebar = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => removeTitleSuffix(index)}
-                                  style={{ 
+                                  style={{
                                     color: ColorTheme.textSecondary,
                                     backgroundColor: 'transparent'
                                   }}
@@ -443,7 +395,7 @@ const HeroSidebar = () => {
                           onChange={(e) => setContent({ ...content, summary: e.target.value })}
                           placeholder="Enter a brief description about yourself"
                           className="resize-none custom-scrollbar h-32"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -462,7 +414,7 @@ const HeroSidebar = () => {
                           onChange={(e) => setContent({ ...content, shortSummary: e.target.value })}
                           placeholder="Enter a short summary about yourself"
                           className="resize-none custom-scrollbar h-32"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -481,7 +433,7 @@ const HeroSidebar = () => {
                           onChange={(e) => setContent({ ...content, longSummary: e.target.value })}
                           placeholder="Enter a detailed summary about yourself"
                           className="resize-none custom-scrollbar h-48"
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -519,7 +471,7 @@ const HeroSidebar = () => {
                           variant="outline"
                           size="sm"
                           onClick={addBadgeText}
-                          style={{ 
+                          style={{
                             backgroundColor: ColorTheme.bgCard,
                             borderColor: ColorTheme.borderLight,
                             color: ColorTheme.textPrimary
@@ -536,7 +488,7 @@ const HeroSidebar = () => {
                               value={text}
                               onChange={(e) => updateBadgeText(index, e.target.value)}
                               placeholder={`Badge text ${index + 1}`}
-                              style={{ 
+                              style={{
                                 backgroundColor: ColorTheme.bgCard,
                                 borderColor: ColorTheme.borderLight,
                                 color: ColorTheme.textPrimary
@@ -548,7 +500,7 @@ const HeroSidebar = () => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => removeBadgeText(index)}
-                                style={{ 
+                                style={{
                                   color: ColorTheme.textSecondary,
                                   backgroundColor: 'transparent'
                                 }}
@@ -574,7 +526,7 @@ const HeroSidebar = () => {
                         variant="outline"
                         size="sm"
                         onClick={addAction}
-                        style={{ 
+                        style={{
                           backgroundColor: ColorTheme.bgCard,
                           borderColor: ColorTheme.borderLight,
                           color: ColorTheme.textPrimary
@@ -595,7 +547,7 @@ const HeroSidebar = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => removeAction(index)}
-                                style={{ 
+                                style={{
                                   color: ColorTheme.textSecondary,
                                   backgroundColor: 'transparent'
                                 }}
@@ -613,7 +565,7 @@ const HeroSidebar = () => {
                                 value={action.label}
                                 onChange={(e) => updateAction(index, 'label', e.target.value)}
                                 placeholder="e.g. View Projects"
-                                style={{ 
+                                style={{
                                   backgroundColor: ColorTheme.bgCard,
                                   borderColor: ColorTheme.borderLight,
                                   color: ColorTheme.textPrimary
@@ -628,7 +580,7 @@ const HeroSidebar = () => {
                                 value={action.url}
                                 onChange={(e) => updateAction(index, 'url', e.target.value)}
                                 placeholder="e.g. #projects"
-                                style={{ 
+                                style={{
                                   backgroundColor: ColorTheme.bgCard,
                                   borderColor: ColorTheme.borderLight,
                                   color: ColorTheme.textPrimary
@@ -642,7 +594,7 @@ const HeroSidebar = () => {
                                 id={`action-style-${index}`}
                                 value={action.style}
                                 onChange={(e) => updateAction(index, 'style', e.target.value)}
-                                style={{ 
+                                style={{
                                   backgroundColor: ColorTheme.bgCard,
                                   borderColor: ColorTheme.borderLight,
                                   color: ColorTheme.textPrimary
@@ -671,7 +623,7 @@ const HeroSidebar = () => {
             className='w-full'
             onClick={handleSubmit}
             disabled={isLoading || !hasChanges}
-            style={{ 
+            style={{
               backgroundColor: ColorTheme.primary,
               color: ColorTheme.textPrimary,
               boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`

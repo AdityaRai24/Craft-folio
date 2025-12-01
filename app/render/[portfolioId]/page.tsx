@@ -17,15 +17,15 @@ import {
   setThemeName,
   setComponentCustomizations,
 } from "@/slices/dataSlice";
-import { templatesConfig } from "@/lib/templateConfig";
+import { templateConfig } from "@/lib/templateConfig";
 import { Spotlight } from "@/components/NeoSpark/Spotlight";
 import Chatbot from "@/components/Chatbot/Chatbot";
 import { motion } from "framer-motion";
 import { fontClassMap } from "@/lib/font";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import PortfolioNotFound from "@/components/PortfolioNotFound";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import PortfolioNotFound from "@/components/Shared/PortfolioNotFound";
+import LoadingSpinner from "@/components/Shared/LoadingSpinner";
 import { CheckCircle, Layout, Palette } from "lucide-react";
 import Sidebar from "@/app/p/Sidebar";
 
@@ -80,9 +80,9 @@ const Page = () => {
           return;
         }
         if (themeResult.success) {
-          setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain 
+          setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain
             ? `https://${themeResult?.data?.PortfolioLink?.subdomain}.craftfolio.live`
-            : themeResult?.data?.PortfolioLink?.slug 
+            : themeResult?.data?.PortfolioLink?.slug
               ? `https://craftfolio.live/p/${themeResult?.data?.PortfolioLink?.slug}`
               : "");
           dispatch(setPortFolioUserId(themeResult?.data?.userId || ""));
@@ -113,7 +113,6 @@ const Page = () => {
         if (customizationsResult.success) {
           // Store customizations in Redux
           dispatch(setComponentCustomizations(customizationsResult.data || {}));
-          console.log("Loaded component customizations:", customizationsResult.data);
         }
 
         // Mark data as loaded only after both fetches complete
@@ -131,15 +130,15 @@ const Page = () => {
   // Don't try to access template config until we have template name
   const Template =
     dataLoaded && templateName
-      ? (templatesConfig[
-          templateName as keyof typeof templatesConfig
-        ] as TemplateType)
+      ? (templateConfig[
+        templateName as keyof typeof templateConfig
+      ] as TemplateType)
       : null;
 
   const getComponentForSection = (sectionType: string) => {
     if (!Template || !Template.sections || !Template.sections[sectionType]) {
       return null;
-    } 
+    }
     const SectionComponent: any = Template.sections[sectionType];
     return SectionComponent ? (
       <SectionComponent
@@ -167,7 +166,10 @@ const Page = () => {
   // By this point, we guarantee the data is loaded
   const NavbarComponent: any = Template.navbar;
   const hasSpotlight = Template.spotlight;
-  const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
+  const normalizedFontName = Object.keys(fontClassMap).find(
+    (key) => key.toLowerCase() === fontName?.toLowerCase()
+  ) || "Raleway";
+  const selectedFontClass = fontClassMap[normalizedFontName];
 
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
@@ -197,6 +199,7 @@ const Page = () => {
               customCSS={customCSSState}
               currentPortTheme={themeName}
               portfolioId={portfolioId}
+              font={selectedFontClass}
             />
           )}
           <Sidebar />

@@ -11,7 +11,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
         str
       );
 
-    let portfolioId = await params.portfolioId;
+    const resolvedParams = await params;
+    let portfolioId = resolvedParams.portfolioId;
 
     // If not UUID, try to get ID through slug
     if (!isUUID(portfolioId)) {
@@ -64,10 +65,10 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
-  children,
-  params,
-}: any) {
+export default async function RootLayout(props: any) {
+  const params = await props.params;
+  const { children } = props;
+
   return (
     <div className="antialiased" suppressHydrationWarning>
       {children}

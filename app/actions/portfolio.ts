@@ -35,7 +35,7 @@ export async function createPortfolio(
       if (customContent.sections && Array.isArray(customContent.sections)) {
         customContent.sections.forEach((section: any) => {
           if (section.type) {
-            customSectionMap[section.type] = section;
+            customSectionMap[section.type.toLowerCase()] = section;
           }
         });
       }
@@ -43,8 +43,44 @@ export async function createPortfolio(
       const newContent = {
         ...templateContent,
         sections: templateContent.sections.map((section: any) => {
-          const customSection = customSectionMap[section.type];
+          const customSection = customSectionMap[section.type.toLowerCase()];
           if (customSection) {
+            // Case 1: Both are arrays (e.g. Experience, SimpleWhite Projects) -> Replace entirely
+            if (
+              Array.isArray(section.data) &&
+              Array.isArray(customSection.data)
+            ) {
+              // If custom data is empty, keep default
+              if (customSection.data.length === 0) return section;
+
+              return {
+                ...section,
+                data: customSection.data,
+                sectionTitle: section.sectionTitle,
+                sectionDescription: section.sectionDescription,
+              };
+            }
+
+            // Case 2: Template is object with 'projects' array, Custom is array (e.g. NeoSpark/MacOS Projects) -> Replace projects array
+            if (
+              !Array.isArray(section.data) &&
+              section.data &&
+              Array.isArray(section.data.projects) &&
+              Array.isArray(customSection.data)
+            ) {
+              // If custom data is empty, keep default
+              if (customSection.data.length === 0) return section;
+
+              return {
+                ...section,
+                data: {
+                  ...section.data,
+                  projects: customSection.data,
+                },
+                sectionTitle: section.sectionTitle,
+                sectionDescription: section.sectionDescription,
+              };
+            }
             // Create a deep copy of the template data
             const mergedData = JSON.parse(JSON.stringify(section.data));
 
@@ -54,20 +90,27 @@ export async function createPortfolio(
               const templateValue = section.data[key];
 
               if (Array.isArray(customValue)) {
-                // If custom value is an array, use it directly
-                mergedData[key] = customValue;
+                // If custom value is an array, use it directly if not empty
+                if (customValue.length > 0) {
+                  mergedData[key] = customValue;
+                }
               } else if (
                 Array.isArray(templateValue) &&
                 typeof customValue === "object" &&
                 customValue !== null
               ) {
                 // If template has an array and custom has an object, merge array items
-                mergedData[key] = templateValue.map(
-                  (item: any, index: number) => ({
-                    ...item,
-                    ...(customValue[index] || {}),
-                  })
-                );
+                // This logic seems risky if we want to replace. 
+                // But assuming this is for non-list properties or specific overrides.
+                // If customValue is empty object, do nothing.
+                if (Object.keys(customValue).length > 0) {
+                    mergedData[key] = templateValue.map(
+                    (item: any, index: number) => ({
+                        ...item,
+                        ...(customValue[index] || {}),
+                    })
+                    );
+                }
               } else if (
                 typeof customValue === "object" &&
                 customValue !== null
@@ -99,7 +142,6 @@ export async function createPortfolio(
       content = template.defaultContent;
     }
 
-    console.log(content);
     const newTemplate = await prisma.portfolio.create({
       data: {
         isTemplate: false,
@@ -144,22 +186,38 @@ export async function updateSection({
     const portfolioSection = allSections.find(
       (section: any) => section.type === sectionName
     );
+
+    let updatedContent;
+
     if (!portfolioSection) {
-      return { success: false, error: `${sectionName} section not found}` };
-    }
-    const updatedContent = {
-      sections: allSections.map((section: any) => {
-        if (section.type === sectionName) {
-          return {
+      // If section doesn't exist, add it
+      updatedContent = {
+        sections: [
+          ...allSections,
+          {
             type: sectionName,
             data: sectionContent,
             sectionTitle: sectionTitle,
             sectionDescription: sectionDescription,
-          };
-        }
-        return section;
-      }),
-    };
+          },
+        ],
+      };
+    } else {
+      // If section exists, update it
+      updatedContent = {
+        sections: allSections.map((section: any) => {
+          if (section.type === sectionName) {
+            return {
+              type: sectionName,
+              data: sectionContent,
+              sectionTitle: sectionTitle,
+              sectionDescription: sectionDescription,
+            };
+          }
+          return section;
+        }),
+      };
+    }
 
     await prisma.portfolio.update({
       where: { id: portfolioId },
@@ -202,9 +260,6 @@ export async function updatePortfolio({
 }
 
 export async function fetchThemesApi() {
-  console.log("🚀 [API] fetchThemesApi called");
-  console.log("📍 [API] Environment:", process.env.NODE_ENV);
-  console.log("🔑 [API] Environment variables check:");
   try {
     const themes = await prisma.template.findMany({
       orderBy: {
@@ -222,7 +277,6 @@ export async function fetchThemesApi() {
       return (order[a.name] || 999) - (order[b.name] || 999);
     });
 
-    console.log(orderedThemes);
     return { success: true, data: orderedThemes };
   } catch (error) {
     console.error("Error fetching themes:", error);
@@ -298,7 +352,6 @@ export async function updateFont({
       where: { id: portfolioId },
       data: { fontName: fontName },
     });
-    console.log({ fontName, theme });
     return { success: true, data: theme };
   } catch (error) {
     console.error("Error updating theme:", error);

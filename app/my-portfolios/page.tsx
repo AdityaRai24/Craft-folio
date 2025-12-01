@@ -3,13 +3,13 @@ import { useUser, SignInButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { fetchPortfoliosByUserId } from "../actions/portfolio";
 import { useRouter } from "next/navigation";
-import MainNavbar from "@/components/MainNavbar";
-import LoadingSpinner, { LoadingMessage } from "@/components/LoadingSpinner";
+import MainNavbar from "@/components/Shared/MainNavbar";
+import LoadingSpinner, { LoadingMessage } from "@/components/Shared/LoadingSpinner";
 import { Palette, Layout, CheckCircle, Rocket } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
-import DeployModal from "@/components/DeployModal";
+import DeployModal from "@/components/Modals/DeployModal";
 
 export default function MyPortfoliosPage() {
   const { user, isLoaded } = useUser();

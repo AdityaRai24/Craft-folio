@@ -119,7 +119,7 @@ const SettingsMenu = ({
 
   return (
     <TooltipProvider>
-      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[100] settings-menu-container">
+      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[9999] settings-menu-container">
         {/* Main Settings Button */}
         <Tooltip>
           <TooltipTrigger asChild>

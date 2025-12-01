@@ -5,8 +5,8 @@ interface PortfolioState {
   templateName: string;
   themeName: string;
   fontName: string;
-  customCSSState : string;
-  portfolioUserId : string;
+  customCSSState: string;
+  portfolioUserId: string;
   sectionTitle: string;
   sectionDescription: string;
   componentCustomizations: Record<string, any>;
@@ -17,8 +17,8 @@ const initialState: PortfolioState = {
   templateName: "",
   themeName: "",
   fontName: "",
-  customCSSState : "",
-  portfolioUserId : "",
+  customCSSState: "",
+  portfolioUserId: "",
   sectionTitle: "",
   sectionDescription: "",
   componentCustomizations: {},
@@ -38,11 +38,11 @@ export const dataSlice = createSlice({
       state.templateName = action.payload;
     },
 
-     setThemeName: (state, action: PayloadAction<string>) => {
+    setThemeName: (state, action: PayloadAction<string>) => {
       state.themeName = action.payload;
     },
 
-     setFontName: (state, action: PayloadAction<string>) => {
+    setFontName: (state, action: PayloadAction<string>) => {
       state.fontName = action.payload;
     },
 
@@ -58,30 +58,44 @@ export const dataSlice = createSlice({
       state,
       action: PayloadAction<{ sectionType: string; newData: any; sectionTitle: string; sectionDescription: string }>
     ) => {
-      if (!state.portfolioData) return;
+      if (!state.portfolioData) state.portfolioData = [];
 
       const { sectionType, newData, sectionTitle, sectionDescription } = action.payload;
-      state.portfolioData = state.portfolioData.map((section: any) => 
-        section.type === sectionType ? {...section, data: newData, sectionTitle: sectionTitle, sectionDescription: sectionDescription } : section
-      );
+      const index = state.portfolioData.findIndex((section: any) => section.type === sectionType);
+
+      if (index !== -1) {
+        state.portfolioData[index] = {
+          ...state.portfolioData[index],
+          data: newData,
+          sectionTitle: sectionTitle,
+          sectionDescription: sectionDescription
+        };
+      } else {
+        state.portfolioData.push({
+          type: sectionType,
+          data: newData,
+          sectionTitle: sectionTitle,
+          sectionDescription: sectionDescription
+        });
+      }
     },
-    
+
     newPortfolioData: (state, action: PayloadAction<any[]>) => {
       // Replace the entire portfolio data array with the new one
       state.portfolioData = action.payload;
     },
-    
+
 
   },
 });
 
-export const { 
-  setPortfolioData, 
-  setTemplateName, 
+export const {
+  setPortfolioData,
+  setTemplateName,
   setThemeName,
   setFontName,
   setPortFolioUserId,
-  updatePortfolioData, 
+  updatePortfolioData,
   newPortfolioData,
   setCustomCSSState,
   setComponentCustomizations

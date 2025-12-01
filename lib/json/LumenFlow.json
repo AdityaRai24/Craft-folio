@@ -1,0 +1,348 @@
+{
+    "sections": [
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "role": "Full Stack Developer",
+                "title": "Full Stack Web Developer",
+                "summary": "Passionate Java developer.\nEnthusiastic about creating innovative solutions.\nDedicated to continuous learning and growth.",
+                "longSummary": "A highly motivated and results-oriented recent graduate with a Bachelor of Arts in Computer Science and a minor in Business from Southwestern University, I possess over four years of experience in software development and IT support.  My expertise spans full-stack development using technologies like React, Flask, FastAPI, and PostgreSQL, coupled with experience in data visualization and API design.  My research background includes AI-driven dungeon generation (Java) and analyzing GitHub collaboration patterns, culminating in a presentation at the World Conference on Computational Intelligence.  Passionate about leveraging technology for innovative solutions, I'm also an active open-source contributor, evidenced by my Minecraft plugin with 2K+ downloads. My career philosophy centers on continuous learning and building impactful applications."
+            },
+            "type": "hero",
+            "sectionTitle": "About Me",
+            "sectionDescription": "Discover my journey, skills, and passion for creating amazing digital experiences."
+        },
+        {
+            "data": [
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                            "name": "Python"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/project",
+                    "projectName": "Gitlytics",
+                    "projectImage": "https://gitlytics.com/assets/images/homepage2.png",
+                    "projectTitle": "Gitlytics",
+                    "projectDescription": "Developed a full-stack web application with Flask serving a REST API and React as the frontend. Implemented GitHub OAuth to get data from user repositories and visualized GitHub data to show collaboration. Used Celery and Redis for asynchronous tasks."
+                },
+                {
+                    "liveLink": "https://project-demo.vercel.app",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                            "name": "Java"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                            "name": "Git"
+                        }
+                    ],
+                    "githubLink": "https://github.com/user/project",
+                    "projectName": "Weather API Project",
+                    "projectImage": "https://nordicapis.com/wp-content/uploads/How-to-Build-an-API-Driven-Weather-App.png",
+                    "projectTitle": "Weather API Project",
+                    "projectDescription": "Developed a React.js application that fetches and displays weather data using a public weather API. Implemented features for searching locations and displaying various weather parameters."
+                }
+            ],
+            "type": "projects",
+            "sectionTitle": "Featured Projects",
+            "sectionDescription": "A showcase of my recent work and technical capabilities."
+        },
+        {
+            "data": [
+                {
+                    "role": "Undergraduate Research Assistant",
+                    "endDate": "Present",
+                    "location": "College Station, TX",
+                    "startDate": "06/2020",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                            "name": "PostgreSQL"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                            "name": "Flask"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                            "name": "React.js"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                            "name": "Docker"
+                        }
+                    ],
+                    "companyName": "Texas A&M University",
+                    "description": "Developed a REST API using FastAPI and PostgreSQL to store data from learning management systems. Developed a full-stack web application using Flask, React, PostgreSQL and Docker to analyze GitHub data. Explored ways to visualize GitHub collaboration in a classroom setting."
+                },
+                {
+                    "role": "Information Technology Support Specialist",
+                    "endDate": "Present",
+                    "location": "Georgetown, TX",
+                    "startDate": "09/2018",
+                    "techStack": [],
+                    "companyName": "Southwestern University",
+                    "description": "Communicated with managers to set up campus computers. Assessed and troubleshooted computer problems for students, faculty, and staff. Maintained upkeep of computers, classroom equipment, and 200 printers across campus."
+                },
+                {
+                    "role": "Artificial Intelligence Research Assistant",
+                    "endDate": "07/2019",
+                    "location": "Georgetown, TX",
+                    "startDate": "05/2019",
+                    "techStack": [
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                            "name": "Java"
+                        },
+                        {
+                            "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                            "name": "Git"
+                        }
+                    ],
+                    "companyName": "Southwestern University",
+                    "description": "Explored methods to generate video game dungeons based on The Legend of Zelda. Developed a game in Java to test the generated dungeons. Contributed 50K+ lines of code and presented research findings at the World Conference on Computational Intelligence."
+                }
+            ],
+            "type": "experience",
+            "sectionTitle": "Professional Experience",
+            "sectionDescription": "My journey through the software development industry"
+        },
+        {
+            "data": [
+                {
+                    "degree": "Bachelor of Arts in Computer Science, Minor in Business",
+                    "endDate": "05/2021",
+                    "location": "Georgetown, TX",
+                    "startDate": "08/2018",
+                    "courseName": "Bachelor of Technology in Computer Science",
+                    "description": "Focused on software development, algorithms, and data structures. Gained hands-on experience in programming and system design. Also studied core business principles, management strategies, and market analysis.",
+                    "institution": "Southwestern University",
+                    "instituteName": "Indian Institute of Technology Bombay"
+                },
+                {
+                    "degree": "Associate's in Liberal Arts",
+                    "endDate": "05/2018",
+                    "location": "Bryan, TX",
+                    "startDate": "08/2014",
+                    "courseName": "Higher Secondary Certificate (PCM)",
+                    "description": "Developed foundational knowledge in various liberal arts disciplines, including humanities, social sciences, and communication skills.",
+                    "institution": "Blinn College",
+                    "instituteName": "Delhi Public School, R.K. Puram"
+                }
+            ],
+            "type": "education",
+            "sectionTitle": "Education",
+            "sectionDescription": "My academic foundation and continuous learning journey"
+        },
+        {
+            "data": [
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                    "name": "Java"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                    "name": "Python"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+                    "name": "C/C++"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+                    "name": "SQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                    "name": "PostgreSQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "JavaScript"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                    "name": "R"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                    "name": "React.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                    "name": "Node.js"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                    "name": "Flask"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                    "name": "Git"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                    "name": "Docker"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg",
+                    "name": "Django"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+                    "name": "MongoDB"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                    "name": "PostgreSQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+                    "name": "MySQL"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+                    "name": "Redis"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg",
+                    "name": "AWS"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                    "name": "Docker"
+                },
+                {
+                    "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                    "name": "Git"
+                }
+            ],
+            "type": "technologies",
+            "sectionTitle": "Technical Skills",
+            "sectionDescription": "Technologies and tools I work with to build amazing applications"
+        },
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "email": "jake@ryan.com",
+                "title": "Full Stack Web Developer",
+                "github": "Jake",
+                "linkedin": "Jake",
+                "location": "San Francisco",
+                "resumeLink": "",
+                "profileImage": "https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fwww.gravatar.com%2Favatar%2F2c7d99fe281ecd3bcd65ab915bac6dd5%3Fs%3D250",
+                "shortSummary": ""
+            },
+            "type": "userInfo",
+            "sectionTitle": "",
+            "sectionDescription": ""
+        },
+        {
+            "data": {
+                "SunsetOcean": {
+                    "colors": {
+                        "text": {
+                            "primary": "#FFFFFF",
+                            "secondary": "#94A3B8"
+                        },
+                        "accent": "#F97316",
+                        "states": {
+                            "muted": "rgba(148, 163, 184, 0.5)"
+                        },
+                        "primary": "#F97316",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(251,146,60,0.2), rgba(79,70,229,0.2), rgba(168,85,247,0.2))",
+                            "header": "linear-gradient(90deg, rgba(251,146,60,0.1), transparent, rgba(79,70,229,0.1))",
+                            "primary": "linear-gradient(90deg, #FB923C, #2563EB)"
+                        },
+                        "secondary": "#4F46E5",
+                        "background": {
+                            "primary": "#111827",
+                            "secondary": "rgba(31, 41, 55, 0.6)"
+                        },
+                        "primaryHover": "#EA580C"
+                    }
+                },
+                "forestGreen": {
+                    "colors": {
+                        "text": {
+                            "primary": "#ECFDF5",
+                            "secondary": "#A7F3D0"
+                        },
+                        "accent": "#22C55E",
+                        "states": {
+                            "muted": "rgba(167, 243, 208, 0.3)"
+                        },
+                        "primary": "#22C55E",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(74,222,128,0.2), rgba(16,185,129,0.2), rgba(6,182,212,0.2))",
+                            "header": "linear-gradient(90deg, rgba(74,222,128,0.1), transparent, rgba(16,185,129,0.1))",
+                            "primary": "linear-gradient(90deg, #4ADE80, #059669)"
+                        },
+                        "secondary": "#16A34A",
+                        "background": {
+                            "primary": "#052E16",
+                            "secondary": "rgba(5, 46, 22, 0.6)"
+                        },
+                        "primaryHover": "#15803D"
+                    }
+                },
+                "royalCrimson": {
+                    "colors": {
+                        "text": {
+                            "primary": "#FFE4E6",
+                            "secondary": "#FCA5A5"
+                        },
+                        "accent": "#EF4444",
+                        "states": {
+                            "muted": "rgba(252, 165, 165, 0.3)"
+                        },
+                        "primary": "#DC2626",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(248,113,113,0.2), rgba(190,18,60,0.2), rgba(236,72,153,0.2))",
+                            "header": "linear-gradient(90deg, rgba(248,113,113,0.1), transparent, rgba(190,18,60,0.1))",
+                            "primary": "linear-gradient(90deg, #EF4444, #BE123C)"
+                        },
+                        "secondary": "#BE123C",
+                        "background": {
+                            "primary": "#1F1B24",
+                            "secondary": "rgba(31, 27, 36, 0.6)"
+                        },
+                        "primaryHover": "#B91C1C"
+                    }
+                }
+            },
+            "type": "themes"
+        },
+        {
+            "data": {
+                "title": "Jake Ryan's Lumen Flow Template",
+                "favicon": "",
+                "description": "Jake Ryan's Lumen Flow Template"
+            },
+            "type": "seo",
+            "sectionTitle": "SEO Settings",
+            "sectionDescription": "SEO settings for your portfolio"
+        }
+    ]
+}

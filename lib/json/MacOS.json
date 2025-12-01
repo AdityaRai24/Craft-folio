@@ -1,0 +1,322 @@
+{
+    "sections": [
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=3870",
+                "title": "Computer Science Student"
+            },
+            "type": "hero",
+            "sectionTitle": "Hero Section",
+            "sectionDescription": "Desktop wallpaper and background"
+        },
+        {
+            "data": {
+                "name": "Jake Ryan",
+                "email": "jake@su.edu",
+                "title": "Computer Science Student",
+                "github": "https://github.com/jake",
+                "linkedin": "https://linkedin.com/in/jake",
+                "location": "Georgetown, TX",
+                "resumeLink": "https://res.cloudinary.com/dhanvyweu/image/upload/v1764403671/jakes-resume_2_lj51jq.pdf",
+                "profileImage": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400",
+                "shortSummary": "CS student at Southwestern University with experience in full-stack development and AI research."
+            },
+            "type": "userInfo",
+            "sectionTitle": "Contact Information",
+            "sectionDescription": "Personal and professional contact details"
+        },
+        {
+            "data": {
+                "projects": [
+                    {
+                        "liveLink": "#",
+                        "techStack": [
+                            "Python",
+                            "Flask",
+                            "React",
+                            "PostgreSQL",
+                            "Docker"
+                        ],
+                        "githubLink": "https://github.com/jake",
+                        "projectName": "Gitlytics",
+                        "projectImage": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&q=80&w=800",
+                        "projectDescription": "A full-stack web application using Flask serving a REST API with React as the frontend. Implemented GitHub OAuth to analyze and visualize collaboration data."
+                    },
+                    {
+                        "liveLink": "#",
+                        "techStack": [
+                            "Java",
+                            "Spigot API",
+                            "Maven",
+                            "TravisCI"
+                        ],
+                        "githubLink": "https://github.com/jake",
+                        "projectName": "Simple Paintball",
+                        "projectImage": "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&q=80&w=800",
+                        "projectDescription": "A Minecraft server plugin with 2K+ downloads. Implemented continuous delivery using TravisCI and collaborated with server admins for features."
+                    }
+                ]
+            },
+            "type": "projects",
+            "sectionTitle": "Featured Projects",
+            "sectionDescription": "Showcase of my recent work and side projects"
+        },
+        {
+            "data": [
+                {
+                    "techStack": [
+                        "FastAPI",
+                        "PostgreSQL",
+                        "Flask",
+                        "React",
+                        "Docker"
+                    ],
+                    "companyName": "Texas A&M University",
+                    "startDate": "June 2020",
+                    "endDate": "Present",
+                    "location": "College Station, TX",
+                    "role": "Undergraduate Research Assistant",
+                    "description": "Developed a REST API using FastAPI and PostgreSQL to store data from learning management systems. Built a full-stack web application to analyze GitHub data."
+                },
+                {
+                    "techStack": [
+                        "IT Support",
+                        "Troubleshooting",
+                        "Hardware Maintenance"
+                    ],
+                    "companyName": "Southwestern University",
+                    "startDate": "Sep 2018",
+                    "endDate": "Present",
+                    "location": "Georgetown, TX",
+                    "role": "IT Support Specialist",
+                    "description": "Communicate with managers to set up campus computers. Assess and troubleshoot computer problems for students and faculty. Maintain 200+ printers and equipment."
+                },
+                {
+                    "techStack": [
+                        "Java",
+                        "Git",
+                        "AI Research",
+                        "Game Development"
+                    ],
+                    "companyName": "Southwestern University",
+                    "startDate": "May 2019",
+                    "endDate": "July 2019",
+                    "location": "Georgetown, TX",
+                    "role": "Artificial Intelligence Research Assistant",
+                    "description": "Explored procedural content generation for video game dungeons. Contributed 50K+ lines of code to an established codebase and conducted human subject studies."
+                }
+            ],
+            "type": "experience",
+            "sectionTitle": "Work Experience",
+            "sectionDescription": "My professional journey and achievements"
+        },
+        {
+            "data": {
+                "categories": [
+                    {
+                        "category": "Languages",
+                        "technologies": [
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+                                "name": "Java",
+                                "proficiency": 90
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+                                "name": "Python",
+                                "proficiency": 90
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+                                "name": "C/C++",
+                                "proficiency": 80
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+                                "name": "SQL (Postgres)",
+                                "proficiency": 85
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+                                "name": "JavaScript",
+                                "proficiency": 85
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+                                "name": "HTML/CSS",
+                                "proficiency": 90
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/r/r-original.svg",
+                                "name": "R",
+                                "proficiency": 70
+                            }
+                        ]
+                    },
+                    {
+                        "category": "Frameworks",
+                        "technologies": [
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+                                "name": "React",
+                                "proficiency": 85
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+                                "name": "Node.js",
+                                "proficiency": 80
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg",
+                                "name": "Flask",
+                                "proficiency": 85
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
+                                "name": "FastAPI",
+                                "proficiency": 80
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg",
+                                "name": "WordPress",
+                                "proficiency": 75
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg",
+                                "name": "Material-UI",
+                                "proficiency": 80
+                            }
+                        ]
+                    },
+                    {
+                        "category": "Tools & Libraries",
+                        "technologies": [
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+                                "name": "Git",
+                                "proficiency": 90
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+                                "name": "Docker",
+                                "proficiency": 80
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
+                                "name": "GCP",
+                                "proficiency": 75
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg",
+                                "name": "pandas",
+                                "proficiency": 85
+                            },
+                            {
+                                "logo": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg",
+                                "name": "NumPy",
+                                "proficiency": 80
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "technologies",
+            "sectionTitle": "Technical Skills",
+            "sectionDescription": "Technologies and tools I work with"
+        },
+        {
+            "data": {
+                "resumeLink": "https://res.cloudinary.com/dhanvyweu/image/upload/v1764403671/jakes-resume_2_lj51jq.pdf"
+            },
+            "type": "resume",
+            "sectionTitle": "Resume",
+            "sectionDescription": "Download my latest resume"
+        },
+        {
+            "data": {
+                "content": "<div class=\"text-center mb-12\"><h1 class=\"text-4xl font-semibold mb-3\">Hi, I'm Jake Ryan</h1><p class=\"text-lg opacity-80\">Computer Science Student & Full Stack Developer</p></div><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-8\"><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/20\"><div class=\"text-4xl mb-4\">🎓</div><h3 class=\"text-xl font-semibold mb-2\">Education</h3><p class=\"text-sm opacity-80\">Southwestern University<br>BA in Computer Science<br>Minor in Business</p></div><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-purple-50 dark:bg-purple-900/20\"><div class=\"text-4xl mb-4\">💻</div><h3 class=\"text-xl font-semibold mb-2\">Development</h3><p class=\"text-sm opacity-80\">Full-stack development with Python, Java, React, and PostgreSQL. Experience with REST APIs and Docker.</p></div><div class=\"p-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20\"><div class=\"text-4xl mb-4\">🤖</div><h3 class=\"text-xl font-semibold mb-2\">Research</h3><p class=\"text-sm opacity-80\">AI research experience in procedural content generation and game development.</p></div></div><div class=\"p-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mb-8\"><h2 class=\"text-2xl font-semibold mb-4\">About Me</h2><p class=\"mb-4 opacity-80\">I am a Computer Science student at Southwestern University with a passion for building software that solves real-world problems. My experience ranges from full-stack web development to artificial intelligence research.</p><p class=\"mb-4 opacity-80\">Currently, I am working as an Undergraduate Research Assistant at Texas A&M University, where I develop REST APIs and web applications to analyze educational data. I also serve as an IT Support Specialist, helping students and faculty with technical issues.</p></div>"
+            },
+            "type": "safari",
+            "sectionTitle": "About Me",
+            "sectionDescription": "My background and journey"
+        },
+        {
+            "data": {
+                "Monterey": {
+                    "colors": {
+                        "text": {
+                            "primary": "#F1F5F9",
+                            "secondary": "#94A3B8"
+                        },
+                        "accent": "#60A5FA",
+                        "states": {
+                            "muted": "rgba(148, 163, 184, 0.5)"
+                        },
+                        "primary": "#3B82F6",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2))",
+                            "header": "linear-gradient(90deg, rgba(59,130,246,0.1), transparent, rgba(139,92,246,0.1))",
+                            "primary": "linear-gradient(90deg, #3B82F6, #8B5CF6)"
+                        },
+                        "secondary": "#8B5CF6",
+                        "background": {
+                            "primary": "#0F172A",
+                            "secondary": "rgba(30, 41, 59, 0.6)"
+                        },
+                        "primaryHover": "#2563EB"
+                    }
+                },
+                "Ventura": {
+                    "colors": {
+                        "text": {
+                            "primary": "#FAFAF9",
+                            "secondary": "#A8A29E"
+                        },
+                        "accent": "#FB923C",
+                        "states": {
+                            "muted": "rgba(168, 162, 158, 0.5)"
+                        },
+                        "primary": "#F97316",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(249,115,22,0.2), rgba(245,158,11,0.2))",
+                            "header": "linear-gradient(90deg, rgba(249,115,22,0.1), transparent, rgba(245,158,11,0.1))",
+                            "primary": "linear-gradient(90deg, #F97316, #F59E0B)"
+                        },
+                        "secondary": "#F59E0B",
+                        "background": {
+                            "primary": "#1C1917",
+                            "secondary": "rgba(41, 37, 36, 0.6)"
+                        },
+                        "primaryHover": "#EA580C"
+                    }
+                },
+                "Sonoma": {
+                    "colors": {
+                        "text": {
+                            "primary": "#ECFDF5",
+                            "secondary": "#6EE7B7"
+                        },
+                        "accent": "#34D399",
+                        "states": {
+                            "muted": "rgba(110, 231, 183, 0.3)"
+                        },
+                        "primary": "#10B981",
+                        "gradients": {
+                            "hover": "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.2))",
+                            "header": "linear-gradient(90deg, rgba(16,185,129,0.1), transparent, rgba(6,182,212,0.1))",
+                            "primary": "linear-gradient(90deg, #10B981, #06B6D4)"
+                        },
+                        "secondary": "#06B6D4",
+                        "background": {
+                            "primary": "#064E3B",
+                            "secondary": "rgba(6, 78, 59, 0.6)"
+                        },
+                        "primaryHover": "#059669"
+                    }
+                }
+            },
+            "type": "themes"
+        }
+    ]
+}

@@ -8,7 +8,7 @@ import {
   getThemeNameApi,
   getAllComponentCustomizations,
 } from "@/app/actions/portfolio";
-import { redirect, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   setCustomCSSState,
   setFontName,
@@ -18,17 +18,16 @@ import {
   setThemeName,
   setComponentCustomizations,
 } from "@/slices/dataSlice";
-import { templatesConfig } from "@/lib/templateConfig";
+import { templateConfig } from "@/lib/templateConfig";
 import { Spotlight } from "@/components/NeoSpark/Spotlight";
 import Chatbot from "@/components/Chatbot/Chatbot";
 import { motion } from "framer-motion";
 import { fontClassMap } from "@/lib/font";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import PortfolioNotFound from "@/components/PortfolioNotFound";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import PortfolioNotFound from "@/components/Shared/PortfolioNotFound";
+import LoadingSpinner from "@/components/Shared/LoadingSpinner";
 import { CheckCircle, Layout, Palette } from "lucide-react";
-import Head from "next/head";
 import Sidebar from "@/app/p/Sidebar";
 import { useUser } from "@clerk/nextjs";
 
@@ -85,7 +84,7 @@ const Page = () => {
         }
         if (response.success && response.portfolioId) {
           setFinalPortfolioId(response.portfolioId);
-          
+
           // Fetch theme data
           const themeResult = await getThemeNameApi({
             portfolioId: response.portfolioId,
@@ -95,9 +94,9 @@ const Page = () => {
             return;
           }
           if (themeResult.success) {
-            setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain 
+            setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain
               ? `https://${themeResult?.data?.PortfolioLink?.subdomain}.craftfolio.live`
-              : themeResult?.data?.PortfolioLink?.slug 
+              : themeResult?.data?.PortfolioLink?.slug
                 ? `https://craftfolio.live/p/${themeResult?.data?.PortfolioLink?.slug}`
                 : "");
             dispatch(setPortFolioUserId(themeResult?.data?.userId || ""));
@@ -128,7 +127,6 @@ const Page = () => {
           if (customizationsResult.success) {
             // Store customizations in Redux
             dispatch(setComponentCustomizations(customizationsResult.data || {}));
-            console.log("Loaded component customizations:", customizationsResult.data);
           }
         }
 
@@ -148,15 +146,15 @@ const Page = () => {
   // Don't try to access template config until we have template name
   const Template =
     dataLoaded && templateName
-      ? (templatesConfig[
-          templateName as keyof typeof templatesConfig
-        ] as TemplateType)
+      ? (templateConfig[
+        templateName as keyof typeof templateConfig
+      ] as TemplateType)
       : null;
 
   const getComponentForSection = (sectionType: string) => {
     if (!Template || !Template.sections || !Template.sections[sectionType]) {
       return null;
-    } 
+    }
     const SectionComponent: any = Template.sections[sectionType];
     return SectionComponent ? (
       <SectionComponent

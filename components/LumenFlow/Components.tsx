@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { getThemeClasses, useLumenFlowTheme } from "./ThemeContext";
 import { User, Settings } from "lucide-react";
-import EditButton, { shouldShowEditButtons } from '@/components/EditButton';
+import EditButton, { shouldShowEditButtons } from '@/components/Shared/EditButton';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useUser } from '@clerk/nextjs';
@@ -23,7 +23,7 @@ const HeaderComponent = ({
 }) => {
   const themeClasses = getThemeClasses(currentTheme);
   const { theme } = useLumenFlowTheme();
-  
+
   // Authentication check
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
   const { user, isLoaded } = useUser();
@@ -51,28 +51,28 @@ const HeaderComponent = ({
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <motion.div
+                  className="p-2 rounded-lg"
+                  style={{ background: themeClasses.gradientPrimary }}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-              <motion.div
-                className="p-2 rounded-lg"
-                style={{ background: themeClasses.gradientPrimary }}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <User className="text-white" size={18} />
-              </motion.div>
-              <motion.h2
-                className="text-2xl md:text-3xl font-bold"
-                style={{ color: theme==="dark" ? themeClasses.textPrimary : "black" }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                {sectionTitle || "About me"}
-              </motion.h2>
+                  <User className="text-white" size={18} />
+                </motion.div>
+                <motion.h2
+                  className="text-2xl md:text-3xl font-bold"
+                  style={{ color: theme === "dark" ? themeClasses.textPrimary : "black" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  {sectionTitle || "About me"}
+                </motion.h2>
               </motion.div>
               <div className="flex items-center gap-2">
                 <EditButton
-                  sectionName={sectionName}
+                  sectionName={sectionName === "hero" ? "lumenflow-hero-merged" : sectionName}
                   divStyles=""
                   styles={` ${theme === "light" ? "text-gray-700" : ""} opacity-70 hover:opacity-100 transition-opacity`}
                 />

@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
       detectedSectionData = portfolioData.find((item: any) => item.type === detectedSection);
     }
 
-    console.log(sections,detectedSection)
     const recentMemory =
       messageMemory?.length > 0
         ? messageMemory
@@ -85,7 +84,6 @@ export async function POST(req: NextRequest) {
         })
       : portfolioData;
     const totalEnd = Date.now();
-    console.log("Total time for processing request:", totalEnd - totalStart, "ms");
     return NextResponse.json({
       originalData: portfolioData,
       updatedData: updatedPortfolioData,

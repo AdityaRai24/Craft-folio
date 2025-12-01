@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -38,7 +39,7 @@ const ContactSidebar = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const portfolioId = params.portfolioId as string;
-  const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { portfolioData, templateName } = useSelector((state: RootState) => state.data);
   const contactSectionData = portfolioData?.find(
     (section: any) => section.type === "userInfo"
   );
@@ -51,7 +52,6 @@ const ContactSidebar = () => {
   );
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
 
-  console.log(portfolioData)
 
   const emptyContent: ContentType = {
     github: "",
@@ -69,7 +69,6 @@ const ContactSidebar = () => {
   const [originalContent, setOriginalContent] = useState({});
   const [isUploaded, setIsUploaded] = useState(false);
   const [isProfileImageUploaded, setIsProfileImageUploaded] = useState(false);
-  console.log(content,contactData)
 
   useEffect(() => {
     if (contactData && Object.keys(contactData).length > 0) {
@@ -106,7 +105,7 @@ const ContactSidebar = () => {
   useEffect(() => {
     setHasHeaderChanges(
       sectionTitle !== (contactSectionData?.sectionTitle || "") ||
-        sectionDescription !== (contactSectionData?.sectionDescription || "")
+      sectionDescription !== (contactSectionData?.sectionDescription || "")
     );
   }, [sectionTitle, sectionDescription, contactSectionData]);
 
@@ -256,8 +255,8 @@ const ContactSidebar = () => {
     }
   };
 
-  const handleProfileImageUpload = async(event: React.ChangeEvent<HTMLInputElement>) => {
-    if(!event.target.files) return
+  const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return
     const formData = new FormData();
     formData.append("file", event.target.files[0]);
     formData.append(
@@ -267,7 +266,7 @@ const ContactSidebar = () => {
 
     try {
       toast.loading("Uploading image...", { id: "profileImageUpload" });
-      
+
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
@@ -282,7 +281,7 @@ const ContactSidebar = () => {
       }
 
       const data = await response.json();
-      setContent({...content, profileImage: data.secure_url});
+      setContent({ ...content, profileImage: data.secure_url });
       setIsProfileImageUploaded(true);
       toast.success("Image uploaded successfully!", { id: "profileImageUpload" });
     } catch (error) {
@@ -292,7 +291,7 @@ const ContactSidebar = () => {
   }
 
   const removeProfileImage = () => {
-    setContent({...content, profileImage: ""});
+    setContent({ ...content, profileImage: "" });
     setIsProfileImageUploaded(false);
   }
 
@@ -334,7 +333,7 @@ const ContactSidebar = () => {
             <TabsContent value="basic" className="mt-4">
               <CardContent className="p-0 space-y-5">
                 {/* Name Field */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label
                     htmlFor="name"
                     className="text-sm font-medium"
@@ -355,10 +354,10 @@ const ContactSidebar = () => {
                       color: ColorTheme.textPrimary,
                     }}
                   />
-                </div>
+                </div> */}
 
                 {/* Title Field */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label
                     htmlFor="title"
                     className="text-sm font-medium"
@@ -379,10 +378,10 @@ const ContactSidebar = () => {
                       color: ColorTheme.textPrimary,
                     }}
                   />
-                </div>
+                </div> */}
 
-                {/* Profile Image Field */}
-                {"profileImage" in content && (
+                {/* Profile Image Field - Hide for MacOS */}
+                {"profileImage" in content && templateName !== "macos" && (
                   <div className="space-y-2">
                     <Label
                       className="text-sm font-medium"

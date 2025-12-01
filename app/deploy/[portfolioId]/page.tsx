@@ -19,8 +19,8 @@ import { SignInButton } from "@clerk/nextjs";
 import { deployPortfolio, checkUserSubdomain, getThemeNameApi } from "@/app/actions/portfolio";
 import toast from "react-hot-toast";
 import Confetti from "react-confetti";
-import MainNavbar from "@/components/MainNavbar";
-import BgShapes from "@/components/BgShapes";
+import MainNavbar from "@/components/Shared/MainNavbar";
+import BgShapes from "@/components/Shared/BgShapes";
 import CustomDomainDeployment from "../../components/CustomDomainDeployment";
 
 interface DeploymentInfo {
@@ -54,35 +54,35 @@ const DeployPage = () => {
   useEffect(() => {
     const checkExistingDeployments = async () => {
       if (!user || !portfolioId) return;
-      
+
       try {
         setIsLoadingDeployments(true);
         const result = await getThemeNameApi({ portfolioId });
-        
+
         if (result.success && result.data?.PortfolioLink) {
           const deployments: DeploymentInfo[] = [];
-          
+
           if (result.data.PortfolioLink.slug) {
             deployments.push({
               url: `https://craftfolio.live/p/${result.data.PortfolioLink.slug}`,
               type: 'slug'
             });
           }
-          
+
           if (result.data.PortfolioLink.subdomain) {
             deployments.push({
               url: `https://${result.data.PortfolioLink.subdomain}.craftfolio.live`,
               type: 'subdomain'
             });
           }
-          
+
           if (result.data.PortfolioLink.custom_domain) {
             deployments.push({
               url: `https://${result.data.PortfolioLink.custom_domain}`,
               type: 'custom'
             });
           }
-          
+
           setExistingDeployments(deployments);
         }
       } catch (error) {
@@ -176,8 +176,7 @@ const DeployPage = () => {
             return;
           }
           toast.success(
-            `Premium user: ${
-              10 - (result.currentCount || 0)
+            `Premium user: ${10 - (result.currentCount || 0)
             } subdomains remaining.`
           );
         } else {
@@ -854,9 +853,9 @@ const DeployPage = () => {
                   )}
                 </motion.button>
               ) : (
-                <div className="mt-6 p-4 rounded-lg border" style={{ 
-                  backgroundColor: 'rgba(16, 185, 129, 0.1)', 
-                  borderColor: 'rgba(16, 185, 129, 0.2)' 
+                <div className="mt-6 p-4 rounded-lg border" style={{
+                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                  borderColor: 'rgba(16, 185, 129, 0.2)'
                 }}>
                   <div className="flex items-start gap-3">
                     <UserPlus className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />

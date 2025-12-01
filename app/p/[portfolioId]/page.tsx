@@ -18,7 +18,7 @@ import {
   setThemeName,
   setComponentCustomizations,
 } from "@/slices/dataSlice";
-import { templatesConfig } from "@/lib/templateConfig";
+import { templateConfig } from "@/lib/templateConfig";
 import Sidebar from "../Sidebar";
 import { Spotlight } from "@/components/NeoSpark/Spotlight";
 import Chatbot from "@/components/Chatbot/Chatbot";
@@ -26,12 +26,12 @@ import { motion } from "framer-motion";
 import { fontClassMap } from "@/lib/font";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import PortfolioNotFound from "@/components/PortfolioNotFound";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import PortfolioNotFound from "@/components/Shared/PortfolioNotFound";
+import LoadingSpinner from "@/components/Shared/LoadingSpinner";
 import { CheckCircle, Layout, Palette } from "lucide-react";
 import Head from "next/head";
 import { useUser } from "@clerk/nextjs";
-import GuestWarningModal from "@/components/GuestWarningModal";
+import GuestWarningModal from "@/components/Modals/GuestWarningModal";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -146,9 +146,9 @@ const Page = () => {
           return;
         }
         if (themeResult.success) {
-          setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain 
+          setPortfolioLink(themeResult?.data?.PortfolioLink?.subdomain
             ? `https://${themeResult?.data?.PortfolioLink?.subdomain}.craftfolio.live`
-            : themeResult?.data?.PortfolioLink?.slug 
+            : themeResult?.data?.PortfolioLink?.slug
               ? `https://craftfolio.live/p/${themeResult?.data?.PortfolioLink?.slug}`
               : "");
           dispatch(setPortFolioUserId(themeResult?.data?.userId || ""));
@@ -167,7 +167,7 @@ const Page = () => {
         if (!contentResult.success) {
           setPortfolioNotFound(true);
           return;
-        } 
+        }
         if (contentResult.success) {
           dispatch(setPortfolioData(contentResult?.data?.sections));
         }
@@ -179,7 +179,6 @@ const Page = () => {
         if (customizationsResult.success) {
           // Store customizations in Redux
           dispatch(setComponentCustomizations(customizationsResult.data || {}));
-          console.log("Loaded component customizations:", customizationsResult.data);
         }
 
         // Mark data as loaded only after both fetches complete
@@ -204,9 +203,9 @@ const Page = () => {
   // Don't try to access template config until we have template name
   const Template =
     dataLoaded && templateName
-      ? (templatesConfig[
-          templateName as keyof typeof templatesConfig
-        ] as TemplateType)
+      ? (templateConfig[
+        templateName as keyof typeof templateConfig
+      ] as TemplateType)
       : null;
 
   // Log all per-section data once fully loaded (for setting defaults)
@@ -220,14 +219,13 @@ const Page = () => {
         return acc;
       }, {} as Record<string, any>);
 
-      console.log(`Customisation snapshot for template: ${templateName}`, sectionData);
     }
   }, [dataLoaded, templateName, portfolioData]);
 
   const getComponentForSection = (sectionType: string) => {
     if (!Template || !Template.sections || !Template.sections[sectionType]) {
       return null;
-    } 
+    }
     const SectionComponent: any = Template.sections[sectionType];
     return SectionComponent ? (
       <SectionComponent
@@ -257,12 +255,53 @@ const Page = () => {
   const hasSpotlight = Template.spotlight;
   const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
 
+  // Special handling for MacOS template - render Desktop component
+  if (templateName === "MacOS") {
+    const DesktopComponent = Template.sections?.desktop as React.ComponentType<{
+      currentPortTheme?: string;
+      customCSS?: string;
+      portfolioId?: string;
+    }>;
+    return (
+      <>
+        <GuestWarningModal open={showGuestModal} onClose={() => setShowGuestModal(false)} />
+        <Sidebar />
+        <div
+          className={cn(" min-h-screen w-full", selectedFontClass)}
+        >
+          {DesktopComponent && (
+            <DesktopComponent
+              currentPortTheme={themeName}
+              customCSS={customCSSState}
+              portfolioId={finalPortfolioId}
+            />
+          )}
+        </div>
+        {/* Only render Chatbot after data is loaded */}
+        {dataLoaded && (
+          <Chatbot
+            portfolioData={portfolioData}
+            themeOptions={themes}
+            setCurrentFont={(font) => dispatch(setFontName(font))}
+            setCurrentPortTheme={(theme) => dispatch(setThemeName(theme))}
+            portfolioId={finalPortfolioId}
+            currentPortTheme={themeName}
+            currentFont={fontName}
+            portfolioLink={portfolioLink}
+            onOpenChange={setIsChatOpen}
+            setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
+            customCSSState={customCSSState}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
       <GuestWarningModal open={showGuestModal} onClose={() => setShowGuestModal(false)} />
       <div className="min-h-screen flex flex-col overflow-x-hidden">
-        
+
 
         {hasSpotlight && (
           <div className="absolute inset-0">
@@ -303,6 +342,9 @@ const Page = () => {
                 <p className="text-xl">Portfolio content not found</p>
               </div>
             )}
+
+            {/* Ensure Contact/Footer is always rendered if supported by template but missing from data */}
+            {allSections && !allSections.includes("contact") && getComponentForSection("contact")}
           </motion.div>
         </div>
 
