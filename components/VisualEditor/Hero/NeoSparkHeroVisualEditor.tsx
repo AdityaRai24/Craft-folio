@@ -12,6 +12,7 @@ import WidthSelector from "../Contact/WidthSelector";
 import { useDraggable } from "@/hooks/useDraggable";
 import { NeoSparkHeroCustomizationState } from "@/types/interfaces/NeoSparkHeroCustomizationState";
 import { ColorTheme } from "@/lib/colorThemes";
+import { WeightSelector } from "./WeightSelector";
 
 interface HeroVisualEditorProps {
     isOpen: boolean;
@@ -126,6 +127,8 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                         </>
                     )}
 
+
+
                     {activeTab === "typography" && (
                         <div className="space-y-6">
                             <SizeSelector
@@ -140,6 +143,18 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                                     { value: "2xl", label: "2XL", size: "1.875rem" },
                                 ]}
                             />
+                            <WeightSelector
+                                value={draftCustomization.titleWeight}
+                                onChange={(value) => onUpdateDraft("titleWeight", value)}
+                                label="Title Weight"
+                                options={[
+                                    { value: "normal", label: "Normal", weight: "400" },
+                                    { value: "medium", label: "Medium", weight: "500" },
+                                    { value: "semibold", label: "Semibold", weight: "600" },
+                                    { value: "bold", label: "Bold", weight: "700" },
+                                    { value: "extrabold", label: "Extra Bold", weight: "800" },
+                                ]}
+                            />
                             <SizeSelector
                                 value={draftCustomization.descriptionSize}
                                 onChange={(value) => onUpdateDraft("descriptionSize", value)}
@@ -149,6 +164,18 @@ const HeroVisualEditor: React.FC<HeroVisualEditorProps> = ({
                                     { value: "sm", label: "Small", size: "0.875rem" },
                                     { value: "md", label: "Medium", size: "1rem" },
                                     { value: "lg", label: "Large", size: "1.125rem" },
+                                ]}
+                            />
+                            <WeightSelector
+                                value={draftCustomization.descriptionWeight}
+                                onChange={(value) => onUpdateDraft("descriptionWeight", value)}
+                                label="Description Weight"
+                                options={[
+                                    { value: "normal", label: "Normal", weight: "400" },
+                                    { value: "medium", label: "Medium", weight: "500" },
+                                    { value: "semibold", label: "Semibold", weight: "600" },
+                                    { value: "bold", label: "Bold", weight: "700" },
+                                    { value: "extrabold", label: "Extra Bold", weight: "800" },
                                 ]}
                             />
                         </div>

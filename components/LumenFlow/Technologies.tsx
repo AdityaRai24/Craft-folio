@@ -24,7 +24,7 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
 
   useEffect(() => {
     if (portfolioData) {
-      const techSection = portfolioData.find((item: any) => item.type === "technologies");
+      const techSection = portfolioData.find((item: any) => item.type.toLowerCase() === "technologies");
       if (techSection && techSection.data) {
         setTechnologies(techSection.data);
       }
@@ -78,8 +78,8 @@ const Technologies = ({ portfolioId, currentTheme }: { portfolioId: string, curr
         style={{
           gap: effectiveCustomization.gap
         }}
-        variants={effectiveCustomization.staggerAnimation ? containerVariants : undefined}
-        initial="hidden"
+        variants={containerVariants}
+        initial={effectiveCustomization.staggerAnimation ? "hidden" : "visible"}
         whileInView="visible"
         viewport={{ once: true }}
       >

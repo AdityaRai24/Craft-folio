@@ -104,12 +104,12 @@ export async function createPortfolio(
                 // But assuming this is for non-list properties or specific overrides.
                 // If customValue is empty object, do nothing.
                 if (Object.keys(customValue).length > 0) {
-                    mergedData[key] = templateValue.map(
+                  mergedData[key] = templateValue.map(
                     (item: any, index: number) => ({
-                        ...item,
-                        ...(customValue[index] || {}),
+                      ...item,
+                      ...(customValue[index] || {}),
                     })
-                    );
+                  );
                 }
               } else if (
                 typeof customValue === "object" &&
@@ -404,28 +404,34 @@ export async function deployPortfolio(
   try {
     // Different validation rules for custom domains
     if (!isCustomDomain) {
+      if (!isSubdomain) {
+        const slugCheck = await checkUserSlugLimit(userId);
+        if (slugCheck.success && slugCheck.hasReachedLimit) {
+          return {
+            success: false,
+            error: `You have reached your limit of ${slugCheck.limit} portfolio slugs. Upgrade to Pro for more.`,
+          };
+        }
+      }
       if (value.length < 3 || value.length > 30) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } must be between 3 and 30 characters`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } must be between 3 and 30 characters`,
         };
       }
       if (!/^[a-z0-9-]+$/.test(value)) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } can only contain lowercase letters, numbers, and hyphens`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } can only contain lowercase letters, numbers, and hyphens`,
         };
       }
       if (value.startsWith("-") || value.endsWith("-")) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } cannot start or end with a hyphen`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } cannot start or end with a hyphen`,
         };
       }
     } else {
@@ -461,13 +467,12 @@ export async function deployPortfolio(
     if (existingPortfolio) {
       return {
         success: false,
-        error: `This ${
-          isCustomDomain
-            ? "domain"
-            : isSubdomain
+        error: `This ${isCustomDomain
+          ? "domain"
+          : isSubdomain
             ? "subdomain"
             : "portfolio slug"
-        } is already taken`,
+          } is already taken`,
       };
     }
 
@@ -494,8 +499,8 @@ export async function deployPortfolio(
     const finalUrl = isCustomDomain
       ? `https://${value}`
       : isSubdomain
-      ? `https://${value}.craftfolio.live`
-      : `https://craftfolio.live/p/${value}`;
+        ? `https://${value}.craftfolio.live`
+        : `https://craftfolio.live/p/${value}`;
 
     return {
       success: true,
@@ -611,31 +616,23 @@ export async function checkUserSubdomain(userId: string) {
     const count = subdomainCount || 0;
     const isPremium = !!premiumUser;
 
-    // If user is premium, allow up to 10 subdomains
+    // If user is premium, allow up to 3 subdomains
     if (isPremium) {
       return {
         success: true,
-        hasSubdomain: count >= 10,
+        hasSubdomain: count >= 3,
         isPremium: true,
         currentCount: count,
       };
     }
 
-    // For non-premium users, check if they have any subdomain
-    const existingSubdomain = await prisma.portfolioLink.findFirst({
-      where: {
-        userId: userId,
-        subdomain: {
-          not: null,
-        },
-      },
-    });
-
+    // For non-premium users, allow up to 1 subdomain
     return {
       success: true,
-      hasSubdomain: !!existingSubdomain,
+      hasSubdomain: count >= 1,
       isPremium: false,
       currentCount: count,
+      limit: 1,
     };
   } catch (error) {
     console.error("Error checking user subdomain:", error);
@@ -643,6 +640,45 @@ export async function checkUserSubdomain(userId: string) {
       success: false,
       error: "Failed to check subdomain status",
     };
+  }
+}
+
+export async function checkUserSlugLimit(userId: string) {
+  try {
+    const premiumUser = await prisma.premiumUser.findFirst({
+      where: { userId: userId },
+    });
+
+    const slugCount = await prisma.portfolioLink.count({
+      where: {
+        userId: userId,
+        slug: { not: null },
+      },
+    });
+
+    const count = slugCount || 0;
+    const isPremium = !!premiumUser;
+
+    if (isPremium) {
+      return {
+        success: true,
+        hasReachedLimit: count >= 5,
+        isPremium: true,
+        currentCount: count,
+        limit: 5,
+      };
+    }
+
+    return {
+      success: true,
+      hasReachedLimit: count >= 3,
+      isPremium: false,
+      currentCount: count,
+      limit: 3,
+    };
+  } catch (error) {
+    console.error("Error checking user slug limit:", error);
+    return { success: false, error: "Failed to check slug limit" };
   }
 }
 
