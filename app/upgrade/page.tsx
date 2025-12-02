@@ -8,6 +8,7 @@ import BgShapes from "@/components/Shared/BgShapes";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Script from "next/script";
 import toast from "react-hot-toast";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 declare global {
   interface Window {
@@ -17,8 +18,16 @@ declare global {
 
 const page = () => {
   const router = useRouter();
+  const { isSignedIn } = useUser();
+  const { openSignIn } = useClerk();
 
   const handlePayment = async () => {
+    if (!isSignedIn) {
+      toast.error("Please login to upgrade");
+      openSignIn();
+      return;
+    }
+
     try {
       // 1. Create Order
       const response = await fetch("/api/payment/create-order", {
@@ -165,7 +174,8 @@ const page = () => {
                   </div>
                   <ul className="space-y-3 text-left max-w-xs mx-auto">
                     {[
-                      "2 Lifetime Subdomain Deployments",
+                      "3 Portfolio Slugs",
+                      "1 Subdomain Deployment",
                       "Basic Templates",
                       "Standard Support",
                       "No Custom Domain",
@@ -208,12 +218,13 @@ const page = () => {
                 </CardHeader>
                 <CardContent className="text-center pt-4 flex-grow">
                   <div className="text-4xl font-bold mb-6" style={{ color: ColorTheme.textPrimary }}>
-                    ₹199 <span className="text-lg font-normal text-gray-400">/ month</span>
+                    ₹199 <span className="text-lg font-normal text-gray-400">/ lifetime</span>
                   </div>
                   <ul className="space-y-3 text-left max-w-xs mx-auto">
                     {[
-                      "10 Subdomain Deployments",
-                      "Custom Domain Support",
+                      "5 Portfolio Slugs",
+                      "3 Subdomain Deployments",
+                      "Unlimited Custom Domains",
                       "All Premium Templates",
                       "Unlimited Exports",
                       "Custom CSS Editor",
