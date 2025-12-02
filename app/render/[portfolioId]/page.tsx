@@ -171,6 +171,49 @@ const Page = () => {
   ) || "Raleway";
   const selectedFontClass = fontClassMap[normalizedFontName];
 
+  // Special handling for MacOS and Windows templates - render Desktop component
+  if (templateName === "MacOS" || templateName === "Windows") {
+    const DesktopComponent = Template.sections?.desktop as React.ComponentType<{
+      currentPortTheme?: string;
+      customCSS?: string;
+      portfolioId?: string;
+      font?: string;
+    }>;
+    return (
+      <div className="min-h-screen flex flex-col overflow-x-hidden">
+        <motion.div
+          className={cn(" min-h-screen w-full", selectedFontClass)}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          {DesktopComponent && (
+            <DesktopComponent
+              currentPortTheme={themeName}
+              customCSS={customCSSState}
+              portfolioId={portfolioId}
+              font={selectedFontClass}
+            />
+          )}
+        </motion.div>
+        {/* Only render Chatbot after data is loaded */}
+        {dataLoaded && (
+          <Chatbot
+            portfolioData={portfolioData}
+            themeOptions={themes}
+            setCurrentFont={(font) => dispatch(setFontName(font))}
+            setCurrentPortTheme={(theme) => dispatch(setThemeName(theme))}
+            portfolioId={portfolioId}
+            currentPortTheme={themeName}
+            currentFont={fontName}
+            portfolioLink={portfolioLink}
+            onOpenChange={setIsChatOpen}
+            setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
+            customCSSState={customCSSState}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       {hasSpotlight && (

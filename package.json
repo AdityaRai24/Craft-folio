@@ -47,6 +47,7 @@
     "pdfjs-dist": "^3.11.174",
     "prismjs": "^1.30.0",
     "react": "^19.0.0",
+    "react-calendar": "^6.0.0",
     "react-confetti": "^6.4.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

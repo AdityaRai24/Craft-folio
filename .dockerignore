@@ -1,4 +1,10 @@
-node_modules
-.next
 Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.git
+.next
+.env
+dist
 docker-compose.yml

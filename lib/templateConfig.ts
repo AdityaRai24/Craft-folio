@@ -20,6 +20,7 @@ import LumenFlowEducation from "@/components/LumenFlow/Education";
 import LumenFlowTechnologies from "@/components/LumenFlow/Technologies";
 
 import MacOSDesktop from "@/components/MacOS/Desktop";
+import WindowsDesktop from "@/components/Windows/Desktop";
 
 export const templateConfig: any = {
   NeoSpark: {
@@ -173,6 +174,36 @@ export const templateConfig: any = {
     defaults: {
       hero: {
         image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=3870",
+      },
+      userInfo: {
+        profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=400",
+      },
+    },
+  },
+  Windows: {
+    navbar: null,
+    spotlight: false,
+    sections: {
+      desktop: WindowsDesktop,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: false,
+      summary: false,
+      title: false,
+      shortSummary: true,
+      longSummary: true,
+      safari: true,
+      wallpaper: true,
+    },
+    hero: ["name", "shortSummary", "longSummary"],
+    structure: {
+      technologies: "categorized",
+    },
+    defaults: {
+      hero: {
+        image: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&q=80",
       },
       userInfo: {
         profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=400",

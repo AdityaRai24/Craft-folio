@@ -1,0 +1,26 @@
+import { ContactCustomizationState } from "@/types/interfaces/ContactCustomizationState";
+
+export const defaultWindowsContactStyles: ContactCustomizationState = {
+    layout: "grid",
+    gridColumns: 3,
+    cardLayout: "stacked",
+    cardSize: "default",
+    containerWidth: "wide",
+    cardSpacing: 16,
+    cardStyle: "default",
+    cardBorderRadius: 6,
+    cardPadding: 6,
+    iconSize: 28,
+    iconStyle: "filled",
+    backgroundOpacity: 90,
+    borderWidth: 1,
+    showLabels: true,
+    showDescriptions: true,
+    textAlignment: "center",
+    animationStyle: "fade",
+    animationSpeed: 300,
+    staggerDelay: 50,
+    hoverEffects: true,
+    copyToClipboard: true,
+    openInNewTab: true,
+};

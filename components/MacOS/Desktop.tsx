@@ -17,6 +17,7 @@ import TerminalWindow from "./TerminalWindow";
 import ResumeViewer from "./ResumeViewer";
 import Contact from "./Contact";
 import SafariBrowser from "./SafariBrowser";
+import Notes from "./Notes";
 import ExperienceWindow from "./ExperienceWindow";
 import Technologies from "./Technologies";
 import WallpaperVisualEditor from "@/components/VisualEditor/Wallpaper/WallpaperVisualEditor";
@@ -31,11 +32,15 @@ import CodeIcon from "./icons/code.svg";
 import WallpaperIcon from "./icons/wallpaper.svg";
 import WidgetIcon from "./icons/widget.svg";
 import SkillsIcon from "./icons/skills.svg";
+import AppleIcon from "./icons/apple.png";
 
 import { useDesktopEnvironment, WindowState } from "@/hooks/useDesktopEnvironment";
 import { useCustomization } from "@/hooks/useCustomization";
 import { defaultMacOSHeroStyles } from "@/types/macos/hero";
 import { defaultMacOSWidgetStyles } from "@/types/macos/widget";
+import ControlCenter from "./ControlCenter";
+import NotificationCenter from "./NotificationCenter";
+import Spotlight from "./Spotlight";
 
 interface DesktopProps {
   currentPortTheme?: string;
@@ -118,6 +123,15 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 500, y: 300 },
       size: { width: 900, height: 600 },
     },
+    notes: {
+      id: "notes",
+      isOpen: false,
+      isMinimized: false,
+      isFullscreen: false,
+      zIndex: 0,
+      position: { x: 450, y: 350 },
+      size: { width: 800, height: 600 },
+    },
     experience: {
       id: "experience",
       isOpen: false,
@@ -164,6 +178,7 @@ const Desktop: React.FC<DesktopProps> = ({
     resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
     safari: { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
+    notes: { id: "notes", icon: AppleIcon, label: "Notes", component: Notes },
     wallpaper: { id: "wallpaper", icon: WallpaperIcon, label: "Wallpaper", component: WallpaperVisualEditor },
     widgets: { id: "widgets", icon: WidgetIcon, label: "Widgets", component: DesktopWidgetVisualEditor },
   };
@@ -185,7 +200,7 @@ const Desktop: React.FC<DesktopProps> = ({
 
     // 2. Add remaining fixed apps (Terminal, Safari, Resume if not in portfolioData)
     // Note: Resume might be a section, but Terminal and Safari are usually system apps
-    const systemApps = ["terminal", "safari", "resume", "wallpaper", "widgets"];
+    const systemApps = ["terminal", "safari", "notes", "resume", "wallpaper", "widgets"];
     systemApps.forEach((appId) => {
       if (!processedIds.has(appId) && dockConfig[appId]) {
         orderedItems.push(dockConfig[appId]);
@@ -231,6 +246,22 @@ const Desktop: React.FC<DesktopProps> = ({
     return item?.label || id;
   };
 
+  const [controlCenterOpen, setControlCenterOpen] = React.useState(false);
+  const [notificationCenterOpen, setNotificationCenterOpen] = React.useState(false);
+  const [spotlightOpen, setSpotlightOpen] = React.useState(false);
+  const [brightness, setBrightness] = React.useState(100);
+
+  // Spotlight Keyboard Shortcut
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSpotlightOpen(prev => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <MacOSThemeProvider currentPortTheme={currentPortTheme}>
@@ -260,7 +291,15 @@ const Desktop: React.FC<DesktopProps> = ({
         font={font}
         widgetData={widgetCustomization}
         heroCustomization={heroCustomization}
-        closeAllWindows={closeAllWindows} // Pass closeAllWindows
+        closeAllWindows={closeAllWindows}
+        controlCenterOpen={controlCenterOpen}
+        setControlCenterOpen={setControlCenterOpen}
+        notificationCenterOpen={notificationCenterOpen}
+        setNotificationCenterOpen={setNotificationCenterOpen}
+        spotlightOpen={spotlightOpen}
+        setSpotlightOpen={setSpotlightOpen}
+        brightness={brightness}
+        setBrightness={setBrightness}
       />
     </MacOSThemeProvider>
   );
@@ -291,8 +330,16 @@ function DesktopContent({
   getWindowTitle,
   font,
   widgetData,
-  closeAllWindows, // Receive closeAllWindows
+  closeAllWindows,
   heroCustomization,
+  controlCenterOpen,
+  setControlCenterOpen,
+  notificationCenterOpen,
+  setNotificationCenterOpen,
+  spotlightOpen,
+  setSpotlightOpen,
+  brightness,
+  setBrightness,
 }: any) {
   const { theme } = useMacOSTheme();
   const { user } = useUser();
@@ -392,6 +439,36 @@ function DesktopContent({
         />
       </div>
 
+      {/* Brightness Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[60] transition-all duration-300"
+        style={{
+          backgroundColor: `rgba(0,0,0,${Math.max(0, (100 - brightness) / 100)})`
+        }}
+      />
+
+      {/* Control Center */}
+      <ControlCenter
+        isOpen={controlCenterOpen}
+        onClose={() => setControlCenterOpen(false)}
+        brightness={brightness}
+        setBrightness={setBrightness}
+      />
+
+      {/* Notification Center */}
+      <NotificationCenter
+        isOpen={notificationCenterOpen}
+        onClose={() => setNotificationCenterOpen(false)}
+      />
+
+      {/* Spotlight */}
+      <Spotlight
+        isOpen={spotlightOpen}
+        onClose={() => setSpotlightOpen(false)}
+        dockItems={dockItems}
+        openWindow={openWindow}
+      />
+
       {/* Desktop Widget */}
       <DesktopWidget
         isVisible={widgetData.isVisible}
@@ -411,6 +488,9 @@ function DesktopContent({
         portfolioId={portfolioId}
         onEditWallpaper={isOwner ? () => openWindow("wallpaper") : undefined}
         onOpenResume={() => openWindow("resume")}
+        onToggleControlCenter={() => setControlCenterOpen(!controlCenterOpen)}
+        onToggleNotificationCenter={() => setNotificationCenterOpen(!notificationCenterOpen)}
+        onToggleSpotlight={() => setSpotlightOpen(!spotlightOpen)}
       />
 
 

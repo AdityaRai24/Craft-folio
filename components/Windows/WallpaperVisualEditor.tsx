@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Upload, Save, RotateCcw, Image as ImageIcon, Sliders } from "lucide-react";
 import toast from "react-hot-toast";
 import { useCustomization } from "@/hooks/useCustomization";
-import { defaultMacOSHeroStyles } from "@/types/macos/hero";
+import { defaultWindowsHeroStyles } from "@/types/windows/hero";
 
 interface WallpaperVisualEditorProps {
     initialWallpaper?: string;
@@ -14,12 +14,11 @@ interface WallpaperVisualEditorProps {
 }
 
 const defaultWallpapers = [
-    "https://4kwallpapers.com/images/wallpapers/macos-sonoma-5120x2880-12164.jpg",
-    "https://4kwallpapers.com/images/wallpapers/macos-ventura-5120x2880-8998.jpg",
-    "https://4kwallpapers.com/images/wallpapers/macos-monterey-stock-purple-dark-mode-layers-5k-5120x2880-5898.jpg",
-    "https://512pixels.net/wp-content/uploads/2025/08/26-Tahoe-Beach-Dawn-thumb.jpeg",
-    "https://512pixels.net/wp-content/uploads/2025/08/26-Tahoe-Beach-Night-thumb.jpeg",
-    "https://512pixels.net/downloads/macos-wallpapers-6k/15-Sequoia-Sunrise.png"
+    "https://res.cloudinary.com/dhanvyweu/image/upload/v1764656024/wp6016634-windows-10-dark-wallpapers_wm6k98.jpg",
+    "https://res.cloudinary.com/dhanvyweu/image/upload/v1764655975/6708614_cb0sk9.jpg",
+    "https://res.cloudinary.com/dhanvyweu/image/upload/v1764655987/image_x96ado.jpg",
+    "https://res.cloudinary.com/dhanvyweu/image/upload/v1764656047/wp8971714-desk-setup-wallpapers_xwbas0.jpg",
+    "https://res.cloudinary.com/dhanvyweu/image/upload/v1764656052/wp11368618-dark-mode-pc-wallpapers_rdudr0.jpg"
 ];
 
 const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
@@ -34,7 +33,7 @@ const WallpaperVisualEditor: React.FC<WallpaperVisualEditorProps> = ({
         resetCustomization,
         draftCustomization,
         openVisualEditor
-    } = useCustomization("hero", defaultMacOSHeroStyles, portfolioId || "");
+    } = useCustomization("hero", defaultWindowsHeroStyles, portfolioId || "");
 
     React.useEffect(() => {
         openVisualEditor();
