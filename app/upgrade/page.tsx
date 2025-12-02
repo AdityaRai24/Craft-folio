@@ -5,14 +5,95 @@ import { Check, Phone, Mail, MapPin } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import MainNavbar from "@/components/Shared/MainNavbar";
 import BgShapes from "@/components/Shared/BgShapes";
-import { handleUpgrade } from "@/lib/razorpay";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import Script from "next/script";
+import toast from "react-hot-toast";
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 const page = () => {
   const router = useRouter();
 
+  const handlePayment = async () => {
+    try {
+      // 1. Create Order
+      const response = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: 199 }), // Amount in INR
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create order");
+      }
+
+      // 2. Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: "CraftFolio Pro",
+        description: "Upgrade to CraftFolio Pro",
+        order_id: data.id,
+        handler: async function (response: any) {
+          // 3. Verify Payment
+          try {
+            const verifyResponse = await fetch("/api/payment/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              toast.success("Payment successful! You are now a Pro member.");
+              router.refresh();
+              // Optionally redirect to dashboard
+              // router.push("/dashboard");
+            } else {
+              toast.error("Payment verification failed. Please contact support.");
+            }
+          } catch (error) {
+            console.error("Verification error:", error);
+            toast.error("Payment verification failed. Please contact support.");
+          }
+        },
+        prefill: {
+          name: "", // You can prefill user details if available
+          email: "",
+          contact: "",
+        },
+        theme: {
+          color: ColorTheme.primary,
+        },
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
   return (
     <div className="relative scrollbar custom-scrollbar min-h-screen flex flex-col">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <BgShapes />
       <MainNavbar />
 
@@ -63,32 +144,61 @@ const page = () => {
             >
               Unlock premium templates, advanced customization, and powerful features.
             </p>
-            <motion.button
-              onClick={handleUpgrade}
-              className="px-8 py-4 rounded-full text-lg font-bold shadow-lg transition-all"
-              style={{
-                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                color: ColorTheme.textPrimary,
-                boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`,
-              }}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: `0 6px 20px ${ColorTheme.primaryGlow}`,
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started Now
-            </motion.button>
           </motion.div>
 
           {/* Pricing Section */}
-          <div className="max-w-md mx-auto mb-20">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-20">
+            {/* Free Plan */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="border h-full flex flex-col" style={{ backgroundColor: ColorTheme.bgCard, borderColor: "rgba(75, 85, 99, 0.3)" }}>
+                <CardHeader className="text-center pb-2">
+                  <CardTitle className="text-2xl font-bold" style={{ color: ColorTheme.textPrimary }}>Free</CardTitle>
+                  <CardDescription style={{ color: ColorTheme.textSecondary }}>Perfect for getting started</CardDescription>
+                </CardHeader>
+                <CardContent className="text-center pt-4 flex-grow">
+                  <div className="text-4xl font-bold mb-6" style={{ color: ColorTheme.textPrimary }}>
+                    ₹0 <span className="text-lg font-normal text-gray-400">/ forever</span>
+                  </div>
+                  <ul className="space-y-3 text-left max-w-xs mx-auto">
+                    {[
+                      "2 Lifetime Subdomain Deployments",
+                      "Basic Templates",
+                      "Standard Support",
+                      "No Custom Domain",
+                      "Community Access"
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3">
+                        <Check className="w-5 h-5 flex-shrink-0" style={{ color: ColorTheme.textSecondary }} />
+                        <span style={{ color: ColorTheme.textSecondary }}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter className="pt-6">
+                  <button
+                    className="w-full py-3 rounded-lg font-medium border transition-all hover:bg-white/5"
+                    style={{
+                      borderColor: ColorTheme.primary,
+                      color: ColorTheme.primary,
+                    }}
+                  >
+                    Current Plan
+                  </button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+
+            {/* Pro Plan */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <Card className="border-2 relative overflow-hidden" style={{ backgroundColor: ColorTheme.bgCard, borderColor: ColorTheme.primary }}>
+              <Card className="border-2 relative overflow-hidden h-full flex flex-col" style={{ backgroundColor: ColorTheme.bgCard, borderColor: ColorTheme.primary }}>
                 <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-bl-lg">
                   RECOMMENDED
                 </div>
@@ -96,18 +206,18 @@ const page = () => {
                   <CardTitle className="text-2xl font-bold" style={{ color: ColorTheme.textPrimary }}>CraftFolio Pro</CardTitle>
                   <CardDescription style={{ color: ColorTheme.textSecondary }}>Everything you need to grow</CardDescription>
                 </CardHeader>
-                <CardContent className="text-center pt-4">
+                <CardContent className="text-center pt-4 flex-grow">
                   <div className="text-4xl font-bold mb-6" style={{ color: ColorTheme.textPrimary }}>
                     ₹199 <span className="text-lg font-normal text-gray-400">/ month</span>
                   </div>
                   <ul className="space-y-3 text-left max-w-xs mx-auto">
                     {[
-                      "All premium templates",
-                      "Unlimited exports",
-                      "Custom CSS editor",
-                      "Priority support",
+                      "10 Subdomain Deployments",
                       "Custom Domain Support",
-                      "10 Subdomain Deployments"
+                      "All Premium Templates",
+                      "Unlimited Exports",
+                      "Custom CSS Editor",
+                      "Priority Support"
                     ].map((feature, i) => (
                       <li key={i} className="flex items-center gap-3">
                         <Check className="w-5 h-5 flex-shrink-0" style={{ color: ColorTheme.primary }} />
@@ -118,7 +228,7 @@ const page = () => {
                 </CardContent>
                 <CardFooter className="pt-6">
                   <motion.button
-                    onClick={handleUpgrade}
+                    onClick={handlePayment}
                     className="w-full py-3 rounded-lg font-bold"
                     style={{
                       backgroundColor: ColorTheme.primary,

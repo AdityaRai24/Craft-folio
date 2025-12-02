@@ -104,12 +104,12 @@ export async function createPortfolio(
                 // But assuming this is for non-list properties or specific overrides.
                 // If customValue is empty object, do nothing.
                 if (Object.keys(customValue).length > 0) {
-                    mergedData[key] = templateValue.map(
+                  mergedData[key] = templateValue.map(
                     (item: any, index: number) => ({
-                        ...item,
-                        ...(customValue[index] || {}),
+                      ...item,
+                      ...(customValue[index] || {}),
                     })
-                    );
+                  );
                 }
               } else if (
                 typeof customValue === "object" &&
@@ -407,25 +407,22 @@ export async function deployPortfolio(
       if (value.length < 3 || value.length > 30) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } must be between 3 and 30 characters`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } must be between 3 and 30 characters`,
         };
       }
       if (!/^[a-z0-9-]+$/.test(value)) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } can only contain lowercase letters, numbers, and hyphens`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } can only contain lowercase letters, numbers, and hyphens`,
         };
       }
       if (value.startsWith("-") || value.endsWith("-")) {
         return {
           success: false,
-          error: `${
-            isSubdomain ? "Subdomain" : "Portfolio Slug"
-          } cannot start or end with a hyphen`,
+          error: `${isSubdomain ? "Subdomain" : "Portfolio Slug"
+            } cannot start or end with a hyphen`,
         };
       }
     } else {
@@ -461,13 +458,12 @@ export async function deployPortfolio(
     if (existingPortfolio) {
       return {
         success: false,
-        error: `This ${
-          isCustomDomain
+        error: `This ${isCustomDomain
             ? "domain"
             : isSubdomain
-            ? "subdomain"
-            : "portfolio slug"
-        } is already taken`,
+              ? "subdomain"
+              : "portfolio slug"
+          } is already taken`,
       };
     }
 
@@ -494,8 +490,8 @@ export async function deployPortfolio(
     const finalUrl = isCustomDomain
       ? `https://${value}`
       : isSubdomain
-      ? `https://${value}.craftfolio.live`
-      : `https://craftfolio.live/p/${value}`;
+        ? `https://${value}.craftfolio.live`
+        : `https://craftfolio.live/p/${value}`;
 
     return {
       success: true,
@@ -621,19 +617,10 @@ export async function checkUserSubdomain(userId: string) {
       };
     }
 
-    // For non-premium users, check if they have any subdomain
-    const existingSubdomain = await prisma.portfolioLink.findFirst({
-      where: {
-        userId: userId,
-        subdomain: {
-          not: null,
-        },
-      },
-    });
-
+    // For non-premium users, allow up to 2 subdomains
     return {
       success: true,
-      hasSubdomain: !!existingSubdomain,
+      hasSubdomain: count >= 2,
       isPremium: false,
       currentCount: count,
     };
