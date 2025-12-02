@@ -17,15 +17,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (Ensure this schema path is correct)
 RUN npx prisma generate
 
 # Build Next.js app
 RUN npm run build
 
-# ================================
-# 3. Production image
-# ================================
 # ================================
 # 3. Production image
 # ================================
@@ -38,25 +35,26 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Copy public folder
 COPY --from=builder /app/public ./public
 
-# Set the correct permission for prerender cache
+# Set permissions for nextjs cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# COPY STANDALONE BUILD
+# (Ensure 'output: "standalone"' is in your next.config.js)
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# If you have a production-only .env, copy that too (optional)
+# Copy .env file (Now allowed because we fixed .dockerignore)
 COPY .env .env
 
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]
