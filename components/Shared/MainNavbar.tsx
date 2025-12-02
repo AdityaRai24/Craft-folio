@@ -102,23 +102,21 @@ const MainNavbar = () => {
             ))}
 
             {/* Upgrade Button */}
-            {user && (
-              <motion.a
-                href="/upgrade"
-                className="px-4 py-1.5 rounded-md text-base font-medium transition-all ml-2"
-                style={{
-                  background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                  color: ColorTheme.textPrimary,
-                  boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`,
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: `0 6px 20px ${ColorTheme.primaryGlow}`,
-                }}
-              >
-                Upgrade
-              </motion.a>
-            )}
+            <motion.a
+              href="/upgrade"
+              className="px-4 py-1.5 rounded-md text-base font-medium transition-all ml-2"
+              style={{
+                background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                color: ColorTheme.textPrimary,
+                boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`,
+              }}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: `0 6px 20px ${ColorTheme.primaryGlow}`,
+              }}
+            >
+              Upgrade
+            </motion.a>
 
             {/* GitHub Star Button - styled as bordered button */}
             <motion.a
