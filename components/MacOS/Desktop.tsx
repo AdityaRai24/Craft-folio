@@ -17,6 +17,7 @@ import TerminalWindow from "./TerminalWindow";
 import ResumeViewer from "./ResumeViewer";
 import Contact from "./Contact";
 import SafariBrowser from "./SafariBrowser";
+import Notes from "./Notes";
 import ExperienceWindow from "./ExperienceWindow";
 import Technologies from "./Technologies";
 import WallpaperVisualEditor from "@/components/VisualEditor/Wallpaper/WallpaperVisualEditor";
@@ -31,6 +32,7 @@ import CodeIcon from "./icons/code.svg";
 import WallpaperIcon from "./icons/wallpaper.svg";
 import WidgetIcon from "./icons/widget.svg";
 import SkillsIcon from "./icons/skills.svg";
+import AppleIcon from "./icons/apple.png";
 
 import { useDesktopEnvironment, WindowState } from "@/hooks/useDesktopEnvironment";
 import { useCustomization } from "@/hooks/useCustomization";
@@ -121,6 +123,15 @@ const Desktop: React.FC<DesktopProps> = ({
       position: { x: 500, y: 300 },
       size: { width: 900, height: 600 },
     },
+    notes: {
+      id: "notes",
+      isOpen: false,
+      isMinimized: false,
+      isFullscreen: false,
+      zIndex: 0,
+      position: { x: 450, y: 350 },
+      size: { width: 800, height: 600 },
+    },
     experience: {
       id: "experience",
       isOpen: false,
@@ -167,6 +178,7 @@ const Desktop: React.FC<DesktopProps> = ({
     resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
     contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
     safari: { id: "safari", icon: SafariIcon, label: "Safari", component: SafariBrowser },
+    notes: { id: "notes", icon: AppleIcon, label: "Notes", component: Notes },
     wallpaper: { id: "wallpaper", icon: WallpaperIcon, label: "Wallpaper", component: WallpaperVisualEditor },
     widgets: { id: "widgets", icon: WidgetIcon, label: "Widgets", component: DesktopWidgetVisualEditor },
   };
@@ -188,7 +200,7 @@ const Desktop: React.FC<DesktopProps> = ({
 
     // 2. Add remaining fixed apps (Terminal, Safari, Resume if not in portfolioData)
     // Note: Resume might be a section, but Terminal and Safari are usually system apps
-    const systemApps = ["terminal", "safari", "resume", "wallpaper", "widgets"];
+    const systemApps = ["terminal", "safari", "notes", "resume", "wallpaper", "widgets"];
     systemApps.forEach((appId) => {
       if (!processedIds.has(appId) && dockConfig[appId]) {
         orderedItems.push(dockConfig[appId]);

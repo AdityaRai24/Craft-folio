@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import Marquee from "react-fast-marquee";
 import { ColorTheme } from "@/lib/colorThemes";
-import { defaultMacOSTechnologiesStyles } from "@/types/macos/technologies";
+import { defaultWindowsTechnologiesStyles } from "@/types/windows/technologies";
 import { TechnologiesVisualEditor } from "@/components/VisualEditor/Technologies/TechnologiesVisualEditor";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { Settings } from "lucide-react";
@@ -36,7 +36,7 @@ const Technologies = ({ portfolioId }: { portfolioId: string }) => {
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("technologies", defaultMacOSTechnologiesStyles, portfolioId);
+    } = useCustomization("technologies", defaultWindowsTechnologiesStyles, portfolioId);
 
     useEffect(() => {
         if (portfolioData) {
@@ -103,9 +103,9 @@ const Technologies = ({ portfolioId }: { portfolioId: string }) => {
             )}
         </motion.div>
     );
-
+    // ...
     return (
-        <div className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#202020]" : "bg-[#f3f3f3]"}`}>
+        <div className={`w-full h-full overflow-y-auto relative`} style={{ backgroundColor: currentTheme.background.primary }}>
             <div className={`mx-auto p-8 max-w-${effectiveCustomization.containerWidth}`}>
                 <div className="flex justify-between items-start md:items-center mb-8 flex-col md:flex-row gap-4">
                     <motion.div

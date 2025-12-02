@@ -89,10 +89,10 @@ const QuickSettings: React.FC<QuickSettingsProps> = ({ isOpen, onClose, brightne
                                 onClick={() => { }}
                             />
                             <GridButton
-                                icon={Moon}
-                                label="Night Light"
-                                active={nightLight}
-                                onClick={() => setNightLight(!nightLight)}
+                                icon={isDark ? Sun : Moon}
+                                label={isDark ? "Light Mode" : "Dark Mode"}
+                                active={false}
+                                onClick={toggleTheme}
                             />
                             <GridButton
                                 icon={Accessibility}
@@ -144,13 +144,7 @@ const QuickSettings: React.FC<QuickSettingsProps> = ({ isOpen, onClose, brightne
                                 <span>77%</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button
-                                    onClick={toggleTheme}
-                                    className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                                    title="Toggle Theme"
-                                >
-                                    {isDark ? <Sun size={16} /> : <Moon size={16} />}
-                                </button>
+
                                 <button
                                     className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                                     title="All Settings"

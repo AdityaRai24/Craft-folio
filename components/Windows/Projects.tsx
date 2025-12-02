@@ -13,7 +13,7 @@ import { RootState } from "@/store/store";
 import { motion } from "framer-motion";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { useUser } from "@clerk/nextjs";
-import { defaultMacOSProjectsStyles } from "@/types/macos/projects";
+import { defaultWindowsProjectsStyles } from "@/types/windows/projects";
 import MagicWrite from "@/components/Shared/MagicWrite";
 import { useProjectStyles } from "@/hooks/useProjectStyles";
 import { ColorTheme } from "@/lib/colorThemes";
@@ -59,7 +59,7 @@ const ProjectsGrid = ({
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("project", defaultMacOSProjectsStyles, portfolioId);
+    } = useCustomization("project", defaultWindowsProjectsStyles, portfolioId);
 
     useEffect(() => {
         if (portfolioData) {
@@ -120,12 +120,11 @@ const ProjectsGrid = ({
             </div>
         );
     }
-
-
-
+    // ...
     return (
         <div
-            className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#202020]" : "bg-[#f3f3f3]"} ${font || ""}`}
+            className={`w-full h-full overflow-y-auto relative ${font || ""}`}
+            style={{ backgroundColor: currentTheme.background.primary }}
         >
             <div className="max-w-7xl mx-auto p-6 md:p-8">
                 {/* Header */}

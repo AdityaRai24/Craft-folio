@@ -21,7 +21,7 @@ const CalendarFlyout: React.FC<CalendarFlyoutProps> = ({ isOpen, onClose }) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div key="calendar-flyout-container">
                     <motion.div
                         key="backdrop"
                         initial={{ opacity: 0 }}
@@ -111,7 +111,7 @@ const CalendarFlyout: React.FC<CalendarFlyoutProps> = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                     </motion.div>
-                </>
+                </div>
             )}
             <style jsx global>{`
                 .react-calendar {

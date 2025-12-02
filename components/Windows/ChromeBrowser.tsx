@@ -9,9 +9,19 @@ const ChromeBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
     const { currentTheme } = useWindowsTheme();
     const isDark = theme === "dark";
 
+    // Helper to get embeddable URL
+    const getEmbeddableUrl = (url: string) => {
+        if (!url) return "";
+        // Handle Google specially to avoid X-Frame-Options issues
+        if (url === "https://www.google.com" || url === "https://google.com" || url === "www.google.com" || url === "google.com") {
+            return "https://www.google.com/webhp?igu=1";
+        }
+        return url;
+    };
+
     // Default homepage is Google
     const [url, setUrl] = useState("https://www.google.com");
-    const [currentSrc, setCurrentSrc] = useState("https://www.google.com/webhp?igu=1"); // Google embeddable URL
+    const [currentSrc, setCurrentSrc] = useState(getEmbeddableUrl("https://www.google.com"));
     const [isLoading, setIsLoading] = useState(false);
     const [history, setHistory] = useState<string[]>(["https://www.google.com"]);
     const [historyIndex, setHistoryIndex] = useState(0);
@@ -37,7 +47,8 @@ const ChromeBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light"
 
     const navigate = (targetUrl: string) => {
         setIsLoading(true);
-        setCurrentSrc(targetUrl);
+        // Use embeddable URL for iframe, but keep clean URL for address bar
+        setCurrentSrc(getEmbeddableUrl(targetUrl));
         setUrl(targetUrl);
 
         // Update history

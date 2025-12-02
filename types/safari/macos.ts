@@ -7,8 +7,8 @@ export const defaultMacOSSafariStyles: SafariCustomizationState = {
     showHomeButton: true,
     showReloadButton: true,
     showUrlBar: true,
-    urlBarText: "craftfolio.dev",
+    urlBarText: "google.com",
     animationSpeed: 300,
-    startUrl: "craftfolio.dev",
+    startUrl: "https://www.google.com",
     font: "Inter",
 };

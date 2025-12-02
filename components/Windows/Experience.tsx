@@ -8,7 +8,7 @@ import { Briefcase, Calendar, MapPin, Settings } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import ExperienceVisualEditor from "@/components/VisualEditor/Experience/ExperienceVisualEditor";
-import { defaultMacOSExperienceStyles } from "@/types/macos/experience";
+import { defaultWindowsExperienceStyles } from "@/types/windows/experience";
 import { useExperienceStyles } from "@/hooks/useExperienceStyles";
 import { useWindowsTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";
@@ -34,7 +34,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("experience", defaultMacOSExperienceStyles, portfolioId);
+    } = useCustomization("experience", defaultWindowsExperienceStyles, portfolioId);
 
     const {
         getCardClasses,
@@ -56,10 +56,9 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
             setExperienceData(data);
         }
     }, [portfolioData]);
-
-
+    // ...
     return (
-        <div className={`w-full h-full flex flex-col relative ${isDark ? "bg-[#202020]" : "bg-[#f3f3f3]"} ${font || ""}`}>
+        <div className={`w-full h-full flex flex-col relative ${font || ""}`} style={{ backgroundColor: currentTheme.background.primary }}>
             <div className="flex-1 overflow-y-auto p-8 relative">
                 <div className={`max-w-4xl mx-auto ${effectiveCustomization.containerWidth === "narrow" ? "max-w-2xl" : effectiveCustomization.containerWidth === "wide" ? "max-w-6xl" : ""}`}>
                     {/* Header */}

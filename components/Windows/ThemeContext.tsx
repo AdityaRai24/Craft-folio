@@ -93,25 +93,38 @@ export function WindowsThemeProvider({
     currentPortTheme?: string;
 }) {
     const [theme, setTheme] = useState<"light" | "dark">("dark");
-    // Default to Windows 11 from JSON, or fallback to hardcoded if needed (but JSON should exist)
+
+    // Helper to get theme data from the new JSON structure
+    const getThemeData = (themeName: string) => {
+        const themesSection = (WindowsData as any).sections?.find((s: any) => s.type === "themes");
+        return themesSection?.data?.[themeName];
+    };
+
     const [currentTheme, setCurrentTheme] = useState<WindowsThemeColors>(
-        (WindowsData as any)["Windows 11"]?.colors || defaultTheme
+        getThemeData("Windows 11")?.colors || defaultTheme
     );
 
     useEffect(() => {
+        if (theme === "light") {
+            setCurrentTheme(lightTheme);
+            return;
+        }
+
         const themeName = currentPortTheme || "Windows 11";
-        const themeData = (WindowsData as any)[themeName];
+        const themeData = getThemeData(themeName);
 
         if (themeData && themeData.colors) {
             setCurrentTheme(themeData.colors);
         } else {
-            // Fallback to Windows 11 if requested theme not found
-            const defaultThemeData = (WindowsData as any)["Windows 11"];
+            // Fallback
+            const defaultThemeData = getThemeData("Windows 11");
             if (defaultThemeData && defaultThemeData.colors) {
                 setCurrentTheme(defaultThemeData.colors);
+            } else {
+                setCurrentTheme(defaultTheme);
             }
         }
-    }, [currentPortTheme]);
+    }, [currentPortTheme, theme]);
 
     const toggleTheme = () => {
         setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));

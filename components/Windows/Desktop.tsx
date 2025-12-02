@@ -8,8 +8,9 @@ import { WindowsThemeProvider, useWindowsTheme } from "./ThemeContext";
 import Window from "./Window";
 import Taskbar from "./Taskbar";
 import StartMenu from "./StartMenu";
-import DesktopIcons from "./DesktopIcons";
-import WindowsWidget from "./WindowsWidget";
+
+import DesktopWidget from "./DesktopWidget";
+import DesktopWidgetVisualEditor from "./DesktopWidgetVisualEditor";
 
 // Use Windows-specific components
 import ProjectsGrid from "./Projects";
@@ -19,6 +20,7 @@ import TerminalWindow from "./Terminal";
 import ResumeViewer from "./Resume";
 import Contact from "./Contact";
 import ChromeBrowser from "./ChromeBrowser";
+import Notes from "./Notes";
 import WallpaperVisualEditor from "./WallpaperVisualEditor";
 
 import { useDesktopEnvironment, WindowState } from "@/hooks/useDesktopEnvironment";
@@ -35,6 +37,7 @@ import WallpaperIcon from "@/components/MacOS/icons/wallpaper.svg";
 import WidgetIcon from "@/components/MacOS/icons/widget.svg";
 import SkillsIcon from "@/components/MacOS/icons/skills.svg";
 import ChromeIcon from "@/components/Windows/icons/chrome.png";
+import NotesIcon from "@/components/Windows/icons/notes.svg";
 
 interface DesktopProps {
     currentPortTheme?: string;
@@ -78,8 +81,24 @@ function DesktopContent({
     );
 
     const [isStartOpen, setIsStartOpen] = useState(false);
-    const [isWidgetOpen, setIsWidgetOpen] = useState(false);
     const [brightness, setBrightness] = useState(100);
+
+    const {
+        effectiveCustomization: widgetCustomization,
+        draftCustomization: widgetDraft,
+        updateDraftCustomization: updateWidgetDraft,
+        saveDraftCustomization: saveWidgetDraft,
+        resetCustomization: resetWidget,
+        setDraftCustomization: setWidgetDraft
+    } = useCustomization(
+        "windowsWidget",
+        defaultWindowsWidgetStyles,
+        portfolioId || ""
+    );
+
+
+
+    const currentWidgetStyles = widgetDraft || widgetCustomization;
 
     // Initial Windows State
     const initialWindows: Record<string, WindowState> = {
@@ -128,6 +147,15 @@ function DesktopContent({
             position: { x: 300, y: 170 },
             size: { width: 1000, height: 700 },
         },
+        notes: {
+            id: "notes",
+            isOpen: false,
+            isMinimized: false,
+            isFullscreen: false,
+            zIndex: 0,
+            position: { x: 350, y: 200 },
+            size: { width: 800, height: 600 },
+        },
         terminal: {
             id: "terminal",
             isOpen: false,
@@ -155,6 +183,15 @@ function DesktopContent({
             position: { x: 450, y: 260 },
             size: { width: 500, height: 600 },
         },
+        widgets: {
+            id: "widgets",
+            isOpen: false,
+            isMinimized: false,
+            isFullscreen: false,
+            zIndex: 0,
+            position: { x: 450, y: 200 },
+            size: { width: 500, height: 700 },
+        },
     };
 
     // Dock/Taskbar Configuration with Image Icons
@@ -164,10 +201,11 @@ function DesktopContent({
         skills: { id: "skills", icon: SkillsIcon, label: "Skills", component: Technologies },
         contact: { id: "contact", icon: ContactIcon, label: "Contact", component: Contact },
         chrome: { id: "chrome", icon: ChromeIcon, label: "Chrome", component: ChromeBrowser },
+        notes: { id: "notes", icon: NotesIcon, label: "Notes", component: Notes },
         terminal: { id: "terminal", icon: Terminal, label: "Terminal", component: TerminalWindow },
         resume: { id: "resume", icon: Preview, label: "Resume", component: ResumeViewer },
         wallpaper: { id: "wallpaper", icon: WallpaperIcon, label: "Wallpaper", component: WallpaperVisualEditor },
-        widgets: { id: "widgets", icon: WidgetIcon, label: "Widgets", component: null }, // Component null because it's a side panel
+        widgets: { id: "widgets", icon: WidgetIcon, label: "Widgets", component: DesktopWidgetVisualEditor },
     };
 
     const {
@@ -186,11 +224,20 @@ function DesktopContent({
         handleMouseDown,
     } = useDesktopEnvironment(initialWindows);
 
+    // Sync draft state with window open/close
+    useEffect(() => {
+        if (windows["widgets"]?.isOpen) {
+            setWidgetDraft(widgetCustomization);
+        } else {
+            setWidgetDraft(null);
+        }
+    }, [windows["widgets"]?.isOpen]);
+
     // Filter dock items based on portfolio data + system apps
     const getOrderedDockItems = () => {
         const items: any[] = [];
         // Always include system apps
-        ["projects", "experience", "skills", "chrome", "contact", "terminal", "resume", "wallpaper", "widgets"].forEach(id => {
+        ["projects", "experience", "skills", "chrome", "notes", "contact", "terminal", "resume", "wallpaper", "widgets"].forEach(id => {
             if (dockConfig[id]) items.push(dockConfig[id]);
         });
         return items;
@@ -233,10 +280,7 @@ function DesktopContent({
     const backgroundImage = heroCustomization.image || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1920&q=80";
 
     const handleAppClick = (id: string) => {
-        if (id === "widgets") {
-            setIsWidgetOpen(!isWidgetOpen);
-            return;
-        }
+
 
         if (windows[id]?.isOpen) {
             if (windows[id]?.isMinimized) restoreWindow(id);
@@ -263,10 +307,19 @@ function DesktopContent({
                 }}
             />
 
-            {/* Desktop Icons */}
-            <div className="absolute inset-0 z-0 pt-4 pl-2">
-                <DesktopIcons userInfoData={userInfoData} openWindow={handleAppClick} />
-            </div>
+            {/* Desktop Widget */}
+            <DesktopWidget
+                isVisible={currentWidgetStyles.isVisible}
+                showTime={currentWidgetStyles.showTime}
+                showDate={currentWidgetStyles.showDate}
+                showGreeting={currentWidgetStyles.showGreeting}
+                position={currentWidgetStyles.position}
+                style={currentWidgetStyles.style}
+                customGreeting={currentWidgetStyles.customGreeting}
+                isDark={theme === "dark"}
+            />
+
+
 
             {/* Windows Layer */}
             <div className="absolute inset-0 z-10 pointer-events-none">
@@ -296,12 +349,25 @@ function DesktopContent({
                                     onMove={(e) => handleMouseDown(e, id)}
                                 >
                                     {Component && (
-                                        <Component
-                                            portfolioId={portfolioId}
-                                            currentPortTheme={currentPortTheme}
-                                            customCSS={customCSS}
-                                            theme={theme}
-                                        />
+                                        id === "widgets" ? (
+                                            <DesktopWidgetVisualEditor
+                                                onClose={() => closeWindow(id)}
+                                                portfolioId={portfolioId}
+                                                theme={theme}
+                                                // Pass draft controls
+                                                currentStyles={currentWidgetStyles}
+                                                onUpdate={updateWidgetDraft}
+                                                onSave={saveWidgetDraft}
+                                                onReset={resetWidget}
+                                            />
+                                        ) : (
+                                            <Component
+                                                portfolioId={portfolioId}
+                                                currentPortTheme={currentPortTheme}
+                                                customCSS={customCSS}
+                                                theme={theme}
+                                            />
+                                        )
                                     )}
                                 </Window>
                             </div>
@@ -310,8 +376,7 @@ function DesktopContent({
                 </AnimatePresence>
             </div>
 
-            {/* Windows Widget Side Panel */}
-            <WindowsWidget isOpen={isWidgetOpen} onClose={() => setIsWidgetOpen(false)} />
+
 
             {/* Start Menu */}
             <StartMenu

@@ -9,11 +9,12 @@ import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButto
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
-import { defaultMacOSContactStyles } from '@/types/macos/contact';
+import { defaultWindowsContactStyles } from '@/types/windows/contact';
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
 import { ColorTheme } from "@/lib/colorThemes";
 import { useWindowsTheme } from "./ThemeContext";
 import { useCustomization } from "@/hooks/useCustomization";
+
 const Contact = ({
     portfolioId,
     theme = "light",
@@ -57,7 +58,7 @@ const Contact = ({
         saveDraftCustomization,
         resetCustomization,
         draftCustomization
-    } = useCustomization("contact", defaultMacOSContactStyles, portfolioId);
+    } = useCustomization("contact", defaultWindowsContactStyles, portfolioId);
 
     const socialLinks = [
         {
@@ -92,11 +93,11 @@ const Contact = ({
             toast.error(`${name} link not provided`);
         }
     };
-
-
+    // ...
     return (
         <div
-            className={`w-full h-full overflow-y-auto relative ${isDark ? "bg-[#202020] text-white" : "bg-[#f3f3f3] text-gray-900"} ${font || ""}`}
+            className={`w-full h-full overflow-y-auto relative ${font || ""}`}
+            style={{ backgroundColor: currentTheme.background.primary }}
         >
             <div className={`mx-auto p-8 ${effectiveCustomization.containerWidth === "narrow" ? "max-w-4xl" :
                 effectiveCustomization.containerWidth === "wide" ? "max-w-5xl" :
