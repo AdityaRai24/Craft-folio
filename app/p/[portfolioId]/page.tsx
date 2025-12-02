@@ -255,8 +255,8 @@ const Page = () => {
   const hasSpotlight = Template.spotlight;
   const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
 
-  // Special handling for MacOS template - render Desktop component
-  if (templateName === "MacOS") {
+  // Special handling for MacOS and Windows templates - render Desktop component
+  if (templateName === "MacOS" || templateName === "Windows") {
     const DesktopComponent = Template.sections?.desktop as React.ComponentType<{
       currentPortTheme?: string;
       customCSS?: string;

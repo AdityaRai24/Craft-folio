@@ -1,0 +1,77 @@
+{
+    "data": {
+        "Sonoma": {
+            "colors": {
+                "text": {
+                    "primary": "#ECFDF5",
+                    "secondary": "#6EE7B7"
+                },
+                "accent": "#34D399",
+                "states": {
+                    "muted": "rgba(110, 231, 183, 0.3)"
+                },
+                "primary": "#10B981",
+                "gradients": {
+                    "hover": "linear-gradient(90deg, rgba(16,185,129,0.2), rgba(6,182,212,0.2))",
+                    "header": "linear-gradient(90deg, rgba(16,185,129,0.1), transparent, rgba(6,182,212,0.1))",
+                    "primary": "linear-gradient(90deg, #10B981, #06B6D4)"
+                },
+                "secondary": "#06B6D4",
+                "background": {
+                    "primary": "#064E3B",
+                    "secondary": "rgba(6, 78, 59, 0.6)"
+                },
+                "primaryHover": "#059669"
+            }
+        },
+        "Ventura": {
+            "colors": {
+                "text": {
+                    "primary": "#FAFAF9",
+                    "secondary": "#A8A29E"
+                },
+                "accent": "#FB923C",
+                "states": {
+                    "muted": "rgba(168, 162, 158, 0.5)"
+                },
+                "primary": "#F97316",
+                "gradients": {
+                    "hover": "linear-gradient(90deg, rgba(249,115,22,0.2), rgba(245,158,11,0.2))",
+                    "header": "linear-gradient(90deg, rgba(249,115,22,0.1), transparent, rgba(245,158,11,0.1))",
+                    "primary": "linear-gradient(90deg, #F97316, #F59E0B)"
+                },
+                "secondary": "#F59E0B",
+                "background": {
+                    "primary": "#1C1917",
+                    "secondary": "rgba(41, 37, 36, 0.6)"
+                },
+                "primaryHover": "#EA580C"
+            }
+        },
+        "Monterey": {
+            "colors": {
+                "text": {
+                    "primary": "#F1F5F9",
+                    "secondary": "#94A3B8"
+                },
+                "accent": "#60A5FA",
+                "states": {
+                    "muted": "rgba(148, 163, 184, 0.5)"
+                },
+                "primary": "#3B82F6",
+                "gradients": {
+                    "hover": "linear-gradient(90deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2))",
+                    "header": "linear-gradient(90deg, rgba(59,130,246,0.1), transparent, rgba(139,92,246,0.1))",
+                    "primary": "linear-gradient(90deg, #3B82F6, #8B5CF6)"
+                },
+                "secondary": "#8B5CF6",
+                "background": {
+                    "primary": "#0F172A",
+                    "secondary": "rgba(30, 41, 59, 0.6)"
+                },
+                "primaryHover": "#2563EB"
+            }
+        }
+    },
+    "type": "themes"
+}

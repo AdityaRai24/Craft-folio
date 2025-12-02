@@ -30,17 +30,29 @@ const TopBar = ({
   portfolioId,
   onEditWallpaper,
   onOpenResume,
+  onToggleControlCenter,
+  onToggleNotificationCenter,
+  onToggleSpotlight,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId?: string;
   onEditWallpaper?: () => void;
   onOpenResume?: () => void;
+  onToggleControlCenter?: () => void;
+  onToggleNotificationCenter?: () => void;
+  onToggleSpotlight?: () => void;
 }) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { theme } = useMacOSTheme();
   const isDark = theme === "dark";
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     // Click outside listener for dropdowns
@@ -158,6 +170,42 @@ const TopBar = ({
             )}
           </div>
         ))}
+      </div>
+
+      {/* Right Side - Status Bar */}
+      <div className="flex items-center gap-4 h-full text-xs font-medium">
+        {/* Spotlight Search */}
+        <button
+          onClick={onToggleSpotlight}
+          className={`opacity-90 hover:opacity-100 transition-opacity cursor-pointer`}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+        {/* Control Center Toggle */}
+        <button
+          onClick={onToggleControlCenter}
+          className={`opacity-90 hover:opacity-100 transition-opacity cursor-pointer`}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+            <circle cx="8" cy="6" r="2" fill="currentColor" />
+            <circle cx="16" cy="12" r="2" fill="currentColor" />
+            <circle cx="8" cy="18" r="2" fill="currentColor" />
+          </svg>
+        </button>
+
+        {/* Date & Time */}
+        <button
+          onClick={onToggleNotificationCenter}
+          className={`opacity-90 hover:opacity-100 transition-opacity cursor-pointer`}
+        >
+          {time.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+          <span className="mx-2">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </button>
       </div>
     </div>
   );
