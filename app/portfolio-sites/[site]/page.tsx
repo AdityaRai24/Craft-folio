@@ -18,18 +18,9 @@ import {
   setThemeName,
   setComponentCustomizations,
 } from "@/slices/dataSlice";
-import { templateConfig } from "@/lib/templateConfig";
-import { Spotlight } from "@/components/NeoSpark/Spotlight";
-import Chatbot from "@/components/Chatbot/Chatbot";
-import { motion } from "framer-motion";
-import { fontClassMap } from "@/lib/font";
-import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import PortfolioNotFound from "@/components/Shared/PortfolioNotFound";
-import LoadingSpinner from "@/components/Shared/LoadingSpinner";
-import { CheckCircle, Layout, Palette } from "lucide-react";
-import Sidebar from "@/app/p/Sidebar";
 import { useUser } from "@clerk/nextjs";
+import PortfolioRenderer from "@/components/Portfolio/PortfolioRenderer";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -39,35 +30,14 @@ const Page = () => {
 
   const {
     portfolioData,
-    portfolioUserId,
     templateName,
-    themeName,
-    fontName,
-    customCSSState,
   } = useSelector((state: RootState) => state.data);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dataLoaded, setDataLoaded] = useState<boolean>(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [finalPortfolioId, setFinalPortfolioId] = useState<string>("");
   const [portfolioNotFound, setPortfolioNotFound] = useState<boolean>(false);
   const [portfolioLink, setPortfolioLink] = useState("");
-
-  type TemplateType = {
-    navbar: React.ComponentType;
-    spotlight?: boolean;
-    sections: {
-      [key: string]: React.ComponentType;
-    };
-  };
-
-  const allSections = dataLoaded
-    ? portfolioData?.map((item: any) => item.type)
-    : [];
-
-  const themes = dataLoaded
-    ? portfolioData?.find((item: any) => item.type === "themes")?.data
-    : undefined;
 
   useEffect(() => {
     const initializePortfolio = async () => {
@@ -143,109 +113,16 @@ const Page = () => {
     initializePortfolio();
   }, [subdomain, dispatch]);
 
-  // Don't try to access template config until we have template name
-  const Template =
-    dataLoaded && templateName
-      ? (templateConfig[
-        templateName as keyof typeof templateConfig
-      ] as TemplateType)
-      : null;
-
-  const getComponentForSection = (sectionType: string) => {
-    if (!Template || !Template.sections || !Template.sections[sectionType]) {
-      return null;
-    }
-    const SectionComponent: any = Template.sections[sectionType];
-    return SectionComponent ? (
-      <SectionComponent
-        currentPortTheme={themeName}
-        customCSS={customCSSState}
-        portfolioId={finalPortfolioId}
-        key={`${sectionType}`}
-      />
-    ) : null;
-  };
-
-  if (portfolioNotFound) {
-    return <PortfolioNotFound />;
-  }
-
-  if (isLoading || !dataLoaded || !Template) {
-    const portfolioMessages: any = [
-      { text: "Loading the portfolio", icon: Palette },
-      { text: "Fetching data", icon: Layout },
-      { text: "Almost there", icon: CheckCircle },
-    ];
-    return <LoadingSpinner loadingMessages={portfolioMessages} />;
-  }
-
-  // By this point, we guarantee the data is loaded
-  const NavbarComponent: any = Template.navbar;
-  const hasSpotlight = Template.spotlight;
-  const selectedFontClass = fontClassMap[fontName] || fontClassMap["raleway"];
-
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
-      {hasSpotlight && (
-        <div className="absolute inset-0">
-          <Spotlight
-            className="-top-40 left-0 md:-top-80 md:left-5"
-            fill="white"
-          />
-        </div>
-      )}
-
-      {/* Responsive layout: on md+ if chat is open, add right margin to main content */}
-      <div
-        className={
-          isChatOpen
-            ? "w-full md:w-[80%] md:mr-[20%] transition-all duration-300"
-            : "w-full transition-all duration-300"
-        }
-      >
-        <motion.div
-          className={cn(" min-h-screen w-full", selectedFontClass)}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-        >
-          {NavbarComponent && (
-            <NavbarComponent
-              customCSS={customCSSState}
-              currentPortTheme={themeName}
-              portfolioId={finalPortfolioId}
-            />
-          )}
-          <Sidebar />
-
-          {allSections && allSections.length > 0 ? (
-            allSections.map((section: string) =>
-              getComponentForSection(section)
-            )
-          ) : (
-            <div className={cn("flex items-center justify-center h-screen")}>
-              <p className="text-xl">Portfolio content not found</p>
-            </div>
-          )}
-        </motion.div>
-      </div>
-
-      {/* Only render Chatbot after data is loaded */}
-      {dataLoaded && (
-        <Chatbot
-          portfolioData={portfolioData}
-          themeOptions={themes}
-          setCurrentFont={(font) => dispatch(setFontName(font))}
-          setCurrentPortTheme={(theme) => dispatch(setThemeName(theme))}
-          portfolioId={finalPortfolioId}
-          currentPortTheme={themeName}
-          currentFont={fontName}
-          portfolioLink={portfolioLink}
-          onOpenChange={setIsChatOpen}
-          setCustomCSS={(css) => dispatch(setCustomCSSState(css))}
-          customCSSState={customCSSState}
-        />
-      )}
-    </div>
+    <PortfolioRenderer
+      isLoading={isLoading}
+      dataLoaded={dataLoaded}
+      portfolioNotFound={portfolioNotFound}
+      portfolioId={finalPortfolioId}
+      portfolioLink={portfolioLink}
+    />
   );
 };
 
 export default Page;
+
