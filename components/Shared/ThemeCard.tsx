@@ -159,10 +159,10 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
       </div>
 
       {/* Image Section */}
-      <div className="relative overflow-hidden group aspect-[16/9] border-b border-white/5">
+      <div className="relative overflow-hidden group  border-b border-white/5">
         <Slider {...sliderSettings} className="h-full">
           {previewImages.map((image, index) => (
-            <div key={index} className="aspect-[16/9] relative">
+            <div key={index} className=" relative">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 pointer-events-none" />
               <img
                 src={image}

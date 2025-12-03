@@ -25,21 +25,21 @@ export const templates = {
             ],
             color: "green",
             isVisible: true,
+            actions: [
+              {
+                type: "button",
+                label: "View Projects",
+                url: "#projects",
+                style: "primary",
+              },
+              {
+                type: "button",
+                label: "Contact Me",
+                url: "#contact",
+                style: "outline",
+              },
+            ],
           },
-          actions: [
-            {
-              type: "button",
-              label: "View Projects",
-              url: "#projects",
-              style: "primary",
-            },
-            {
-              type: "button",
-              label: "Contact Me",
-              url: "#contact",
-              style: "outline",
-            },
-          ],
         },
       },
       {
@@ -134,8 +134,8 @@ export const templates = {
       }
     ],
   },
-  SimpleWhite : {
-    
+  SimpleWhite: {
+
   },
   MacOS: {
     sections: [
@@ -224,6 +224,7 @@ export const templates = {
             ],
             icon: "🚀",
             color: "#34C759",
+            side: "right",
           },
         ],
       },
@@ -251,5 +252,53 @@ export const templates = {
         },
       },
     ],
+  },
+  BlankCanvas: {
+    sections: [
+      {
+        type: "userInfo",
+        data: {
+          github: "https://github.com/yourusername",
+          linkedin: "https://linkedin.com/in/yourusername",
+          email: "hello@example.com",
+        },
+      },
+      {
+        type: "hero",
+        data: {
+          name: "Your Name",
+        }
+      },
+      {
+        type: "canvas",
+        data: {
+          content: `<h1>Hello, World! 👋</h1><p>Welcome to your new <strong>Blank Canvas</strong> portfolio.</p><p>This is a Notion-style editor. You can:</p><ul><li>Type anywhere to add text</li><li>Type <code>/</code> to insert headings, images, lists, and more</li><li>Drag and drop blocks to rearrange them</li></ul><h2>About Me</h2><p>I am a creative developer passionate about building tools that help people.</p><h2>Projects</h2><p>Here is a list of my recent work:</p><ul><li><strong>Project A</strong>: A cool web app</li><li><strong>Project B</strong>: A mobile application</li></ul>`
+        }
+      },
+      {
+        type: "themes",
+        data: {
+          simpleBlack: {
+            colors: {
+              primary: 'black',
+              primaryHover: 'gray-800',
+              secondary: 'white',
+              accent: 'gray',
+              text: {
+                primary: 'black',
+                secondary: 'gray-600',
+              },
+              background: {
+                primary: 'white',
+                secondary: 'gray-50',
+              },
+              states: {
+                muted: 'opacity-70',
+              }
+            }
+          }
+        }
+      }
+    ]
   },
 };

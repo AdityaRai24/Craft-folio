@@ -13,7 +13,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
+import { setPreviewMode } from "@/slices/editModeSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { Eye, EyeOff } from "lucide-react";
 interface SettingsMenuProps {
   isMenuExpanded: boolean;
   setIsMenuExpanded: (expanded: boolean) => void;
@@ -39,6 +42,11 @@ const SettingsMenu = ({
   onShowDeploy,
   onShowSEOSettings,
 }: SettingsMenuProps) => {
+
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
+  const dispatch = useDispatch();
+
+
   const buttonVariants = {
     hover: {
       scale: 1.1,
@@ -117,9 +125,10 @@ const SettingsMenu = ({
     };
   };
 
+
   return (
     <TooltipProvider>
-      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[9999] settings-menu-container">
+      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-[9999] settings-menu-container flex flex-col gap-4 items-center">
         {/* Main Settings Button */}
         <Tooltip>
           <TooltipTrigger asChild>
@@ -147,6 +156,33 @@ const SettingsMenu = ({
           </TooltipTrigger>
           <TooltipContent className="bg-white text-black border border-gray-200 shadow-lg z-[9999]">
             <p>Settings Menu</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Preview Toggle Button */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              onClick={() => dispatch(setPreviewMode(!previewMode))}
+              className="relative p-3 cursor-pointer rounded-full shadow-lg transition-all duration-300"
+              style={{
+                backgroundColor: previewMode ? "#10b981" : themeColors.bgCard, // Green when active
+                color: previewMode ? "#ffffff" : themeColors.textPrimary,
+                boxShadow: `0 4px 16px ${themeColors.primaryGlow}`,
+                border: `1px solid ${themeColors.borderLight}`
+              }}
+            >
+              {previewMode ? <EyeOff size={20} /> : <Eye size={20} />}
+            </motion.button>
+          </TooltipTrigger>
+          <TooltipContent className="bg-white text-black border border-gray-200 shadow-lg z-[9999]">
+            <p>{previewMode ? "Exit Preview" : "Preview Mode"}</p>
           </TooltipContent>
         </Tooltip>
 

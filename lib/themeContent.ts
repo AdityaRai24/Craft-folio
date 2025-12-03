@@ -1,5 +1,5 @@
-export const themeContent : any = {
-  NeoSpark : {
+export const themeContent: any = {
+  NeoSpark: {
     colors: {
       primary: 'green-500',      // Main action color
       primaryHover: 'green-800', // Primary color hover state
@@ -132,6 +132,27 @@ export const themeContent : any = {
       },
       states: {
         muted: 'opacity-70',    // Muted state with reduced opacity
+      }
+    }
+  },
+  BlankCanvas: {
+    simpleBlack: {
+      colors: {
+        primary: 'black',
+        primaryHover: 'gray-800',
+        secondary: 'white',
+        accent: 'gray',
+        text: {
+          primary: 'black',
+          secondary: 'gray-600',
+        },
+        background: {
+          primary: 'white',
+          secondary: 'gray-50',
+        },
+        states: {
+          muted: 'opacity-70',
+        }
       }
     }
   }

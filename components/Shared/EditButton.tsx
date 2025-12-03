@@ -20,7 +20,7 @@ const EditButton = ({
   divStyles?: string;
 }) => {
   const dispatch = useDispatch();
-  const { currentlyEditing } = useSelector(
+  const { currentlyEditing, previewMode } = useSelector(
     (state: RootState) => state.editMode
   );
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
@@ -34,7 +34,7 @@ const EditButton = ({
     }
   };
 
-  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const shouldShowButton = !previewMode && shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
   return (
     <div className={divStyles ? divStyles : "hidden md:block "}>

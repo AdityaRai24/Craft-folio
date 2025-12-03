@@ -14,5 +14,9 @@ export const maps: any = {
     "MacOS": {
         "themeName": "Monterey",
         "fontName": "Raleway"
+    },
+    "BlankCanvas": {
+        "themeName": "simpleBlack",
+        "fontName": "Inter"
     }
 }

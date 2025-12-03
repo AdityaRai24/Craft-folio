@@ -21,8 +21,36 @@ import LumenFlowTechnologies from "@/components/LumenFlow/Technologies";
 
 import MacOSDesktop from "@/components/MacOS/Desktop";
 import WindowsDesktop from "@/components/Windows/Desktop";
+import BlankCanvas from "@/components/BlankCanvas/Canvas";
 
 export const templateConfig: any = {
+  BlankCanvas: {
+    navbar: null, // Navbar is built-in to Canvas
+    spotlight: false,
+    sections: {
+      canvas: BlankCanvas,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: false,
+      summary: false,
+      title: false,
+      shortSummary: false,
+      longSummary: false,
+      safari: false,
+      wallpaper: false,
+    },
+    hero: [],
+    structure: {
+      technologies: "flat",
+    },
+    defaults: {
+      userInfo: {
+        profileImage: "https://placehold.co/400x400?text=Profile+Image",
+      },
+    },
+  },
   NeoSpark: {
     navbar: NeoSparkNavbar,
     spotlight: true,

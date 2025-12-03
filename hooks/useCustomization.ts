@@ -34,6 +34,15 @@ export function useCustomization<T extends Record<string, any>>(
     // Visual editor open state
     const [visualEditorOpen, setVisualEditorOpen] = useState(false);
 
+    const { previewMode } = useSelector((state: RootState) => state.editMode);
+
+    // Close visual editor when preview mode is active
+    useEffect(() => {
+        if (previewMode) {
+            setVisualEditorOpen(false);
+        }
+    }, [previewMode]);
+
     // Use effectiveCustomization for preview - shows draft when editor is open, otherwise main state
     const effectiveCustomization = visualEditorOpen && draftCustomization
         ? draftCustomization

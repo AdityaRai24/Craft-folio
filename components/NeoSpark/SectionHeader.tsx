@@ -21,6 +21,7 @@ const SectionHeader = ({
 }) => {
   // Authentication check
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const { user, isLoaded } = useUser();
   const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
 
@@ -41,7 +42,7 @@ const SectionHeader = ({
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20">
           <div className="flex items-center justify-center gap-1 sm:gap-2">
             <EditButton sectionName={sectionName} />
-            {onVisualEditorOpen && shouldShowButton && (
+            {onVisualEditorOpen && shouldShowButton && !previewMode && (
               <button
                 onClick={onVisualEditorOpen}
                 className="md:flex hidden items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"

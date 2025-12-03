@@ -29,6 +29,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
   const [activeTab, setActiveTab] = useState<Tab>("layout");
 
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme.data[currentPortTheme];
   const titleColor = theme.colors.primary;
@@ -229,23 +230,25 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       {experience.description}
                     </p>
                     {/* Magic Write Button */}
-                    <div className={`absolute -top-2 z-10 hidden md:block ${isAlternating && index % 2 === 0 ? "-left-10" : "-right-2"
-                      }`}>
-                      <MagicWrite
-                        onMagicWrite={async (prompt: string) => {
-                          const enhanced = await handleMagicWrite(prompt, experience.description, "experience");
-                          const updated = [...experienceData];
-                          updated[index] = { ...updated[index], description: enhanced };
-                          setExperienceData(updated);
-                          await saveEnhancedContent(updated);
-                          return enhanced;
-                        }}
-                        placeholder="Enhance this experience description..."
-                        buttonText=""
-                        context={experience?.description}
-                        className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
-                      />
-                    </div>
+                    {!previewMode && (
+                      <div className={`absolute -top-2 z-10 hidden md:block ${isAlternating && index % 2 === 0 ? "-left-10" : "-right-2"
+                        }`}>
+                        <MagicWrite
+                          onMagicWrite={async (prompt: string) => {
+                            const enhanced = await handleMagicWrite(prompt, experience.description, "experience");
+                            const updated = [...experienceData];
+                            updated[index] = { ...updated[index], description: enhanced };
+                            setExperienceData(updated);
+                            await saveEnhancedContent(updated);
+                            return enhanced;
+                          }}
+                          placeholder="Enhance this experience description..."
+                          buttonText=""
+                          context={experience?.description}
+                          className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {effectiveCustomization.techStackVisible && experience.techStack && (
