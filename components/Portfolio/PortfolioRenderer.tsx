@@ -3,11 +3,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useEffect, useState } from "react";
+import { useCustomization } from "@/hooks/useCustomization";
 import {
     setCustomCSSState,
     setFontName,
     setThemeName,
 } from "@/slices/dataSlice";
+import { defaultAcademicSidebarStyles } from "@/types/academic/sidebar";
 import { templateConfig } from "@/lib/templateConfig";
 import Sidebar from "@/app/p/Sidebar";
 import { Spotlight } from "@/components/NeoSpark/Spotlight";
@@ -44,6 +46,7 @@ const PortfolioRenderer = ({
         themeName,
         fontName,
         customCSSState,
+        componentCustomizations,
     } = useSelector((state: RootState) => state.data);
 
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -62,8 +65,8 @@ const PortfolioRenderer = ({
         : [];
 
     const themes = dataLoaded
-        ? portfolioData?.find((item: any) => item.type === "themes")?.data
-        : undefined;
+        ? portfolioData?.find((item: any) => item.type === "themes")?.data || {}
+        : {};
 
     // Show guest modal on first load if in guest mode
     useEffect(() => {
@@ -71,6 +74,15 @@ const PortfolioRenderer = ({
             setShowGuestModal(true);
         }
     }, [dataLoaded, portfolioUserId]);
+
+    // Get sidebar customization for Academic template
+    // We move the hook here to control layout preview
+    const sidebarState = useCustomization("sidebar", defaultAcademicSidebarStyles, portfolioId);
+    const { effectiveCustomization } = sidebarState;
+
+    const sidebarWidth = effectiveCustomization.width || "280px";
+    const sidebarAlignment = effectiveCustomization.alignment || "left";
+    const isAcademic = templateName === "Academic";
 
     // Don't try to access template config until we have template name
     const Template =
@@ -164,7 +176,8 @@ const PortfolioRenderer = ({
                 open={showGuestModal}
                 onClose={() => setShowGuestModal(false)}
             />
-            <div className="min-h-screen flex flex-col overflow-x-hidden">
+            {/* Removed overflow-x-hidden to fix sticky sidebar */}
+            <div className="min-h-screen flex flex-col">
                 {hasSpotlight && (
                     <div className="absolute inset-0">
                         <Spotlight
@@ -183,32 +196,47 @@ const PortfolioRenderer = ({
                     }
                 >
                     <motion.div
-                        className={cn(" min-h-screen w-full", selectedFontClass)}
+                        className={cn(
+                            "min-h-screen w-full transition-all duration-300 ease-in-out",
+                            selectedFontClass,
+                            isAcademic ? "flex flex-col md:flex-row" : "",
+                            isAcademic && sidebarAlignment === "right" ? "md:flex-row-reverse" : ""
+                        )}
+                        style={
+                            {
+                                "--sidebar-width": sidebarWidth,
+                            } as React.CSSProperties
+                        }
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                         {NavbarComponent && (
-                            <NavbarComponent
-                                customCSS={customCSSState}
-                                currentPortTheme={themeName}
-                                portfolioId={portfolioId}
-                            />
+                            <div className={cn(isAcademic ? "w-full md:w-[var(--sidebar-width)] flex-shrink-0" : "")}>
+                                <NavbarComponent
+                                    customCSS={customCSSState}
+                                    currentPortTheme={themeName}
+                                    portfolioId={portfolioId}
+                                    {...sidebarState}
+                                />
+                            </div>
                         )}
                         <Sidebar />
 
-                        {allSections && allSections.length > 0 ? (
-                            allSections.map((section: string) =>
-                                getComponentForSection(section)
-                            )
-                        ) : (
-                            <div className={cn("flex items-center justify-center h-screen")}>
-                                <p className="text-xl">Portfolio content not found</p>
-                            </div>
-                        )}
+                        <div className={cn("flex-1", isAcademic ? "min-w-0" : "")}>
+                            {allSections && allSections.length > 0 ? (
+                                allSections.map((section: string) =>
+                                    getComponentForSection(section)
+                                )
+                            ) : (
+                                <div className={cn("flex items-center justify-center h-screen")}>
+                                    <p className="text-xl">Portfolio content not found</p>
+                                </div>
+                            )}
 
-                        {/* Ensure Contact/Footer is always rendered if supported by template but missing from data */}
-                        {allSections &&
-                            !allSections.includes("contact") &&
-                            getComponentForSection("contact")}
+                            {/* Ensure Contact/Footer is always rendered if supported by template but missing from data */}
+                            {allSections &&
+                                !allSections.includes("contact") &&
+                                getComponentForSection("contact")}
+                        </div>
                     </motion.div>
                 </div>
 

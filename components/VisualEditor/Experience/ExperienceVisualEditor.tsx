@@ -30,6 +30,11 @@ interface ExperienceVisualEditorProps {
     primaryColor?: string;
     primaryDarkColor?: string;
     showTimelineControls?: boolean;
+    showCardLayout?: boolean;
+    showTechStack?: boolean;
+    showLayoutTab?: boolean;
+    showStylingTab?: boolean;
+    showTimingTab?: boolean;
 }
 
 const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
@@ -45,10 +50,22 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
     primaryColor = ColorTheme.primary,
     primaryDarkColor = ColorTheme.primaryDark,
     showTimelineControls = true,
+    showCardLayout = true,
+    showTechStack = true,
+    showLayoutTab = true,
+    showStylingTab = true,
+    showTimingTab = true,
 }) => {
     const { isDragging, position: windowPosition, dragRef, handleMouseDown } = useDraggable();
 
     if (!isOpen || !draftCustomization) return null;
+
+    const tabs = [
+        showLayoutTab && "layout",
+        "typography",
+        showStylingTab && "styling",
+        showTimingTab && "timing"
+    ].filter(Boolean) as ("layout" | "typography" | "styling" | "timing")[];
 
     return (
         <>
@@ -78,10 +95,10 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
 
                 {/* Tab Navigation */}
                 <div className="flex border-b border-zinc-700">
-                    {["layout", "typography", "styling", "timing"].map((tab) => (
+                    {tabs.map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => onTabChange(tab as any)}
+                            onClick={() => onTabChange(tab)}
                             className={`flex-1 py-2 sm:py-3 px-2 sm:px-3 text-xs sm:text-sm capitalize transition-colors ${activeTab === tab
                                 ? "text-white"
                                 : "text-gray-400 hover:text-white hover:bg-zinc-800"
@@ -108,11 +125,13 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                 <div className="max-h-96 overflow-y-auto p-3 sm:p-4 space-y-4 sm:space-y-6">
                     {activeTab === "layout" && (
                         <>
-                            <CardStyleSelector
-                                value={draftCustomization?.cardLayout ?? customization.cardLayout}
-                                onChange={(value) => onUpdateDraft("cardLayout", value)}
-                                primaryColor={primaryColor}
-                            />
+                            {showCardLayout && (
+                                <CardStyleSelector
+                                    value={draftCustomization?.cardLayout ?? customization.cardLayout}
+                                    onChange={(value) => onUpdateDraft("cardLayout", value)}
+                                    primaryColor={primaryColor}
+                                />
+                            )}
 
                             <SliderControl
                                 label="Card Spacing"
@@ -314,10 +333,12 @@ const ExperienceVisualEditor: React.FC<ExperienceVisualEditorProps> = ({
                                 step={1}
                             />
 
-                            <TechStackStyleSelector
-                                value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
-                                onChange={value => onUpdateDraft("techStackStyle", value)}
-                            />
+                            {showTechStack && (
+                                <TechStackStyleSelector
+                                    value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
+                                    onChange={value => onUpdateDraft("techStackStyle", value)}
+                                />
+                            )}
                         </>
                     )}
 

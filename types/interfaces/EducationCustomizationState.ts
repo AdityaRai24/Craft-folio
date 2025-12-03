@@ -32,6 +32,9 @@ export interface EducationCustomizationState {
     dateFormat: "short" | "long" | "year";
     institutionStyle: "bold" | "italic" | "minimal";
     institutionSize: "sm" | "md" | "lg";
+    backgroundColor?: string;
+    borderColor?: string;
+    headingColor?: string;
 }
 
 

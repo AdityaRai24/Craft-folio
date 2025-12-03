@@ -18,6 +18,7 @@ export interface ProjectsCustomizationState {
   // Layout & Structure
   layout: "single" | "grid";
   gridColumns: number;
+  backgroundColor?: string;
   cardSpacing: number;
   cardBorderRadius: number;
   imageBorderRadius: number;

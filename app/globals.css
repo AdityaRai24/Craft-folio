@@ -9,7 +9,7 @@
 .main-bg-noise {
   background-repeat: repeat;
   z-index: 0;
-  background-image: url("/images/backgrounds/noise-texture.svg");
+  /* background-image: url("/images/backgrounds/noise-texture.svg"); */
   scroll-behavior: smooth;
 }
 

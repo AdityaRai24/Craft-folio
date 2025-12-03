@@ -22,6 +22,13 @@ import LumenFlowTechnologies from "@/components/LumenFlow/Technologies";
 import MacOSDesktop from "@/components/MacOS/Desktop";
 import WindowsDesktop from "@/components/Windows/Desktop";
 
+import AcademicSidebar from "@/components/Academic/Sidebar";
+import AcademicHero from "@/components/Academic/Hero";
+import AcademicResearch from "@/components/Academic/Research";
+import AcademicEducation from "@/components/Academic/Education";
+import AcademicExperience from "@/components/Academic/Experience";
+import AcademicContact from "@/components/Academic/Contact";
+
 export const templateConfig: any = {
   NeoSpark: {
     navbar: NeoSparkNavbar,
@@ -207,6 +214,37 @@ export const templateConfig: any = {
       },
       userInfo: {
         profileImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=400",
+      },
+    },
+  },
+  Academic: {
+    navbar: AcademicSidebar,
+    spotlight: false,
+    sections: {
+      hero: AcademicHero,
+      projects: AcademicResearch,
+      experience: AcademicExperience,
+      education: AcademicEducation,
+      contact: AcademicContact,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: false,
+      summary: true,
+      title: true,
+      shortSummary: false,
+      longSummary: true,
+      safari: false,
+      profileImage: true,
+    },
+    hero: ["name", "title", "summary", "longSummary"],
+    structure: {
+      technologies: "flat",
+    },
+    defaults: {
+      userInfo: {
+        profileImage: "https://placehold.co/400x400?text=Dr.+Profile",
       },
     },
   },

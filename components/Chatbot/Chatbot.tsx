@@ -92,7 +92,7 @@ const PortfolioChatbot = ({
   const themeColors = CHATBOT_THEMES[chatbotTheme];
 
   const dispatch = useDispatch();
-  const themeOptionsArray = Object.keys(themeOptions);
+  const themeOptionsArray = themeOptions ? Object.keys(themeOptions) : [];
 
   useEffect(() => {
     if (typeof window !== "undefined") {

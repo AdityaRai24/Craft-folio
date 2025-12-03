@@ -259,40 +259,36 @@ const ExperienceSidebar = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-5">
-            {experienceSection?.sectionTitle && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
-                <Input
-                  id="sectionTitle"
-                  value={sectionTitle}
-                  onChange={(e) => setSectionTitle(e.target.value)}
-                  placeholder="Enter section title"
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="sectionTitle" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Title</Label>
+              <Input
+                id="sectionTitle"
+                value={sectionTitle}
+                onChange={(e) => setSectionTitle(e.target.value)}
+                placeholder="Enter section title"
+                style={{
+                  backgroundColor: ColorTheme.bgCard,
+                  borderColor: ColorTheme.borderLight,
+                  color: ColorTheme.textPrimary
+                }}
+              />
+            </div>
 
-            {experienceSection?.sectionDescription && (
-              <div className="space-y-2">
-                <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
-                <Textarea
-                  id="sectionDescription"
-                  value={sectionDescription}
-                  onChange={(e) => setSectionDescription(e.target.value)}
-                  placeholder="Enter section description"
-                  className="resize-none h-20"
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="sectionDescription" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Section Description</Label>
+              <Textarea
+                id="sectionDescription"
+                value={sectionDescription}
+                onChange={(e) => setSectionDescription(e.target.value)}
+                placeholder="Enter section description"
+                className="resize-none h-20"
+                style={{
+                  backgroundColor: ColorTheme.bgCard,
+                  borderColor: ColorTheme.borderLight,
+                  color: ColorTheme.textPrimary
+                }}
+              />
+            </div>
 
             {hasHeaderChanges && (
               <Button

@@ -36,8 +36,8 @@ const TypographySelector: React.FC<TypographySelectorProps> = ({
             key={option.value}
             onClick={() => onChange(option.value)}
             className={`cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 ${value === option.value
-                ? "border-transparent text-white"
-                : "border-gray-600 hover:border-gray-400 bg-zinc-800"
+              ? "border-transparent text-white"
+              : "border-gray-600 hover:border-gray-400 bg-zinc-800"
               }`}
             style={
               value === option.value
