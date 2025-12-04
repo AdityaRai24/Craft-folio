@@ -1,6 +1,6 @@
 export interface Technology {
     name: string;
-    logo?: string;
+    logo: string;
 }
 
 export interface Experience {

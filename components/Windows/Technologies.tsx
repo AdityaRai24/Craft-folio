@@ -16,13 +16,13 @@ import { useCustomization } from "@/hooks/useCustomization";
 import { Technology } from "@/types/interfaces/TechnologiesCustomizationState";
 
 
-const Technologies = ({ portfolioId }: { portfolioId: string }) => {
+const Technologies = ({ portfolioId, previewMode }: { portfolioId: string; previewMode?: boolean }) => {
     const dispatch = useDispatch();
     const { portfolioData, componentCustomizations, portfolioUserId } = useSelector((state: RootState) => state.data);
     const { currentTheme, theme } = useWindowsTheme();
     const isDark = theme === "dark";
     const { user, isLoaded } = useUser();
-    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
     const [technologies, setTechnologies] = useState<Technology[]>([]);
 

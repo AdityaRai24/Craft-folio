@@ -47,7 +47,12 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
 
     const initialContent = canvasSection?.data?.content || "";
     const logoText = heroSection?.data?.name || "Portfolio";
-    const socialLinks = userInfoSection?.data || {};
+
+    // Extract social links handling both { socials: [...] } and [...] formats
+    const userInfoData = userInfoSection?.data || {};
+    const socialLinks = Array.isArray(userInfoData.socials)
+        ? userInfoData.socials
+        : (Array.isArray(userInfoData) ? userInfoData : userInfoData);
 
     const canEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
     const {
@@ -121,7 +126,13 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
     };
 
     return (
-        <div className={`min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col ${font || "font-sans"}`}>
+        <div
+            className={`min-h-screen flex flex-col ${font || "font-sans"}`}
+            style={{
+                backgroundColor: 'var(--port-bg)',
+                color: 'var(--port-text)',
+            }}
+        >
             <style>{customCSS}</style>
             <style jsx global>{`
                 .bn-editor {
@@ -130,7 +141,20 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
                 .dark .bn-editor {
                     background-color: transparent !important;
                 }
-                /* Target the specific element that might have the background */
+                /* Force font inheritance on all text content within the editor */
+                .bn-editor,
+                .bn-editor div,
+                .bn-editor p,
+                .bn-editor h1,
+                .bn-editor h2,
+                .bn-editor h3,
+                .bn-editor li,
+                .bn-block-content,
+                .bn-inline-content {
+                    font-family: inherit !important;
+                }
+                
+                /* Ensure background transparency */
                 .bn-block-content {
                     background-color: transparent !important;
                 }
@@ -152,8 +176,8 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
                         onClick={openVisualEditor}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-full transition-colors shadow-lg hover:shadow-xl hover:brightness-110"
                         style={{
-                            background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                            boxShadow: `0 4px 14px 0 ${ColorTheme.primaryGlow}`
+                            background: `linear-gradient(135deg, #10b981, #047857)`,
+                            boxShadow: `0 4px 14px 0 rgba(16, 185, 129, 0.15)`
                         }}
                     >
                         <Settings size={16} />
@@ -181,13 +205,16 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
                         </div>
                     )}
 
-                    <BlockNoteView
-                        editor={editor}
-                        onChange={onEditorChange}
-                        editable={canEdit && !previewMode}
-                        theme={theme === "dark" ? "dark" : "light"}
-                        className="min-h-[50vh]"
-                    />
+                    {/* Wrapper to ensure font class is available for inheritance */}
+                    <div className={font || ""}>
+                        <BlockNoteView
+                            editor={editor}
+                            onChange={onEditorChange}
+                            editable={canEdit && !previewMode}
+                            theme={theme === "dark" ? "dark" : "light"}
+                            className="min-h-[50vh]"
+                        />
+                    </div>
                 </div>
             </main>
 
@@ -208,7 +235,7 @@ const CanvasContent: React.FC<CanvasProps> = ({ portfolioId, currentPortTheme, c
 
 const Canvas: React.FC<CanvasProps> = (props) => {
     return (
-        <BlankCanvasThemeProvider currentPortTheme={props.currentPortTheme}>
+        <BlankCanvasThemeProvider>
             <CanvasContent {...props} />
         </BlankCanvasThemeProvider>
     );

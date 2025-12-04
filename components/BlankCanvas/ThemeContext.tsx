@@ -1,54 +1,57 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { generateBlankCanvasTheme } from "@/lib/portfolioThemes";
 
-interface ThemeContextType {
-    theme: "light" | "dark";
+type Theme = "light" | "dark";
+
+interface BlankCanvasThemeContextType {
+    theme: Theme;
     toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const BlankCanvasThemeContext = createContext<BlankCanvasThemeContextType | undefined>(undefined);
 
-export function BlankCanvasThemeProvider({
-    children,
-    currentPortTheme,
-}: {
-    children: React.ReactNode;
-    currentPortTheme?: string;
-}) {
-    // Initialize theme from prop or local storage, default to light
-    const [theme, setTheme] = useState<"light" | "dark">(() => {
+export function BlankCanvasThemeProvider({ children }: { children: React.ReactNode }) {
+    const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window !== "undefined") {
-            const savedTheme = localStorage.getItem("blank-canvas-theme") as "light" | "dark";
-            return savedTheme || (currentPortTheme === "dark" ? "dark" : "light");
+            const savedTheme = localStorage.getItem("blank-canvas-theme") as Theme;
+            return savedTheme || "light";
         }
-        return currentPortTheme === "dark" ? "dark" : "light";
+        return "light";
     });
 
     useEffect(() => {
         const root = window.document.documentElement;
-        root.classList.remove("dark", "light");
+
+        // Manage global class for Tailwind dark mode (optional, but good for some utility classes)
+        root.classList.remove("light", "dark");
         root.classList.add(theme);
+
+        // Apply scoped CSS variables
+        const themeVars = generateBlankCanvasTheme(theme);
+        Object.entries(themeVars).forEach(([key, value]) => {
+            root.style.setProperty(key, value as string);
+        });
+
         localStorage.setItem("blank-canvas-theme", theme);
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+        setTheme((prev) => (prev === "light" ? "dark" : "light"));
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <BlankCanvasThemeContext.Provider value={{ theme, toggleTheme }}>
             {children}
-        </ThemeContext.Provider>
+        </BlankCanvasThemeContext.Provider>
     );
 }
 
 export function useBlankCanvasTheme() {
-    const context = useContext(ThemeContext);
+    const context = useContext(BlankCanvasThemeContext);
     if (context === undefined) {
-        throw new Error(
-            "useBlankCanvasTheme must be used within a BlankCanvasThemeProvider"
-        );
+        throw new Error("useBlankCanvasTheme must be used within a BlankCanvasThemeProvider");
     }
     return context;
 }

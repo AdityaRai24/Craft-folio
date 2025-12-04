@@ -35,18 +35,27 @@ const CanvasSidebar = () => {
         if (userInfoSection) {
             const data = userInfoSection.data || {};
 
-            // Check if data is already in array format (new) or object format (old)
-            if (Array.isArray(data)) {
-                // Ensure all links have IDs (migration fix for links created before ID was added)
-                const linksWithIds = data.map(link => ({
+            // Check if data has 'socials' array (newest format)
+            if (data.socials && Array.isArray(data.socials)) {
+                // Ensure all links have IDs
+                const linksWithIds = data.socials.map((link: any) => ({
                     ...link,
                     id: link.id || crypto.randomUUID()
                 }));
                 setSocialLinks(linksWithIds);
-            } else {
-                // Convert old object format to array
+            }
+            // Check if data is already in array format (intermediate format)
+            else if (Array.isArray(data)) {
+                const linksWithIds = data.map((link: any) => ({
+                    ...link,
+                    id: link.id || crypto.randomUUID()
+                }));
+                setSocialLinks(linksWithIds);
+            }
+            // Legacy object format
+            else {
                 const converted: SocialLink[] = Object.entries(data).map(([key, value]) => {
-                    if (!value) return null;
+                    if (!value || key === 'socials') return null; // Skip 'socials' key if it somehow got here but wasn't an array
                     return {
                         id: crypto.randomUUID(),
                         platform: key as SocialPlatform,
@@ -86,8 +95,8 @@ const CanvasSidebar = () => {
 
             // Update UserInfo (Socials)
             if (userInfoSection) {
-                // Save as array directly
-                const newUserInfoData = socialLinks;
+                // Save as object with socials array
+                const newUserInfoData = { socials: socialLinks };
 
                 dispatch(updatePortfolioData({
                     sectionType: "userInfo",

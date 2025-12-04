@@ -1,0 +1,52 @@
+{
+    "sections": [
+        {
+            "data": {
+                "name": "My Portfolio"
+            },
+            "type": "hero"
+        },
+        {
+            "data": {
+                "content": "<h1>Welcome to your Blank Canvas</h1><p>This is a flexible, document-style portfolio template designed for creators who want complete control over their narrative.</p><br><h3>How to use this template:</h3><ul><li><strong>Just start typing:</strong> Click anywhere and start writing your story.</li><li><strong>Add rich content:</strong> Type <code>/</code> to open the command menu. You can add headings, lists, images, code blocks, and more.</li><li><strong>Customize the look:</strong> Use the \"Visual Editor\" button to change the font, max-width, and other settings.</li></ul><br><h3>What can you build?</h3><p>This template is perfect for:</p><ul><li>Case studies and long-form writing</li><li>Minimalist resumes</li><li>Project documentation</li><li>Personal blogs</li></ul><br><p><em>Delete this text and start creating your masterpiece!</em></p>"
+            },
+            "type": "canvas",
+            "sectionTitle": "Canvas Content",
+            "sectionDescription": "Main content area"
+        },
+        {
+            "data": {
+                "socials": [
+                    {
+                        "id": "default-github",
+                        "platform": "github",
+                        "url": "https://github.com"
+                    },
+                    {
+                        "id": "default-linkedin",
+                        "platform": "linkedin",
+                        "url": "https://linkedin.com"
+                    },
+                    {
+                        "id": "default-email",
+                        "platform": "email",
+                        "url": "mailto:hello@example.com"
+                    }
+                ]
+            },
+            "type": "userInfo",
+            "sectionTitle": "Contact Info",
+            "sectionDescription": "Social links for the navbar"
+        },
+        {
+            "data": {
+                "title": "My Portfolio",
+                "favicon": "",
+                "description": "A minimal portfolio site"
+            },
+            "type": "seo",
+            "sectionTitle": "SEO Settings",
+            "sectionDescription": "SEO settings for your portfolio"
+        }
+    ]
+}

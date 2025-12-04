@@ -192,7 +192,31 @@
                 "github": "github.com/jake",
                 "linkedin": "linkedin.com/in/jake",
                 "location": "San Francisco, CA",
-                "resumeLink": ""
+                "resumeLink": "",
+                "leftSocials": [
+                    {
+                        "id": "default-github",
+                        "platform": "github",
+                        "url": "https://github.com/jake"
+                    },
+                    {
+                        "id": "default-linkedin",
+                        "platform": "linkedin",
+                        "url": "https://linkedin.com/in/jake"
+                    }
+                ],
+                "rightSocials": [
+                    {
+                        "id": "default-email",
+                        "platform": "email",
+                        "url": "jake@su.edu"
+                    },
+                    {
+                        "id": "default-location",
+                        "platform": "location",
+                        "url": "San Francisco, CA"
+                    }
+                ]
             },
             "type": "userInfo"
         },

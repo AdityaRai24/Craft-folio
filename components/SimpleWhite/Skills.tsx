@@ -22,12 +22,13 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
   const dispatch = useDispatch();
 
   const { portfolioData, componentCustomizations } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
 
   // Theme colors
   const primaryColor = theme?.colors?.primary || ColorTheme.primary;
-  const textSecondaryColor = theme?.colors?.text?.secondary || ColorTheme.textSecondary;
+  const textSecondaryColor = "#4B5563"; // Darker gray for better contrast
   const backgroundPrimaryColor = theme?.colors?.background?.primary || ColorTheme.bgMain;
   const backgroundSecondaryColor = theme?.colors?.background?.secondary || ColorTheme.bgCard;
 
@@ -144,6 +145,7 @@ const Skills: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => 
           onVisualEditorClick={openVisualEditor}
           headerClasses={{ container: "mb-12 text-center relative", title: "text-4xl font-bold mb-4", description: "text-lg text-gray-600" }}
           currentPortTheme={currentPortTheme}
+          hideVisualEditor={previewMode}
         />
       </div>
 

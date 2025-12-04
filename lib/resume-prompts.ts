@@ -221,3 +221,65 @@ Return ONLY valid JSON in this format:
   "content": string // The HTML string
 }}
 `);
+
+export const blankCanvasHTMLTemplate = new PromptTemplate({
+  template: `
+    You are an expert portfolio builder. Your task is to convert the provided resume content into a professional, well-structured HTML document suitable for a developer portfolio.
+
+    The HTML will be used in a rich text editor, so use standard HTML tags like <h1>, <h2>, <h3>, <p>, <ul>, <li>, <strong>, <br>.
+    
+    Do NOT include <html>, <head>, or <body> tags.
+    Do NOT use any classes or inline styles.
+    
+    Structure the content as follows:
+    1.  **Hero Section**:
+        *   <h1>Name</h1>
+        *   <h2>Title/Role</h2>
+        *   <p>Professional Summary</p>
+        <hr>
+    
+    2.  **About Me**:
+        *   <h2>About Me</h2>
+        *   <p>A detailed bio based on the resume summary and experience.</p>
+        <hr>
+    
+    3.  **Work Experience**:
+        *   <h2>Work Experience</h2>
+        *   <ul>
+        *     <li><strong>Role @ Company</strong> (Date)<br>Description of responsibilities and achievements.</li>
+        *   </ul>
+        <hr>
+    
+    4.  **Projects** (if available):
+        *   <h2>Projects</h2>
+        *   <ul>
+        *     <li><strong>Project Name</strong> - Description.</li>
+        *   </ul>
+        <hr>
+    
+    5.  **Education**:
+        *   <h2>Education</h2>
+        *   <ul>
+        *     <li><strong>Degree</strong>, Institution (Date)</li>
+        *   </ul>
+        <hr>
+    
+    6.  **Skills**:
+        *   <h2>Skills</h2>
+        *   <p>List of skills, separated by commas or categorized.</p>
+        <hr>
+    
+    7.  **Contact**:
+        *   <h2>Contact</h2>
+        *   <p>Email, LinkedIn, GitHub, etc.</p>
+
+    Resume Content:
+    {resume_content}
+
+    Return ONLY valid JSON in this format:
+    {{
+      "content": string // The HTML string
+    }}
+  `,
+  inputVariables: ["resume_content"],
+});

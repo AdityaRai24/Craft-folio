@@ -256,6 +256,7 @@ const ProfessionalJourney = ({ currentPortTheme, customCSS, portfolioId }: any) 
                       }`}>
                       {experience.techStack.map((tech, i) => (
                         <span key={i} className={getTechStackClasses()}>
+                          <img src={tech.logo} alt={tech.name} className="w-4 h-4 mr-1 object-contain" />
                           {tech.name}
                         </span>
                       ))}

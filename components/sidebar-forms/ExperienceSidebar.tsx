@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { techList } from '@/lib/techlist';
 import { ColorTheme } from '@/lib/colorThemes';
 import { Experience, Technology } from '@/types/interfaces/Experience';
+import TechStackSelector from '../Shared/TechStackSelector';
 
 const ExperienceSidebar = () => {
 
@@ -36,9 +37,7 @@ const ExperienceSidebar = () => {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [currentExperience, setCurrentExperience] = useState<Experience>(emptyExperience);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [techInput, setTechInput] = useState<string>("");
-  const [suggestions, setSuggestions] = useState<Technology[]>([]);
-  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  // Tech search state removed - using TechStackSelector component
   const [sectionTitle, setSectionTitle] = useState(experienceSection?.sectionTitle || "");
   const [sectionDescription, setSectionDescription] = useState(experienceSection?.sectionDescription || "");
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
@@ -59,50 +58,6 @@ const ExperienceSidebar = () => {
       sectionDescription !== (experienceSection?.sectionDescription || "")
     );
   }, [sectionTitle, sectionDescription, experienceSection]);
-
-  const handleTechInputChange = (value: string) => {
-    setTechInput(value);
-    setHasSearched(value.trim() !== "");
-
-    if (value.trim() === "") {
-      setSuggestions([]);
-    } else {
-      const results = techList.filter((item: Technology) =>
-        item.name.toLowerCase().includes(value.toLowerCase()));
-      setSuggestions(results.slice(0, 4));
-    }
-  }
-
-  const addTechItem = (tech: Technology) => {
-    if (!currentExperience.techStack?.some(item => item.name === tech.name)) {
-      setCurrentExperience({
-        ...currentExperience,
-        techStack: [...(currentExperience.techStack || []), tech]
-      });
-    }
-    setTechInput("");
-    setSuggestions([]);
-    setHasSearched(false);
-  }
-
-  const addCustomTech = () => {
-    if (techInput.trim() !== "") {
-      const customTech: Technology = {
-        name: techInput.trim(),
-        logo: `https://placehold.co/100x100?text=${techInput.trim()}&font=montserrat&fontsize=18`
-      };
-      addTechItem(customTech);
-    }
-  }
-
-  const removeTechItem = (index: number) => {
-    const updatedTechStack = [...(currentExperience.techStack || [])];
-    updatedTechStack.splice(index, 1);
-    setCurrentExperience({
-      ...currentExperience,
-      techStack: updatedTechStack
-    });
-  }
 
   const handleSaveExperience = async () => {
     const originalExperiences = [...experiences];
@@ -401,106 +356,10 @@ const ExperienceSidebar = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex flex-col justify-between items-start">
-                <Label className="text-sm font-medium mb-2" style={{ color: ColorTheme.textPrimary }}>Tech Stack / Skills</Label>
-                <div className="flex gap-2 w-full">
-                  <Input
-                    value={techInput}
-                    onChange={(e) => handleTechInputChange(e.target.value)}
-                    placeholder="Search technologies..."
-                    style={{
-                      backgroundColor: ColorTheme.bgCard,
-                      borderColor: ColorTheme.borderLight,
-                      color: ColorTheme.textPrimary
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && suggestions.length > 0) {
-                        addTechItem(suggestions[0]);
-                      } else if (e.key === 'Enter' && techInput.trim() !== "") {
-                        addCustomTech();
-                      }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addCustomTech}
-                    style={{
-                      backgroundColor: ColorTheme.bgCard,
-                      borderColor: ColorTheme.borderLight,
-                      color: ColorTheme.textPrimary
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-1" /> Add
-                  </Button>
-                </div>
-              </div>
-
-              {suggestions.length > 0 && (
-                <div className="mb-4 mt-1">
-                  {suggestions.map((tech) => (
-                    <div
-                      key={tech.name}
-                      onClick={() => addTechItem(tech)}
-                      style={{
-                        backgroundColor: ColorTheme.bgCardHover,
-                        borderColor: ColorTheme.borderLight,
-                        color: ColorTheme.textPrimary
-                      }}
-                      className="flex border px-3 py-2 mt-1 rounded-lg items-center justify-between gap-2 cursor-pointer hover:bg-opacity-50 transition-colors"
-                    >
-                      <span className="text-sm">{tech.name}</span>
-                      <img src={tech.logo} alt={tech.name} width={20} height={20} />
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {hasSearched && suggestions.length === 0 && (
-                <div style={{
-                  backgroundColor: ColorTheme.bgCardHover,
-                  borderColor: ColorTheme.borderLight,
-                  color: ColorTheme.textSecondary
-                }} className="border rounded-lg p-3 text-center my-2">
-                  <p className="text-sm">No technologies found matching "{techInput}"</p>
-                  <p className="text-xs mt-1" style={{ color: ColorTheme.textMuted }}>Click Add to create it as a custom technology</p>
-                </div>
-              )}
-
-              {currentExperience.techStack && currentExperience.techStack.length > 0 && (
-                <div className="mt-3">
-                  <Label className="text-xs font-medium mb-1" style={{ color: ColorTheme.textSecondary }}>Selected Technologies</Label>
-                  <div className="space-y-2 mt-2">
-                    {currentExperience.techStack.map((tech, index) => (
-                      <div key={index} style={{
-                        backgroundColor: ColorTheme.bgCard,
-                        color: ColorTheme.textPrimary
-                      }} className="flex items-center justify-between rounded-md px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          <img src={tech.logo} alt={tech.name} className="w-5 h-5" />
-                          <span className="text-sm">{tech.name}</span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeTechItem(index)}
-                          style={{
-                            color: ColorTheme.textSecondary,
-                            backgroundColor: 'transparent'
-                          }}
-                          className="h-6 w-6 p-0 hover:bg-opacity-50 rounded-full"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <TechStackSelector
+              selectedTech={currentExperience.techStack || []}
+              onChange={(newStack) => setCurrentExperience({ ...currentExperience, techStack: newStack })}
+            />
 
             <Button
               type="button"

@@ -5,7 +5,6 @@ import {
   Mail,
   Github,
   Linkedin,
-
   MapPin,
   ExternalLink,
   Copy,
@@ -23,6 +22,7 @@ import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVi
 import { useCustomization } from "@/hooks/useCustomization";
 import SectionLoading from "../Shared/SectionLoading";
 import { useContactStyles } from "@/hooks/useContactStyles";
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
 
 type Tab = "layout" | "styling"
 
@@ -87,64 +87,85 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
   const getContactPlatforms = () => {
     const platforms = [];
 
-    // Always add Email
-    if (effectiveCustomization.showEmail) {
-      platforms.push({
-        key: "email",
-        icon: Mail,
-        label: "Email",
-        value: contactData.email || "hello@example.com",
-        href: `mailto:${contactData.email || "hello@example.com"}`,
-        description: contactData.email || "hello@example.com",
+    // Prioritize 'socials' array if available
+    if (contactData.socials && Array.isArray(contactData.socials) && contactData.socials.length > 0) {
+      contactData.socials.forEach((link: any) => {
+        const config = getPlatformConfig(link.platform);
+
+        let icon = config.icon;
+        let label = config.label;
+        let href = config.formatHref ? config.formatHref(link.url) : link.url;
+        let value = link.url;
+        let description = config.formatDescription ? config.formatDescription(link.url) : link.url;
+
+        platforms.push({
+          key: link.platform,
+          icon: icon,
+          label: label,
+          value: value,
+          href: href,
+          description: description,
+        });
       });
-    }
+    } else {
+      // Fallback to individual fields
+      // Always add Email
+      if (effectiveCustomization.showEmail && contactData.email) {
+        platforms.push({
+          key: "email",
+          icon: Mail,
+          label: "Email",
+          value: contactData.email,
+          href: `mailto:${contactData.email}`,
+          description: contactData.email,
+        });
+      }
 
-    // Always add LinkedIn
-    if (effectiveCustomization.showLinkedin) {
-      platforms.push({
-        key: "linkedin",
-        icon: Linkedin,
-        label: "LinkedIn",
-        value: contactData.linkedin || "https://linkedin.com/in/username",
-        href: contactData.linkedin || "https://linkedin.com/in/username",
-        description: contactData.linkedin
-          ? (contactData.linkedin.includes("/")
-            ? "@" + contactData.linkedin.split("/").filter(Boolean).pop()
-            : "@" + contactData.linkedin)
-          : "@username",
-      });
-    }
+      // Always add LinkedIn
+      if (effectiveCustomization.showLinkedin && contactData.linkedin) {
+        platforms.push({
+          key: "linkedin",
+          icon: Linkedin,
+          label: "LinkedIn",
+          value: contactData.linkedin,
+          href: contactData.linkedin,
+          description: contactData.linkedin
+            ? (contactData.linkedin.includes("/")
+              ? "@" + contactData.linkedin.split("/").filter(Boolean).pop()
+              : "@" + contactData.linkedin)
+            : "@username",
+        });
+      }
 
-    // Always add GitHub
-    if (effectiveCustomization.showGithub) {
-      platforms.push({
-        key: "github",
-        icon: Github,
-        label: "GitHub",
-        value: contactData.github || "https://github.com/username",
-        href: contactData.github || "https://github.com/username",
-        description: contactData.github
-          ? (contactData.github.includes("/")
-            ? "@" + contactData.github.split("/").filter(Boolean).pop()
-            : "@" + contactData.github)
-          : "@username",
-      });
-    }
+      // Always add GitHub
+      if (effectiveCustomization.showGithub && contactData.github) {
+        platforms.push({
+          key: "github",
+          icon: Github,
+          label: "GitHub",
+          value: contactData.github,
+          href: contactData.github,
+          description: contactData.github
+            ? (contactData.github.includes("/")
+              ? "@" + contactData.github.split("/").filter(Boolean).pop()
+              : "@" + contactData.github)
+            : "@username",
+        });
+      }
 
-
-
-    // Always add Location
-    if (effectiveCustomization.showLocation) {
-      platforms.push({
-        key: "location",
-        icon: MapPin,
-        label: "Location",
-        value: contactData.location || "San Francisco, CA",
-        href: `https://maps.google.com/?q=${encodeURIComponent(
-          contactData.location || "San Francisco, CA"
-        )}`,
-        description: contactData.location || "San Francisco, CA",
-      });
+      // Always add Location
+      if (effectiveCustomization.showLocation && contactData.location) {
+        platforms.push({
+          key: "location",
+          icon: MapPin,
+          label: "Location",
+          value: contactData.location,
+          href: `https://maps.google.com/?q=${encodeURIComponent(
+            contactData.location
+          )}`,
+          description: contactData.location,
+        });
+      }
     }
 
     return platforms;
@@ -315,19 +336,19 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       )}
                     </div>
                   </div>
-                ) : (
+                ) : platform.href.startsWith("http") ? (
                   // Clickable Link Card (Email, LinkedIn, GitHub, Phone)
                   <motion.a
                     href={platform.href}
                     target="_blank" // Force new tab as requested
                     rel="noopener noreferrer"
-                    className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
+                    className={`group flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full`}
                     whileHover={
                       effectiveCustomization.hoverEffects ? { scale: 1.02 } : {}
                     }
                     whileTap={effectiveCustomization.hoverEffects ? { scale: 0.98 } : {}}
                   >
-                    <div className="absolute top-3 right-3 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                       <ArrowUpRight className="w-4 h-4" />
                     </div>
 
@@ -353,6 +374,31 @@ const Contact = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       )}
                     </div>
                   </motion.a>
+                ) : (
+                  // Non-clickable Card
+                  <div className={`flex ${effectiveCustomization.cardLayout === "flex" ? "items-center w-full" : "flex-col"} ${getTextAlignment()} w-full h-full cursor-default`}>
+                    <div className={`flex items-center ${effectiveCustomization.cardLayout === "flex" ? "mr-4" : "justify-center mb-2"}`}>
+                      <platform.icon
+                        style={{ ...getIconSize(), color: titleColor }}
+                        className={`${effectiveCustomization.cardLayout === "flex" ? "" : "mb-2 sm:mb-3"} ${effectiveCustomization.iconStyle === "filled"
+                          ? "fill-current"
+                          : ""
+                          }`}
+                      />
+                    </div>
+                    <div className={`${effectiveCustomization.cardLayout === "flex" ? "flex-1" : ""}`}>
+                      {effectiveCustomization.showLabels && (
+                        <div className="text-white text-base sm:text-xl font-bold mb-1 sm:mb-2">
+                          {platform.label}
+                        </div>
+                      )}
+                      {effectiveCustomization.showDescriptions && (
+                        <p className="text-gray-300 break-all text-xs sm:text-base">
+                          {platform.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             </motion.div>

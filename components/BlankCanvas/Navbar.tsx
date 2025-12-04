@@ -76,13 +76,14 @@ const Navbar: React.FC<NavbarProps> = ({
                 {/* Theme Toggle */}
                 <button
                     onClick={toggleTheme}
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-gray-600 dark:text-gray-400"
+                    className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                    style={{ color: 'var(--port-text-secondary)' }}
                     title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                 >
                     {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                 </button>
 
-                <div className="w-px h-6 bg-gray-200 dark:bg-zinc-800 mx-2" />
+                <div className="w-px h-6 mx-2" style={{ backgroundColor: 'var(--port-border)' }} />
 
                 {normalizedLinks.map((link, index) => {
                     const Icon = PLATFORM_ICONS[link.platform] || Globe;
@@ -96,7 +97,8 @@ const Navbar: React.FC<NavbarProps> = ({
                             href={href}
                             target={link.platform === 'email' ? undefined : "_blank"}
                             rel="noopener noreferrer"
-                            className="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
+                            className="transition-colors hover:opacity-80"
+                            style={{ color: 'var(--port-text-secondary)' }}
                             title={link.platform}
                         >
                             <Icon size={20} />

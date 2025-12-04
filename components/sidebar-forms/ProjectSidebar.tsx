@@ -12,10 +12,9 @@ import { updatePortfolioData } from '@/slices/dataSlice';
 import { useParams } from 'next/navigation';
 import { updateSection } from '@/app/actions/portfolio';
 import toast from 'react-hot-toast';
-import { techList } from '@/lib/techlist';
 import { ColorTheme } from '@/lib/colorThemes';
 import { Project } from '@/types/interfaces/ProjectsCustomizationState';
-import { Technology } from '@/types/interfaces/ProjectsCustomizationState';
+import TechStackSelector from '../Shared/TechStackSelector';
 
 const ProjectSidebar = () => {
 
@@ -43,10 +42,7 @@ const ProjectSidebar = () => {
   const [sectionDescription, setSectionDescription] = useState(projectsSection?.sectionDescription || "");
   const [hasHeaderChanges, setHasHeaderChanges] = useState(false);
 
-  // Tech search state
-  const [techSearchValue, setTechSearchValue] = useState<string>("");
-  const [techSuggestions, setTechSuggestions] = useState<Technology[]>([]);
-  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  // Tech search state removed - using TechStackSelector component
 
   const params = useParams();
   const portfolioId = params.portfolioId as string;
@@ -98,49 +94,6 @@ const ProjectSidebar = () => {
       setIsUploaded(false);
     }
   }, [currentProject.projectImage]);
-
-  const handleTechSearch = (value: string): void => {
-    setTechSearchValue(value)
-    setHasSearched(value.trim() !== "")
-
-    if (value.trim() === "") {
-      setTechSuggestions([])
-    } else {
-      const results = techList.filter((item: Technology) =>
-        item.name.toLowerCase().includes(value.toLowerCase()))
-      setTechSuggestions(results.slice(0, 6))
-    }
-  }
-
-  const addTechToProject = (item: Technology): void => {
-    if (!currentProject.techStack?.some(tech => tech.name === item.name)) {
-      setCurrentProject({
-        ...currentProject,
-        techStack: [...(currentProject.techStack || []), item]
-      });
-    }
-    setTechSearchValue("")
-    setTechSuggestions([])
-    setHasSearched(false)
-  }
-
-  const addCustomTech = (): void => {
-    if (techSearchValue.trim() !== "") {
-      const customTech: Technology = {
-        name: techSearchValue,
-        logo: `https://placehold.co/100x100?text=${techSearchValue}&font=montserrat&fontsize=18`
-      }
-      addTechToProject(customTech)
-    }
-  }
-
-  const removeTechItem = (name: string) => {
-    const updatedTechStack = currentProject.techStack?.filter(tech => tech.name !== name) || [];
-    setCurrentProject({
-      ...currentProject,
-      techStack: updatedTechStack
-    });
-  }
 
   const handleSaveProject = async () => {
     const originalProjects = [...projects];
@@ -456,118 +409,10 @@ const ProjectSidebar = () => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>Tech Stack</Label>
-              <div className='flex items-center justify-between gap-4 mb-4'>
-                <Input
-                  type='text'
-                  value={techSearchValue}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTechSearch(e.target.value)}
-                  placeholder='Search Technologies...'
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight,
-                    color: ColorTheme.textPrimary
-                  }}
-                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                    if (e.key === 'Enter' && techSuggestions.length > 0) {
-                      addTechToProject(techSuggestions[0])
-                    } else if (e.key === 'Enter' && techSearchValue.trim() !== "") {
-                      addCustomTech();
-                    }
-                  }}
-                />
-                <Button
-                  onClick={addCustomTech}
-                  style={{
-                    backgroundColor: ColorTheme.primary,
-                    color: ColorTheme.textPrimary,
-                    boxShadow: `0 4px 14px ${ColorTheme.primaryGlow}`
-                  }}
-                >
-                  Add
-                </Button>
-              </div>
-
-              {techSuggestions.length > 0 ? (
-                <div className='mb-6'>
-                  <h3 className='text-sm font-medium mb-2' style={{ color: ColorTheme.textPrimary }}>Suggestions</h3>
-                  <div>
-                    {techSuggestions.map((item: Technology) => (
-                      <div
-                        onClick={() => addTechToProject(item)}
-                        key={item.name}
-                        className='flex px-4 mt-2 rounded-lg items-center justify-between gap-4 py-2 cursor-pointer transition-colors'
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          borderColor: ColorTheme.borderLight,
-                          color: ColorTheme.textPrimary
-                        }}
-                      >
-                        <span className='text-sm'>{item.name}</span>
-                        <img src={item.logo} alt={item.name} width={25} height={25} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                hasSearched && (
-                  <div className='rounded-lg p-4 text-center mb-6'
-                    style={{
-                      backgroundColor: ColorTheme.bgCard,
-                      borderColor: ColorTheme.borderLight
-                    }}
-                  >
-                    <p className='text-sm' style={{ color: ColorTheme.textSecondary }}>No technologies found matching "{techSearchValue}"</p>
-                    <p className='text-xs mt-1' style={{ color: ColorTheme.textMuted }}>Use the Add button to add it as a custom technology</p>
-                  </div>
-                )
-              )}
-
-              {currentProject.techStack && currentProject.techStack.length > 0 ? (
-                <div>
-                  <h3 className='text-sm font-medium mb-2' style={{ color: ColorTheme.textPrimary }}>Selected Technologies</h3>
-                  <div>
-                    {currentProject.techStack.map((item: Technology) => (
-                      <div
-                        key={item.name}
-                        className='flex px-4 mt-2 rounded-lg items-center justify-between py-2'
-                        style={{
-                          backgroundColor: ColorTheme.bgCard,
-                          borderColor: ColorTheme.borderLight
-                        }}
-                      >
-                        <div className='flex items-center gap-4'>
-                          <img src={item.logo} alt={item.name} width={25} height={25} />
-                          <span className='text-sm' style={{ color: ColorTheme.textPrimary }}>{item.name}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeTechItem(item.name)}
-                          className='p-1 h-auto'
-                          style={{
-                            backgroundColor: 'transparent',
-                            color: ColorTheme.textSecondary
-                          }}
-                        >
-                          <X size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className='rounded-lg p-4 text-center mb-2'
-                  style={{
-                    backgroundColor: ColorTheme.bgCard,
-                    borderColor: ColorTheme.borderLight
-                  }}
-                >
-                  <p className='text-sm' style={{ color: ColorTheme.textSecondary }}>No technologies selected</p>
-                </div>
-              )}
-            </div>
+            <TechStackSelector
+              selectedTech={currentProject.techStack || []}
+              onChange={(newStack) => setCurrentProject({ ...currentProject, techStack: newStack })}
+            />
 
             <div className="space-y-2">
               <Label htmlFor="githubLink" className="text-sm font-medium" style={{ color: ColorTheme.textPrimary }}>GitHub Link</Label>

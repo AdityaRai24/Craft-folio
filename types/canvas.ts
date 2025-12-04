@@ -9,6 +9,7 @@ export type SocialPlatform =
     | "behance"
     | "email"
     | "website"
+    | "location"
     | "other";
 
 export interface SocialLink {
@@ -25,5 +26,5 @@ export interface CanvasCustomization {
 
 export const defaultCanvasCustomization: CanvasCustomization = {
     navbarVisible: true,
-    maxWidth: "100%",
+    maxWidth: "75%",
 };

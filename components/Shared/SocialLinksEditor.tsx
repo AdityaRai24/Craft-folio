@@ -1,43 +1,30 @@
 import React, { useState } from "react";
 import {
-    Github, Linkedin, Twitter, Instagram, Youtube, Facebook, Dribbble,
-    Mail, Globe, Plus, Trash2, GripVertical
+    Plus, Trash2, GripVertical, Globe
 } from "lucide-react";
 import { SocialLink, SocialPlatform } from "@/types/canvas";
 import { Reorder, useDragControls } from "framer-motion";
+import { SOCIAL_PLATFORMS, getPlatformConfig } from "@/lib/socialLinkUtils";
 
 interface SocialLinksEditorProps {
     links: SocialLink[];
     onChange: (links: SocialLink[]) => void;
 }
 
-const PLATFORMS: { value: SocialPlatform; label: string; icon: any }[] = [
-    { value: "github", label: "GitHub", icon: Github },
-    { value: "linkedin", label: "LinkedIn", icon: Linkedin },
-    { value: "twitter", label: "Twitter / X", icon: Twitter },
-    { value: "instagram", label: "Instagram", icon: Instagram },
-    { value: "youtube", label: "YouTube", icon: Youtube },
-    { value: "facebook", label: "Facebook", icon: Facebook },
-    { value: "dribbble", label: "Dribbble", icon: Dribbble },
-    { value: "email", label: "Email", icon: Mail },
-    { value: "website", label: "Website", icon: Globe },
-];
-
 const SocialLinkItem = ({
     link,
     index,
     updateLink,
     removeLink,
-    getIcon
 }: {
     link: SocialLink;
     index: number;
     updateLink: (index: number, url: string) => void;
     removeLink: (index: number) => void;
-    getIcon: (platform: SocialPlatform) => any;
 }) => {
     const controls = useDragControls();
-    const Icon = getIcon(link.platform);
+    const config = getPlatformConfig(link.platform);
+    const Icon = config.icon;
 
     return (
         <Reorder.Item
@@ -100,11 +87,6 @@ const SocialLinksEditor: React.FC<SocialLinksEditorProps> = ({ links, onChange }
         onChange(updatedLinks);
     };
 
-    const getIcon = (platform: SocialPlatform) => {
-        const found = PLATFORMS.find(p => p.value === platform);
-        return found ? found.icon : Globe;
-    };
-
     return (
         <div className="space-y-4">
             <h3 className="text-sm font-medium text-gray-200">Social Links</h3>
@@ -118,7 +100,6 @@ const SocialLinksEditor: React.FC<SocialLinksEditorProps> = ({ links, onChange }
                         index={index}
                         updateLink={handleUpdateLink}
                         removeLink={handleRemoveLink}
-                        getIcon={getIcon}
                     />
                 ))}
             </Reorder.Group>
@@ -132,7 +113,7 @@ const SocialLinksEditor: React.FC<SocialLinksEditorProps> = ({ links, onChange }
                         onChange={(e) => setNewPlatform(e.target.value as SocialPlatform)}
                         className="w-full bg-zinc-800 text-white text-sm rounded-md border border-zinc-600 px-2 py-1.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                     >
-                        {PLATFORMS.map(p => (
+                        {SOCIAL_PLATFORMS.map(p => (
                             <option key={p.value} value={p.value}>{p.label}</option>
                         ))}
                     </select>

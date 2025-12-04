@@ -155,25 +155,25 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
                     </div>
 
                     {/* Right section - Connect */}
-                    <div>
+                    <div className="mb-4 md:mb-0">
                         <h3 className="text-base sm:text-lg font-medium mb-2 sm:mb-3">Connect</h3>
-                        <div className="flex space-x-3 sm:space-x-4">
-                            <a
-                                href={userInfo?.github}
-                                target={effectiveCustomization.openInNewTab ? "_blank" : undefined}
-                                rel={effectiveCustomization.openInNewTab ? "noopener noreferrer" : undefined}
-                                className="text-gray-600 hover:text-gray-900 text-sm sm:text-base"
-                            >
-                                GitHub
-                            </a>
-                            <a
-                                href={userInfo?.linkedin}
-                                target={effectiveCustomization.openInNewTab ? "_blank" : undefined}
-                                rel={effectiveCustomization.openInNewTab ? "noopener noreferrer" : undefined}
-                                className="text-gray-600 hover:text-gray-900 text-sm sm:text-base"
-                            >
-                                LinkedIn
-                            </a>
+                        <div className="flex flex-col space-y-2">
+                            {[...(userInfo?.leftSocials || []), ...(userInfo?.rightSocials || [])]
+                                .filter((link: any) => link.platform?.toLowerCase() !== 'location')
+                                .map((link: any, index: number) => {
+                                    const isClickable = link.url && link.url.startsWith('http');
+                                    return (
+                                        <a
+                                            key={index}
+                                            href={isClickable ? link.url : undefined}
+                                            target={effectiveCustomization.openInNewTab && isClickable ? "_blank" : undefined}
+                                            rel={effectiveCustomization.openInNewTab && isClickable ? "noopener noreferrer" : undefined}
+                                            className={`text-gray-600 hover:text-gray-900 text-sm sm:text-base capitalize ${!isClickable ? 'cursor-default' : ''}`}
+                                        >
+                                            {link.platform}
+                                        </a>
+                                    );
+                                })}
                         </div>
                     </div>
                 </div>
@@ -182,10 +182,10 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
                 <div className="text-center text-gray-500 text-xs sm:text-sm mt-6 sm:mt-8">
                     © 2025 {heroData?.name || "John Doe"}. All rights reserved.
                 </div>
-            </footer>
+            </footer >
 
             {/* Contact Visual Editor */}
-            <ContactVisualEditor
+            < ContactVisualEditor
                 isOpen={visualEditorOpen}
                 onClose={() => setVisualEditorOpen(false)}
                 customization={customization}
@@ -198,7 +198,7 @@ const Contact = ({ currentPortTheme, portfolioId }: any) => {
                 primaryColor={primaryColor}
                 primaryDarkColor={primaryHoverColor}
             />
-        </div>
+        </div >
     );
 };
 

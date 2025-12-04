@@ -44,9 +44,9 @@ const CanvasVisualEditor: React.FC<CanvasVisualEditorProps> = ({
         onUpdate("maxWidth", `${value}%`);
     };
 
-    // Primary color for accents
-    const primaryColor = ColorTheme.primary;
-    const primaryDarkColor = ColorTheme.primaryDark;
+    // Primary color for accents - FIXED to ensure consistent editor look
+    const primaryColor = "#10b981"; // Emerald-500
+    const primaryDarkColor = "#047857"; // Emerald-700
 
     return (
         <>
@@ -126,6 +126,7 @@ const CanvasVisualEditor: React.FC<CanvasVisualEditorProps> = ({
                                     max={100}
                                     step={5}
                                     unit="%"
+                                    accentColor={primaryColor}
                                 />
                                 <p className="text-xs text-zinc-500 mt-1">
                                     Adjust the maximum width of the content area.

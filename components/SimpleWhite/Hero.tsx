@@ -24,31 +24,55 @@ import SimpleWhiteHeroVisualEditor from "@/components/VisualEditor/Hero/SimpleWh
 import { useSimpleWhiteHeroStyles } from "@/hooks/useSimpleWhiteHeroStyles";
 import { defaultSimpleWhiteContactStyles } from "@/types/simplewhite/contact";
 import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVisualEditor";
-
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
 
 type Tab = "layout" | "typography" | "buttons" | "effects";
 
 const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
-  const { portfolioData } = useSelector((state: RootState) => state.data);
-  const inTheme = portfolioData?.find((item: any) => item.type === "themes");
-  const theme = currentPortTheme ? inTheme?.data?.[currentPortTheme] : undefined;
-
   // Authentication check
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
+  const { currentlyEditing, previewMode } = useSelector((state: RootState) => state.editMode);
   const { user, isLoaded } = useUser();
-  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
-  // Theme colors
-  const textPrimaryColor = theme?.colors?.text?.primary || ColorTheme.textPrimary;
-  const textSecondaryColor = theme?.colors?.text?.secondary || ColorTheme.textSecondary;
+  // Theme colors - Enforcing SimpleBlack as default
+  const theme = {
+    colors: {
+      text: {
+        primary: "#111827",
+        secondary: "#374151"
+      },
+      accent: "#6B7280",
+      states: {
+        muted: "rgba(107, 114, 128, 0.1)"
+      },
+      primary: "#374151",
+      gradients: {
+        hover: "linear-gradient(90deg, rgba(107,114,128,0.1), rgba(55,65,81,0.1))",
+        header: "linear-gradient(90deg, rgba(107,114,128,0.05), transparent)",
+        primary: "linear-gradient(90deg, #6B7280, #374151)"
+      },
+      secondary: "#1F2937",
+      background: {
+        primary: "#FFFFFF",
+        secondary: "#F9FAFB"
+      },
+      primaryHover: "#1F2937"
+    }
+  };
+
+  const textPrimaryColor = theme.colors.text.primary;
+  const textSecondaryColor = theme.colors.text.secondary;
 
   const [isLoading, setIsLoading] = useState(true);
   const [heroData, setHeroData] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<Tab>("layout");
   const [contactActiveTab, setContactActiveTab] = useState<"layout" | "styling">("layout");
-
+  const {
+    portfolioData,
+  } = useSelector((state: RootState) => state.data);
 
   const {
     customization,
@@ -177,25 +201,6 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             <main className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-4 xl:gap-8">
               {/* Left Column - Main Info */}
               <div className="lg:col-span-2 relative">
-                <div className="flex gap-2 mb-4">
-                  <EditButton
-                    sectionName={"simple-white-hero"}
-                    styles="text-xs px-2 sm:px-3 py-1"
-                  />
-                  {shouldShowButton && (
-                    <button
-                      onClick={openVisualEditor}
-                      className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
-                      style={{
-                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
-                      }}
-                    >
-                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span className="hidden sm:inline">Visual Editor</span>
-                    </button>
-                  )}
-                </div>
-
                 <motion.h1
                   className={getTitleClasses()}
                   style={{ color: textPrimaryColor }}
@@ -243,70 +248,147 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       "I build exceptional and accessible digital experiences for the web."}
                   </motion.p>
                   <div className="absolute -top-1 -right-1 z-10 hidden md:block">
-                    <MagicWrite
-                      onMagicWrite={async (prompt: string) => {
-                        const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
-                        const updated = { ...heroData, summary: enhanced };
-                        setHeroData(updated);
-                        await saveEnhancedContent(updated);
-                        return enhanced;
-                      }}
-                      placeholder="Enhance this description..."
-                      buttonText=""
-                      context={heroData?.summary || "I build exceptional and accessible digital experiences for the web."}
-                      className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
-                    />
+                    {!previewMode && (
+                      <MagicWrite
+                        onMagicWrite={async (prompt: string) => {
+                          const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
+                          const updated = { ...heroData, summary: enhanced };
+                          setHeroData(updated);
+                          await saveEnhancedContent(updated);
+                          return enhanced;
+                        }}
+                        placeholder="Enhance this description..."
+                        buttonText=""
+                        context={heroData?.summary || "I build exceptional and accessible digital experiences for the web."}
+                        className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
+                      />
+                    )}
                   </div>
                 </div>
 
                 {/* Social Links */}
                 <div className={`flex space-x-2 sm:space-x-3 md:space-x-4 mb-6 sm:mb-8 md:mb-12 lg:mb-16 ${effectiveCustomization.socialLinksVisible ? "" : "hidden"}`}>
-                  <motion.a
-                    href={userInfo?.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={getSocialLinksClasses()}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: 1,
-                      opacity: 1,
-                      transition: {
-                        scale: {
-                          type: "spring",
-                          damping: 10,
-                          stiffness: 100,
-                        }
-                      }
-                    }}
-                  >
-                    <FaGithub className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
-                  </motion.a>
-
-                  <motion.a
-                    href={userInfo?.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={getSocialLinksClasses()}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: 1,
-                      opacity: 1,
-                      transition: {
-                        scale: {
-                          type: "spring",
-                          damping: 10,
-                          stiffness: 100,
-                        }
-                      }
-                    }}
-                  >
-                    <FaLinkedin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
-                  </motion.a>
+                  {userInfo?.leftSocials && Array.isArray(userInfo.leftSocials) && userInfo.leftSocials.length > 0 ? (
+                    userInfo.leftSocials.map((link: any) => {
+                      const config = getPlatformConfig(link.platform);
+                      const Icon = config.icon;
+                      return link.url.startsWith("http") ? (
+                        <motion.a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={getSocialLinksClasses()}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            transition: {
+                              scale: {
+                                type: "spring",
+                                damping: 10,
+                                stiffness: 100,
+                              }
+                            }
+                          }}
+                        >
+                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
+                        </motion.a>
+                      ) : (
+                        <motion.div
+                          key={link.id}
+                          className={getSocialLinksClasses()}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            transition: {
+                              scale: {
+                                type: "spring",
+                                damping: 10,
+                                stiffness: 100,
+                              }
+                            }
+                          }}
+                        >
+                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    <>
+                      {userInfo?.github && (
+                        <motion.a
+                          href={userInfo?.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={getSocialLinksClasses()}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            transition: {
+                              scale: {
+                                type: "spring",
+                                damping: 10,
+                                stiffness: 100,
+                              }
+                            }
+                          }}
+                        >
+                          <FaGithub className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
+                        </motion.a>
+                      )}
+                      {userInfo?.linkedin && (
+                        <motion.a
+                          href={userInfo?.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={getSocialLinksClasses()}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{
+                            scale: 1,
+                            opacity: 1,
+                            transition: {
+                              scale: {
+                                type: "spring",
+                                damping: 10,
+                                stiffness: 100,
+                              }
+                            }
+                          }}
+                        >
+                          <FaLinkedin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" style={{ color: textPrimaryColor }} />
+                        </motion.a>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Right Column - About */}
               <div className="lg:col-span-2 relative">
+                <div className="flex gap-2 mb-4 justify-end">
+                  {!previewMode && (
+                    <EditButton
+                      sectionName={"simple-white-hero"}
+                      styles="text-xs px-2 sm:px-3 py-1 bg-white border-dotted"
+                    />
+                  )}
+                  {shouldShowButton && (
+                    <button
+                      onClick={openVisualEditor}
+                      className="md:flex hidden cursor-pointer items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-xs font-medium text-white rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${ColorTheme.primary}, ${ColorTheme.primaryDark})`,
+                      }}
+                    >
+                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Visual Editor</span>
+                    </button>
+                  )}
+                </div>
+
                 {effectiveCustomization.aboutCardVisible && (
                   <motion.div
                     className={`${getCardStyle()} cursor-pointer`}
@@ -341,39 +423,47 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                       About Me
                     </motion.h2>
 
-                    <motion.div
-                      className="flex items-center mb-3 sm:mb-4"
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{
-                        y: 0,
-                        opacity: 1,
-                        transition: { delay: 0.6, duration: 0.5 },
-                      }}
-                    >
-                      <MdEmail className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" style={{ color: textSecondaryColor }} />
-                      <a
-                        href={`mailto:${userInfo?.email}`}
-                        className="text-base sm:text-lg lg:text-xl font-medium break-all"
-                        style={{ color: textSecondaryColor }}
-                      >
-                        {userInfo?.email}
-                      </a>
-                    </motion.div>
-
-                    <motion.div
-                      className="flex items-center mb-6 sm:mb-7 lg:mb-8"
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{
-                        y: 0,
-                        opacity: 1,
-                        transition: { delay: 0.7, duration: 0.5 },
-                      }}
-                    >
-                      <MdLocationOn className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" style={{ color: textSecondaryColor }} />
-                      <span className="text-base sm:text-lg font-medium" style={{ color: textSecondaryColor }}>
-                        {userInfo?.location}
-                      </span>
-                    </motion.div>
+                    {/* Right Socials */}
+                    {userInfo?.rightSocials && Array.isArray(userInfo.rightSocials) && userInfo.rightSocials.length > 0 && (
+                      <div className="flex flex-col gap-3 mb-6 sm:mb-7 lg:mb-8">
+                        {userInfo.rightSocials.map((link: any, index: number) => {
+                          const config = getPlatformConfig(link.platform);
+                          const Icon = config.icon;
+                          return (
+                            <motion.div
+                              key={link.id}
+                              className="flex items-center"
+                              initial={{ y: 20, opacity: 0 }}
+                              animate={{
+                                y: 0,
+                                opacity: 1,
+                                transition: { delay: 0.7 + (index * 0.1), duration: 0.5 },
+                              }}
+                            >
+                              <Icon className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 flex-shrink-0" style={{ color: textSecondaryColor }} />
+                              {link.url.startsWith("http") ? (
+                                <a
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-base sm:text-lg font-medium hover:underline break-all"
+                                  style={{ color: textSecondaryColor }}
+                                >
+                                  {config.label === "Email" ? link.url : config.label}
+                                </a>
+                              ) : (
+                                <span
+                                  className="text-base sm:text-lg font-medium break-all"
+                                  style={{ color: textSecondaryColor }}
+                                >
+                                  {config.label === "Email" ? link.url : link.url}
+                                </span>
+                              )}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
 
                     <div className="relative">
                       <motion.p
@@ -386,47 +476,48 @@ const Hero: NextPage = ({ currentPortTheme, customCSS, portfolioId }: any) => {
                           transition: { delay: 0.8, duration: 0.5 },
                         }}
                       >
-                        {userInfo?.shortSummary ||
-                          "I build exceptional and accessible digital experiences for the web."}
+                        {heroData?.shortSummary}
                       </motion.p>
                       <div className="absolute -top-1 -right-1 z-10 hidden md:block">
-                        <MagicWrite
-                          onMagicWrite={async (prompt: string, context?: string) => {
-                            const enhancedSummary = await handleMagicWrite(prompt, heroData?.shortSummary || userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web.");
-                            // Update userInfo with enhanced summary
-                            const updatedUserInfo = {
-                              ...userInfo,
-                              shortSummary: enhancedSummary
-                            };
-                            setUserInfo(updatedUserInfo);
+                        {!previewMode && (
+                          <MagicWrite
+                            onMagicWrite={async (prompt: string, context?: string) => {
+                              const enhancedSummary = await handleMagicWrite(prompt, heroData?.shortSummary || "I build exceptional and accessible digital experiences for the web.");
+                              // Update heroData with enhanced summary
+                              const updatedHeroData = {
+                                ...heroData,
+                                shortSummary: enhancedSummary
+                              };
+                              setHeroData(updatedHeroData);
 
-                            // Save to database
-                            try {
-                              const result = await updateSection({
-                                sectionName: "userInfo",
-                                portfolioId,
-                                sectionContent: updatedUserInfo,
-                                sectionTitle: "User Info",
-                                sectionDescription: "User information section"
-                              });
+                              // Save to database
+                              try {
+                                const result = await updateSection({
+                                  sectionName: "hero",
+                                  portfolioId,
+                                  sectionContent: updatedHeroData,
+                                  sectionTitle: "Hero",
+                                  sectionDescription: "Hero section"
+                                });
 
-                              if (result.success) {
-                                toast.success("Summary enhanced and saved successfully!");
-                              } else {
+                                if (result.success) {
+                                  toast.success("Summary enhanced and saved successfully!");
+                                } else {
+                                  toast.error("Failed to save changes to database");
+                                }
+                              } catch (error) {
+                                console.error("Error saving hero info:", error);
                                 toast.error("Failed to save changes to database");
                               }
-                            } catch (error) {
-                              console.error("Error saving user info:", error);
-                              toast.error("Failed to save changes to database");
-                            }
 
-                            return enhancedSummary;
-                          }}
-                          placeholder="Enhance this summary..."
-                          buttonText=""
-                          context={heroData?.shortSummary || userInfo?.shortSummary || "I build exceptional and accessible digital experiences for the web."}
-                          className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
-                        />
+                              return enhancedSummary;
+                            }}
+                            placeholder="Enhance this summary..."
+                            buttonText=""
+                            context={heroData?.shortSummary || "I build exceptional and accessible digital experiences for the web."}
+                            className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110"
+                          />
+                        )}
                       </div>
                     </div>
                   </motion.div>

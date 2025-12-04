@@ -12,6 +12,7 @@ import EditButton from '@/components/Shared/EditButton';
 
 import { useCustomization } from "@/hooks/useCustomization";
 import { defaultNeoSparkNavbarStyles } from "@/types/neospark/navbar";
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
 
 const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundStyle, portfolioId }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -205,30 +206,58 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
               transition={spring}
               className="hidden md:flex items-center justify-center gap-4"
             >
-              <motion.a
-                layout
-                transition={spring}
-                href={userInfo?.github}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GithubIcon
-                  className="cursor-pointer hover:text-green-300 transition-colors"
-                  size={20}
-                />
-              </motion.a>
-              <motion.a
-                layout
-                transition={spring}
-                href={userInfo?.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LinkedinIcon
-                  className="cursor-pointer hover:text-green-300 transition-colors"
-                  size={20}
-                />
-              </motion.a>
+              {userInfo?.navbarSocials && Array.isArray(userInfo.navbarSocials) ? (
+                userInfo.navbarSocials.map((link: any) => {
+                  const config = getPlatformConfig(link.platform);
+                  const Icon = config.icon;
+                  return (
+                    <motion.a
+                      key={link.id}
+                      layout
+                      transition={spring}
+                      href={config.formatHref ? config.formatHref(link.url) : link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Icon
+                        className="cursor-pointer hover:text-green-300 transition-colors"
+                        size={20}
+                      />
+                    </motion.a>
+                  );
+                })
+              ) : (
+                <>
+                  {userInfo?.github && (
+                    <motion.a
+                      layout
+                      transition={spring}
+                      href={userInfo?.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <GithubIcon
+                        className="cursor-pointer hover:text-green-300 transition-colors"
+                        size={20}
+                      />
+                    </motion.a>
+                  )}
+                  {userInfo?.linkedin && (
+                    <motion.a
+                      layout
+                      transition={spring}
+                      href={userInfo?.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <LinkedinIcon
+                        className="cursor-pointer hover:text-green-300 transition-colors"
+                        size={20}
+                      />
+                    </motion.a>
+                  )}
+                </>
+              )}
               <Button
                 onClick={handleResumeDownload}
                 onMouseOver={(e) => {
@@ -289,22 +318,46 @@ const Navbar = ({ currentPortTheme, customCSS, backgroundTheme, getBackgroundSty
               </a>
             ))}
             <div className="flex items-center gap-3 sm:gap-4 mt-2">
-              <a
-                href={userInfo?.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-green-300"
-              >
-                <GithubIcon size={18} />
-              </a>
-              <a
-                href={userInfo?.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-green-300"
-              >
-                <LinkedinIcon size={18} />
-              </a>
+              {userInfo?.navbarSocials && Array.isArray(userInfo.navbarSocials) ? (
+                userInfo.navbarSocials.map((link: any) => {
+                  const config = getPlatformConfig(link.platform);
+                  const Icon = config.icon;
+                  return (
+                    <a
+                      key={link.id}
+                      href={config.formatHref ? config.formatHref(link.url) : link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-green-300"
+                    >
+                      <Icon size={18} />
+                    </a>
+                  );
+                })
+              ) : (
+                <>
+                  {userInfo?.github && (
+                    <a
+                      href={userInfo?.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-green-300"
+                    >
+                      <GithubIcon size={18} />
+                    </a>
+                  )}
+                  {userInfo?.linkedin && (
+                    <a
+                      href={userInfo?.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-green-300"
+                    >
+                      <LinkedinIcon size={18} />
+                    </a>
+                  )}
+                </>
+              )}
               <Button
                 onClick={handleResumeDownload}
                 style={{ background: buttonBgColor, color: buttonTextColor }}

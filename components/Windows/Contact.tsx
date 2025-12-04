@@ -19,12 +19,14 @@ const Contact = ({
     portfolioId,
     theme = "light",
     font,
+    previewMode,
 }: {
     currentPortTheme?: string;
     customCSS?: string;
     portfolioId: string;
     theme?: "light" | "dark";
     font?: string;
+    previewMode?: boolean;
 }) => {
     const params = useParams();
     const { user, isLoaded } = useUser();
@@ -36,7 +38,7 @@ const Contact = ({
     const { currentTheme } = useWindowsTheme();
 
     const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
-    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
     const [editedData, setEditedData] = useState(userInfoData);
     const isDark = theme === "dark";
