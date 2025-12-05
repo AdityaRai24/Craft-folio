@@ -1,0 +1,75 @@
+"use client";
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Download, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+interface ExportButtonProps {
+    portfolioUrl: string;
+    className?: string;
+}
+
+const ExportButton = ({ portfolioUrl, className }: ExportButtonProps) => {
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExport = async () => {
+        try {
+            setIsExporting(true);
+            toast.loading("Generating static site... This may take a few seconds.", { id: "export-toast" });
+
+            const response = await fetch('/api/export-portfolio', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ portfolioUrl }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Export failed');
+            }
+
+            // Handle Blob response for download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "portfolio-export.zip";
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            toast.success("Portfolio downloaded successfully!", { id: "export-toast" });
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to export portfolio. Please try again.", { id: "export-toast" });
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    return (
+        <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className={`gap-2 ${className}`}
+            variant="outline"
+        >
+            {isExporting ? (
+                <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating...
+                </>
+            ) : (
+                <>
+                    <Download className="h-4 w-4" />
+                    Download Static Site
+                </>
+            )}
+        </Button>
+    );
+};
+
+export default ExportButton;

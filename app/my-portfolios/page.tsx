@@ -10,6 +10,7 @@ import { ColorTheme } from "@/lib/colorThemes";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import DeployModal from "@/components/Modals/DeployModal";
+import ExportButton from "@/components/ExportButton";
 
 export default function MyPortfoliosPage() {
   const { user, isLoaded } = useUser();
@@ -167,6 +168,15 @@ export default function MyPortfoliosPage() {
                   )}
                 </div>
                 <div className="ml-4 flex items-center gap-2">
+                  <ExportButton
+                    portfolioUrl={
+                      portfolio.PortfolioLink?.subdomain
+                        ? `https://${portfolio.PortfolioLink.subdomain}.craftfolio.live`
+                        : portfolio.PortfolioLink?.slug
+                          ? `https://craftfolio.live/p/${portfolio.PortfolioLink.slug}`
+                          : `https://craftfolio.live/p/${portfolio.id}`
+                    }
+                  />
                   <motion.button
                     onClick={() => window.open(`/p/${portfolio.id}`, '_blank', 'noopener,noreferrer')}
                     className="px-4 py-2 rounded-lg cursor-pointer text-sm font-medium flex items-center gap-2"
