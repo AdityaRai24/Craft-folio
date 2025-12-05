@@ -24,6 +24,7 @@ import SocialLinksEditor from "../Shared/SocialLinksEditor";
 import ResumeUpload from "../Shared/ResumeUpload";
 import ImageUpload from "../Shared/ImageUpload";
 import { SocialLink } from "@/types/canvas";
+import BentoContactSidebar from "./BentoContactSidebar";
 
 interface ContentType {
   github: string;
@@ -42,6 +43,10 @@ const ContactSidebar = () => {
   const dispatch = useDispatch();
   const portfolioId = params.portfolioId as string;
   const { portfolioData, templateName } = useSelector((state: RootState) => state.data);
+
+  if (templateName === "Bento") {
+    return <BentoContactSidebar />;
+  }
   const contactSectionData = portfolioData?.find(
     (section: any) => section.type === "userInfo"
   );

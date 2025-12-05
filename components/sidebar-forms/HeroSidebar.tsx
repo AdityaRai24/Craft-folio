@@ -18,12 +18,18 @@ import React from 'react';
 import { templateConfig } from '@/lib/templateConfig';
 import { ColorTheme } from '@/lib/colorThemes';
 import { setCurrentEdit } from '@/slices/editModeSlice';
+import BentoHeroSidebar from './BentoHeroSidebar';
 
 const HeroSidebar = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const portfolioId = params.portfolioId as string;
   const { portfolioData, templateName } = useSelector((state: RootState) => state.data);
+
+  if (templateName === "Bento") {
+    return <BentoHeroSidebar />;
+  }
+
   const heroSectionData = portfolioData?.find((section: any) => section.type === "hero");
   const heroData = heroSectionData?.data || {};
   const [sectionTitle, setSectionTitle] = useState(heroSectionData?.sectionTitle || "");
