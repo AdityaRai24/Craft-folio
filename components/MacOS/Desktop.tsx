@@ -492,7 +492,7 @@ function DesktopContent({
         currentPortTheme={currentPortTheme}
         customCSS={customCSS}
         portfolioId={portfolioId}
-        onEditWallpaper={isOwner ? () => openWindow("wallpaper") : undefined}
+        onEditWallpaper={isOwner && !previewMode ? () => openWindow("wallpaper") : undefined}
         onOpenResume={() => openWindow("resume")}
         onToggleControlCenter={() => setControlCenterOpen(!controlCenterOpen)}
         onToggleNotificationCenter={() => setNotificationCenterOpen(!notificationCenterOpen)}

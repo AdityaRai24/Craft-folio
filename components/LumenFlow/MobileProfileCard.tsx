@@ -1,5 +1,6 @@
 import React from "react";
 import { Github, Linkedin, Mail, MapPin } from "lucide-react";
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
 
 interface MobileProfileCardProps {
     heroData: any;
@@ -63,53 +64,39 @@ const MobileProfileCard: React.FC<MobileProfileCardProps> = ({
                     {/* Contact Info */}
                     {effectiveCustomization.socialLinksVisible && (
                         <div className="flex flex-wrap items-center justify-end gap-2 max-w-[60%]">
-                            {contactData?.github && (
-                                <a
-                                    href={contactData.github}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
-                                        ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                                        : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                                        }`}
-                                >
-                                    <Github size={16} />
-                                </a>
-                            )}
-                            {contactData?.linkedin && (
-                                <a
-                                    href={contactData.linkedin}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
-                                        ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                                        : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                                        }`}
-                                >
-                                    <Linkedin size={16} />
-                                </a>
-                            )}
-                            {contactData?.email && (
-                                <a
-                                    href={`mailto:${contactData.email}`}
-                                    className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
-                                        ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-                                        : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
-                                        }`}
-                                >
-                                    <Mail size={16} />
-                                </a>
-                            )}
-                            {contactData?.location && (
-                                <div
-                                    className={`rounded-full p-2 ${theme === "light"
-                                        ? "bg-gray-50 text-gray-700"
-                                        : "bg-gray-800/80 text-gray-300"
-                                        }`}
-                                >
-                                    <MapPin size={16} />
-                                </div>
-                            )}
+                            {(contactData?.socials || []).map((link: any, index: number) => {
+                                const config = getPlatformConfig(link.platform);
+                                const Icon = config.icon;
+
+                                if (!link.url) return null;
+
+                                return (
+                                    <div key={index}>
+                                        {link.platform === 'location' ? (
+                                            <div
+                                                className={`rounded-full p-2 ${theme === "light"
+                                                    ? "bg-gray-50 text-gray-700"
+                                                    : "bg-gray-800/80 text-gray-300"
+                                                    }`}
+                                            >
+                                                <Icon size={16} />
+                                            </div>
+                                        ) : (
+                                            <a
+                                                href={link.platform === 'email' ? `mailto:${link.url}` : link.url}
+                                                target={link.platform === 'email' ? undefined : "_blank"}
+                                                rel={link.platform === 'email' ? undefined : "noopener noreferrer"}
+                                                className={`rounded-full p-2 transition-all duration-200 hover:scale-110 ${theme === "light"
+                                                    ? "bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
+                                                    : "bg-gray-800/80 hover:bg-orange-500/20 text-gray-300 hover:text-orange-400"
+                                                    }`}
+                                            >
+                                                <Icon size={16} />
+                                            </a>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

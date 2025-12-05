@@ -282,8 +282,8 @@ const ContactSidebar = () => {
         <CardContent>
           <CardContent className="p-0 space-y-5">
 
-            {/* Profile Image Field */}
-            {profileImage && (
+            {/* Profile Image Field - Hidden for MacOS and Windows */}
+            {templateName !== "MacOS" && templateName !== "Windows" && profileImage && (
               <ImageUpload
                 label="Profile Image"
                 value={profileImage}
@@ -352,10 +352,13 @@ const ContactSidebar = () => {
               </Button>
             )}
 
-            <ResumeUpload
-              value={resumeLink}
-              onChange={setResumeLink}
-            />
+            {/* Resume Upload - Hidden for MacOS and Windows */}
+            {templateName !== "MacOS" && templateName !== "Windows" && (
+              <ResumeUpload
+                value={resumeLink}
+                onChange={setResumeLink}
+              />
+            )}
 
             {templateName === "NeoSpark" ? (
               <Tabs defaultValue="contact" className="w-full">
