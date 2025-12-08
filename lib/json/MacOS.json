@@ -20,7 +20,29 @@
                 "location": "Georgetown, TX",
                 "resumeLink": "https://res.cloudinary.com/dhanvyweu/image/upload/v1764403671/jakes-resume_2_lj51jq.pdf",
                 "profileImage": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400",
-                "shortSummary": "CS student at Southwestern University with experience in full-stack development and AI research."
+                "shortSummary": "CS student at Southwestern University with experience in full-stack development and AI research.",
+                "socials": [
+                    {
+                        "id": "1",
+                        "platform": "github",
+                        "url": "https://github.com/jake"
+                    },
+                    {
+                        "id": "2",
+                        "platform": "linkedin",
+                        "url": "https://linkedin.com/in/jake"
+                    },
+                    {
+                        "id": "3",
+                        "platform": "email",
+                        "url": "jake@su.edu"
+                    },
+                    {
+                        "id": "4",
+                        "platform": "location",
+                        "url": "Georgetown, TX"
+                    }
+                ]
             },
             "type": "userInfo",
             "sectionTitle": "Contact Information",

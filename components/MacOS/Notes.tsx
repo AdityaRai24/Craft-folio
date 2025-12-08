@@ -86,18 +86,20 @@ const Notes = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark
         }
     };
 
+    const { previewMode } = useSelector((state: RootState) => state.editMode);
+
     return (
         <div
             className={`w-full h-full flex flex-col relative ${font || ""} ${isDark ? "bg-[#1e1e1e] text-white" : "bg-white text-gray-900"}`}
         >
             {/* Edit Button (Creator Only) */}
-            {showEdit && !isEditing && (
+            {showEdit && !previewMode && !isEditing && (
                 <div className="absolute top-4 right-4 z-10">
                     <button
                         onClick={() => setIsEditing(true)}
                         className={`p-2 rounded-full shadow-lg transition-all duration-200 ${isDark
-                                ? "bg-gray-800 hover:bg-gray-700 text-yellow-500"
-                                : "bg-white hover:bg-gray-50 text-yellow-600 border border-gray-200"
+                            ? "bg-gray-800 hover:bg-gray-700 text-yellow-500"
+                            : "bg-white hover:bg-gray-50 text-yellow-600 border border-gray-200"
                             }`}
                         title="Edit Notes"
                     >
@@ -105,8 +107,6 @@ const Notes = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark
                     </button>
                 </div>
             )}
-
-            {/* Editor/Content */}
             <div className={`flex-1 overflow-hidden ${isDark ? "bg-[#1e1e1e]" : "bg-white"}`}>
                 {isEditing ? (
                     <NotesEditor

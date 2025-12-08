@@ -11,7 +11,7 @@ interface SliderControlProps {
   unit?: string;
 }
 
-const SliderControl: React.FC<SliderControlProps> = ({
+const SliderControl: React.FC<SliderControlProps & { accentColor?: string }> = ({
   label,
   value,
   onChange,
@@ -19,6 +19,7 @@ const SliderControl: React.FC<SliderControlProps> = ({
   max = 100,
   step = 1,
   unit = "px",
+  accentColor = ColorTheme.primary,
 }) => {
   return (
     <div className="mb-4">
@@ -28,7 +29,7 @@ const SliderControl: React.FC<SliderControlProps> = ({
           height: 16px;
           width: 16px;
           border-radius: 50%;
-          background: ${ColorTheme.primary};
+          background: ${accentColor};
           cursor: pointer;
           border: none;
           z-index: 10;
@@ -38,7 +39,7 @@ const SliderControl: React.FC<SliderControlProps> = ({
           height: 16px;
           width: 16px;
           border-radius: 50%;
-          background: ${ColorTheme.primary};
+          background: ${accentColor};
           cursor: pointer;
           border: none;
           z-index: 10;
@@ -57,7 +58,7 @@ const SliderControl: React.FC<SliderControlProps> = ({
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
         style={{
-          background: `linear-gradient(to right, ${ColorTheme.primary} 0%, ${ColorTheme.primary
+          background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor
             } ${(value - min) / (max - min) * 100}%, #3f3f46 ${(value - min) / (max - min) * 100}%, #3f3f46 100%)`,
         }}
       />

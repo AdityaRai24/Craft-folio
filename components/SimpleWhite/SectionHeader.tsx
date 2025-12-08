@@ -26,6 +26,7 @@ interface SectionHeaderProps {
     description: string;
   };
   currentPortTheme?: string;
+  hideVisualEditor?: boolean;
 }
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -42,7 +43,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   description,
   onVisualEditorClick,
   headerClasses,
-  currentPortTheme
+  currentPortTheme,
+  hideVisualEditor
 }) => {
   const { portfolioData } = useSelector((state: RootState) => state.data);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
@@ -53,7 +55,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   const { portfolioUserId } = useSelector((state: RootState) => state.data);
   const { user, isLoaded } = useUser();
-  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const shouldShowButton = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !hideVisualEditor;
 
   if (!headerVisible) return null;
 
@@ -83,7 +85,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
         <div className="flex absolute gap-2 sm:gap-3 right-2 sm:right-0 top-2 sm:top-0">
           <EditButton
             sectionName={sectionName}
-            styles="text-xs px-2 sm:px-3 py-1"
+            styles="text-xs px-2 sm:px-3 py-1 bg-white border-dotted"
           />
           {shouldShowButton && (
             <button

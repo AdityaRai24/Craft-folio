@@ -11,6 +11,7 @@ import EducationSidebar from '@/components/sidebar-forms/EducationSidebar';
 import TerminalSidebar from '@/components/sidebar-forms/TerminalSidebar';
 import SimpleWhiteHeroSidebar from '@/components/sidebar-forms/SimpleWhiteHeroSidebar';
 import LumenFlowMergedSidebar from '@/components/sidebar-forms/LumenFlowMergedSidebar';
+import CanvasSidebar from '@/components/sidebar-forms/CanvasSidebar';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ColorTheme } from '@/lib/colorThemes';
@@ -56,6 +57,7 @@ const Sidebar = () => {
         {currentlyEditing === "terminal" && <TerminalSidebar />}
         {currentlyEditing === "simple-white-hero" && <SimpleWhiteHeroSidebar />}
         {currentlyEditing === "lumenflow-hero-merged" && <LumenFlowMergedSidebar />}
+        {currentlyEditing === "canvas" && <CanvasSidebar />}
       </div>
     </div>
   );

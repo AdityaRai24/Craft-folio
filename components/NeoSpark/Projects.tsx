@@ -31,6 +31,7 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
   const [activeTab, setActiveTab] = useState<Tab>("layout");
 
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const sectionRef = useRef<HTMLElement | null>(null);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme?.data[currentPortTheme];
@@ -273,19 +274,21 @@ const Projects: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any) =
                           {project?.projectDescription}
                         </p>
                         {/* Magic Write Button */}
-                        <div className="absolute -top-2 -right-2 z-10 hidden md:block">
-                          <MagicWrite
-                            onMagicWrite={async (prompt: string, context?: string) => {
-                              const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription);
-                              handleDescriptionUpdate(index, enhancedDescription);
-                              return enhancedDescription;
-                            }}
-                            placeholder="Enhance this project description..."
-                            buttonText=""
-                            context={project?.projectDescription}
-                            className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
-                          />
-                        </div>
+                        {!previewMode && (
+                          <div className="absolute -top-2 -right-2 z-10 hidden md:block">
+                            <MagicWrite
+                              onMagicWrite={async (prompt: string, context?: string) => {
+                                const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription);
+                                handleDescriptionUpdate(index, enhancedDescription);
+                                return enhancedDescription;
+                              }}
+                              placeholder="Enhance this project description..."
+                              buttonText=""
+                              context={project?.projectDescription}
+                              className="w-8 h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className={getTitleAlignment()}>
                         <h4 className="flex items-center gap-2 font-semibold mb-2">

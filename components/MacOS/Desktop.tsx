@@ -58,6 +58,7 @@ const Desktop: React.FC<DesktopProps> = ({
   const portfolioData = useSelector(
     (state: RootState) => state.data.portfolioData
   );
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const {
     effectiveCustomization: heroCustomization
   } = useCustomization("hero", defaultMacOSHeroStyles, portfolioId || "");
@@ -300,6 +301,7 @@ const Desktop: React.FC<DesktopProps> = ({
         setSpotlightOpen={setSpotlightOpen}
         brightness={brightness}
         setBrightness={setBrightness}
+        previewMode={previewMode}
       />
     </MacOSThemeProvider>
   );
@@ -340,6 +342,7 @@ function DesktopContent({
   setSpotlightOpen,
   brightness,
   setBrightness,
+  previewMode,
 }: any) {
   const { theme } = useMacOSTheme();
   const { user } = useUser();
@@ -351,6 +354,9 @@ function DesktopContent({
 
   // Filter dock items based on ownership
   const visibleDockItems = dockItems.filter((item: any) => {
+    if (previewMode) {
+      if (item.id === "wallpaper" || item.id === "widgets") return false;
+    }
     if (item.id === "wallpaper" || item.id === "widgets") {
       return isOwner;
     }
@@ -486,7 +492,7 @@ function DesktopContent({
         currentPortTheme={currentPortTheme}
         customCSS={customCSS}
         portfolioId={portfolioId}
-        onEditWallpaper={isOwner ? () => openWindow("wallpaper") : undefined}
+        onEditWallpaper={isOwner && !previewMode ? () => openWindow("wallpaper") : undefined}
         onOpenResume={() => openWindow("resume")}
         onToggleControlCenter={() => setControlCenterOpen(!controlCenterOpen)}
         onToggleNotificationCenter={() => setNotificationCenterOpen(!notificationCenterOpen)}
@@ -613,6 +619,7 @@ function DesktopContent({
                         <WindowComponent
                           theme={theme}
                           portfolioId={portfolioId}
+                          previewMode={previewMode}
                         />
                       ) : (
                         <WindowComponent
@@ -621,6 +628,7 @@ function DesktopContent({
                           portfolioId={portfolioId}
                           theme={theme}
                           font={font}
+                          previewMode={previewMode}
                         />
                       )
                     ) : (

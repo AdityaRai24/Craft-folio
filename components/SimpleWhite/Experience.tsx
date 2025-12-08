@@ -21,6 +21,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
   const [experienceData, setExperienceData] = useState<ExperienceData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
 
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme?.data?.[currentPortTheme];
@@ -28,7 +29,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
   const primaryColor = theme?.colors?.primary || "blue-600";
   const primaryDarkColor = theme?.colors?.primaryDark || "blue-700";
   const textPrimaryColor = theme?.colors?.text?.primary || "#1F2937";
-  const textSecondaryColor = theme?.colors?.text?.secondary || "gray-600";
+  const textSecondaryColor = "#4B5563"; // Darker gray for better contrast
 
   const [visibleItems, setVisibleItems] = useState<boolean[]>([]);
   const [activeTab, setActiveTab] = useState<"layout" | "typography" | "styling" | "timing">("layout");
@@ -152,6 +153,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
             description: "font-sans text-lg sm:text-xl section-description md:text-2xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-3xl mx-auto transition-all duration-700"
           }}
           currentPortTheme={currentPortTheme}
+          hideVisualEditor={previewMode}
         />
 
         {experienceData.length === 0 ? (
@@ -194,7 +196,7 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                             {exp.companyName && (
                               <div className="flex items-baseline gap-1">
                                 <span className="text-gray-400">at</span>
-                                <div className={getCompanyClasses()} style={{ color: primaryColor }}>
+                                <div className={getCompanyClasses()} style={{ color: primaryDarkColor }}>
                                   {exp.companyName}
                                 </div>
                               </div>
@@ -229,20 +231,22 @@ const Experience: React.FC = ({ currentPortTheme, customCSS, portfolioId }: any)
                           {exp.description}
                         </p>
                         <div className="absolute -top-2 -right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <MagicWrite
-                            onMagicWrite={async (prompt: string) => {
-                              const enhanced = await handleMagicWrite(prompt, exp.description, "experience");
-                              const updated = [...experienceData];
-                              updated[index] = { ...updated[index], description: enhanced };
-                              setExperienceData(updated);
-                              await saveEnhancedContent(updated);
-                              return enhanced;
-                            }}
-                            placeholder="Enhance description..."
-                            buttonText=""
-                            context={exp.description}
-                            className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
-                          />
+                          {!previewMode && (
+                            <MagicWrite
+                              onMagicWrite={async (prompt: string) => {
+                                const enhanced = await handleMagicWrite(prompt, exp.description, "experience");
+                                const updated = [...experienceData];
+                                updated[index] = { ...updated[index], description: enhanced };
+                                setExperienceData(updated);
+                                await saveEnhancedContent(updated);
+                                return enhanced;
+                              }}
+                              placeholder="Enhance description..."
+                              buttonText=""
+                              context={exp.description}
+                              className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
+                            />
+                          )}
                         </div>
                       </div>
 

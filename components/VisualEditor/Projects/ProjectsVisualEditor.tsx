@@ -121,6 +121,9 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                 onChange={value => onUpdateDraft("layout", value)}
                 gridColumns={draftCustomization?.gridColumns ?? customization.gridColumns}
                 onGridColumnsChange={cols => onUpdateDraft("gridColumns", cols)}
+                showSingleOption={false}
+                bentoInnerLayout={draftCustomization?.bentoInnerLayout ?? customization.bentoInnerLayout}
+                onBentoInnerLayoutChange={value => onUpdateDraft("bentoInnerLayout", value)}
               />
 
               <SliderControl
@@ -137,8 +140,6 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                 onChange={value => onUpdateDraft("titleAlignment", value)}
               />
 
-
-
               {(draftCustomization?.layout ?? customization.layout) === "single" && (
                 <ImagePositionSelector
                   value={draftCustomization?.imagePosition ?? customization.imagePosition}
@@ -149,32 +150,35 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
           )}
 
           {activeTab === "typography" && (
-            <div className="space-y-6">
-              <TypographySelector
-                label="Title Size"
-                value={draftCustomization?.titleSize ?? customization.titleSize}
-                onChange={value => onUpdateDraft("titleSize", value)}
-                type="size"
-                options={[
-                  { value: "sm", label: "Small", preview: "0.875rem" },
-                  { value: "md", label: "Medium", preview: "1rem" },
-                  { value: "lg", label: "Large", preview: "1.125rem" },
-                  { value: "xl", label: "Extra Large", preview: "1.25rem" },
-                ]}
-              />
-
-              <TypographySelector
-                label="Title Weight"
-                value={draftCustomization?.titleWeight ?? customization.titleWeight}
-                onChange={value => onUpdateDraft("titleWeight", value)}
-                type="weight"
-                options={[
-                  { value: "normal", label: "Normal", preview: "font-normal" },
-                  { value: "medium", label: "Medium", preview: "font-medium" },
-                  { value: "semibold", label: "Semibold", preview: "font-semibold" },
-                  { value: "bold", label: "Bold", preview: "font-bold" },
-                ]}
-              />
+            <>
+              <div className="space-y-4">
+                <TypographySelector
+                  label="Title Size"
+                  value={draftCustomization?.titleSize ?? customization.titleSize}
+                  onChange={value => onUpdateDraft("titleSize", value)}
+                  type="size"
+                  options={[
+                    { value: "sm", label: "Small", preview: "text-xl" },
+                    { value: "md", label: "Medium", preview: "text-2xl" },
+                    { value: "lg", label: "Large", preview: "text-3xl" },
+                    { value: "xl", label: "Extra Large", preview: "text-4xl" },
+                  ]}
+                  primaryColor={primaryColor}
+                />
+                <TypographySelector
+                  label="Title Weight"
+                  value={draftCustomization?.titleWeight ?? customization.titleWeight}
+                  onChange={value => onUpdateDraft("titleWeight", value)}
+                  type="weight"
+                  options={[
+                    { value: "normal", label: "Normal", preview: "font-normal" },
+                    { value: "medium", label: "Medium", preview: "font-medium" },
+                    { value: "semibold", label: "Semibold", preview: "font-semibold" },
+                    { value: "bold", label: "Bold", preview: "font-bold" },
+                  ]}
+                  primaryColor={primaryColor}
+                />
+              </div>
 
               <div className="border-t border-zinc-700 pt-4 space-y-4">
                 <TypographySelector
@@ -183,13 +187,13 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                   onChange={value => onUpdateDraft("descriptionSize", value)}
                   type="size"
                   options={[
-                    { value: "xs", label: "Extra Small", preview: "0.75rem" },
-                    { value: "sm", label: "Small", preview: "0.875rem" },
-                    { value: "md", label: "Medium", preview: "1rem" },
-                    { value: "lg", label: "Large", preview: "1.125rem" },
+                    { value: "xs", label: "Extra Small", preview: "text-xs" },
+                    { value: "sm", label: "Small", preview: "text-sm" },
+                    { value: "md", label: "Medium", preview: "text-base" },
+                    { value: "lg", label: "Large", preview: "text-lg" },
                   ]}
+                  primaryColor={primaryColor}
                 />
-
                 <TypographySelector
                   label="Description Weight"
                   value={draftCustomization?.descriptionWeight ?? customization.descriptionWeight}
@@ -201,79 +205,94 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
                     { value: "semibold", label: "Semibold", preview: "font-semibold" },
                     { value: "bold", label: "Bold", preview: "font-bold" },
                   ]}
+                  primaryColor={primaryColor}
                 />
               </div>
-            </div>
+            </>
           )}
 
           {activeTab === "styling" && (
             <>
-
               <SliderControl
-                label="Card Border Radius"
+                label="Card Radius"
                 value={draftCustomization?.cardBorderRadius ?? customization.cardBorderRadius}
                 onChange={value => onUpdateDraft("cardBorderRadius", value)}
                 min={0}
-                max={24}
-                step={2}
+                max={48}
+                step={4}
               />
 
               <SliderControl
-                label="Image Border Radius"
+                label="Image Radius"
                 value={draftCustomization?.imageBorderRadius ?? customization.imageBorderRadius}
                 onChange={value => onUpdateDraft("imageBorderRadius", value)}
                 min={0}
-                max={24}
-                step={2}
+                max={48}
+                step={4}
               />
 
               <SliderControl
                 label="Card Padding"
                 value={draftCustomization?.cardPadding ?? customization.cardPadding}
                 onChange={value => onUpdateDraft("cardPadding", value)}
+                min={16}
+                max={64}
+                step={4}
+              />
+
+              <SliderControl
+                label="Border Width"
+                value={draftCustomization?.borderWidth ?? customization.borderWidth}
+                onChange={value => onUpdateDraft("borderWidth", value)}
                 min={0}
-                max={12}
-                step={2}
+                max={4}
+                step={1}
               />
 
-              <ButtonStyleSelector
-                value={draftCustomization?.githubButtonStyle ?? customization.githubButtonStyle}
-                onChange={value => onUpdateDraft("githubButtonStyle", value)}
-                label="GitHub Button Style"
+              <AspectRatioSelector
+                value={draftCustomization?.imageAspectRatio ?? customization.imageAspectRatio}
+                onChange={value => onUpdateDraft("imageAspectRatio", value)}
+                imageHeight={draftCustomization?.imageHeight ?? customization.imageHeight}
+                onImageHeightChange={value => onUpdateDraft("imageHeight", value)}
               />
-
-              <ButtonStyleSelector
-                value={draftCustomization?.liveButtonStyle ?? customization.liveButtonStyle}
-                onChange={value => onUpdateDraft("liveButtonStyle", value)}
-                label="Live Demo Button Style"
-              />
-
-              {(draftCustomization?.githubButtonStyle === "default" || draftCustomization?.githubButtonStyle === "filled" ||
-                draftCustomization?.liveButtonStyle === "default" || draftCustomization?.liveButtonStyle === "filled") && (
-                  <SliderControl
-                    label="Button Border Radius"
-                    value={draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius}
-                    onChange={value => onUpdateDraft("buttonBorderRadius", value)}
-                    min={0}
-                    max={24}
-                    step={2}
-                  />
-                )}
 
               <TechStackStyleSelector
                 value={draftCustomization?.techStackStyle ?? customization.techStackStyle}
                 onChange={value => onUpdateDraft("techStackStyle", value)}
+              />
+
+              <ButtonStyleSelector
+                label="GitHub Button"
+                value={draftCustomization?.githubButtonStyle ?? customization.githubButtonStyle}
+                onChange={value => onUpdateDraft("githubButtonStyle", value)}
+              />
+
+              <ButtonStyleSelector
+                label="Live Button"
+                value={draftCustomization?.liveButtonStyle ?? customization.liveButtonStyle}
+                onChange={value => onUpdateDraft("liveButtonStyle", value)}
+              />
+
+              <SliderControl
+                label="Button Radius"
+                value={draftCustomization?.buttonBorderRadius ?? customization.buttonBorderRadius}
+                onChange={value => onUpdateDraft("buttonBorderRadius", value)}
+                min={0}
+                max={24}
+                step={4}
               />
             </>
           )}
 
           {activeTab === "timing" && (
             <>
-              <AspectRatioSelector
-                value={draftCustomization?.imageAspectRatio ?? customization.imageAspectRatio}
-                onChange={value => onUpdateDraft("imageAspectRatio", value)}
-                imageHeight={draftCustomization?.imageHeight ?? customization.imageHeight}
-                onImageHeightChange={height => onUpdateDraft("imageHeight", height)}
+              <SliderControl
+                label="Animation Speed"
+                value={draftCustomization?.animationSpeed ?? customization.animationSpeed ?? 0.5}
+                onChange={value => onUpdateDraft("animationSpeed", value)}
+                min={0.1}
+                max={1.0}
+                step={0.1}
               />
             </>
           )}
@@ -302,7 +321,7 @@ const ProjectsVisualEditor: React.FC<ProjectsVisualEditorProps> = ({
         </div>
       </div>
 
-      {/* Overlay for floating window */}
+      {/* Overlay */}
       <div
         className="fixed inset-0 bg-black/20 z-40"
         onClick={onClose}

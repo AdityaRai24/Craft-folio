@@ -16,7 +16,8 @@ export interface Project {
 
 export interface ProjectsCustomizationState {
   // Layout & Structure
-  layout: "single" | "grid";
+  layout: "single" | "grid" | "split";
+  bentoInnerLayout?: "single" | "two-cols";
   gridColumns: number;
   cardSpacing: number;
   cardBorderRadius: number;

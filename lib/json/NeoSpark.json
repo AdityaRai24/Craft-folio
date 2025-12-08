@@ -402,10 +402,44 @@
                 "name": "Alex Rivera",
                 "email": "alex.rivera@email.com",
                 "title": "Senior Full Stack Engineer",
-                "github": "github.com/alexrivera",
-                "linkedin": "linkedin.com/in/alexrivera",
+                "github": "https://github.com/alexrivera",
+                "linkedin": "https://linkedin.com/in/alexrivera",
                 "location": "San Francisco, CA",
-                "resumeLink": ""
+                "resumeLink": "",
+                "socials": [
+                    {
+                        "id": "default-github",
+                        "platform": "github",
+                        "url": "https://github.com/alexrivera"
+                    },
+                    {
+                        "id": "default-linkedin",
+                        "platform": "linkedin",
+                        "url": "https://linkedin.com/in/alexrivera"
+                    },
+                    {
+                        "id": "default-email",
+                        "platform": "email",
+                        "url": "alex.rivera@email.com"
+                    },
+                    {
+                        "id": "default-location",
+                        "platform": "location",
+                        "url": "San Francisco, CA"
+                    }
+                ],
+                "navbarSocials": [
+                    {
+                        "id": "nav-github",
+                        "platform": "github",
+                        "url": "https://github.com/alexrivera"
+                    },
+                    {
+                        "id": "nav-linkedin",
+                        "platform": "linkedin",
+                        "url": "https://linkedin.com/in/alexrivera"
+                    }
+                ]
             },
             "type": "userInfo",
             "sectionTitle": "Let's Connect!",

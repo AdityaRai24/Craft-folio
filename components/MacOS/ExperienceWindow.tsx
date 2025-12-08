@@ -14,7 +14,7 @@ import { useMacOSTheme } from "./ThemeContext";
 import { useUser } from "@clerk/nextjs";
 import { useCustomization } from "@/hooks/useCustomization";
 
-const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId: string; font?: string }) => {
+const ExperienceWindow = ({ theme = "light", portfolioId, font, previewMode }: { theme?: "light" | "dark"; portfolioId: string; font?: string; previewMode?: boolean }) => {
     const isDark = theme === "dark";
     const dispatch = useDispatch();
     const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
@@ -48,7 +48,7 @@ const ExperienceWindow = ({ theme = "light", portfolioId, font }: { theme?: "lig
 
     const { portfolioUserId } = useSelector((state: RootState) => state.data);
     const { user, isLoaded } = useUser();
-    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
     useEffect(() => {
         if (portfolioData) {

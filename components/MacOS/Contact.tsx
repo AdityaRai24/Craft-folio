@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, ExternalLink, Settings } from "lucide-react";
+import { Mail, ExternalLink, Settings } from "lucide-react";
 import EditButton, { shouldShowEditButtons } from "@/components/Shared/EditButton";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -14,16 +14,19 @@ import { ContactVisualEditor } from "@/components/VisualEditor/Contact/ContactVi
 import { ColorTheme } from "@/lib/colorThemes";
 import { useMacOSTheme } from "./ThemeContext";
 import { useCustomization } from "@/hooks/useCustomization";
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
 const Contact = ({
   portfolioId,
   theme = "light",
   font,
+  previewMode,
 }: {
   currentPortTheme?: string;
   customCSS?: string;
   portfolioId: string;
   theme?: "light" | "dark";
   font?: string;
+  previewMode?: boolean;
 }) => {
   const params = useParams();
   const { user, isLoaded } = useUser();
@@ -35,7 +38,7 @@ const Contact = ({
   const { currentTheme } = useMacOSTheme();
 
   const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
-  const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+  const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
   const [editedData, setEditedData] = useState(userInfoData);
   const isDark = theme === "dark";
@@ -59,32 +62,17 @@ const Contact = ({
     draftCustomization
   } = useCustomization("contact", defaultMacOSContactStyles, portfolioId);
 
-  const socialLinks = [
-    {
-      name: "GitHub",
-      icon: Github,
-      url: userInfoData.github,
-      color: isDark ? "from-gray-800 to-gray-900" : "from-gray-900 to-gray-800",
-      hoverColor: isDark ? "hover:from-gray-700 hover:to-gray-800" : "hover:from-gray-800 hover:to-gray-700",
+  const socialLinks = (userInfoData.socials || []).map((link: any) => {
+    const config = getPlatformConfig(link.platform);
+    return {
+      name: config.label,
+      icon: config.icon,
+      url: link.url,
+      color: isDark ? "from-gray-800 to-gray-900" : "from-gray-900 to-gray-800", // Default color
+      hoverColor: isDark ? "hover:from-gray-700 hover:to-gray-800" : "hover:from-gray-800 hover:to-gray-700", // Default hover
       iconBg: currentTheme.primary,
-    },
-    {
-      name: "LinkedIn",
-      icon: Linkedin,
-      url: userInfoData.linkedin,
-      color: isDark ? "from-blue-700 to-blue-800" : "from-blue-600 to-blue-700",
-      hoverColor: isDark ? "hover:from-blue-600 hover:to-blue-700" : "hover:from-blue-500 hover:to-blue-600",
-      iconBg: currentTheme.primary,
-    },
-    {
-      name: "Email",
-      icon: Mail,
-      url: userInfoData.email ? `mailto:${typeof userInfoData.email === 'string' ? userInfoData.email : (userInfoData.email?.email || userInfoData.email?.value || "")}` : null,
-      color: isDark ? "from-red-600 to-red-700" : "from-red-500 to-red-600",
-      hoverColor: isDark ? "hover:from-red-500 hover:to-red-600" : "hover:from-red-400 hover:to-red-500",
-      iconBg: currentTheme.primary,
-    },
-  ].filter(Boolean); // Keep all defined links, don't filter by url existence
+    };
+  });
 
   const handleLinkClick = (e: React.MouseEvent, url: string | null | undefined, name: string) => {
     if (!url) {
@@ -144,7 +132,7 @@ const Contact = ({
               gap: `${effectiveCustomization.cardSpacing}px`
             }}
           >
-            {socialLinks.map((link, index) => {
+            {socialLinks.map((link: any, index: number) => {
               const Icon = link.icon;
               const hasUrl = !!link.url;
 

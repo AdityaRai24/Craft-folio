@@ -15,6 +15,7 @@ import {
   longSummaryTemplate,
   categorizationTemplate,
   safariContentTemplate,
+  blankCanvasHTMLTemplate,
 } from "@/lib/resume-prompts";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -109,6 +110,30 @@ export async function POST(req: Request) {
         console.error("Error in AI generation:", error);
         return null;
       }
+    }
+
+    // Special handling for Blank Canvas
+    if (finalTheme === "BlankCanvas") {
+      const blankCanvasContent = await safeAIGeneration(
+        blankCanvasHTMLTemplate,
+        { resume_content: resumeContent },
+        0.7,
+        8192
+      );
+
+      return new Response(JSON.stringify({
+        sections: [
+          {
+            type: "canvas",
+            data: {
+              content: blankCanvasContent?.content || ""
+            }
+          }
+        ]
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Generate Safari Content (Only for MacOS)

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { RefreshCw, Home, ArrowLeft, ArrowRight, Lock, Globe, Search } from "lucide-react";
 import { useWindowsTheme } from "./ThemeContext";
 
-const ChromeBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
+const ChromeBrowser = ({ theme = "light", portfolioId, font, previewMode }: { theme?: "light" | "dark"; portfolioId?: string; font?: string; previewMode?: boolean }) => {
     const { currentTheme } = useWindowsTheme();
     const isDark = theme === "dark";
 

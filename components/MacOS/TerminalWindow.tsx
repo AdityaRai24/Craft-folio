@@ -259,11 +259,13 @@ ${summary}`;
     );
   };
 
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
+
   return (
     <div
       className={`w-full h-full flex flex-col font-mono text-sm relative ${font || ""} ${isDark ? "bg-[#1a1a1a] text-white" : "bg-white text-gray-900"}`}
     >
-      {showEdit && !isEditing && (
+      {showEdit && !previewMode && !isEditing && (
         <div className="absolute top-4 right-4 z-10">
           <button
             onClick={() => dispatch(setCurrentEdit("terminal"))}

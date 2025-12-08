@@ -161,14 +161,9 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
     animateTitle,
   ]);
 
-  if (isLoading || !heroData) {
-    return (
-      <SectionLoading />
-    );
-  }
 
-  const badgeTexts = heroData.badge?.texts || [];
-  const titleTexts = heroData.titleSuffixOptions || [];
+  const badgeTexts = heroData?.badge?.texts || [];
+  const titleTexts = heroData?.titleSuffixOptions || [];
 
   const badgeColor = theme.colors.primary;
   const badgeTextColor = theme.colors.text.primary;
@@ -182,6 +177,14 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
   const animationVariants = getAnimationVariants();
   const buttonClasses = getButtonClasses();
+
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
+
+  if (isLoading || !heroData) {
+    return (
+      <SectionLoading />
+    );
+  }
 
   return (
     <div className="w-full relative bg-black">
@@ -227,7 +230,7 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
 
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-20 flex items-center gap-1 sm:gap-2">
           <EditButton sectionName="hero" />
-          {shouldShowButton && (
+          {shouldShowButton && !previewMode && (
             <button
               onClick={openVisualEditor}
               className="md:flex hidden items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-white rounded-lg transition-colors text-xs sm:text-sm"
@@ -270,21 +273,23 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
             dangerouslySetInnerHTML={{ __html: heroData.summary }}
           ></motion.p>
           {/* Magic Write Button */}
-          <div className="absolute hidden md:block -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
-            <MagicWrite
-              onMagicWrite={async (prompt: string) => {
-                const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
-                const updated = { ...heroData, summary: enhanced };
-                setHeroData(updated);
-                await saveEnhancedContent(updated);
-                return enhanced;
-              }}
-              placeholder="Enhance this hero description..."
-              buttonText=""
-              context={heroData.summary}
-              className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
-            />
-          </div>
+          {!previewMode && (
+            <div className="absolute hidden md:block -top-1 sm:-top-2 -right-1 sm:-right-2 z-10">
+              <MagicWrite
+                onMagicWrite={async (prompt: string) => {
+                  const enhanced = await handleMagicWrite(prompt, heroData.summary, "hero");
+                  const updated = { ...heroData, summary: enhanced };
+                  setHeroData(updated);
+                  await saveEnhancedContent(updated);
+                  return enhanced;
+                }}
+                placeholder="Enhance this hero description..."
+                buttonText=""
+                context={heroData.summary}
+                className="w-6 h-6 sm:w-8 sm:h-8 p-0 rounded-full shadow-lg hover:scale-110 relative"
+              />
+            </div>
+          )}
         </div>
 
         {/* Buttons */}

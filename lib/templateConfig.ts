@@ -21,8 +21,70 @@ import LumenFlowTechnologies from "@/components/LumenFlow/Technologies";
 
 import MacOSDesktop from "@/components/MacOS/Desktop";
 import WindowsDesktop from "@/components/Windows/Desktop";
+import BlankCanvas from "@/components/BlankCanvas/Canvas";
+
+import BentoNavbar from "@/components/Bento/Navbar";
+import BentoHero from "@/components/Bento/Hero";
+import BentoProjects from "@/components/Bento/Projects";
+import BentoExperience from "@/components/Bento/Experience";
+import BentoTechnologies from "@/components/Bento/Technologies";
+import BentoContact from "@/components/Bento/Contact";
 
 export const templateConfig: any = {
+  Bento: {
+    navbar: BentoNavbar,
+    spotlight: false,
+    sections: {
+      hero: BentoHero,
+      projects: BentoProjects,
+      experience: BentoExperience,
+      technologies: BentoTechnologies,
+      contact: BentoContact,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: false,
+      summary: true,
+      title: true,
+      shortSummary: true,
+      longSummary: false,
+      safari: false,
+      wallpaper: false,
+    },
+    hero: ["name", "title", "summary", "shortSummary"],
+    structure: {
+      technologies: "flat",
+    },
+    defaults: {},
+  },
+  BlankCanvas: {
+    navbar: null, // Navbar is built-in to Canvas
+    spotlight: false,
+    sections: {
+      canvas: BlankCanvas,
+    },
+    features: {
+      badge: false,
+      actions: false,
+      titlePrefixSuffix: false,
+      summary: false,
+      title: false,
+      shortSummary: false,
+      longSummary: false,
+      safari: false,
+      wallpaper: false,
+    },
+    hero: [],
+    structure: {
+      technologies: "flat",
+    },
+    defaults: {
+      userInfo: {
+        profileImage: "https://placehold.co/400x400?text=Profile+Image",
+      },
+    },
+  },
   NeoSpark: {
     navbar: NeoSparkNavbar,
     spotlight: true,

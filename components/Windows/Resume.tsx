@@ -69,11 +69,13 @@ const Resume = ({
         }
     };
 
+    const { previewMode } = useSelector((state: RootState) => state.editMode);
+
     return (
         <div className={`w-full h-full flex flex-col ${isDark ? "bg-[#202020]" : "bg-white"} relative ${font || ""}`}>
             {/* Header Actions */}
             <div className="absolute top-4 right-4 z-10 flex gap-2">
-                {showEdit && (
+                {showEdit && !previewMode && (
                     <button
                         onClick={() => setIsEditorOpen(true)}
                         className={`flex items-center cursor-pointer justify-center gap-3 rounded-lg border-dashed backdrop-blur bg-white/80 tracking-wider dark:bg-black/60 border border-dashed border-gray-400 dark:border-gray-600 shadow-md text-gray-900 dark:text-gray-100 hover:bg-white/90 dark:hover:bg-black/80 transition-all px-4 py-2 text-sm font-medium`}
@@ -113,7 +115,7 @@ const Resume = ({
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
                         <p className="text-lg font-medium">No resume uploaded</p>
-                        {showEdit && (
+                        {showEdit && !previewMode && (
                             <button
                                 onClick={() => setIsEditorOpen(true)}
                                 className="mt-4 text-blue-500 hover:underline"
@@ -126,7 +128,7 @@ const Resume = ({
             </div>
 
             {/* Visual Editor */}
-            {portfolioId && (
+            {portfolioId && !previewMode && (
                 <ResumeVisualEditor
                     isOpen={isEditorOpen}
                     onClose={() => setIsEditorOpen(false)}

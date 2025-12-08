@@ -2,11 +2,18 @@ import React from "react";
 
 import { ColorTheme } from "@/lib/colorThemes";
 
+interface CardStyleOption {
+    value: string;
+    label: string;
+    preview: string;
+}
+
 interface CardStyleSelectorProps {
     value: string;
     onChange: (value: any) => void;
     previewHeight?: string;
     primaryColor?: string;
+    options?: CardStyleOption[];
 }
 
 const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({
@@ -14,18 +21,19 @@ const CardStyleSelector: React.FC<CardStyleSelectorProps> = ({
     onChange,
     previewHeight = "h-16",
     primaryColor = ColorTheme.primary,
+    options = [
+        { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
+        { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
+        { value: "glass", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
+        { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
+        { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
+    ]
 }) => {
     return (
         <div>
             <label className="block text-white text-left font-medium mb-3">Card Style</label>
             <div className="grid grid-cols-2 gap-3">
-                {[
-                    { value: "default", label: "Default", preview: "bg-zinc-800 border border-zinc-700" },
-                    { value: "minimal", label: "Minimal", preview: "bg-transparent border-0" },
-                    { value: "glass", label: "Glass", preview: "bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50" },
-                    { value: "neon", label: "Neon", preview: "bg-zinc-900 border border-purple-500/30 shadow-lg shadow-purple-500/20" },
-                    { value: "gradient", label: "Gradient", preview: "bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200" },
-                ].map((style) => (
+                {options.map((style) => (
                     <div
                         key={style.value}
                         onClick={() => onChange(style.value)}

@@ -72,6 +72,7 @@ function DesktopContent({
 }: any) {
     const { theme } = useWindowsTheme();
     const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
+    const { previewMode } = useSelector((state: RootState) => state.editMode);
     const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
 
     const { effectiveCustomization: heroCustomization } = useCustomization(
@@ -238,6 +239,7 @@ function DesktopContent({
         const items: any[] = [];
         // Always include system apps
         ["projects", "experience", "skills", "chrome", "notes", "contact", "terminal", "resume", "wallpaper", "widgets"].forEach(id => {
+            if (previewMode && (id === "wallpaper" || id === "widgets")) return;
             if (dockConfig[id]) items.push(dockConfig[id]);
         });
         return items;
@@ -366,6 +368,7 @@ function DesktopContent({
                                                 currentPortTheme={currentPortTheme}
                                                 customCSS={customCSS}
                                                 theme={theme}
+                                                previewMode={previewMode}
                                             />
                                         )
                                     )}

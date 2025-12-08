@@ -92,7 +92,9 @@ const PortfolioChatbot = ({
   const themeColors = CHATBOT_THEMES[chatbotTheme];
 
   const dispatch = useDispatch();
-  const themeOptionsArray = Object.keys(themeOptions);
+  const themeOptionsArray = themeOptions ? Object.keys(themeOptions) : [];
+
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -104,7 +106,12 @@ const PortfolioChatbot = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (isMenuExpanded && !target.closest(".settings-menu-container")) {
+      // If clicking inside the settings menu, do nothing
+      if (target.closest(".settings-menu-container")) {
+        return;
+      }
+
+      if (isMenuExpanded) {
         setIsMenuExpanded(false);
       }
     };
@@ -575,7 +582,7 @@ const PortfolioChatbot = ({
     <div
       className={
         isOpen
-          ? "fixed top-0 right-0 h-screen z-50 w-full md:w-[350px] lg:w-[400px]"
+          ? "fixed top-0 right-0 h-screen z-[99999] w-full md:w-[350px] lg:w-[400px]"
           : ""
       }
     >
@@ -840,7 +847,6 @@ const PortfolioChatbot = ({
                 </div>
               </motion.div>
             )}
-            <GuestWarning user={user} themeColors={themeColors} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -857,6 +863,16 @@ const PortfolioChatbot = ({
           onShowAdvanced={handleShowAdvanced}
           onShowDeploy={handleShowDeploy}
           onShowSEOSettings={handleShowSEOSettings}
+          onShowAddSection={() => {
+            toast("Add Section feature coming soon!", {
+              icon: "🚧",
+              style: {
+                borderRadius: '10px',
+                background: '#333',
+                color: '#fff',
+              },
+            });
+          }}
         />
       )}
 

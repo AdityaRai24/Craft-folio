@@ -7,7 +7,7 @@ import { useMacOSTheme } from "./ThemeContext";
 import { useCustomization } from "@/hooks/useCustomization";
 import { defaultMacOSSafariStyles } from "@/types/safari/macos";
 
-const SafariBrowser = ({ theme = "light", portfolioId, font }: { theme?: "light" | "dark"; portfolioId?: string; font?: string }) => {
+const SafariBrowser = ({ theme = "light", portfolioId, font, previewMode }: { theme?: "light" | "dark"; portfolioId?: string; font?: string; previewMode?: boolean }) => {
   const { currentTheme } = useMacOSTheme();
   const isDark = theme === "dark";
 

@@ -171,7 +171,7 @@ const PortfolioThemePage = () => {
         />
       </div>
 
-      <div className="container mx-auto max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl pt-24 sm:pt-28 md:pt-32 px-4 sm:px-6 pb-16 sm:pb-20 md:pb-24 relative z-10">
+      <div className="container mx-auto max-w-[95%] pt-24 sm:pt-28 md:pt-32 px-4 sm:px-6 pb-16 sm:pb-20 md:pb-24 relative z-10">
         {/* Hero section */}
         <motion.div
           className="text-center mb-16 sm:mb-20"

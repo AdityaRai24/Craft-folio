@@ -116,16 +116,15 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
       className={`
         rounded-2xl overflow-hidden transition-all duration-300 h-full w-full
         bg-zinc-900/50 backdrop-blur-xl border
-        ${selectedTheme === theme.id ? 'border-emerald-500 ring-1 ring-emerald-500/50' : 'border-white/10 hover:border-emerald-500/30 hover:bg-zinc-800/50'}
+        ${selectedTheme === theme.id ? 'border-emerald-500 ring-1 ring-emerald-500/50' : 'border-white/10  hover:bg-zinc-800/50'}
       `}
       variants={fadeInScale}
       whileHover={{
-        y: -5,
         boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)"
       }}
     >
       {/* Theme Tag */}
-      <div className="absolute top-4 left-4 z-20">
+      {/* <div className="absolute top-4 left-4 z-20">
         <span
           className="text-xs px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 backdrop-blur-md shadow-lg"
           style={{
@@ -156,18 +155,18 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
             </>
           )}
         </span>
-      </div>
+      </div> */}
 
       {/* Image Section */}
-      <div className="relative overflow-hidden group aspect-[16/9] border-b border-white/5">
+      <div className="relative overflow-hidden group  border-b border-white/5">
         <Slider {...sliderSettings} className="h-full">
           {previewImages.map((image, index) => (
-            <div key={index} className="aspect-[16/9] relative">
+            <div key={index} className=" relative">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 pointer-events-none" />
               <img
                 src={image}
                 alt={`${theme.name} theme preview ${index + 1}`}
-                className={`w-full h-full object-cover ${!isMobile ? 'cursor-pointer' : ''}`}
+                className={`w-full h-[250px] object-cover ${!isMobile ? 'cursor-pointer' : ''}`}
                 onClick={() => handleImageClick(index)}
               />
             </div>
@@ -186,7 +185,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
       </div>
 
       {/* Content Section */}
-      <div className="p-6">
+      <div className="p-3">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-2xl font-bold text-white tracking-tight">{theme.name}</h3>
         </div>
@@ -224,7 +223,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
         </div>
 
         {/* Show More Button */}
-        <button
+        {/* <button
           className="w-full flex items-center justify-center gap-1 text-xs font-medium text-gray-500 hover:text-emerald-400 transition-colors py-2"
           onClick={() => handleCardClick(theme.id)}
         >
@@ -232,7 +231,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, handleSelectTheme, selecte
           <ChevronDown
             className={`h-3 w-3 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
           />
-        </button>
+        </button> */}
 
         {/* Expanded Content */}
         {isExpanded && (

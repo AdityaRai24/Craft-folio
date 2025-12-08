@@ -28,6 +28,7 @@ import { getContainerVariants, getProjectVariants, getImageVariants } from "./va
 const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
   const dispatch = useDispatch();
   const { portfolioData } = useSelector((state: RootState) => state.data);
+  const { previewMode } = useSelector((state: RootState) => state.editMode);
   const inTheme = portfolioData?.find((item: any) => item.type === "themes");
   const theme = inTheme?.data?.[currentPortTheme];
 
@@ -220,6 +221,7 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
             description: "font-sans text-lg sm:text-xl section-description md:text-2xl font-normal text-gray-600 tracking-normal leading-relaxed max-w-3xl mx-auto transition-all duration-700"
           }}
           currentPortTheme={currentPortTheme}
+          hideVisualEditor={previewMode}
         />
 
         {/* Projects Grid */}
@@ -327,17 +329,19 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                           {project?.projectDescription}
                         </p>
                         <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <MagicWrite
-                            onMagicWrite={async (prompt: string, context?: string) => {
-                              const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription || "");
-                              handleProjectDescriptionUpdate(index, enhancedDescription);
-                              return enhancedDescription;
-                            }}
-                            placeholder="Enhance description..."
-                            buttonText=""
-                            context={project?.projectDescription || ""}
-                            className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
-                          />
+                          {!previewMode && (
+                            <MagicWrite
+                              onMagicWrite={async (prompt: string, context?: string) => {
+                                const enhancedDescription = await handleMagicWrite(prompt, project?.projectDescription || "");
+                                handleProjectDescriptionUpdate(index, enhancedDescription);
+                                return enhancedDescription;
+                              }}
+                              placeholder="Enhance description..."
+                              buttonText=""
+                              context={project?.projectDescription || ""}
+                              className="w-8 h-8 p-1.5 rounded-full bg-white shadow-md hover:shadow-lg text-gray-600 hover:text-blue-600"
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -393,7 +397,12 @@ const Projects: React.FC = ({ currentPortTheme, portfolioId }: any) => {
                               target="_blank"
                               rel="noopener noreferrer"
                               className={getButtonClasses("live")}
-                              style={getButtonStyle("live")}
+                              style={{
+                                ...getButtonStyle("live"),
+                                backgroundColor: "#000000",
+                                color: "#FFFFFF",
+                                borderColor: "#000000"
+                              }}
                             >
                               <ExternalLink className="h-4 w-4" />
                               Live Demo

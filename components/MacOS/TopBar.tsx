@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import { useMacOSTheme } from "./ThemeContext";
 import { FaApple } from "react-icons/fa6";
+import { getPlatformConfig } from "@/lib/socialLinkUtils";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 // --- Configuration Types ---
 interface DropdownItem {
@@ -48,6 +51,8 @@ const TopBar = ({
   const { theme } = useMacOSTheme();
   const isDark = theme === "dark";
   const [time, setTime] = useState(new Date());
+  const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
+  const userInfoData = portfolioData?.find((item: any) => item.type === "userInfo")?.data || {};
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -99,14 +104,16 @@ const TopBar = ({
         { label: "Change Wallpaper", icon: ImageIcon, action: handleWallpaperEdit }
       ]
     }] : []),
-    { label: "Window", action: () => { } },
     {
       label: "Contact",
-      items: [
-        { label: "GitHub", icon: Github, action: () => openLink("https://github.com") },
-        { label: "LinkedIn", icon: Linkedin, action: () => openLink("https://linkedin.com") },
-        { label: "Email", icon: Mail, action: () => window.location.href = "mailto:your@email.com" }
-      ]
+      items: (userInfoData.socials || []).map((link: any) => {
+        const config = getPlatformConfig(link.platform);
+        return {
+          label: config.label,
+          icon: config.icon,
+          action: () => openLink(link.url)
+        };
+      })
     },
   ];
 

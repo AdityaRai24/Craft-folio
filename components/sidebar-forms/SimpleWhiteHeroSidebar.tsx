@@ -19,8 +19,11 @@ import { updatePortfolioData } from "@/slices/dataSlice";
 import toast from "react-hot-toast";
 import React from "react";
 import { Textarea } from "../ui/textarea";
-import { Cloud, X } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
+import ResumeUpload from "../Shared/ResumeUpload";
+import SocialLinksEditor from "../Shared/SocialLinksEditor";
+import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
+import { SocialLink } from "@/types/canvas";
 
 interface ContentType {
     // Hero Data
@@ -32,8 +35,6 @@ interface ContentType {
     shortSummary: string;
     email: string;
     location: string;
-    github: string;
-    linkedin: string;
     resumeLink: string;
 }
 
@@ -62,14 +63,13 @@ const SimpleWhiteHeroSidebar = () => {
         shortSummary: "",
         email: "",
         location: "",
-        github: "",
-        linkedin: "",
         resumeLink: "",
     };
 
     const [content, setContent] = useState<ContentType>(emptyContent);
+    const [leftSocials, setLeftSocials] = useState<SocialLink[]>([]);
+    const [rightSocials, setRightSocials] = useState<SocialLink[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isUploaded, setIsUploaded] = useState(false);
 
     useEffect(() => {
         if (portfolioData) {
@@ -77,14 +77,29 @@ const SimpleWhiteHeroSidebar = () => {
                 name: heroData.name || "",
                 title: heroData.title || "",
                 summary: heroData.summary || "",
-                shortSummary: contactData.shortSummary || "",
+                shortSummary: heroData.shortSummary || "",
                 email: contactData.email || "",
                 location: contactData.location || "",
-                github: contactData.github || "",
-                linkedin: contactData.linkedin || "",
                 resumeLink: contactData.resumeLink || "",
             });
-            setIsUploaded(!!contactData.resumeLink);
+
+            // Handle Left Socials
+            if (contactData.leftSocials && Array.isArray(contactData.leftSocials)) {
+                setLeftSocials(contactData.leftSocials);
+            } else {
+                // Migration: Convert individual fields to social links if leftSocials doesn't exist
+                const newLinks: SocialLink[] = [];
+                if (contactData.github) newLinks.push({ id: crypto.randomUUID(), platform: "github", url: contactData.github });
+                if (contactData.linkedin) newLinks.push({ id: crypto.randomUUID(), platform: "linkedin", url: contactData.linkedin });
+                setLeftSocials(newLinks);
+            }
+
+            // Handle Right Socials
+            if (contactData.rightSocials && Array.isArray(contactData.rightSocials)) {
+                setRightSocials(contactData.rightSocials);
+            } else {
+                setRightSocials([]);
+            }
         }
     }, [portfolioData]);
 
@@ -102,17 +117,20 @@ const SimpleWhiteHeroSidebar = () => {
                 name: content.name,
                 title: content.title,
                 summary: content.summary,
+                shortSummary: content.shortSummary,
             };
 
             // Prepare User Info Update
             const userInfoUpdate = {
                 ...contactData,
-                shortSummary: content.shortSummary,
-                email: content.email,
-                location: content.location,
-                github: content.github,
-                linkedin: content.linkedin,
+                email: rightSocials.find(l => l.platform === "email")?.url || content.email,
+                location: rightSocials.find(l => l.platform === "location")?.url || content.location,
                 resumeLink: content.resumeLink,
+                leftSocials: leftSocials,
+                rightSocials: rightSocials,
+                // Keep legacy fields for backward compatibility
+                github: leftSocials.find(l => l.platform === "github")?.url || contactData.github,
+                linkedin: leftSocials.find(l => l.platform === "linkedin")?.url || contactData.linkedin,
             };
 
             // Dispatch Redux Updates
@@ -161,48 +179,6 @@ const SimpleWhiteHeroSidebar = () => {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const handleResumeUpload = async (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        if (!event.target.files) return;
-        const formData = new FormData();
-        formData.append("file", event.target.files[0]);
-        formData.append(
-            "upload_preset",
-            process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string
-        );
-
-        try {
-            toast.loading("Uploading resume...", { id: "resumeUpload" });
-
-            const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
-
-            if (!response.ok) {
-                toast.error("Upload failed", { id: "resumeUpload" });
-                return;
-            }
-
-            const data = await response.json();
-            setContent({ ...content, resumeLink: data.secure_url });
-            setIsUploaded(true);
-            toast.success("Resume uploaded successfully!", { id: "resumeUpload" });
-        } catch (error) {
-            toast.error("An error occurred during upload", { id: "resumeUpload" });
-            console.error("Upload error:", error);
-        }
-    };
-
-    const removeResume = () => {
-        setContent({ ...content, resumeLink: "" });
-        setIsUploaded(false);
     };
 
     return (
@@ -322,212 +298,57 @@ const SimpleWhiteHeroSidebar = () => {
                         />
                     </div>
 
-                    {/* Email Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="email"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Email
-                        </Label>
-                        <Input
-                            id="email"
-                            value={content.email}
-                            onChange={(e) =>
-                                setContent({ ...content, email: e.target.value })
-                            }
-                            placeholder="Enter your email"
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
 
-                    {/* Location Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="location"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Location
-                        </Label>
-                        <Input
-                            id="location"
-                            value={content.location}
-                            onChange={(e) =>
-                                setContent({ ...content, location: e.target.value })
-                            }
-                            placeholder="Enter your location"
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
-
-                    {/* GitHub Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="github"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            GitHub URL
-                        </Label>
-                        <Input
-                            id="github"
-                            value={content.github}
-                            onChange={(e) =>
-                                setContent({ ...content, github: e.target.value })
-                            }
-                            placeholder="https://github.com/..."
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
-
-                    {/* LinkedIn Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="linkedin"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            LinkedIn URL
-                        </Label>
-                        <Input
-                            id="linkedin"
-                            value={content.linkedin}
-                            onChange={(e) =>
-                                setContent({ ...content, linkedin: e.target.value })
-                            }
-                            placeholder="https://linkedin.com/in/..."
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
 
                     {/* Resume Upload */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="resumeUpload"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Resume
-                        </Label>
-                        <div className="mt-1 flex flex-col items-center">
-                            {content.resumeLink ? (
-                                <div className="relative w-full">
-                                    <div
-                                        className="flex items-center justify-between w-full p-3 rounded-md"
-                                        style={{
-                                            backgroundColor: ColorTheme.bgCard,
-                                            borderColor: ColorTheme.borderLight,
-                                        }}
-                                    >
-                                        <div className="flex items-center">
-                                            <span
-                                                style={{ color: ColorTheme.textPrimary }}
-                                                className="truncate max-w-xs"
-                                            >
-                                                Resume.pdf
-                                            </span>
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={removeResume}
-                                            style={{
-                                                backgroundColor: ColorTheme.bgCardHover,
-                                                color: ColorTheme.textPrimary,
-                                            }}
-                                            className="h-8 w-8 p-0 hover:bg-opacity-50 rounded-full"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <label className="w-full cursor-pointer">
-                                    <div
-                                        className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center h-32 hover:border-opacity-50 transition-colors"
-                                        style={{
-                                            borderColor: ColorTheme.borderLight,
-                                        }}
-                                    >
-                                        <Cloud
-                                            className="h-8 w-8"
-                                            style={{ color: ColorTheme.textSecondary }}
-                                        />
-                                        <p
-                                            className="mt-2 text-sm"
-                                            style={{ color: ColorTheme.textSecondary }}
-                                        >
-                                            Upload resume
-                                        </p>
-                                        <p
-                                            className="mt-1 text-xs"
-                                            style={{ color: ColorTheme.textMuted }}
-                                        >
-                                            PDF up to 10MB
-                                        </p>
-                                        <input
-                                            type="file"
-                                            id="resumeUpload"
-                                            accept="application/pdf"
-                                            onChange={handleResumeUpload}
-                                            className="hidden"
-                                        />
-                                    </div>
-                                </label>
-                            )}
-                        </div>
+                    <ResumeUpload
+                        value={content.resumeLink}
+                        onChange={(url) => setContent({ ...content, resumeLink: url })}
+                    />
 
-                        {!isUploaded && !content.resumeLink && (
-                            <div className="mt-2">
-                                <Label
-                                    htmlFor="resumeLink"
-                                    className="text-sm font-medium"
-                                    style={{ color: ColorTheme.textPrimary }}
-                                >
-                                    Or paste resume URL
-                                </Label>
-                                <Input
-                                    id="resumeLink"
-                                    value={content.resumeLink}
-                                    onChange={(e) =>
-                                        setContent({ ...content, resumeLink: e.target.value })
-                                    }
-                                    placeholder="Enter your resume link"
-                                    style={{
-                                        backgroundColor: ColorTheme.bgCard,
-                                        borderColor: ColorTheme.borderLight,
-                                        color: ColorTheme.textPrimary,
-                                    }}
-                                    className="mt-2"
+                    {/* Social Links Tabs */}
+                    <Tabs defaultValue="left" className="w-full">
+                        <style jsx global>{`
+                            .custom-tab[data-state="active"] {
+                                background-color: ${ColorTheme.primary} !important;
+                                color: ${ColorTheme.textPrimary} !important;
+                            }
+                        `}</style>
+                        <TabsList className="w-full grid grid-cols-2" style={{ backgroundColor: ColorTheme.bgNav, borderColor: ColorTheme.borderLight }}>
+                            <TabsTrigger
+                                value="left"
+                                className="custom-tab"
+                                style={{ color: ColorTheme.textPrimary }}
+                            >
+                                Left Socials
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="right"
+                                className="custom-tab"
+                                style={{ color: ColorTheme.textPrimary }}
+                            >
+                                Right Socials
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="left" className="mt-4">
+                            <div className="space-y-2">
+                                <Label className="text-xs text-gray-400">Social links on the left side (Hero)</Label>
+                                <SocialLinksEditor
+                                    links={leftSocials}
+                                    onChange={setLeftSocials}
                                 />
-                                <p
-                                    className="text-xs mt-2"
-                                    style={{ color: ColorTheme.textSecondary }}
-                                >
-                                    Link to your resume (PDF recommended)
-                                </p>
                             </div>
-                        )}
-                    </div>
+                        </TabsContent>
+                        <TabsContent value="right" className="mt-4">
+                            <div className="space-y-2">
+                                <Label className="text-xs text-gray-400">Social links on the right side (About)</Label>
+                                <SocialLinksEditor
+                                    links={rightSocials}
+                                    onChange={setRightSocials}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
 
                 </CardContent>
 

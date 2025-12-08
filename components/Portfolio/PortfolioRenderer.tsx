@@ -128,7 +128,7 @@ const PortfolioRenderer = ({
                     onClose={() => setShowGuestModal(false)}
                 />
                 <Sidebar />
-                <div className={cn(" min-h-screen w-full", selectedFontClass)}>
+                <div className={cn(" min-h-screen w-full", selectedFontClass)} id="portfolio-content">
                     {DesktopComponent && (
                         <DesktopComponent
                             currentPortTheme={themeName}
@@ -185,6 +185,7 @@ const PortfolioRenderer = ({
                     <motion.div
                         className={cn(" min-h-screen w-full", selectedFontClass)}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
+                        id="portfolio-content"
                     >
                         {NavbarComponent && (
                             <NavbarComponent

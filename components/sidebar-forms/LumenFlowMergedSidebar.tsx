@@ -21,12 +21,16 @@ import React from "react";
 import { Textarea } from "../ui/textarea";
 import { Cloud, X } from "lucide-react";
 import { ColorTheme } from "@/lib/colorThemes";
+import SocialLinksEditor from "../Shared/SocialLinksEditor";
+import ResumeUpload from "../Shared/ResumeUpload";
+import { SocialLink } from "@/types/canvas";
 
 interface ContentType {
     // Hero Data
     name: string;
     title: string;
     summary: string;
+    longSummary: string;
 
     // User Info Data
     shortSummary: string;
@@ -59,6 +63,7 @@ const SimpleWhiteHeroSidebar = () => {
         name: "",
         title: "",
         summary: "",
+        longSummary: "",
         shortSummary: "",
         email: "",
         location: "",
@@ -68,6 +73,7 @@ const SimpleWhiteHeroSidebar = () => {
     };
 
     const [content, setContent] = useState<ContentType>(emptyContent);
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploaded, setIsUploaded] = useState(false);
 
@@ -77,6 +83,7 @@ const SimpleWhiteHeroSidebar = () => {
                 name: heroData.name || "",
                 title: heroData.title || "",
                 summary: heroData.summary || "",
+                longSummary: heroData.longSummary || "",
                 shortSummary: contactData.shortSummary || "",
                 email: contactData.email || "",
                 location: contactData.location || "",
@@ -85,6 +92,19 @@ const SimpleWhiteHeroSidebar = () => {
                 resumeLink: contactData.resumeLink || "",
             });
             setIsUploaded(!!contactData.resumeLink);
+
+            // Handle Social Links
+            if (contactData.socials && Array.isArray(contactData.socials)) {
+                setSocialLinks(contactData.socials);
+            } else {
+                // Migration
+                const newLinks: SocialLink[] = [];
+                if (contactData.email) newLinks.push({ id: crypto.randomUUID(), platform: "email", url: contactData.email });
+                if (contactData.linkedin) newLinks.push({ id: crypto.randomUUID(), platform: "linkedin", url: contactData.linkedin });
+                if (contactData.github) newLinks.push({ id: crypto.randomUUID(), platform: "github", url: contactData.github });
+                if (contactData.location) newLinks.push({ id: crypto.randomUUID(), platform: "location", url: contactData.location });
+                setSocialLinks(newLinks);
+            }
         }
     }, [portfolioData]);
 
@@ -102,17 +122,25 @@ const SimpleWhiteHeroSidebar = () => {
                 name: content.name,
                 title: content.title,
                 summary: content.summary,
+                longSummary: content.longSummary,
             };
 
             // Prepare User Info Update
+            // Extract individual fields for backward compatibility
+            const email = socialLinks.find(l => l.platform === "email")?.url || "";
+            const linkedin = socialLinks.find(l => l.platform === "linkedin")?.url || "";
+            const github = socialLinks.find(l => l.platform === "github")?.url || "";
+            const location = socialLinks.find(l => l.platform === "location")?.url || "";
+
             const userInfoUpdate = {
                 ...contactData,
                 shortSummary: content.shortSummary,
-                email: content.email,
-                location: content.location,
-                github: content.github,
-                linkedin: content.linkedin,
+                email,
+                location,
+                github,
+                linkedin,
                 resumeLink: content.resumeLink,
+                socials: socialLinks
             };
 
             // Dispatch Redux Updates
@@ -163,47 +191,7 @@ const SimpleWhiteHeroSidebar = () => {
         }
     };
 
-    const handleResumeUpload = async (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        if (!event.target.files) return;
-        const formData = new FormData();
-        formData.append("file", event.target.files[0]);
-        formData.append(
-            "upload_preset",
-            process.env.NEXT_PUBLIC_CLOUDINARY_PRESET as string
-        );
 
-        try {
-            toast.loading("Uploading resume...", { id: "resumeUpload" });
-
-            const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`,
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
-
-            if (!response.ok) {
-                toast.error("Upload failed", { id: "resumeUpload" });
-                return;
-            }
-
-            const data = await response.json();
-            setContent({ ...content, resumeLink: data.secure_url });
-            setIsUploaded(true);
-            toast.success("Resume uploaded successfully!", { id: "resumeUpload" });
-        } catch (error) {
-            toast.error("An error occurred during upload", { id: "resumeUpload" });
-            console.error("Upload error:", error);
-        }
-    };
-
-    const removeResume = () => {
-        setContent({ ...content, resumeLink: "" });
-        setIsUploaded(false);
-    };
 
     return (
         <div className="flex-1 custom-scrollbar h-full">
@@ -297,6 +285,31 @@ const SimpleWhiteHeroSidebar = () => {
                         />
                     </div>
 
+                    {/* Long Summary Field */}
+                    <div className="space-y-2">
+                        <Label
+                            htmlFor="longSummary"
+                            className="text-sm font-medium"
+                            style={{ color: ColorTheme.textPrimary }}
+                        >
+                            Long Summary (My Story)
+                        </Label>
+                        <Textarea
+                            id="longSummary"
+                            value={content.longSummary}
+                            onChange={(e) =>
+                                setContent({ ...content, longSummary: e.target.value })
+                            }
+                            placeholder="Enter your detailed story"
+                            className="resize-none h-32"
+                            style={{
+                                backgroundColor: ColorTheme.bgCard,
+                                borderColor: ColorTheme.borderLight,
+                                color: ColorTheme.textPrimary,
+                            }}
+                        />
+                    </div>
+
                     {/* Short Summary Field */}
                     <div className="space-y-2">
                         <Label
@@ -322,212 +335,20 @@ const SimpleWhiteHeroSidebar = () => {
                         />
                     </div>
 
-                    {/* Email Field */}
+                    {/* Social Links Editor */}
                     <div className="space-y-2">
-                        <Label
-                            htmlFor="email"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Email
-                        </Label>
-                        <Input
-                            id="email"
-                            value={content.email}
-                            onChange={(e) =>
-                                setContent({ ...content, email: e.target.value })
-                            }
-                            placeholder="Enter your email"
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
-
-                    {/* Location Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="location"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Location
-                        </Label>
-                        <Input
-                            id="location"
-                            value={content.location}
-                            onChange={(e) =>
-                                setContent({ ...content, location: e.target.value })
-                            }
-                            placeholder="Enter your location"
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
-
-                    {/* GitHub Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="github"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            GitHub URL
-                        </Label>
-                        <Input
-                            id="github"
-                            value={content.github}
-                            onChange={(e) =>
-                                setContent({ ...content, github: e.target.value })
-                            }
-                            placeholder="https://github.com/..."
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
-                        />
-                    </div>
-
-                    {/* LinkedIn Field */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="linkedin"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            LinkedIn URL
-                        </Label>
-                        <Input
-                            id="linkedin"
-                            value={content.linkedin}
-                            onChange={(e) =>
-                                setContent({ ...content, linkedin: e.target.value })
-                            }
-                            placeholder="https://linkedin.com/in/..."
-                            style={{
-                                backgroundColor: ColorTheme.bgCard,
-                                borderColor: ColorTheme.borderLight,
-                                color: ColorTheme.textPrimary,
-                            }}
+                        <Label className="text-xs text-gray-400">Social Links</Label>
+                        <SocialLinksEditor
+                            links={socialLinks}
+                            onChange={setSocialLinks}
                         />
                     </div>
 
                     {/* Resume Upload */}
-                    <div className="space-y-2">
-                        <Label
-                            htmlFor="resumeUpload"
-                            className="text-sm font-medium"
-                            style={{ color: ColorTheme.textPrimary }}
-                        >
-                            Resume
-                        </Label>
-                        <div className="mt-1 flex flex-col items-center">
-                            {content.resumeLink ? (
-                                <div className="relative w-full">
-                                    <div
-                                        className="flex items-center justify-between w-full p-3 rounded-md"
-                                        style={{
-                                            backgroundColor: ColorTheme.bgCard,
-                                            borderColor: ColorTheme.borderLight,
-                                        }}
-                                    >
-                                        <div className="flex items-center">
-                                            <span
-                                                style={{ color: ColorTheme.textPrimary }}
-                                                className="truncate max-w-xs"
-                                            >
-                                                Resume.pdf
-                                            </span>
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={removeResume}
-                                            style={{
-                                                backgroundColor: ColorTheme.bgCardHover,
-                                                color: ColorTheme.textPrimary,
-                                            }}
-                                            className="h-8 w-8 p-0 hover:bg-opacity-50 rounded-full"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <label className="w-full cursor-pointer">
-                                    <div
-                                        className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center h-32 hover:border-opacity-50 transition-colors"
-                                        style={{
-                                            borderColor: ColorTheme.borderLight,
-                                        }}
-                                    >
-                                        <Cloud
-                                            className="h-8 w-8"
-                                            style={{ color: ColorTheme.textSecondary }}
-                                        />
-                                        <p
-                                            className="mt-2 text-sm"
-                                            style={{ color: ColorTheme.textSecondary }}
-                                        >
-                                            Upload resume
-                                        </p>
-                                        <p
-                                            className="mt-1 text-xs"
-                                            style={{ color: ColorTheme.textMuted }}
-                                        >
-                                            PDF up to 10MB
-                                        </p>
-                                        <input
-                                            type="file"
-                                            id="resumeUpload"
-                                            accept="application/pdf"
-                                            onChange={handleResumeUpload}
-                                            className="hidden"
-                                        />
-                                    </div>
-                                </label>
-                            )}
-                        </div>
-
-                        {!isUploaded && !content.resumeLink && (
-                            <div className="mt-2">
-                                <Label
-                                    htmlFor="resumeLink"
-                                    className="text-sm font-medium"
-                                    style={{ color: ColorTheme.textPrimary }}
-                                >
-                                    Or paste resume URL
-                                </Label>
-                                <Input
-                                    id="resumeLink"
-                                    value={content.resumeLink}
-                                    onChange={(e) =>
-                                        setContent({ ...content, resumeLink: e.target.value })
-                                    }
-                                    placeholder="Enter your resume link"
-                                    style={{
-                                        backgroundColor: ColorTheme.bgCard,
-                                        borderColor: ColorTheme.borderLight,
-                                        color: ColorTheme.textPrimary,
-                                    }}
-                                    className="mt-2"
-                                />
-                                <p
-                                    className="text-xs mt-2"
-                                    style={{ color: ColorTheme.textSecondary }}
-                                >
-                                    Link to your resume (PDF recommended)
-                                </p>
-                            </div>
-                        )}
-                    </div>
+                    <ResumeUpload
+                        value={content.resumeLink}
+                        onChange={(url) => setContent({ ...content, resumeLink: url })}
+                    />
 
                 </CardContent>
 

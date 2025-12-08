@@ -26,12 +26,14 @@ const ProjectsGrid = ({
     portfolioId,
     theme = "light",
     font,
+    previewMode,
 }: {
     currentPortTheme?: string;
     customCSS?: string;
     portfolioId: string;
     theme?: "light" | "dark";
     font?: string;
+    previewMode?: boolean;
 }) => {
     const dispatch = useDispatch();
     const portfolioData = useSelector((state: RootState) => state.data.portfolioData);
@@ -46,7 +48,7 @@ const ProjectsGrid = ({
     const isDark = theme === "dark";
     const { portfolioUserId } = useSelector((state: RootState) => state.data);
     const { user, isLoaded } = useUser();
-    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded);
+    const showEdit = shouldShowEditButtons(portfolioUserId, user, isLoaded) && !previewMode;
 
 
     const {
