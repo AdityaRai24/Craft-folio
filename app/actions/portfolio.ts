@@ -794,6 +794,7 @@ export async function deleteComponentCustomization({
         where: { id: customization.id },
       });
       return { success: true };
+
     } else {
       return { success: false, error: "Customization not found" };
     }
@@ -802,3 +803,23 @@ export async function deleteComponentCustomization({
     return { success: false, error: "Failed to delete customization" };
   }
 }
+
+export async function updatePortfolioName({
+  portfolioId,
+  name,
+}: {
+  portfolioId: string;
+  name: string;
+}) {
+  try {
+    const portfolio = await prisma.portfolio.update({
+      where: { id: portfolioId },
+      data: { name: name },
+    });
+    return { success: true, data: portfolio };
+  } catch (error) {
+    console.error("Error updating portfolio name:", error);
+    return { success: false, error: "Failed to update portfolio name" };
+  }
+}
+

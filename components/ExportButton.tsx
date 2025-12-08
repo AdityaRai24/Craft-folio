@@ -8,9 +8,10 @@ import toast from 'react-hot-toast';
 interface ExportButtonProps {
     portfolioUrl: string;
     className?: string;
+    iconOnly?: boolean;
 }
 
-const ExportButton = ({ portfolioUrl, className }: ExportButtonProps) => {
+const ExportButton = ({ portfolioUrl, className, iconOnly = false }: ExportButtonProps) => {
     const [isExporting, setIsExporting] = useState(false);
 
     const handleExport = async () => {
@@ -56,16 +57,17 @@ const ExportButton = ({ portfolioUrl, className }: ExportButtonProps) => {
             disabled={isExporting}
             className={`gap-2 ${className}`}
             variant="outline"
+            title="Download Static Site"
         >
             {isExporting ? (
                 <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating...
+                    {!iconOnly && "Generating..."}
                 </>
             ) : (
                 <>
                     <Download className="h-4 w-4" />
-                    Download Static Site
+                    {!iconOnly && "Download Static Site"}
                 </>
             )}
         </Button>

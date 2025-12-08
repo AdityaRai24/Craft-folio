@@ -10,18 +10,19 @@ datasource db {
 }
 
 model Portfolio {
-  id            String         @id @default(uuid())
-  userId        String
-  templateName  String         @default("default")
-  content       Json
-  isPublished   Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  isTemplate    Boolean        @default(false)
-  customCSS     String?
-  fontName      String         @default("Raleway")
-  themeName     String         @default("default")
-  PortfolioLink PortfolioLink?
+  id             String                   @id @default(uuid())
+  userId         String
+  templateName   String                   @default("default")
+  name           String?
+  content        Json
+  isPublished    Boolean                  @default(false)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  isTemplate     Boolean                  @default(false)
+  customCSS      String?
+  fontName       String                   @default("Raleway")
+  themeName      String                   @default("default")
+  PortfolioLink  PortfolioLink?
   customizations ComponentCustomization[]
 }
 
@@ -54,13 +55,13 @@ model PremiumUser {
 }
 
 model ComponentCustomization {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
   portfolioId String
-  component   String   
-  settings    Json     
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  component   String
+  settings    Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([portfolioId, component])
 }
