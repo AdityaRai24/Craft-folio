@@ -11,13 +11,16 @@ interface ExportButtonProps {
     iconOnly?: boolean;
 }
 
+import ExportingModal from './Modals/ExportingModal';
+
 const ExportButton = ({ portfolioUrl, className, iconOnly = false }: ExportButtonProps) => {
     const [isExporting, setIsExporting] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const handleExport = async () => {
         try {
             setIsExporting(true);
-            toast.loading("Generating static site... This may take a few seconds.", { id: "export-toast" });
+            setShowModal(true);
 
             const response = await fetch('/api/export-portfolio', {
                 method: 'POST',
@@ -48,29 +51,39 @@ const ExportButton = ({ portfolioUrl, className, iconOnly = false }: ExportButto
             toast.error("Failed to export portfolio. Please try again.", { id: "export-toast" });
         } finally {
             setIsExporting(false);
+            setShowModal(false);
         }
     };
 
     return (
-        <Button
-            onClick={handleExport}
-            disabled={isExporting}
-            className={`gap-2 ${className}`}
-            variant="outline"
-            title="Download Static Site"
-        >
-            {isExporting ? (
-                <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {!iconOnly && "Generating..."}
-                </>
-            ) : (
-                <>
-                    <Download className="h-4 w-4" />
-                    {!iconOnly && "Download Static Site"}
-                </>
-            )}
-        </Button>
+        <>
+            <ExportingModal
+                isOpen={showModal}
+                onOpenChange={(open) => {
+                    // Prevent closing via outside click/escape if strictly exporting
+                    if (!isExporting) setShowModal(open);
+                }}
+            />
+            <Button
+                onClick={handleExport}
+                disabled={isExporting}
+                className={`gap-2 ${className}`}
+                variant="outline"
+                title="Download Static Site"
+            >
+                {isExporting ? (
+                    <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {!iconOnly && "Generating..."}
+                    </>
+                ) : (
+                    <>
+                        <Download className="h-4 w-4" />
+                        {!iconOnly && "Download Static Site"}
+                    </>
+                )}
+            </Button>
+        </>
     );
 };
 

@@ -303,54 +303,54 @@ const Hero = ({ currentPortTheme, customCSS, portfolioId }: any) => {
           className={buttonClasses.container}
         >
           {heroData?.actions?.map((item: any) => {
+            const labelToIdMap: Record<string, string> = {
+              "View Projects": "#projects",
+              "Contact Me": "#contact",
+              About: "#about",
+              "Tech Stack": "#technologies",
+            };
+
+            const href = item.href || labelToIdMap[item.label] || `#${item.label.toLowerCase().replace(/ /g, "-")}`;
+            const isExternal = item.href ? true : false;
+
             return (
               <motion.div key={item.label}>
-                <Button
-                  style={{
-                    backgroundColor:
-                      item.style === "primary" ? buttonBgColor : "transparent",
-                    color: item.style === "primary" ? buttonTextColor : "white",
-                    border:
-                      item.style === "outline"
-                        ? `1px solid ${buttonBgColor}`
-                        : "",
-                  }}
-                  className={buttonClasses.button}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = buttonHoverBgColor;
-                    e.currentTarget.style.color = buttonHoverTextColor;
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      item.style === "primary" ? buttonBgColor : "transparent";
-                    e.currentTarget.style.color =
-                      item.style === "primary" ? buttonTextColor : "white";
-                    e.currentTarget.style.border =
-                      item.style === "outline"
-                        ? `1px solid ${buttonBgColor}`
-                        : "";
-                    e.currentTarget.style.boxShadow = "";
-                  }}
-                  onClick={() => {
-                    const labelToIdMap: Record<string, string> = {
-                      "View Projects": "projects",
-                      "Contact Me": "contact",
-                      About: "about",
-                      "Tech Stack": "tech-stack",
-                    };
-                    const sectionId =
-                      labelToIdMap[item.label] ||
-                      item.label.toLowerCase().replace(/ /g, "-");
-                    const section = document.getElementById(sectionId);
-                    if (section) {
-                      section.scrollIntoView({ behavior: "smooth" });
-                    } else if (item.href) {
-                      window.location.href = item.href;
-                    }
-                  }}
+                <a
+                  href={href}
+                  target={isExternal ? "_blank" : "_self"}
+                  rel={isExternal ? "noopener noreferrer" : ""}
+                  className="no-underline" // Remove default anchor underline
                 >
-                  {item.label} <ArrowRight size={18} />
-                </Button>
+                  <Button
+                    style={{
+                      backgroundColor:
+                        item.style === "primary" ? buttonBgColor : "transparent",
+                      color: item.style === "primary" ? buttonTextColor : "white",
+                      border:
+                        item.style === "outline"
+                          ? `1px solid ${buttonBgColor}`
+                          : "",
+                    }}
+                    className={`${buttonClasses.button} pointer-events-none`} // pointer-events-none lets the click pass through to the anchor
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = buttonHoverBgColor;
+                      e.currentTarget.style.color = buttonHoverTextColor;
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        item.style === "primary" ? buttonBgColor : "transparent";
+                      e.currentTarget.style.color =
+                        item.style === "primary" ? buttonTextColor : "white";
+                      e.currentTarget.style.border =
+                        item.style === "outline"
+                          ? `1px solid ${buttonBgColor}`
+                          : "";
+                      e.currentTarget.style.boxShadow = "";
+                    }}
+                  >
+                    {item.label} <ArrowRight size={18} />
+                  </Button>
+                </a>
               </motion.div>
             );
           })}
