@@ -5,7 +5,7 @@ CraftFolio is a modern, AI-powered portfolio builder that helps users create stu
 ## 🚀 Features
 
 - **AI-Powered Portfolio Generation**: Create professional portfolios using AI assistance
-- **Multiple Portfolio Templates**: Choose from various pre-designed templates
+- **Multiple Portfolio Templates**: Choose from various pre-designed templates.
 - **Real-time Customization**: Simple interface for easy customization
 - **Responsive Design**: Mobile-first approach ensuring perfect display across all devices
 - **Authentication**: Secure user authentication using Clerk
