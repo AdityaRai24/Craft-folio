@@ -1,6 +1,6 @@
 # CraftFolio - AI-Powered Portfolio Builder
 
-CraftFolio is a modern, AI-powered portfolio builder that helps users create stunning professional portfolios with ease. Built with cutting-edge technologies, it offers a seamless experience for creating, customizing, and managing personal portfolios.
+CraftFolio is a modern, AI-powered portfolio builder that helps users create stunning professional portfolios with ease. Built with cutting-edge technologies, it offers a seamless experience for creating, customizing, and managing personal portfolios..
 
 ## 🚀 Features
 
