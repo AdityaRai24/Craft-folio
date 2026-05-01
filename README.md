@@ -16,7 +16,7 @@ CraftFolio is a modern, AI-powered portfolio builder that helps users create stu
 - **Subdomain Deployment**: Deploy your portfolio to a custom subdomain (e.g., `yourname.craftfolio.com`).
 - **Slug Deployment**: Deploy your portfolio to a custom slug (e.g., `craftfolio.com/yourname`).
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack.
 
 ### Frontend : 
 - **Framework**: Next.js 15.3.1
